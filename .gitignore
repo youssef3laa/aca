@@ -1,0 +1,16 @@
+**/logs	
+**/*.iml
+*.imL
+**/node_modules/
+web-app/client-side/node_modules/
+web-app/client-side/src/_drafts/
+**/.deploy*/
+web-app/client-side/package-lock.json
+**/target/
+appwork.iml
+appwork-common/appwork-common.iml
+appwork-common/target/
+web-app/web-app.iml
+web-app/target/
+**/*.idea
+.idea/
