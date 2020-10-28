@@ -10,7 +10,6 @@ import java.util.function.Consumer;
  * @example <caption>Example usage of class.</caption>
  * // return execute System.out.println if value found
  * ReflectionUtil.of(identityComponentsPerson).ifPresent("getId", (s)-> {System.out.println(s);})
- *
  */
 public class ReflectionUtil<T> {
     private T obj;
@@ -34,9 +33,9 @@ public class ReflectionUtil<T> {
 
     public  ReflectionUtil ifPresent(String methodName, Consumer<? super T> consumer ) {
         this.value = invoke(methodName);
-        if (this.value != null){
-            present(consumer);
-        }
+
+        if (this.value != null)  present(consumer);
+
         return this;
     }
 

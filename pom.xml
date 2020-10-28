@@ -11,6 +11,7 @@
 
     <modules>
         <module>appwork-common</module>
+        <module>appwork-dev</module>
         <module>web-app</module>
     </modules>
 

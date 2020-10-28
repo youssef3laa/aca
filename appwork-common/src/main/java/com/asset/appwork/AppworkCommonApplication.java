@@ -10,6 +10,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
+import org.springframework.data.util.Optionals;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -24,12 +25,21 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 @SpringBootApplication
-@EnableAsync
-@EnableScheduling
-@EnableTransactionManagement
 public class AppworkCommonApplication {
     @Autowired
     private Environment env;
+
+    public static void main(String[] args) {
+        IdentityComponentsPerson identityComponentsPerson = new IdentityComponentsPerson();
+        identityComponentsPerson.setDisplayName("Name");
+        ReflectionUtil.of(identityComponentsPerson).ifPresent("getId", (s)-> {
+            System.out.println(s);
+        }).ifPresent("getDisplayName", (s)->{
+            System.out.println(s);
+        }).ifPresent("getTest", (s) -> {
+
+        });
+    }
 
     @Primary
     @Bean
@@ -58,23 +68,10 @@ public class AppworkCommonApplication {
         dataSource.addDataSourceProperty("user", env.getProperty("spring.datasource.username"));
         dataSource.addDataSourceProperty("password", env.getProperty("spring.datasource.password"));
         dataSource.setInitializationFailTimeout(0);
-//        dataSource.setPoolName("wmHikariCp");
         return dataSource;
 
     }
 
 
-    public static void main(String[] args) {
-        IdentityComponentsPerson identityComponentsPerson = new IdentityComponentsPerson();
-        identityComponentsPerson.setDisplayName("Name");
-        ReflectionUtil.of(identityComponentsPerson).ifPresent("getId", (s)-> {
-            System.out.println(s);
-        }).ifPresent("getDisplayName", (s)->{
-            System.out.println(s);
-        }).ifPresent("getTest", (s) -> {
 
-        });
-//        functional interfaces 40
-
-    }
 }

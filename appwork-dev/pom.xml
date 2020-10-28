@@ -9,43 +9,50 @@
         <version>2.1.6.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.asset.appwork.web</groupId>
-    <artifactId>web-app</artifactId>
+
+    <groupId>com.asset.appwork.dev</groupId>
+    <artifactId>appwork-dev</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-
     <properties>
+        <!-- Main Class -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <swagger.version>2.9.2</swagger.version>
-        <start-class>com.asset.appwork.WebAppApplication</start-class>
-        <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
     </properties>
-
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.5</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.10.1</version>
+        </dependency>
         <dependency>
             <groupId>com.asset.appwork.common</groupId>
             <artifactId>appwork-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>com.asset.appwork.dev</groupId>
-            <artifactId>appwork-dev</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-
     </dependencies>
-
 
 </project>

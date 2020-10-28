@@ -1,11 +1,8 @@
-var env = process.env.NODE_ENV || 'development'
 
-console.log(process.env.NODE_ENV )
 
 var config = {
-    development: require('./development.js'),
-    production: require('./production.js'),
-    staging: require('./staging.js')
+    API_URL: 'http://localhost:9000',
+    VUE_APP_I18N_SUPPORTED_LOCALE: 'en,ar'
 }
   
-module.exports = config[env]
+module.exports = config

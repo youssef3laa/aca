@@ -1,117 +1,105 @@
 <template>
-      <v-form
-      ref="form"
-      v-model="valid"
-      lazy-validation
+    <v-card  class="mt-5 mx-a">
+        <validation-observer
+      ref="observer"
+      v-slot="{ invalid }"
     >
-      <v-text-field
-        v-model="username"
-        :counter="10"
-        :rules="usernameRules"
-        label="Username"
-        required
-      ></v-text-field>
-  
-      <v-text-field
-        v-model="password"
-        :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-        :rules="[rules.required, rules.min]"
-        :type="show1 ? 'text' : 'password'"
-        name="input-10-1"
-        hint="At least 8 characters"
-        counter
-        @click:append="show1 = !show1"
-      >
-      <template #label>
-        <span v-t="'password'"></span>
-      </template>
-      </v-text-field>
-  
-      <v-checkbox
-        v-model="checkbox"
-        :rules="[v => !!v || 'You must agree to continue!']"
-        label="Do you agree?"
-        required
-      ></v-checkbox>
+        <v-form @submit.prevent="submit" ref="form">
 
+            <v-card-title>
+                <h1>{{ $t('login') }}</h1>
+            </v-card-title>
+        
+            <v-card-text>
 
-       <v-btn
-        :disabled="!valid"
-        color="success"
-        class="mr-3"
-        @click="submit"
-      >
-        Login
-      </v-btn>
+                <validation-provider name="email" rules="required|minmax:2,25"
+                    v-slot="{ errors }">
 
-      <v-btn
-        :disabled="!valid"
-        color="success"
-        class="mr-3"
-        @click="validate"
-      >
-        Validate
-      </v-btn>
-  
-      <v-btn
-        color="error"
-        class="mr-3"
-        @click="reset"
-      >
-        Reset Form
-      </v-btn>
-  
-      <v-btn
-        color="warning"
-        @click="resetValidation"
-      >
-        Reset Validation
-      </v-btn>
-    </v-form>
-    
-    
+                    <v-text-field 
+                        v-model="user.email" 
+                        prepend-icon="mdi-account-circle">
+
+                        <template #label>
+                            <span v-t="'username'"></span>
+                        </template>
+
+                    </v-text-field>
+                    <span>{{  errors[0] }}</span>
+                </validation-provider>
+                <validation-provider name="password" rules="required|minmax:2,25"
+                    v-slot="{ errors }">
+
+                    <v-text-field 
+                        :type="showPassword ? 'text' : 'password'" 
+                        v-model="user.password" 
+                        prepend-icon="mdi-lock" 
+                        :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                        @click:append="showPassword = !showPassword">
+                        <template #label>
+                            <span v-t="'password'"></span>
+                        </template>
+                    </v-text-field>
+                    <span>{{  errors[0] }}</span>
+                </validation-provider>
+                <LocaleSwitcher />
+            
+            </v-card-text>
+            <v-divider></v-divider>
+            <v-card-actions>
+                <v-btn  :disabled="invalid" @click="submit" color="info">{{ $t('login') }}</v-btn>
+            </v-card-actions>
+        </v-form>
+        </validation-observer>
+    </v-card>
 </template>
-
 <script>
-// console.log(this.$vuetify.lang.current)
+import {ValidationProvider, ValidationObserver}  from 'vee-validate';
+import '../../core-module/services/validation-mixin';
+import LocaleSwitcher from '../../core-module/components/the-local-switcher'
+
 export default {
-
-  name: 'LoginView',
-  data: () => ({
-    valid: true,
-    username: '',
-    show1: false,
-    usernameRules: [
-      v => !!v || 'Name is required',
-      v => (v && v.length <= 10) || 'Name must be less than 10 characters',
-    ],
-    password: '',
-    rules: {
-        required: value => !!value || 'Required.',
-        min: v => v.length >= 8 || 'Min 8 characters',
-        emailMatch: () => (`The email and password you entered don't match`),
+    name: 'LoginView',
+    components: {
+        ValidationProvider,
+        ValidationObserver,
+        LocaleSwitcher
     },
-    select: null,
-    checkbox: false,
-  }),
-
-  methods: {
-    validate () {
-      this.$refs.form.validate()
+    data(){
+        return {
+            errors: [],
+            user: {
+                username: '',
+                email: ''
+            },
+            showPassword: false
+        }
     },
-    reset () {
-      this.$refs.form.reset()
-    },
-    resetValidation () {
-      this.$refs.form.resetValidation()
-    },
-    submit(){
+    methods: {
+        submit() {
+            console.log(this.$refs.observer.validate())
+            console.log(this.$refs.form)
+            this.$refs.form.reset()
+        },
+        onSubmit(e) {
+            e.preventDefault();
+            this.errors = this.validateForm(this.user);
 
-    }
-  },
-  i18n: {
-    messages: '../../../locales/en.json'
-  }
+            if(this.errors.formIsValid) {
+                console.log('Form is valid. Make an ajax request');
+            }
+        },
+        onChange(inputValue, inputName) {
+            // or
+            // const inputValue = this.user[inputName];
+            const inputErrors = this.validateField(inputName, inputValue);
+            console.log(inputErrors)
 
+            if(inputErrors && inputErrors.length) {
+                this.errors[inputName] = inputErrors;
+            } else {
+                this.errors[inputName] = null;
+            }
+        }
+    },
 }
 </script>

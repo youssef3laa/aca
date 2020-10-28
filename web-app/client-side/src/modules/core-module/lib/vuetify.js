@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify/lib';
 import zhHans from 'vuetify/es5/locale/ar'
-import sv from '../../../locales/en.json'
+import sv from '../../../locales/ar.json'
 
 Vue.use(Vuetify);
 
@@ -14,11 +14,16 @@ const vuetify = new Vuetify({
   theme: {
     themes: {
       light: {
-        primary: '#3f51b5',
-        secondary: '#b0bec5',
-        accent: '#8c9eff',
+        background: '#072742',
+        primary: '#072742',
+        secondary: '#1a4573',
+        accent: '#fffcf2',
+        anchor: '#8c9eff',
         error: '#b71c1c',
       },
+      dark: {
+        background: '#072742',
+      }
     },
   },
 })
