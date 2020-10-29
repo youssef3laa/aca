@@ -1,14 +1,14 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify/lib';
-import zhHans from 'vuetify/es5/locale/ar'
-import sv from '../../../locales/ar.json'
+import arabic from 'vuetify/es5/locale/ar'
+import arabicpack from '../../core-module/locales/ar.json'
 
 Vue.use(Vuetify);
 
 
 const vuetify = new Vuetify({
   lang: {
-    locales: { zhHans, sv },
+    locales: { arabic, arabicpack },
     current: 'zhHans',
   },
   theme: {

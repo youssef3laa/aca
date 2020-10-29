@@ -1,6 +1,8 @@
-import {  extend } from 'vee-validate';
+
+import {extend } from 'vee-validate';
 import { required, max } from 'vee-validate/dist/rules';
 import { localize } from 'vee-validate';
+
 
 extend('required', {
   ...required,
@@ -29,7 +31,7 @@ localize({
         minmax: (field, { min, max }) =>  `${field} must be between ${min} and ${max}`
       },
       names: {
-        email: "Email",
+        username: "Username",
         password: "Password"
       }
     },
@@ -41,8 +43,8 @@ localize({
         minmax: (field, { min, max }) =>  `${field} يجب ان يكون ${min} بين ${max}`
       },
       names: {
-        email: "Email",
-        password: "Password"
+        username: "إسم المستخدم",
+        password: "كلمه المرور"
       }
     }
 });

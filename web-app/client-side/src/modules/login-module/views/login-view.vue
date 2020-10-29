@@ -26,7 +26,7 @@
                     </v-text-field>
                     <span>{{  errors[0] }}</span>
                 </validation-provider>
-                <validation-provider name="password" rules="required|minmax:2,25"
+                 <validation-provider name="password" rules="required|minmax:2,25"
                     v-slot="{ errors }">
 
                     <v-text-field 
@@ -77,7 +77,6 @@ export default {
     },
     data(){
         return {
-            errors: [],
             user: {
                 username: '',
                 password: '',
@@ -112,26 +111,6 @@ export default {
             
 
                 
-        },
-        onSubmit(e) {
-            e.preventDefault();
-            this.errors = this.validateForm(this.user);
-
-            if(this.errors.formIsValid) {
-                console.log('Form is valid. Make an ajax request');
-            }
-        },
-        onChange(inputValue, inputName) {
-            // or
-            // const inputValue = this.user[inputName];
-            const inputErrors = this.validateField(inputName, inputValue);
-            console.log(inputErrors)
-
-            if(inputErrors && inputErrors.length) {
-                this.errors[inputName] = inputErrors;
-            } else {
-                this.errors[inputName] = null;
-            }
         }
     },
 }

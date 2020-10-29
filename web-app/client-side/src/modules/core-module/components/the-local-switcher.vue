@@ -12,8 +12,7 @@
 </template>
 
 <script>
-
-
+import { localize } from 'vee-validate';
 export default {
     name: 'LocaleSwitcher',
     data() {
@@ -28,6 +27,8 @@ export default {
             
             if (this.$i18n.locale !== locale) {
                 this.$i18n.locale = locale;
+                localize(locale);
+                // this.$validator.localize('ar');
                 if(this.$i18n.locale == "ar") {
                     this.$vuetify.rtl = true
                 }else {
@@ -44,6 +45,7 @@ export default {
     },
     created: function () {
         console.log( this.$validator)
+        localize(this.$i18n.locale);
         if(this.$i18n.locale == "en"){
             this.$vuetify.rtl = false
             this.showMessages = false;
