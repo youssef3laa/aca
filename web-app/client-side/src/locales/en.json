@@ -3,5 +3,8 @@
   "username" : "Username",
   "password" : "Password",
   "currentLanguage" : "English",
-  "login" : "Login"
+  "login" : "Login",
+  "logged-in-success": "تم الدخول بنجاح",
+  "CANNOT_CONNECT_TO_SERVER":  "Cannot connect to the server",
+  "INVALID_CREDENTIALS": "Username or Password is wrong"
 }

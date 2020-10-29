@@ -20,7 +20,7 @@ public enum ResponseCode {
 
     /** Client errors **/
     BAD_REQUEST(400, "Bad Request", HttpStatus.BAD_REQUEST),
-    UNAUTHORIZED(401, "Unauthorized", HttpStatus.UNAUTHORIZED),
+    UNAUTHORIZED(401, "UNAUTHORIZED", HttpStatus.UNAUTHORIZED),
     PAYMENT_REQUIRED(402, "Payment Required", HttpStatus.PAYMENT_REQUIRED),
     FORBIDDEN(403, "Forbidden", HttpStatus.FORBIDDEN),
     NOT_FOUND(404, "Not Found", HttpStatus.NOT_FOUND),
@@ -31,21 +31,21 @@ public enum ResponseCode {
 
 
     // Define all custom Profile errors request, Start from 450 To 499
-    INVALID_AUTH(450, "Invalid username/password supplied", HttpStatus.FORBIDDEN),
-    INVALID_TOKEN(451, "Expired or Invalid Token", HttpStatus.FORBIDDEN),
-    DUPRICATED_TOKEN(452, "Dupricated token you have to login", HttpStatus.FORBIDDEN),
-    UNSUPPORTED_FILE_TYPE(453, "Unsupported File Type", HttpStatus.FORBIDDEN),
-    EXCEED_MAX_SIZE(454, "Exceed max size", HttpStatus.FORBIDDEN),
-    NOT_EXIST(455, "Not Exist", HttpStatus.NOT_FOUND),
+    INVALID_AUTH(450, "INVALID_CREDENTIALS", HttpStatus.FORBIDDEN),
+    INVALID_TOKEN(451, "INVALID_TOKEN", HttpStatus.FORBIDDEN),
+    DUPRICATED_TOKEN(452, "DEPRECATED_TOKEN_YOU_HAVE_TO_LOGIN", HttpStatus.FORBIDDEN),
+    UNSUPPORTED_FILE_TYPE(453, "UNSUPPORTED_FILE_TYPE", HttpStatus.FORBIDDEN),
+    EXCEED_MAX_SIZE(454, "EXCEED_MAX_SIZE", HttpStatus.FORBIDDEN),
+    NOT_EXIST(455, "NOT_EXIST", HttpStatus.NOT_FOUND),
 
     /** Server errors **/
-    INTERNAL_SERVER_ERROR(500, "Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR),
-    NOT_IMPLEMENTED(501, "Not Implemented", HttpStatus.NOT_IMPLEMENTED),
-    DATABASE_ERROR(503, "Database save error", HttpStatus.SERVICE_UNAVAILABLE),
+    INTERNAL_SERVER_ERROR(500, "INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR),
+    NOT_IMPLEMENTED(501, "NOT_IMPLEMENTED", HttpStatus.NOT_IMPLEMENTED),
+    DATABASE_ERROR(503, "SERVICE_UNAVAILABLE", HttpStatus.SERVICE_UNAVAILABLE),
 
     // Define More Detailed Failure Response, Start from 550 To 599
-    NO_DATA_SAVED(501, "No Data Saved", HttpStatus.INTERNAL_SERVER_ERROR),
-    GENERAL_FAILURE(555, "General Failure", HttpStatus.INTERNAL_SERVER_ERROR);
+    NO_DATA_SAVED(501, "INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR),
+    GENERAL_FAILURE(555, "INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
 
 
     private int code;

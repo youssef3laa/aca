@@ -1,7 +1,12 @@
 package com.asset.appwork.controller;
 
 import com.asset.appwork.cordys.CordysManagement;
+import com.asset.appwork.dto.Account;
+import com.asset.appwork.enums.ResponseCode;
+import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.model.IdentityComponentsPerson;
 import com.asset.appwork.model.User;
+import com.asset.appwork.repository.IdentityComponentsPersonRepository;
 import com.asset.appwork.response.AppResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +14,8 @@ import org.springframework.data.util.Optionals;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -21,27 +28,33 @@ public class UserController {
 
     @Autowired
     CordysManagement cordysManagement;
+
     @PostMapping("/login")
-    public ResponseEntity<AppResponse<User>> login(@RequestParam String username, @RequestParam String password, @RequestParam String organization) {
-        AppResponse.ResponseBuilder<User> respBuilder = AppResponse.builder();
+    public ResponseEntity<AppResponse<Account>> login(@RequestBody Account account) {
+        AppResponse.ResponseBuilder<Account> respBuilder = AppResponse.builder();
 
         try {
-            CordysManagement.User user= cordysManagement.create(username, password, organization);
-            respBuilder.data(user.getUser());
-
-            Optionals.ifPresentOrElse(Optional.of(respBuilder), (s)->{
-                Object object = s;
-
-                System.out.println(s);
-            }, ()-> System.out.print(""));
-
-
-
+            CordysManagement.User user= cordysManagement.create(account.getUsername(), account.getPassword(), account.getOrganization());
+            account.setSAMLart(user.getSAMLart());
+            respBuilder.data(account);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        } catch (AppworkException e) {
+            respBuilder.status(e.getCode());
         }
-
         return respBuilder.build().getResponseEntity();
     }
 
+    @Autowired
+    IdentityComponentsPersonRepository identityComponentsPersonRepository;
+
+    @GetMapping("/customers")
+    public List<IdentityComponentsPerson> getAll() {
+
+        Iterable<IdentityComponentsPerson> customers = identityComponentsPersonRepository.findAll();
+        List<IdentityComponentsPerson> result = new ArrayList<>();
+        customers.forEach(result::add);
+
+        return result;
+    }
 }

@@ -67,7 +67,7 @@ public class Http {
         if (doAuthentication) method.setDoAuthentication(doAuthentication);
 
         try {
-            method.setRequestHeader(header);
+            if (header != null) method.setRequestHeader(header);
             contentType = Optional.of(contentType).orElseGet(()-> ContentType.JSON_REQUEST.getContentType());
             method.setRequestEntity(new StringRequestEntity(data, contentType, "UTF-8"));
             statusCode = this.client.executeMethod(method);

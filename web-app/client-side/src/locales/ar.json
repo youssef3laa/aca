@@ -3,5 +3,7 @@
     "username" : "اسم المستخدم",
     "password" : "كلمه المرور",
     "currentLanguage" : "عربي",
-    "login" : "تسجيل دخول"
+    "login" : "تسجيل دخول",
+    "CANNOT_CONNECT_TO_SERVER":  "خطأ في الإتصال بالسيرفر",
+    "INVALID_CREDENTIALS": "برجاء التأكد من اسم المستخدم و كلمه المرور"
   }

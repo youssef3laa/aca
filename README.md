@@ -5,25 +5,72 @@
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
 Appwork is a project for handling correspondence to Administrative Control Authority (ACA). the aim of this project is to be build as a cloud based product. To acheive this we need to take into considaration the code quality not just in back end but also into front end. 
-Stack used for Back End:
+# Backend Stack:
   - Spring boot
   - Spring JPA
   - lombok (automatically plugs getter and setters, constructors, and Automate your logging variables)
   - jackson (Java JSON library)
   - java-ews (outlook integration and sending emails)
 
-Stack used for Front End:
-  - vue cli
-  - sass
-  - vue i18n (internationalization plugin for Vue.js)
-  - vue-axios (promise-based HTTP client)
-  - vuetify (Material Design Framework)
+# Java Modules
+- appwork-common module (for database interaction and shared features)
+- appwork-dev (communcication with appworks and content server)
+- web-app module (for handling http request and the security layer will be implemented on the top of this module )
 
-The java project is consist of two independent modules (appwork-common module and web-app module )
-  - appwork-common module (this module is reponsible for database communication and handling any shared features between other modules )
-  - web-app module this module handle any http request 
+Each module may have their own exception and handle it on their own ways
 
-Java tips and tricks
+# ResponseBuilder class
+it class for handling response for client side usage example: 
+```sh  
+AppResponse.ResponseBuilder<Account> respBuilder = AppResponse.builder();
+try {
+    CordysManagement.User user= cordysManagement.create(account.getUsername(), account.getPassword(), account.getOrganization());
+    account.setSAMLart(user.getSAMLart());
+    respBuilder.data(account);
+} catch (JsonProcessingException e) {
+    respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+} catch (AppworkException e) {
+    respBuilder.status(e.getCode());
+}
+return respBuilder.build().getResponseEntity();
+    
+```
+# ResponseCode enum code class 
+hold all the error codes and translation keys that will be sent to the frontend. so frontend will display error messages based on the key retreived from backend  
+
+# AppworkException class 
+we extend the java exception to send error code in the exception found example: 
+```sh
+throw new AppworkException("INVALID_CREDENTIALS", ResponseCode.INVALID_AUTH);
+```
+
+# Backend Naming Convention!
+| Type | Style | Example |
+| :---: | :---: | :---: |
+| Class | Upper Camel Case (PascalCase) | MyClass |
+| Class | Class name should be noun  |  |    
+| Class | Try to make only one public method Everything else private  |  |  
+| Method | Lower Camel Case  | findMyPhone() | 
+| Method | Method name should be verb  | | 
+| Method |Avoid using many parameters| saveUser(User user)
+| Variable | Lower Camel Case  |  |
+| Variable | One-character names should be avoided except for temporary variables | x,y,z |
+| Packages | all lowercase | service |
+| Packages | should be one of the top-level domain names |  com, edu, gov, mil, net, org, ex: com.sun.eng |
+| Constants | all uppercase  | POSITIVE_INFINITY, FIRSTNAME |
+| Constants | Only constant can have “_” in their name  |  |
+| exceptions | should be a noun and should describe exactly what happened.  | ArgumentCannotBeNull, ProductIsOutOfStock |
+| exceptions | Avoid to implement exception class for every unwanted behaviour .  | |
+| File name | {important-parameter}-{date}-{version}-{Sequence}  |  1915-201031-v1-001.txt |
+| boolean | For any boolean checking use is{Somthing}  | isSaved | 
+
+   - To find something from database use `find` instead of get
+   - To remove something from database use `remove` instead of delete 
+   - To save something in database use `save` instead of create or insert or put
+   - To write something into file use `write` instead of save or update 
+
+
+# Java tips and tricks
    - Minimize object creation (by understanding when object is created and re-use it)
    - Avoid using old school for loop use 
 ```sh  
@@ -52,32 +99,7 @@ interface with a SAM(Single Abstract Method).  used to make the implementation o
    - Consumer
    - Runnable
    - Supplier
-
-
-# Backend Naming Convention!
-
-| Type | Style | Example |
-| :---: | :---: | :---: |
-| Class | Upper Camel Case (PascalCase) | MyClass |
-| Class | Try to make only one public method Everything else private  |  |    
-| Class | 2–3 words for class names  |  | 
-| Method | Lower Camel Case  | findMyPhone() | 
-| Method |Avoid using many parameters| saveUser(String name, Address userAddress)
-| Method | Use verbs for method name  |  | 
-| Method | 1–2 words for method names  |  | 
-| Variable | Lower Camel Case  |  |
-| Constants | all uppercase  | FIRSTNAME |
-| Constants | 3–4 words for global variable names  |  |
-| Constants | Only constant can have “_” in their name  |  |
-| File name | {important-parameter}-{date}-{version}-{Sequence}  |  1915-201031-v1-001.txt |
-| boolean | For any boolean checking use is{Somthing}  | isSaved | 
-
-   - To find something from database use `find` instead of get
-   - To remove something from database use `remove` instead of delete 
-   - To save something in database use `save` instead of create or insert or put
-   - To write something into file use `write` instead of save or update 
-
-Comments: 
+# Backend Comments: 
 use java Docs for comments by the way Is not good practice to write many comments;
 ```sh   
 /**
@@ -102,16 +124,20 @@ public Image getImage(URL url, String name) {
         return null;
     }
 }
-
 ```
-
+# Frontend Stack:
+  - vue cli
+  - sass
+  - vue i18n (internationalization plugin for Vue.js)
+  - vue-axios (promise-based HTTP client)
+  - vuetify (Material Design Framework)
+  - vee-validate (for handling front end validation)
 # Frontend Naming Convention!
    - Component should always be multi-word, “UserCard”
    - Filenames kebab-case “user-card.vue”
    - Components that are only used once per page should begin with the prefix “The”  “TheNavbar.vue” or “TheFooter.vue”.
    - Child components should include their parent name example if you would like a “Photo” component used in the “UserCard” you will name it “UserCardPhoto”.
-
-# Folder structure
+# Frontend Folder structure
 In this project we follow module based structure; each module contains (components, lib, services, routers, views and locales)
    - Components: are the components used in these module
    - lib: library used for this module

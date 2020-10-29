@@ -1,5 +1,7 @@
 package com.asset.appwork.cordys;
 
+import com.asset.appwork.enums.ResponseCode;
+import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.service.CordysService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Data;
@@ -14,7 +16,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,20 +39,19 @@ public class CordysManagement {
         timer.start();
     }
 
-    public User create(String username, String password, String organization) throws JsonProcessingException {
-        Cordys cordys = this.get(organization);
+    public User create(String username, String password, String organization) throws JsonProcessingException, AppworkException {
+        Cordys cordys = new Cordys(cordysService, organization);
+        concurrentHashMap.put(organization, cordys);
+        updateLastActiveTime(cordys);
         User user = cordys.create(username, password);
         return user;
     }
 
     public Cordys get(String organization){
         Cordys cordys = concurrentHashMap.get(organization);
-        Optional.of(cordys).orElseGet(()->{
-            Cordys c = new Cordys(cordysService, organization);
-            concurrentHashMap.put(organization, c);
-            return c;
-        });
-        updateLastActiveTime(cordys);
+
+        if (cordys != null) updateLastActiveTime(cordys);
+
         return cordys;
     }
 
@@ -97,10 +97,12 @@ public class CordysManagement {
         }
 
         public Cordys(CordysService cordysService, String organization){
-            super();
+            this();
             this.cordysService = cordysService;
             this.organization = organization;
             this.url ="http://appworks-dev:81/home/"+organization+"/com.eibus.web.soap.Gateway.wcp";
+            lastActiveTime = new Date();
+
         }
 
         private void checkInActiveUser(){
@@ -122,10 +124,12 @@ public class CordysManagement {
             return this.concurrentHashMap.get(id).getSAMLart();
         }
 
-        public User create(String username, String password) throws JsonProcessingException {
+        public User create(String username, String password) throws JsonProcessingException, AppworkException {
 
             String SAMLart = cordysService.login(username, password);
+            if (SAMLart == null) throw new AppworkException("INVALID_CREDENTIALS", ResponseCode.INVALID_AUTH);
             User user = new User(SAMLart, url);
+            updateLastActiveTime(user);
             concurrentHashMap.put(SAMLart, user);
             return user;
         }
@@ -164,6 +168,7 @@ public class CordysManagement {
         User(String SAMLart, String url){
             this.SAMLart = SAMLart;
             this.url = url +"?SAMLart="+this.SAMLart;
+            lastActiveTime = new Date();
         }
     }
 }
