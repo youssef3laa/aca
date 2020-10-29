@@ -128,10 +128,10 @@ public Image getImage(URL url, String name) {
 # Frontend Stack:
   - vue cli
   - sass
-  - vue i18n (internationalization plugin for Vue.js)
-  - vue-axios (promise-based HTTP client)
-  - vuetify (Material Design Framework)
-  - vee-validate (for handling front end validation)
+  - [vue i18n](https://kazupon.github.io/vue-i18n/guide/directive.html) (internationalization plugin for Vue.js)
+  - [vue-axios](https://www.npmjs.com/package/vue-axios) (promise-based HTTP client)
+  - [vuetify](https://vuetifyjs.com/en/components/cards/#loading) (Material Design Framework)
+  - [vee-validate](https://logaretm.github.io/vee-validate/overview.html#getting-started) (for handling front end validation)
 # Frontend Naming Convention!
    - Component should always be multi-word, “UserCard”
    - Filenames kebab-case “user-card.vue”
