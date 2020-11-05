@@ -7,6 +7,7 @@ Vue.use(Vuetify);
 
 
 const vuetify = new Vuetify({
+  rtl: true,
   lang: {
     locales: { arabic, arabicpack },
     current: 'zhHans',

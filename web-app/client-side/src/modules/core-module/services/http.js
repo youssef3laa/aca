@@ -1,5 +1,7 @@
 import axios from 'axios'
 import config from '../../../config/config'
+import Vue from 'vue'
+
 
 const REQUEST = axios.create({  
     baseURL: config.API_URL,
@@ -12,10 +14,24 @@ const REQUEST = axios.create({
 export default {
 
     post(url, data){
-        return REQUEST.post(url, data)
+        if (Vue.prototype.$user && Vue.prototype.$user.getSAMLart()) {
+            REQUEST.defaults.headers['account'] = Vue.prototype.$user.toString()
+        }
+
+        return REQUEST.post(url, data, {  
+            
+            transformResponse: [function (response) {  
+                if(response.data) return JSON.parse(response.data)
+                return JSON.parse(response);  
+            }]  
+        })
     },
 
     get(url){
+        console.log(Vue.prototype.$user);
+        if (Vue.prototype.$user && Vue.prototype.$user.getSAMLart()) {
+            REQUEST.defaults.headers['account'] = Vue.prototype.$user.toString()
+        }
         return REQUEST.get(url)
     },
 

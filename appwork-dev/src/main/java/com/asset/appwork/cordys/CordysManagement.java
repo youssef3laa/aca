@@ -2,10 +2,12 @@ package com.asset.appwork.cordys;
 
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.service.CordysService;
+import com.asset.appwork.util.Http;
+import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.swing.*;
@@ -26,8 +28,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class CordysManagement {
     static ConcurrentHashMap<String, Cordys> concurrentHashMap = new ConcurrentHashMap();
+
     @Autowired
-    CordysService cordysService;
+    Environment env;
 
     public CordysManagement(){
         Timer timer = new Timer(3000, new ActionListener() {
@@ -39,19 +42,20 @@ public class CordysManagement {
         timer.start();
     }
 
-    public User create(String username, String password, String organization) throws JsonProcessingException, AppworkException {
-        Cordys cordys = new Cordys(cordysService, organization);
-        concurrentHashMap.put(organization, cordys);
-        updateLastActiveTime(cordys);
+    public User getUser(String username, String password, String organization) throws JsonProcessingException, AppworkException {
+        Cordys cordys = getCordys(organization);
         User user = cordys.create(username, password);
         return user;
     }
 
-    public Cordys get(String organization){
+    public Cordys getCordys(String organization){
         Cordys cordys = concurrentHashMap.get(organization);
-
-        if (cordys != null) updateLastActiveTime(cordys);
-
+        String gatewayUrl = env.getProperty(organization+".domain") + env.getProperty(organization+".gateway.url");
+        if (cordys== null){
+            cordys = new Cordys(organization, gatewayUrl);
+            concurrentHashMap.put(organization, cordys);
+        }
+        updateLastActiveTime(cordys);
         return cordys;
     }
 
@@ -72,8 +76,6 @@ public class CordysManagement {
         }
     }
 
-
-
     @Data
     public class Cordys {
 
@@ -81,7 +83,6 @@ public class CordysManagement {
         String url = "";
         String organization;
         Date lastActiveTime;
-        CordysService cordysService;
         ConcurrentHashMap<String, User> concurrentHashMap = new ConcurrentHashMap();
 
 
@@ -96,11 +97,10 @@ public class CordysManagement {
             timer.start();
         }
 
-        public Cordys(CordysService cordysService, String organization){
+        public Cordys( String organization, String gatewayUrl){
             this();
-            this.cordysService = cordysService;
             this.organization = organization;
-            this.url ="http://appworks-dev:81/home/"+organization+"/com.eibus.web.soap.Gateway.wcp";
+            this.url =gatewayUrl;
             lastActiveTime = new Date();
 
         }
@@ -116,22 +116,22 @@ public class CordysManagement {
             }
         }
 
-        public User get(String id){
-            return this.concurrentHashMap.get(id);
-        }
-
-        public String getSAMLart(String id){
-            return this.concurrentHashMap.get(id).getSAMLart();
-        }
-
         public User create(String username, String password) throws JsonProcessingException, AppworkException {
 
-            String SAMLart = cordysService.login(username, password);
+            String SAMLart = login(username, password);
             if (SAMLart == null) throw new AppworkException("INVALID_CREDENTIALS", ResponseCode.INVALID_AUTH);
             User user = new User(SAMLart, url);
             updateLastActiveTime(user);
             concurrentHashMap.put(SAMLart, user);
             return user;
+        }
+
+        private String login(String username, String passowrd) throws JsonProcessingException {
+            String otdsURL = "http://appworks-dev:8080/otdsws/rest/authentication/credentials";
+
+            String data = "{\"userName\" : \""+username+"\", \"password\" : \"" + passowrd + "\" }";
+            Http http = new Http().setDoAuthentication(true).setContentType(Http.ContentType.JSON_REQUEST).setData(data).post(otdsURL);
+            return SystemUtil.readJSONField(http.getResponse(), "ticket");
         }
 
         private void updateLastActiveTime(User user){
@@ -153,8 +153,6 @@ public class CordysManagement {
             }
             return result.toString();
         }
-
-
     }
 
     @Data

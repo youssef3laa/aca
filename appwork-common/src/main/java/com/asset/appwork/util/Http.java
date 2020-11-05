@@ -1,6 +1,5 @@
 package com.asset.appwork.util;
 
-import com.asset.appwork.cordys.CordysManagement;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;

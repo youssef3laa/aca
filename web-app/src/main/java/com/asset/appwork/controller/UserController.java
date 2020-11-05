@@ -34,7 +34,7 @@ public class UserController {
         AppResponse.ResponseBuilder<Account> respBuilder = AppResponse.builder();
 
         try {
-            CordysManagement.User user= cordysManagement.create(account.getUsername(), account.getPassword(), account.getOrganization());
+            CordysManagement.User user= cordysManagement.getUser(account.getUsername(), account.getPassword(), account.getOrganization());
             account.setSAMLart(user.getSAMLart());
             respBuilder.data(account);
         } catch (JsonProcessingException e) {
