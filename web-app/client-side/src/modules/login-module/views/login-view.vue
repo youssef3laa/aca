@@ -71,7 +71,7 @@ import LocaleSwitcher from '../../core-module/components/the-local-switcher'
 import http from '../../core-module/services/http'
 import system from '../../core-module/services/system-service'
 import router from '../../../router'
-
+import Vue from 'vue'
 
 export default {
     name: 'LoginView',
@@ -95,9 +95,10 @@ export default {
             // this.$refs.form.reset()
             http.post('user/login', this.user.toJson()).then(response=> {
                 system.showMessage(this.$refs.message, "logged-in-success", 'success')
-                this.user.setSAMLart(response.data.data.samlart)
+                this.user.setSAMLart(response.data.data.SAMLart)
+                Vue.prototype.$user = this.user;
                 localStorage.setItem("user", this.user.toString());
-                console.log(response.data.data.samlart);
+                console.log(response.data.data.SAMLart);
 
                 router.push('home')
                 
