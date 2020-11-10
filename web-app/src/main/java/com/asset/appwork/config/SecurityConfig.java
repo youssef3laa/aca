@@ -34,14 +34,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.
-                authenticationProvider(domainUsernamePasswordAuthenticationProvider()).
-//                authenticationProvider(backendAdminUsernamePasswordAuthenticationProvider()).
+        auth.authenticationProvider(domainUsernamePasswordAuthenticationProvider()).
                 authenticationProvider(tokenAuthenticationProvider());
 //        auth.authenticationProvider(authProvider);
     }
-
-
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -70,6 +66,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public AuthenticationProvider domainUsernamePasswordAuthenticationProvider() {
         return new DomainUsernamePasswordAuthenticationProvider(tokenService());
-//        , someExternalServiceAuthenticator());
     }
 }
