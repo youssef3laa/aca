@@ -39,8 +39,7 @@
 			</v-list-item>
 			<v-divider></v-divider>
 			<v-list dense>
-				<v-list-item v-for="item in items" :key="item.title" link>
-
+				<v-list-item v-for="item in items" :key="item.title" v-on:click="item.action" link>
 					<v-list-item-content>
 						<v-list-item-title>{{ item.title }}</v-list-item-title>
 					</v-list-item-content>
@@ -53,6 +52,7 @@
 
 <script>
 	import config from '../../../config/config'
+	import router from '../../../router'
 	export default {
 		name: 'TheNavbar',
 		components: {
@@ -63,10 +63,23 @@
 				title: config.APP_NAME,
 				drawer: false,
 				items: [
-					{ title: 'Home', icon: 'dashboard' },
-					{ title: 'About', icon: 'question_answer' },
+					{ title: 'Home', icon: 'dashboard', action: this.home },
+					{ title: 'About', icon: 'question_answer', action: this.about },
+					{ title: 'Logout', icon: 'question_answer', action: this.logout },
 				],
 			}
 		},
+		methods: {
+			home() {
+
+			},
+			about() {
+
+			},
+			logout() {
+				localStorage.removeItem('user')
+				router.go('login')
+			}
+		}
 	}
 </script>

@@ -3,7 +3,7 @@
     <TheNavbar />
     <v-app id="inspire">
       <v-container>
-        <!-- <TableComponent /> -->
+        <TableComponent />
         <component v-bind:is="formBuilder"></component>
       </v-container>
     </v-app>

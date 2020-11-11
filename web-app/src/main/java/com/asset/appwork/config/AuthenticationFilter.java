@@ -50,7 +50,7 @@ public class AuthenticationFilter extends GenericFilterBean{
 //                return;
 //            }
 
-            if (username.isPresent() && !((String)token.get()).isEmpty()){
+            if (username.isPresent() && password.isPresent()){
                 processUsernamePasswordAuthentication(httpResponse, username, password);
                 return;
             }
