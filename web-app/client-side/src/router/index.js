@@ -23,18 +23,18 @@ Vue.use(VueRouter)
 // ]
 
 var allRoutes = []
-allRoutes = allRoutes.concat(LoginRoutes, AdminRoutes, {
-	path: '/',
-	name: 'Home',
-	component: Home
+allRoutes = allRoutes.concat(LoginRoutes, AdminRoutes,{
+  path: '/',
+  name: 'Home',
+  component: Home,
 })
 
 const routes = allRoutes
 
 const router = new VueRouter({
-	mode: 'history',
-	base: process.env.BASE_URL,
-	routes
+  mode: 'history',
+  base: process.env.BASE_URL,
+  routes,
 })
 
 export default router

@@ -92,13 +92,14 @@ export default {
             e.preventDefault();
             console.log(this.$refs.observer.validate())
             console.log(localStorage.getItem("user"))
+            http.addHeader('X-Auth-Username', this.user.username)
+            http.addHeader('X-Auth-Password', this.user.password)
             // this.$refs.form.reset()
             http.post('user/login', this.user.toJson()).then(response=> {
                 system.showMessage(this.$refs.message, "logged-in-success", 'success')
-                this.user.setSAMLart(response.data.data.SAMLart)
+                this.user.setSAMLart(response.data)
                 Vue.prototype.$user = this.user;
                 localStorage.setItem("user", this.user.toString());
-                console.log(response.data.data.SAMLart);
 
                 router.push('home')
                 
