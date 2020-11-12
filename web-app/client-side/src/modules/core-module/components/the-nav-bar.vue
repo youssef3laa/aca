@@ -1,13 +1,10 @@
 <template>
 	<div>
-		
 		<v-app-bar :style="[$vuetify.rtl ? {'direction': 'rtl'} : {'direction': 'ltr'}]">
 			<div style="width: 200px">
 				<v-img contain width="200px" src="https://www.aca.gov.eg/style%20library/img/mainLogo.png">
 				</v-img>
 			</div>
-			
-
 
 			<v-spacer></v-spacer>
 

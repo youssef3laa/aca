@@ -6,6 +6,7 @@ import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.util.CordysUtil;
+import com.asset.appwork.util.SystemUtil;
 import com.asset.appwork.webservice.Employee;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,12 +31,15 @@ public class EmployeeController {
     public ResponseEntity<AppResponse<String>> initiateEmployee(@RequestHeader("X-Auth-Token") String token,@RequestBody() String employeeJson){
         Employee employee = new Employee();
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            JsonNode jsonNode = mapper.readTree(employeeJson);
-            String Fname = jsonNode.get("Fname").asText();
-            String Lname = jsonNode.get("Lname").asText();
-            String Email = jsonNode.get("Email").asText();
+//        ObjectMapper mapper = new ObjectMapper();
+//            JsonNode jsonNode = mapper.readTree(employeeJson);
+//            jsonNode.get("Fname").asText();
+//            jsonNode.get("Lname").asText();
+//            jsonNode.get("Email").asText();
+            String Fname = SystemUtil.readJSONField(employeeJson, "Fname");
+            String Lname = SystemUtil.readJSONField(employeeJson, "Lname");
+            String Email = SystemUtil.readJSONField(employeeJson, "Email");
             Account account = tokenService.readTokenData(token);
             if(account != null){
                 String response = cordysUtil.sendRequest(account, employee.initiateEmployeeApproval(account.getSAMLart(),Fname,Lname,Email));
