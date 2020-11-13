@@ -2,7 +2,9 @@ package com.asset.appwork.config;
 
 
 import com.asset.appwork.dto.Account;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +42,9 @@ public class TokenService {
     public Authentication retrieve(String token) {
         try {
             Account account = readTokenData(token);
+            if(account == null){
+                return null;
+            }
             AuthenticationWithToken resultOfAuthentication = new AuthenticationWithToken(account.getUsername(), null,
                     AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_DOMAIN_USER"));
             resultOfAuthentication.setToken(token);
@@ -51,9 +56,9 @@ public class TokenService {
     }
 
     public Account readTokenData(String token){
-        String jsonSubject = JWT.require(HMAC512(SECRET.getBytes())).build().verify(token).getSubject();
         ObjectMapper mapper = new ObjectMapper();
         try {
+            String jsonSubject = JWT.require(HMAC512(SECRET.getBytes())).build().verify(token).getSubject();
             Account account = mapper.readValue(jsonSubject,Account.class);
 //            if(account.isPresent()){
             return account;

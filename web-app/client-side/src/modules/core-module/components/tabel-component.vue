@@ -2,14 +2,24 @@
     <v-card>
         <v-data-table
             :headers="headers"
-            :items="desserts"
-            :search="search"
-        ></v-data-table>
+            :items="data"
+            :search="search">
+            <template v-slot:item.actions="{ item }">
+              <v-icon
+                small
+                class="mr-2"
+                @click="display(item)"
+              >
+                mdi-pencil
+              </v-icon>
+            </template>
+        </v-data-table>
     </v-card>
-
 </template>
 
 <script>
+import http from '../../core-module/services/http'
+
 export default {
     name: "TableComponent",
   data () {
@@ -26,9 +36,9 @@ export default {
         { text: 'Fat (g)', value: 'fat' },
         { text: 'Carbs (g)', value: 'carbs' },
         { text: 'Protein (g)', value: 'protein' },
-        { text: 'Iron (%)', value: 'iron' },
+        { text: 'Iron (%)', value: 'iron'},
       ],
-      desserts: [
+      data: [
         {
           name: 'Frozen Yogurt',
           calories: 159,
@@ -36,6 +46,7 @@ export default {
           carbs: 24,
           protein: 4.0,
           iron: '1%',
+          id: 5,
         },
         {
           name: 'Ice cream sandwich',
@@ -112,5 +123,22 @@ export default {
       ],
     }
   },
+  methods:{
+    display(item) {
+      console.log(item);
+    },
+  },
+  mounted: function() {
+    this.headers = []
+    this.data = []
+    http
+        .get('workflow/human/tasks')
+        .then((response) => {
+          var responseData = JSON.parse(response.data.data)
+          this.headers = responseData.headers
+          this.data = responseData.data
+          // this.componentName = 'EmployeeData'
+        })  
+  }
 }
 </script>
