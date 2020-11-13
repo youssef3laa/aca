@@ -1,10 +1,9 @@
-import Vue from 'vue';
-import Vuetify from 'vuetify/lib';
+import Vue from 'vue'
+import Vuetify from 'vuetify/lib'
 import arabic from 'vuetify/es5/locale/ar'
 import arabicpack from '../../core-module/locales/ar.json'
 
-Vue.use(Vuetify);
-
+Vue.use(Vuetify)
 
 const vuetify = new Vuetify({
   rtl: true,
@@ -24,9 +23,9 @@ const vuetify = new Vuetify({
       },
       dark: {
         background: '#072742',
-      }
+      },
     },
   },
 })
 
-export default vuetify;
+export default vuetify

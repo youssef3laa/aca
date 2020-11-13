@@ -15,8 +15,10 @@
     "minimatch": "^3.0.4",
     "vee-validate": "^3.4.3",
     "vue": "^2.6.11",
+    "vue-class-component": "^7.2.6",
     "vue-i18n": "^8.17.3",
     "vue-router": "^3.2.0",
+    "vue-sub": "^1.1.1",
     "vuetify": "^2.2.11"
   },
   "devDependencies": {

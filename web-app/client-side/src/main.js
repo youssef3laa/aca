@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import vuetify from './modules/core-module/lib/vuetify'
+import observable from './modules/core-module/lib/vue-sub-lib'
 import i18n from './modules/core-module/lib/i18n'
 import router from './router'
 import { ValidationProvider } from 'vee-validate'
@@ -16,5 +17,6 @@ new Vue({
   i18n,
   router,
   axios,
+  observable,
   render: (h) => h(App),
 }).$mount('#app')

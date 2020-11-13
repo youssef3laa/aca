@@ -1,0 +1,44 @@
+<template>
+  <!-- <v-text-field @input="$emit('input', $event.target.value)"> -->
+  <validation-provider
+    :name="field.name"
+    :rules="field.rule"
+    v-slot="{ errors }"
+  >
+    <v-text-field v-model="d" @input="addInput">
+      <template #label>
+        <span v-t="field.label"></span>
+      </template>
+    </v-text-field>
+    <span class="red--text">{{ errors[0] }}</span>
+  </validation-provider>
+</template>
+
+<script>
+import { ValidationProvider } from 'vee-validate'
+
+export default {
+  name: 'input-builder',
+  components: {
+    ValidationProvider,
+  },
+  data() {
+    return {
+      eventName: this.field.eventName,
+      d: this.val,
+    }
+  },
+  methods: {
+    addInput: function() {
+      this.$emit(this.eventName, {
+        name: this.field.name,
+        value: this.d,
+        method: 'saveValue',
+      })
+
+      this.$observable.fire('input', this.d);
+    },
+  },
+  props: ['val', 'field'],
+}
+</script>
