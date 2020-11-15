@@ -8,7 +8,7 @@
       <v-tab-item v-for="formData in section.forms" :key="formData.id">
         <v-card flat>
           <v-card-text v-text="formData.form.name"></v-card-text>
-          <formBuilder v-on:modelChange="dataChange" :forms="formData.form" :model="formData.model"/>
+          <formBuilder v-on:modelChange="dataChange" :forms="formData" :model="formData.model" />
         </v-card>
       </v-tab-item>
     </v-tabs-items>

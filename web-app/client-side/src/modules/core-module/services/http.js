@@ -30,7 +30,6 @@ export default {
   },
 
   get(url) {
-    console.log(Vue.prototype.$user)
     if (Vue.prototype.$user && Vue.prototype.$user.getSAMLart()) {
       REQUEST.defaults.headers['X-Auth-Token'] = Vue.prototype.$user.getSAMLart()
     }

@@ -17,12 +17,21 @@ export default {
     },
   },
   mounted() {
-    this.$observable.subscribe('input', function(data){
+    this.$observable.subscribe('input', function(data) {
       console.log(data)
-    });
-    this.$observable.subscribe('submit', function(data){
+    })
+    var self = this
+    this.$observable.subscribe('model', function(data) {
       console.log(data)
-    });
+      var x = {
+        type: 'modelUpdate',
+        model: {
+          serial_num: '111'
+        },
+      }
+
+      self.$observable.fire('submit', x)
+    })
   },
   data() {
     return {
@@ -39,6 +48,8 @@ export default {
                 ],
                 forms: [
                   {
+                    subscribe: 'submit',
+                    publish: 'model',
                     form: [
                       {
                         type: 'inputComponent',

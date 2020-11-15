@@ -40,5 +40,11 @@ export default {
     },
   },
   props: ['val', 'field'],
+  watch: {
+    val: function(newVal, oldVal){
+      console.log(oldVal);
+      this.d = newVal;
+    }
+  }
 }
 </script>
