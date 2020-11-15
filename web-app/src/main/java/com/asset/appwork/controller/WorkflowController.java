@@ -72,8 +72,10 @@ public class WorkflowController {
             Task task= new Task();
             Account account = tokenService.readTokenData(token);
             String taskId = SystemUtil.readJSONField(taskJson, "TaskId");
-            String taskData = SystemUtil.readJSONField(taskJson, "TaskData");
+            String nameSpace = SystemUtil.readJSONField(taskJson, "NameSpace");
+            String taskData = SystemUtil.readJSONObject(taskJson, "TaskData");
             taskData = SystemUtil.convertJSONtoXML(taskData);
+            taskData = SystemUtil.addNameSpaceToXML(taskData,nameSpace);
             if(account != null){
                 String response = cordysUtil.sendRequest(account, task.performTaskAction(account.getSAMLart(), taskId, "COMPLETE", "", taskData));
                 respBuilder.data(response);
@@ -81,7 +83,7 @@ public class WorkflowController {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (AppworkException e) {
+        }catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
         }

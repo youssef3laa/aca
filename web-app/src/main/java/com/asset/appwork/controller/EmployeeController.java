@@ -32,11 +32,6 @@ public class EmployeeController {
         Employee employee = new Employee();
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
-//        ObjectMapper mapper = new ObjectMapper();
-//            JsonNode jsonNode = mapper.readTree(employeeJson);
-//            jsonNode.get("Fname").asText();
-//            jsonNode.get("Lname").asText();
-//            jsonNode.get("Email").asText();
             String Fname = SystemUtil.readJSONField(employeeJson, "Fname");
             String Lname = SystemUtil.readJSONField(employeeJson, "Lname");
             String Email = SystemUtil.readJSONField(employeeJson, "Email");

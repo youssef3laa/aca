@@ -1,4 +1,5 @@
 <template>
+  <v-container>
     <v-card>
         <v-data-table
             :headers="headers"
@@ -15,13 +16,15 @@
             </template>
         </v-data-table>
     </v-card>
+    <component v-bind:is="formBuilder" v-bind:taskInfo="this.selectedTask"></component>
+  </v-container>
 </template>
 
 <script>
 import http from '../../core-module/services/http'
 
 export default {
-    name: "TableComponent",
+  name: "TableComponent",
   data () {
     return {
       search: '',
@@ -121,12 +124,24 @@ export default {
           iron: '6%',
         },
       ],
+      selectedTask: null
     }
   },
   methods:{
     display(item) {
-      console.log(item);
+      this.selectedTask = {
+        taskId: item.TaskId,
+        taskData: item.TaskData
+      }
     },
+  },
+  computed: {
+    formBuilder: function() {
+      if (this.selectedTask) {
+        return () => import('../../../components/TaskView.vue')
+      }
+      return null
+    }
   },
   mounted: function() {
     this.headers = []

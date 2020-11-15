@@ -4,20 +4,17 @@
       <form action="">
         <v-row>
           <v-col>
-            <label for="Fname"> FirstName</label>
-            <input type="text" name="Fname" style="background-color:white" v-model="Fname" />
+            <v-text-field outlined filled label="First Name" name="Fname" v-model="Fname" />
           </v-col>
           <v-col>
-            <label for="Lname">Last Name </label>
-            <input type="text" name="Lname" id="" style="background-color:white" v-model="Lname" />
+            <v-text-field outlined filled label="Last Name" name="Lname" v-model="Lname" />
           </v-col>
           <v-col>
-            <label for="email">email </label>
-            <input type="text" name="email" id="" style="background-color:white" v-model="Email" />
+            <v-text-field outlined filled label="Email" name="email" v-model="Email" />
           </v-col>
-        </v-row>
-        <v-row>
-          <button v-on:click="create">Create Employee</button>
+          <v-col>
+            <v-btn v-on:click="create">Create Employee</v-btn>
+          </v-col>
         </v-row>
       </form>
     </v-container>
@@ -25,7 +22,7 @@
 </template>
 
 <script>
-// import http from '../modules/core-module/services/http';
+import http from '../modules/core-module/services/http';
 import router from '../router'
 export default {
   name: 'EmployeeData',
@@ -45,13 +42,13 @@ export default {
         'Email': this.Email
       }
       console.log(employee);
-      router.go(0);
-      // http.post('http://localhost:9000/api/employee/initiate/',employee)
-      //   .then((response) => {
-      //     console.log(response);
-      //   }).catch((error) => {
-      //     console.error(error);
-      //   })
+      http.post('employee/initiate/',employee)
+        .then((response) => {
+            console.log(response);
+            router.go(0);
+        }).catch((error) => {
+          console.error(error);
+        })
     }
   }
 }
