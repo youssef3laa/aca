@@ -27,6 +27,13 @@ public class SystemUtil {
         return (jsonNode == null ? null : jsonNode.textValue());
     }
 
+    public static String readJSONObject(String json, String name) throws  JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(json);
+        jsonNode = jsonNode.get(name);
+        return (jsonNode == null ? null : jsonNode.toPrettyString());
+    }
+
     public static Document convertStringToXMLDocument(String data) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         //API to obtain DOM Document instance
@@ -75,12 +82,19 @@ public class SystemUtil {
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectMapper xmlMapper = new XmlMapper();
             JsonNode tree = objectMapper.readTree(json);
-            String xml = xmlMapper.writer().writeValueAsString(tree);
-            return xml;
+            String xml = xmlMapper.writer().withoutRootName().writeValueAsString(tree);
+            return xml.replace("<>","").replace("</>","");
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String addNameSpaceToXML(String xml, String nameSpace) {
+        if(!nameSpace.isEmpty() && !xml.isEmpty()){
+            return xml.replaceFirst(">"," xmlns=\""+nameSpace+"\">");
+        }
+        return xml;
     }
 
     public static String converDocumentNodetoJSON(Node node){
