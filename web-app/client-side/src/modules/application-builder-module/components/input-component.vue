@@ -30,13 +30,13 @@ export default {
   },
   methods: {
     addInput: function() {
-      this.$emit(this.eventName, {
+      this.$emit('update', {
         name: this.field.name,
         value: this.d,
-        method: 'saveValue',
+        type: 'inputChange',
       })
 
-      this.$observable.fire('input', this.d);
+      // this.$observable.fire('input', this.d);
     },
   },
   props: ['val', 'field'],

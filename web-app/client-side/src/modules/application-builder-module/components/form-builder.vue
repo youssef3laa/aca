@@ -12,8 +12,8 @@
           >
             <component
               :field="field"
+              v-on:update="updateText"
               :val="formModel[field.name]"
-              @[field.eventName]="updateText"
               :is="field.type"
             ></component>
           </v-col>
@@ -46,10 +46,23 @@ export default {
   methods: {
     updateText: function(data) {
       // console.log(data)
-      this.forms.model[data.name] = data.value
+      if (data.name && data.value) this.forms.model[data.name] = data.value
+
+      if (
+        this.forms.publish &&
+        data.action &&
+        this.forms.event == 'submit' &&
+        data.action == 'submit'
+      ) {
+        this.$observable.fire(this.forms.publish, {
+          model: this.forms.model,
+          valid: !this.$refs['observer'].flags.invalid,
+        })
+      }
+
       console.log(this.$refs['observer'])
       if (!this.$refs['observer'].flags.invalid) {
-        if (this.forms.publish) {
+        if (this.forms.publish && this.forms.publish != 'submit') {
           this.$observable.fire(this.forms.publish, this.forms.model)
         }
         this.$emit('modelChange', this.forms.model)
@@ -67,7 +80,7 @@ export default {
         if (data.type == 'modelUpdate') {
           var keys = Object.keys(data.model)
           keys.forEach((key, index) => {
-            console.log(index);
+            console.log(index)
             self.formModel[key] = data.model[key]
           })
           self.formModel.serial_num = data.model.serial_num
