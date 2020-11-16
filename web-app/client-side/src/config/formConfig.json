@@ -1,0 +1,12 @@
+{
+    "form": {
+        "fields": [{
+            "type": "text",
+            "label": "First Name",
+            "name": "firstName"
+        }],
+        "model": {
+
+        }
+    }
+}
