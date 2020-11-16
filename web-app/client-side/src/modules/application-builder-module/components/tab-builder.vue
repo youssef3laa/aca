@@ -8,7 +8,7 @@
       <v-tab-item v-for="formData in section.forms" :key="formData.id">
         <v-card flat>
           <v-card-text v-text="formData.form.name"></v-card-text>
-          <formBuilder v-on:modelChange="dataChange" :forms="formData" :model="formData.model" />
+          <FormBuilder :forms="formData" :model="formData.model" />
         </v-card>
       </v-tab-item>
     </v-tabs-items>
@@ -17,19 +17,12 @@
 </template>
 
 <script>
-import formBuilder from './form-builder'
+import FormBuilder from './form-builder'
 export default {
   tab: null,
-  name: 'tab-builder',
+  name: 'TabBuilder',
   components: {
-    formBuilder,
-  },
-  methods: {
-    dataChange: function(model){
-      console.log("tab builder")
-      console.log(model)
-       this.$emit("modelChange", model);
-    }
+    FormBuilder,
   },
   data() {
     return {

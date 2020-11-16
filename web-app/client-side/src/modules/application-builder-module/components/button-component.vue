@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'buttonComponent',
+  name: 'ButtonComponent',
   props: ['val', 'field'],
   methods: {
     submit: function() {

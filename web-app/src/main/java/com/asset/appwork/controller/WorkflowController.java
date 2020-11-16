@@ -41,19 +41,18 @@ public class WorkflowController {
                 String response = cordysUtil.sendRequest(account, workflow.getHumanTasks(account.getSAMLart()));
                 Document document = SystemUtil.convertStringToXMLDocument(response);
                 NodeList tasks = document.getElementsByTagName("NOTF_TASK_INSTANCE");
-                String table = "{\"headers\":[\n" +
-                        "{\"text\": \"Task Activity\", \"align\": \"start\", \"filterable\": false, \"value\": \"Activity\"},\n"+
-                        "{\"text\": \"Process Name\", \"value\": \"ProcessName\"},\n"+
-                        "{\"text\": \"Date\", \"value\": \"DeliveryDate\"},\n"+
-                        "{ \"text\": \"Actions\", \"value\": \"actions\", \"sortable\": false }\n"+
-                        "],\n" +
+                String data = "{\n" +
                         "\"data\": [\n";
-                for(int i = 0 ; i < tasks.getLength() ; i++){
-                    table += SystemUtil.converDocumentNodetoJSON(tasks.item(i))+",\n";
+//                String data = "[\n";
+                if(tasks.getLength() > 0){
+                    for(int i = 0 ; i < tasks.getLength() ; i++){
+                        data += SystemUtil.converDocumentNodetoJSON(tasks.item(i))+",\n";
+                    }
+                    data = data.substring(0,data.length()-2);
                 }
-                table = table.substring(0,table.length()-2);
-                table += "]}";
-                respBuilder.data(table);
+//                data += "]";
+                data += "]}";
+                respBuilder.data(data);
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();

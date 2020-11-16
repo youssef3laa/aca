@@ -2,6 +2,8 @@ package com.asset.appwork.config;
 
 
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.enums.ResponseCode;
+import com.asset.appwork.exception.AppworkException;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -10,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import java.util.concurrent.ConcurrentHashMap;
 import com.auth0.jwt.JWT;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.stereotype.Service;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
@@ -23,7 +26,7 @@ public class TokenService {
     private static final String SECRET = "Asset99a";
     //    private static final long EXPIRATION_TIME = 864_000_000; // 10 days
 
-    public String generateNewToken(Account account) {
+    public String generateNewToken(Account account) throws AppworkException {
         try {
             ObjectMapper mapper =  new ObjectMapper();
 
@@ -34,28 +37,25 @@ public class TokenService {
                     .sign(HMAC512(SECRET.getBytes()));
             return token;
         } catch (Exception e){
-            e.printStackTrace();
-            return null;
+            throw new AppworkException(e.getMessage(), ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public Authentication retrieve(String token) {
+    public Authentication retrieve(String token) throws AppworkException {
         try {
             Account account = readTokenData(token);
-            if(account == null){
-                return null;
-            }
-            AuthenticationWithToken resultOfAuthentication = new AuthenticationWithToken(account.getUsername(), null,
+            if(account == null) throw new AppworkException("Invalid User", ResponseCode.INVALID_AUTH);
+
+            AuthenticationFilter.AuthenticationWithToken resultOfAuthentication = new AuthenticationFilter.AuthenticationWithToken(account.getUsername(), null,
                     AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_DOMAIN_USER"));
             resultOfAuthentication.setToken(token);
             return resultOfAuthentication;
         }catch (Exception e){
-            e.printStackTrace();
-            return null;
+            throw new AppworkException(e.getMessage(), ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public Account readTokenData(String token){
+    public Account readTokenData(String token) throws AppworkException {
         ObjectMapper mapper = new ObjectMapper();
         try {
             String jsonSubject = JWT.require(HMAC512(SECRET.getBytes())).build().verify(token).getSubject();
@@ -66,8 +66,7 @@ public class TokenService {
 //                return null;
 //            }
         }catch (Exception e){
-            e.printStackTrace();
-            return null;
+            throw new AppworkException(e.getMessage(), ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }
 

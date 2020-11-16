@@ -97,7 +97,7 @@ export default {
             // this.$refs.form.reset()
             http.post('user/login', this.user.toJson()).then(response=> {
                 system.showMessage(this.$refs.message, "logged-in-success", 'success')
-                this.user.setSAMLart(response.data)
+                this.user.setSAMLart(response.data.data)
                 Vue.prototype.$user = this.user;
                 localStorage.setItem("user", this.user.toString());
 

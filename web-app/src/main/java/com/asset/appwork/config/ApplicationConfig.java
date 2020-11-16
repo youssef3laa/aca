@@ -14,6 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -30,14 +32,17 @@ import java.util.Collections;
 @Configuration
 @EnableWebSecurity
 @ComponentScan("com.asset.appwork")
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class ApplicationConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
-    @Autowired
-    private CustomAuthenticationProvider authProvider;
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new TenantManagement.TenantNameInterceptor());
+    }
+
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(domainUsernamePasswordAuthenticationProvider()).
+        auth.
                 authenticationProvider(tokenAuthenticationProvider());
 //        auth.authenticationProvider(authProvider);
     }
@@ -47,8 +52,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable().
                 sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
                 and().
-                authorizeRequests().
-                anyRequest().authenticated()
+                authorizeRequests()
+                .antMatchers("/api/user/login").permitAll()
+                .anyRequest().authenticated()
 
                 .and()
                 .cors().configurationSource(new CorsConfigurationSource() {
@@ -74,11 +80,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AuthenticationProvider tokenAuthenticationProvider() {
-        return new TokenAuthenticationProvider(tokenService());
+        return new AuthenticationFilter.TokenAuthenticationProvider(tokenService());
     }
 
-    @Bean
-    public AuthenticationProvider domainUsernamePasswordAuthenticationProvider() {
-        return new DomainUsernamePasswordAuthenticationProvider(tokenService());
-    }
+//    @Bean
+//    public AuthenticationProvider domainUsernamePasswordAuthenticationProvider() {
+//        return new AuthenticationFilter.DomainUsernamePasswordAuthenticationProvider(tokenService());
+//    }
 }

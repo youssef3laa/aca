@@ -28,15 +28,17 @@
 
 <script>
 import { ValidationObserver } from 'vee-validate'
-import inputComponent from './input-component'
-import buttonComponent from './button-component'
+import InputComponent from './input-component'
+import ButtonComponent from './button-component'
+import TableComponent from './table-component'
 
 export default {
-  name: 'form-builder',
+  name: 'FormBuilder',
   components: {
-    inputComponent,
+    InputComponent,
     ValidationObserver,
-    buttonComponent,
+    ButtonComponent,
+    TableComponent
   },
   data() {
     return {

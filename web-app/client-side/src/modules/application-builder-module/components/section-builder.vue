@@ -1,21 +1,28 @@
 <template>
   <v-container>
-    <tabBuilder
+    <TabBuilder
       :section="section"
       v-on:modelChange="dataChange"
       v-if="section.tabs"
     />
+    <span v-else v-for="formData in section.forms" :key="formData.id">
+      <v-card flat>
+        <v-card-text v-text="formData.form.name"></v-card-text>
+        <FormBuilder :forms="formData" :model="formData.model" />
+      </v-card>
+    </span>
+   
   </v-container>
 </template>
 
 <script>
-import tabBuilder from './tab-builder'
-// import formBuilder from './FormBuilder'
+import TabBuilder from './tab-builder'
+import FormBuilder from './form-builder'
 export default {
-  name: 'section-builder',
+  name: 'SectionBuilder',
   components: {
-    tabBuilder,
-    // formBuilder,
+    TabBuilder,
+    FormBuilder,
   },
   methods: {
     dataChange: function(model) {

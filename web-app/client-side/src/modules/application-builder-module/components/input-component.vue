@@ -18,7 +18,7 @@
 import { ValidationProvider } from 'vee-validate'
 
 export default {
-  name: 'input-builder',
+  name: 'InputComponent',
   components: {
     ValidationProvider,
   },
