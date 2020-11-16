@@ -1,5 +1,6 @@
 <template>
-	<div>
+<div>
+
 		<v-app-bar :style="[$vuetify.rtl ? {'direction': 'rtl'} : {'direction': 'ltr'}]">
 			<div style="width: 200px">
 				<v-img contain width="200px" src="https://www.aca.gov.eg/style%20library/img/mainLogo.png">
@@ -43,8 +44,7 @@
 				</v-list-item>
 			</v-list>
 		</v-navigation-drawer>
-
-	</div>
+</div>
 </template>
 
 <script>
@@ -61,6 +61,7 @@
 				drawer: false,
 				items: [
 					{ title: 'Home', icon: 'dashboard', action: this.home },
+					{ title: 'Demo', icon: 'dashboard', action: this.demo },
 					{ title: 'About', icon: 'question_answer', action: this.about },
 					{ title: 'Logout', icon: 'question_answer', action: this.logout },
 				],
@@ -68,10 +69,12 @@
 		},
 		methods: {
 			home() {
-
+				router.push('home')
+			},
+			demo() {
+				router.push('demo')
 			},
 			about() {
-
 			},
 			logout() {
 				localStorage.removeItem('user')
