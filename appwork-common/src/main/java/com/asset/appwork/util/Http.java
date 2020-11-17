@@ -1,14 +1,23 @@
 package com.asset.appwork.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.http.HttpHeaders;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by karim on 10/25/20.
@@ -16,42 +25,61 @@ import java.util.Optional;
 @Slf4j
 public class Http {
     HttpClient client;
-    Header header;
-    String data;
-    String contentType;
+    //    Header header;
+    Set<Header> headers;
+    Object data;
+    ContentType contentType;
     Integer statusCode;
     String response;
     boolean doAuthentication;
 
-    public Http(){
+    public Http() {
         this.client = new HttpClient();
+//        headerSet = Collections.emptySet();
+        headers = new HashSet<>();
     }
 
-    public String getResponse(){
-        return this.response;
-    }
-
-    public Http setHeader(String key, String value ){
-        Optional.of(this.header).orElseGet(()-> new Header() );
-        header.setName(key);
-        header.setValue(value);
+    public Http basicAuthentication(String username, String password) {
+        String auth = username + ":" + password;
+        byte[] encodedAuth = Base64.encodeBase64(
+                auth.getBytes(StandardCharsets.ISO_8859_1));
+        String authHeader = "Basic " + new String(encodedAuth);
+        this.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
         return this;
     }
 
-    public Http setData(String data){
+    public String getResponse() {
+        return this.response;
+    }
+
+    public Http setHeader(String key, String value) {
+        Header tempHeader = new Header();
+        tempHeader.setName(key);
+        tempHeader.setValue(value);
+        headers.add(tempHeader);
+//        Optional.of(this.header).orElseGet(()-> new Header() );
+//        header.setName(key);
+//        header.setValue(value);
+        return this;
+    }
+
+    public Http setData(Object data) {
         this.data = data;
         return this;
     }
 
-    public Http get(String url){
+    public Http get(String url) {
         GetMethod method = new GetMethod(url);
-        method.setRequestHeader(header);
+        if (!headers.isEmpty()) headers.forEach(headerVar -> {
+            method.addRequestHeader(headerVar);
+        });
+
         try {
             statusCode = this.client.executeMethod(method);
             response = method.getResponseBodyAsString();
 
         } catch (IOException e) {
-           log.error(e.getMessage());
+            log.error(e.getMessage());
         }
         return this;
     }
@@ -66,9 +94,12 @@ public class Http {
         if (doAuthentication) method.setDoAuthentication(doAuthentication);
 
         try {
-            if (header != null) method.setRequestHeader(header);
-            contentType = Optional.of(contentType).orElseGet(()-> ContentType.JSON_REQUEST.getContentType());
-            method.setRequestEntity(new StringRequestEntity(data, contentType, "UTF-8"));
+
+            if (!headers.isEmpty()) headers.forEach(headerVar -> {
+                method.addRequestHeader(headerVar);
+            });
+
+            method.setRequestEntity(setRequestEntity());
             statusCode = this.client.executeMethod(method);
             response = method.getResponseBodyAsString();
 
@@ -78,20 +109,39 @@ public class Http {
         return this;
     }
 
-    public Http setContentType(ContentType requestType){
-        this.contentType = requestType.getContentType();
+    private RequestEntity setRequestEntity() throws UnsupportedEncodingException {
+        switch (this.contentType) {
+            case JSON_REQUEST:
+            case XML_REQUEST:
+                return new StringRequestEntity((String) this.data, this.contentType.getContentType(), StandardCharsets.UTF_8.name());
+            case FORM_REQUEST:
+                return new MultipartRequestEntity((Part[]) this.data, new HttpMethodParams());
+            default:
+                return null;
+        }
+    }
+
+    public Http setContentType(ContentType requestType) {
+        this.contentType = requestType;
         return this;
     }
 
 
-    public enum ContentType{
+    public enum ContentType {
         XML_REQUEST("text/xml"),
         FORM_REQUEST("application/x-www-form-urlencoded"),
         JSON_REQUEST("application/json");
 
         private final String contentType;
-        private ContentType(String contentType) { this.contentType = contentType; }
-        public String getContentType() { return contentType; }
+
+        ContentType(String contentType) {
+            this.contentType = contentType;
+        }
+
+        public String getContentType() {
+            return contentType;
+        }
     }
+
 
 }
