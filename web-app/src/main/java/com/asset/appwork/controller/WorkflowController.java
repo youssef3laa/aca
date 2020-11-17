@@ -1,7 +1,6 @@
 package com.asset.appwork.controller;
 
 import com.asset.appwork.config.TokenService;
-import com.asset.appwork.cordys.CordysManagement;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
@@ -11,9 +10,6 @@ import com.asset.appwork.util.SystemUtil;
 import com.asset.appwork.webservice.Task;
 import com.asset.appwork.webservice.Workflow;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +32,7 @@ public class WorkflowController {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Workflow workflow = new Workflow();
-            Account account = tokenService.readTokenData(token);
+            Account account = tokenService.get(token);
             if(account != null){
                 String response = cordysUtil.sendRequest(account, workflow.getHumanTasks(account.getSAMLart()));
                 Document document = SystemUtil.convertStringToXMLDocument(response);
@@ -69,7 +65,7 @@ public class WorkflowController {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Task task= new Task();
-            Account account = tokenService.readTokenData(token);
+            Account account = tokenService.get(token);
             String taskId = SystemUtil.readJSONField(taskJson, "TaskId");
             String nameSpace = SystemUtil.readJSONField(taskJson, "NameSpace");
             String taskData = SystemUtil.readJSONObject(taskJson, "TaskData");
