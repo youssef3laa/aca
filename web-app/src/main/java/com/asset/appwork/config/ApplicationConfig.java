@@ -39,12 +39,9 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter implements W
         registry.addInterceptor(new TenantManagement.TenantNameInterceptor());
     }
 
-
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.
-                authenticationProvider(tokenAuthenticationProvider());
-//        auth.authenticationProvider(authProvider);
+        auth.authenticationProvider(tokenAuthenticationProvider());
     }
 
     @Override
@@ -55,7 +52,6 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter implements W
                 authorizeRequests()
                 .antMatchers("/api/user/login").permitAll()
                 .anyRequest().authenticated()
-
                 .and()
                 .cors().configurationSource(new CorsConfigurationSource() {
             @Override
@@ -67,24 +63,12 @@ public class ApplicationConfig extends WebSecurityConfigurerAdapter implements W
                 config.setAllowCredentials(true);
                 return config;
             }
-        });;
+        });
         http.addFilterBefore(new AuthenticationFilter(authenticationManager()), BasicAuthenticationFilter.class);
-//        http.authorizeRequests().anyRequest().authenticated().and().httpBasic();
-    }
-
-
-    @Bean
-    public TokenService tokenService() {
-        return new TokenService();
     }
 
     @Bean
     public AuthenticationProvider tokenAuthenticationProvider() {
-        return new AuthenticationFilter.TokenAuthenticationProvider(tokenService());
+        return new AuthenticationFilter.TokenAuthenticationProvider();
     }
-
-//    @Bean
-//    public AuthenticationProvider domainUsernamePasswordAuthenticationProvider() {
-//        return new AuthenticationFilter.DomainUsernamePasswordAuthenticationProvider(tokenService());
-//    }
 }

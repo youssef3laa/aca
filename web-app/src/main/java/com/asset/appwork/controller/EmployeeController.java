@@ -9,8 +9,6 @@ import com.asset.appwork.util.CordysUtil;
 import com.asset.appwork.util.SystemUtil;
 import com.asset.appwork.webservice.Employee;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +33,7 @@ public class EmployeeController {
             String Fname = SystemUtil.readJSONField(employeeJson, "Fname");
             String Lname = SystemUtil.readJSONField(employeeJson, "Lname");
             String Email = SystemUtil.readJSONField(employeeJson, "Email");
-            Account account = tokenService.readTokenData(token);
+            Account account = tokenService.get(token);
             if(account != null){
                 String response = cordysUtil.sendRequest(account, employee.initiateEmployeeApproval(account.getSAMLart(),Fname,Lname,Email));
                 respBuilder.data(response);
