@@ -1,6 +1,6 @@
 <template>
   <div>
-    <TheNavbar />
+    <!-- <TheNavbar /> -->
     <v-app id="inspire">
       <v-container>
         <AppBuilder :app="app" />
@@ -10,14 +10,14 @@
 </template>
 
 <script>
-import TheNavbar from "../../core-module/components/the-nav-bar";
-import AppBuilder from "../../application-builder-module/components/app-builder";
-import http from "../../core-module/services/http";
+// import TheNavbar from '../../core-module/components/the-nav-bar'
+import AppBuilder from '../../application-builder-module/components/app-builder'
+import http from '../../core-module/services/http'
 
 export default {
-  name: "HomePage",
+  name: 'HomePage',
   components: {
-    TheNavbar,
+    // TheNavbar,
     AppBuilder,
   },
   data() {
@@ -31,49 +31,49 @@ export default {
                 tabs: [
                   {
                     id: 1,
-                    name: "بيانات السياسة",
+                    name: 'بيانات السياسة',
                   },
                 ],
                 forms: [
                   {
-                    publish: "submit",
-                    event: "submit",
+                    publish: 'submit',
+                    event: 'submit',
                     form: [
                       {
-                        type: "InputComponent",
-                        label: "First name",
-                        name: "Fname",
+                        type: 'InputComponent',
+                        label: 'First name',
+                        name: 'Fname',
                         col: 4,
-                        rule: "required|minmax:2,25",
+                        rule: 'required|minmax:2,25',
                         //  readonly : true
                       },
                       {
-                        type: "InputComponent",
-                        label: "Last name",
-                        name: "Lname",
+                        type: 'InputComponent',
+                        label: 'Last name',
+                        name: 'Lname',
                         col: 4,
-                        rule: "required|minmax:2,25",
+                        rule: 'required|minmax:2,25',
                       },
                       {
-                        type: "InputComponent",
-                        label: "Email Adress",
-                        name: "Email",
+                        type: 'InputComponent',
+                        label: 'Email Adress',
+                        name: 'Email',
                         col: 4,
-                        rule: "required|minmax:2,25",
+                        rule: 'required|minmax:2,25',
                       },
                       {
-                        type: "ButtonComponent",
-                        action: "submit",
-                        label: "submit",
-                        name: "submitBtn",
+                        type: 'ButtonComponent',
+                        action: 'submit',
+                        label: 'submit',
+                        name: 'submitBtn',
                         col: 4,
-                        rule: "required|minmax:2,25",
+                        rule: 'required|minmax:2,25',
                       },
                     ],
                     model: {
-                      Fname: "",
-                      Lname: "",
-                      Email: "",
+                      Fname: '',
+                      Lname: '',
+                      Email: '',
                     },
                   },
                 ],
@@ -82,16 +82,16 @@ export default {
                 tabs: [
                   {
                     id: 1,
-                    name: "المهام",
+                    name: 'المهام',
                   },
                 ],
                 forms: [
                   {
                     form: [
                       {
-                        type: "TableComponent",
-                        name: "taskTable",
-                        subscribe: "tasks",
+                        type: 'TableComponent',
+                        name: 'taskTable',
+                        subscribe: 'tasks',
                         col: 12,
                       },
                     ],
@@ -99,35 +99,35 @@ export default {
                       taskTable: {
                         headers: [
                           {
-                            text: "Task",
-                            align: "start",
+                            text: 'Task',
+                            align: 'start',
                             filterable: false,
-                            value: "Activity",
+                            value: 'Activity',
                           },
                           {
-                            text: "Sender Name",
-                            value: "Sender.displayName",
+                            text: 'Sender Name',
+                            value: 'Sender.displayName',
                           },
                           {
-                            text: "Process Name",
-                            value: "ProcessName",
+                            text: 'Process Name',
+                            value: 'ProcessName',
                           },
                           {
-                            text: "Date",
-                            value: "DeliveryDate",
+                            text: 'Date',
+                            value: 'DeliveryDate',
                           },
                           {
-                            text: "Target Type",
-                            value: "Target.type",
+                            text: 'Target Type',
+                            value: 'Target.type',
                           },
                           {
-                            text: "Actions",
-                            value: "actions",
+                            text: 'Actions',
+                            value: 'actions',
                             sortable: false,
                           },
                         ],
                         data: [],
-                        search: "",
+                        search: '',
                       },
                     },
                   },
@@ -137,29 +137,30 @@ export default {
           },
         ],
       },
-    };
+    }
   },
   methods: {
-    getTasks: function () {
-      http.get("workflow/human/tasks").then((response) => {
-        console.log(response);
-        var data = JSON.parse(response.data.data);
-        console.log(data);
-        this.$observable.fire("tasks", {
-          type: "modelUpdate",
+    getTasks: function() {
+      http.get('workflow/human/tasks').then((response) => {
+        console.log(response)
+        var data = JSON.parse(response.data.data)
+        console.log(data)
+        this.$observable.fire('tasks', {
+          type: 'modelUpdate',
           model: data,
-        });
-      });
+        })
+      })
     },
   },
 
-  mounted: function () {
-    this.$observable.subscribe("submit", (model) => {
-      console.log(model);
-      // this.getTasks()
+  mounted: function() {
+    this.getTasks()
+    this.$observable.subscribe('submit', (model) => {
+      console.log(model)
+      this.getTasks()
       if (model.valid) {
         http
-          .post('employee/initiate/', model)
+          .post('employee/initiate/', model.model)
           .then((response) => {
             console.log(response)
             this.getTasks()
@@ -168,9 +169,9 @@ export default {
             console.error(error)
           })
       }
-    });
+    })
   },
-};
+}
 
 // <component
 //         v-if="formBuilder != null"

@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import LoginRoutes from '../modules/login-module/router/router'
 import AdminRoutes from '../modules/admin-module/router/router'
 import DemoRoutes from '../modules/demo-module/router/router'
+import ManualStep from '../modules/manual-step-module/router/router'
 
 Vue.use(VueRouter)
 
@@ -24,7 +25,7 @@ Vue.use(VueRouter)
 // ]
 
 var allRoutes = []
-allRoutes = allRoutes.concat(LoginRoutes, AdminRoutes, DemoRoutes,{
+allRoutes = allRoutes.concat(LoginRoutes, AdminRoutes, DemoRoutes, ManualStep, {
   path: '/',
   name: 'Home',
   component: Home,
