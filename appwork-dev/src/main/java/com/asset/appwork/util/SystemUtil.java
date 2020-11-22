@@ -97,7 +97,7 @@ public class SystemUtil {
         return xml;
     }
 
-    public static String converDocumentNodetoJSON(Node node){
+    public static String convertDocumentNodetoJSON(Node node){
         String xml = convertXMLDocumentNodeToString(node);
         String json = convertXMLtoJSON(xml);
         return json;

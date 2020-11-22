@@ -7,13 +7,14 @@ import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.util.CordysUtil;
 import com.asset.appwork.util.SystemUtil;
-import com.asset.appwork.webservice.Task;
 import com.asset.appwork.webservice.Workflow;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -42,7 +43,7 @@ public class WorkflowController {
 //                String data = "[\n";
                 if(tasks.getLength() > 0){
                     for(int i = 0 ; i < tasks.getLength() ; i++){
-                        data += SystemUtil.converDocumentNodetoJSON(tasks.item(i))+",\n";
+                        data += SystemUtil.convertDocumentNodetoJSON(tasks.item(i))+",\n";
                     }
                     data = data.substring(0,data.length()-2);
                 }
@@ -64,7 +65,7 @@ public class WorkflowController {
     public ResponseEntity<AppResponse<String>> completeWorkflow(@RequestHeader("X-Auth-Token") String token,@RequestBody() String taskJson) {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
-            Task task= new Task();
+            Workflow workflow= new Workflow();
             Account account = tokenService.get(token);
             String taskId = SystemUtil.readJSONField(taskJson, "TaskId");
             String nameSpace = SystemUtil.readJSONField(taskJson, "NameSpace");
@@ -72,7 +73,7 @@ public class WorkflowController {
             taskData = SystemUtil.convertJSONtoXML(taskData);
             taskData = SystemUtil.addNameSpaceToXML(taskData,nameSpace);
             if(account != null){
-                String response = cordysUtil.sendRequest(account, task.performTaskAction(account.getSAMLart(), taskId, "COMPLETE", "", taskData));
+                String response = cordysUtil.sendRequest(account, workflow.performTaskAction(account.getSAMLart(), taskId, "COMPLETE", "", taskData));
                 respBuilder.data(response);
             }
         } catch (JsonProcessingException e) {
@@ -84,4 +85,46 @@ public class WorkflowController {
         }
         return respBuilder.build().getResponseEntity();
     }
+
+    @PostMapping("/task/claim")
+    public ResponseEntity<AppResponse<String>> claimTask(@RequestHeader("X-Auth-Token") String token,@RequestBody() String taskId){
+        AppResponse.ResponseBuilder<String> responseBuilder = AppResponse.builder();
+        try {
+            Workflow workflow= new Workflow();
+            Account account = tokenService.get(token);
+            if(account != null){
+                String response = cordysUtil.sendRequest(account, workflow.getTask(account.getSAMLart(), taskId));
+                System.out.println(response);
+
+                Document document = SystemUtil.convertStringToXMLDocument(response);
+                Node task = null;
+                if (document != null) {
+                    task = document.getElementsByTagName("Task").item(0);
+                    response = SystemUtil.convertDocumentNodetoJSON(task);
+                    String taskState = SystemUtil.readJSONField(response, "State");
+                    if (taskState != null) {
+                        if(!taskState.equals("ASSIGNED")){
+                            response = cordysUtil.sendRequest(account, workflow.claimTask(account.getSAMLart(), taskId));
+                        }else{
+                            response = "Task is already claimed.";
+                        }
+                    }else{
+                        throw new AppworkException("Invalid Task State Response", ResponseCode.INTERNAL_SERVER_ERROR);
+                    }
+                }else{
+                    throw new AppworkException("Invalid Task State Response", ResponseCode.INTERNAL_SERVER_ERROR);
+                }
+                responseBuilder.data(response);
+            }
+        }catch (AppworkException e){
+            e.printStackTrace();
+            responseBuilder.status(e.getCode());
+            responseBuilder.data(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+        return responseBuilder.build().getResponseEntity();
+    }
+
 }
