@@ -25,7 +25,6 @@ import java.util.Set;
 @Slf4j
 public class Http {
     HttpClient client;
-    //    Header header;
     Set<Header> headers;
     Object data;
     ContentType contentType;
@@ -35,7 +34,6 @@ public class Http {
 
     public Http() {
         this.client = new HttpClient();
-//        headerSet = Collections.emptySet();
         headers = new HashSet<>();
     }
 
@@ -57,9 +55,6 @@ public class Http {
         tempHeader.setName(key);
         tempHeader.setValue(value);
         headers.add(tempHeader);
-//        Optional.of(this.header).orElseGet(()-> new Header() );
-//        header.setName(key);
-//        header.setValue(value);
         return this;
     }
 
