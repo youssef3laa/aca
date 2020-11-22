@@ -1,4 +1,5 @@
 package com.asset.appwork.util;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +28,14 @@ public class SystemUtil {
         return (jsonNode == null ? null : jsonNode.textValue());
     }
 
-    public static String readJSONObject(String json, String name) throws  JsonProcessingException {
+    public static JsonNode convertStringToJsonNode(String json) throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        return json != null ? mapper.readTree(json) : null;
+    }
+
+    public static String readJSONObject(String json, String name) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(json);
         jsonNode = jsonNode.get(name);
@@ -51,7 +59,7 @@ public class SystemUtil {
         return null;
     }
 
-    public static String convertXMLDocumentNodeToString(Node node){
+    public static String convertXMLDocumentNodeToString(Node node) {
         try {
             StringWriter writer = new StringWriter();
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -77,13 +85,13 @@ public class SystemUtil {
         return null;
     }
 
-    public static String convertJSONtoXML(String json){
+    public static String convertJSONtoXML(String json) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectMapper xmlMapper = new XmlMapper();
             JsonNode tree = objectMapper.readTree(json);
             String xml = xmlMapper.writer().withoutRootName().writeValueAsString(tree);
-            return xml.replace("<>","").replace("</>","");
+            return xml.replace("<>", "").replace("</>", "");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -91,13 +99,13 @@ public class SystemUtil {
     }
 
     public static String addNameSpaceToXML(String xml, String nameSpace) {
-        if(!nameSpace.isEmpty() && !xml.isEmpty()){
-            return xml.replaceFirst(">"," xmlns=\""+nameSpace+"\">");
+        if (!nameSpace.isEmpty() && !xml.isEmpty()) {
+            return xml.replaceFirst(">", " xmlns=\"" + nameSpace + "\">");
         }
         return xml;
     }
 
-    public static String convertDocumentNodetoJSON(Node node){
+    public static String convertDocumentNodetoJSON(Node node) {
         String xml = convertXMLDocumentNodeToString(node);
         String json = convertXMLtoJSON(xml);
         return json;
