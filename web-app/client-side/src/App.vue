@@ -1,8 +1,11 @@
 <template>
+
   <div id="app">
     <TheNavbar />
+    <v-app id="inspire">
     <!-- <dynamicView /> -->
     <router-view />
+    </v-app>
   </div>
 </template>
 

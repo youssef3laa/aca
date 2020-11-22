@@ -1,11 +1,13 @@
 <template>
   <div>
     <!-- <TheNavbar /> -->
-    <v-app id="inspire">
+    <!-- <v-app id="inspire"> -->
       <v-container>
         <AppBuilder :app="app" />
       </v-container>
-    </v-app>
+
+      <v-container> <ApprovalCard /> </v-container>
+    <!-- </v-app> -->
   </div>
 </template>
 
@@ -13,12 +15,14 @@
 // import TheNavbar from '../../core-module/components/the-nav-bar'
 import AppBuilder from '../../application-builder-module/components/app-builder'
 import http from '../../core-module/services/http'
+import ApprovalCard from '../../approval-card-module/Approval-component'
 
 export default {
   name: 'HomePage',
   components: {
     // TheNavbar,
     AppBuilder,
+    ApprovalCard,
   },
   data() {
     return {

@@ -14,7 +14,7 @@
                 
                     <v-card-text>
 
-                        <validation-provider name="username" rules="required|minmax:2,25"
+                        <validation-provider name="username" rules="required|minmax:2,55"
                             v-slot="{ errors }">
 
                             <v-text-field 
