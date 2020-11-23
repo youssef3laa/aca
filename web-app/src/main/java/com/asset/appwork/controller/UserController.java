@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/user")
 @RestController
-public class UserController{
+public class UserController {
 
     @Autowired
     TokenService tokenService;
@@ -29,7 +29,7 @@ public class UserController{
 
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
-            CordysManagement.User user= cordysManagement.getUser(account.getUsername(), account.getPassword(), account.getOrganization());
+            CordysManagement.User user = cordysManagement.getUser(account.getUsername().trim(), account.getPassword(), account.getOrganization().trim());
             account.setSAMLart(user.getSAMLart());
             respBuilder.data(tokenService.generate(account));
         } catch (JsonProcessingException e) {
