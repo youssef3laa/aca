@@ -5,7 +5,7 @@
     :rules="field.rule"
     v-slot="{ errors }"
   >
-    <v-text-field v-model="d" @input="addInput">
+    <v-text-field v-model="d" @input="addInput" :disabled="readonly">
       <template #label>
         <span v-t="field.label"></span>
       </template>
@@ -26,6 +26,7 @@ export default {
     return {
       eventName: this.field.eventName,
       d: this.val,
+      readonly: this.field.readonly
     }
   },
   methods: {

@@ -1,5 +1,6 @@
 <template>
-  <v-container>
+  <!-- <v-container> -->
+    <div>
     <v-tabs v-model="tab" align-with-title >
       <v-tabs-slider color="yellow"></v-tabs-slider>
       <v-tab v-for="tab in section.tabs" :key="tab.id">{{ tab.name }}</v-tab>
@@ -12,8 +13,10 @@
         </v-card>
       </v-tab-item>
     </v-tabs-items>
+    </div>
+
  
-  </v-container>
+  <!-- </v-container> -->
 </template>
 
 <script>

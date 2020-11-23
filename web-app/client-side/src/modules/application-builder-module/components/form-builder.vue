@@ -31,6 +31,8 @@ import { ValidationObserver } from 'vee-validate'
 import InputComponent from './input-component'
 import ButtonComponent from './button-component'
 import TableComponent from './table-component'
+import RadioGroupComponent from './radioGroup-component'
+import TextareaComponent from './textarea-component'
 
 export default {
   name: 'FormBuilder',
@@ -38,7 +40,9 @@ export default {
     InputComponent,
     ValidationObserver,
     ButtonComponent,
-    TableComponent
+    TableComponent,
+    RadioGroupComponent,
+    TextareaComponent
   },
   data() {
     return {
@@ -95,3 +99,8 @@ export default {
 </script>
 
 <style></style>
+
+
+
+
+
