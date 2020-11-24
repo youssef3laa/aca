@@ -84,11 +84,23 @@ export default {
     console.log(item)
     this.$observable.subscribe('compelete', (model) => {
       console.log(model)
-   
+      console.log(this.app.pages[0].sections[0].forms[0].model)
+      // this.app.pages[0].sections[0].forms[0].form.pop();
+      
+      
+      // .push({
+      //   type: 'InputComponent',
+      //   label: 'name',
+      //   name: 'Fname',
+      //   col: 4,
+      //   readonly: false,
+      //   rule: 'required|minmax:2,25',
+      // })
+      console.log('complete Key')
     })
     this.$observable.subscribe('submit', (model) => {
       console.log(model)
-      console.log('submit is called');
+      console.log('submit is called')
       // var output = {
       //   TaskId: this.taskId,
       //   NameSpace: 'http://schemas.cordys.com/',
@@ -129,15 +141,15 @@ export default {
                 ],
                 forms: [
                   {
-                    publish: 'submit',
-                    event: 'submit',
+                    publish: 'complete',
                     form: [
                       {
                         type: 'InputComponent',
                         label: 'First name',
                         name: 'Fname',
                         col: 4,
-                        readonly: true,
+                        readonly: false,
+                        rule: 'required|minmax:2,25',
                       },
                       {
                         type: 'InputComponent',
@@ -174,7 +186,7 @@ export default {
               {
                 forms: [
                   {
-                    publish: 'submit',
+                    publish: 'compelete',
                     event: 'submit',
                     form: [
                       {
@@ -198,7 +210,7 @@ export default {
                         ],
                         name: 'decision',
                         label: 'decision',
-                        col: 4,
+                        col: 6,
                       },
                       {
                         type: 'TextareaComponent',
@@ -208,8 +220,8 @@ export default {
                       },
                       {
                         type: 'ButtonComponent',
-                        action: 'submit',
                         label: 'submit',
+                        action: 'submit',
                         name: 'submit',
                         col: 4,
                       },

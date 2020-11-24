@@ -52,6 +52,9 @@ export default {
   methods: {
     updateText: function(data) {
       // console.log(data)
+      this.forms.model['_valid'] = !this.$refs['observer'].flags.invalid;
+      
+      
       if (data.name && data.value) this.forms.model[data.name] = data.value
 
       if (
@@ -65,13 +68,11 @@ export default {
           valid: !this.$refs['observer'].flags.invalid,
         })
       }
-
-      console.log(this.$refs['observer'])
-      if (!this.$refs['observer'].flags.invalid) {
-        if (this.forms.publish && this.forms.publish != 'submit') {
+      else if (!this.$refs['observer'].flags.invalid) {
+        if (this.forms.publish && !this.forms.event ) {
           this.$observable.fire(this.forms.publish, this.forms.model)
         }
-        this.$emit('modelChange', this.forms.model)
+        // this.$emit('modelChange', this.forms.model)
       }
       // console.log(this.model);
     },
