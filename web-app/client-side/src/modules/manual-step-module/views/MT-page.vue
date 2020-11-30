@@ -1,7 +1,7 @@
 <template>
   <!-- <v-app id="inspire"> -->
   <v-container>
-    <AppBuilder :app="app" />
+    <AppBuilder ref="appBuilders" :app="app" />
     <!-- <ApprovalCard :taskID="taskId" /> -->
   </v-container>
 
@@ -10,6 +10,7 @@
 
 <script>
 import http from '../../core-module/services/http'
+// import {ref} from 'vue'
 import AppBuilder from '../../application-builder-module/components/app-builder'
 // import ApprovalCard from '../../approval-card-module/Approval-component'
 
@@ -18,6 +19,7 @@ export default {
   props: ['item'],
   components: {
     AppBuilder,
+
     // ApprovalCard,
   },
   computed: {
@@ -43,10 +45,20 @@ export default {
             response.data.data.Body.ReadEmployeeDataResponse.LastName
           let email =
             response.data.data.Body.ReadEmployeeDataResponse.EmployeeData.Email
-          let model = this.app.pages[0].sections[0].forms[0].model
-          model.Fname = firstName
-          model.Lname = lastName
-          model.Email = email
+
+          this.$refs.appBuilders.setModelData('form1',
+            {
+              Fname: firstName,
+              Lname: lastName,
+              Email: email,
+            }
+          )
+
+          let model = this.app.pages[0].sections[0].forms[0]
+          console.log(model)
+          // model.Fname = firstName
+          // model.Lname = lastName
+          // model.Email = email
         })
         .catch((error) => {
           console.error(error)
@@ -85,9 +97,10 @@ export default {
     this.$observable.subscribe('compelete', (model) => {
       console.log(model)
       console.log(this.app.pages[0].sections[0].forms[0].model)
-      // this.app.pages[0].sections[0].forms[0].form.pop();
-      
-      
+      this.app.pages[0].sections[0].forms[0].form.pop()
+      this.$refs.appBuilders.setAppData(this.app)
+      // this.$refs.appBuilder.setPageDatas(this.app);
+
       // .push({
       //   type: 'InputComponent',
       //   label: 'name',
@@ -131,19 +144,24 @@ export default {
       app: {
         pages: [
           {
+            key:"page1",
             sections: [
               {
+                key:"section1",
                 tabs: [
                   {
+                    key:"tab1",
                     id: 1,
                     name: 'بيانات السياسة',
                   },
                 ],
                 forms: [
                   {
+                    key: 'form1',
                     publish: 'complete',
                     form: [
                       {
+                        key:"input1",
                         type: 'InputComponent',
                         label: 'First name',
                         name: 'Fname',
@@ -152,6 +170,7 @@ export default {
                         rule: 'required|minmax:2,25',
                       },
                       {
+                        key:"input1",
                         type: 'InputComponent',
                         label: 'Last name',
                         name: 'Lname',
@@ -159,6 +178,7 @@ export default {
                         readonly: true,
                       },
                       {
+                        key:"input1",
                         type: 'InputComponent',
                         label: 'Email Adress',
                         name: 'Email',
@@ -186,10 +206,12 @@ export default {
               {
                 forms: [
                   {
+                    key:"form2",
                     publish: 'compelete',
                     event: 'submit',
                     form: [
                       {
+                        key:"form2Input",
                         type: 'RadioGroupComponent',
                         decisions: [
                           {

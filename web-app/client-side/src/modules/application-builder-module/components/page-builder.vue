@@ -19,7 +19,9 @@ export default {
       console.log('Page Builder')
       console.log(model)
       this.$emit('modelChange', model)
-    },
+    }
+   
   },
+  
 }
 </script>
