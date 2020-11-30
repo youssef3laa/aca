@@ -46,13 +46,11 @@ export default {
           let email =
             response.data.data.Body.ReadEmployeeDataResponse.EmployeeData.Email
 
-          this.$refs.appBuilders.setModelData('form1',
-            {
-              Fname: firstName,
-              Lname: lastName,
-              Email: email,
-            }
-          )
+          this.$refs.appBuilders.setModelData('form1', {
+            Fname: firstName,
+            Lname: lastName,
+            Email: email,
+          })
 
           let model = this.app.pages[0].sections[0].forms[0]
           console.log(model)
@@ -144,13 +142,13 @@ export default {
       app: {
         pages: [
           {
-            key:"page1",
+            key: 'page1',
             sections: [
               {
-                key:"section1",
+                key: 'section1',
                 tabs: [
                   {
-                    key:"tab1",
+                    key: 'tab1',
                     id: 1,
                     name: 'بيانات السياسة',
                   },
@@ -161,7 +159,7 @@ export default {
                     publish: 'complete',
                     form: [
                       {
-                        key:"input1",
+                        key: 'input1',
                         type: 'InputComponent',
                         label: 'First name',
                         name: 'Fname',
@@ -170,7 +168,7 @@ export default {
                         rule: 'required|minmax:2,25',
                       },
                       {
-                        key:"input1",
+                        key: 'input1',
                         type: 'InputComponent',
                         label: 'Last name',
                         name: 'Lname',
@@ -178,12 +176,17 @@ export default {
                         readonly: true,
                       },
                       {
-                        key:"input1",
+                        key: 'input1',
                         type: 'InputComponent',
                         label: 'Email Adress',
                         name: 'Email',
                         col: 4,
                         readonly: true,
+                      },
+                      {
+                        type: 'RichtextComponent',
+                        name: 'richText',
+                        col: 12,
                       },
                       // {
                       //   type: 'ButtonComponent',
@@ -198,6 +201,7 @@ export default {
                       Fname: '',
                       Lname: '',
                       Email: '',
+                      richText: '<span style="background-color: rgb(255, 255, 0);">Test</span>',
                     },
                   },
                 ],
@@ -206,13 +210,37 @@ export default {
               {
                 forms: [
                   {
-                    key:"form2",
+                    key: 'form2',
                     publish: 'compelete',
                     event: 'submit',
                     form: [
                       {
-                        key:"form2Input",
+                        key: 'form2Input',
                         type: 'RadioGroupComponent',
+                        decisions: [
+                          {
+                            label: 'approve',
+                            id: 1,
+                            value: 'approve',
+                          },
+                          {
+                            label: 'reject',
+                            id: 2,
+                            value: 'reject',
+                          },
+                          {
+                            label: 'requestModification',
+                            id: 3,
+                            value: 'requestModification',
+                          },
+                        ],
+                        name: 'decision',
+                        label: 'decision',
+                        col: 6,
+                      },
+                      {
+                        key: 'form2Input',
+                        type: 'CheckboxComponent',
                         decisions: [
                           {
                             label: 'approve',

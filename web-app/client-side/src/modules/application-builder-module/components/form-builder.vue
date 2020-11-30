@@ -33,6 +33,8 @@ import ButtonComponent from './button-component'
 import TableComponent from './table-component'
 import RadioGroupComponent from './radioGroup-component'
 import TextareaComponent from './textarea-component'
+import CheckboxComponent from './checkbox-component'
+import RichtextComponent from './richText-component'
 
 export default {
   name: 'FormBuilder',
@@ -42,19 +44,21 @@ export default {
     ButtonComponent,
     TableComponent,
     RadioGroupComponent,
-    TextareaComponent
+    TextareaComponent,
+    CheckboxComponent,
+    RichtextComponent,
   },
   data() {
     return {
       formModel: this.model,
+      content: '',
     }
   },
   methods: {
     updateText: function(data) {
       // console.log(data)
-      this.forms.model['_valid'] = !this.$refs['observer'].flags.invalid;
-      
-      
+      this.forms.model['_valid'] = !this.$refs['observer'].flags.invalid
+
       if (data.name && data.value) this.forms.model[data.name] = data.value
 
       if (
@@ -67,9 +71,8 @@ export default {
           model: this.forms.model,
           valid: !this.$refs['observer'].flags.invalid,
         })
-      }
-      else if (!this.$refs['observer'].flags.invalid) {
-        if (this.forms.publish && !this.forms.event ) {
+      } else if (!this.$refs['observer'].flags.invalid) {
+        if (this.forms.publish && !this.forms.event) {
           this.$observable.fire(this.forms.publish, this.forms.model)
         }
         // this.$emit('modelChange', this.forms.model)
@@ -100,8 +103,3 @@ export default {
 </script>
 
 <style></style>
-
-
-
-
-
