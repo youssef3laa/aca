@@ -10,9 +10,11 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>appwork-cs</module>
         <module>appwork-common</module>
         <module>appwork-dev</module>
         <module>web-app</module>
+        <module>application-builder</module>
     </modules>
 
 </project>
