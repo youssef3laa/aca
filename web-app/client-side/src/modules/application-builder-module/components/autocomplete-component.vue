@@ -1,0 +1,42 @@
+<template>
+  <v-autocomplete
+    v-model="value"
+    :items="items"
+    outlined
+    dense
+    chips
+    deletable-chips
+    small-chips
+    label="field"
+    multiple
+    clearable
+    v-on:change="test"
+  ></v-autocomplete>
+</template>
+
+<script>
+export default {
+  name: 'autoCompleteComponent',
+  data() {
+    return {
+      //   items: ['foo', 'bar', 'fizz', 'buzz'],
+      //   values: ['foo', 'bar'],
+      items: this.field.items,
+      //   value: this.field.value,
+      value: this.val,
+    }
+  },
+  methods: {
+    test: function() {
+      console.log(this.value)
+    },
+  },
+  props: ['val', 'field'],
+  watch: {
+    val: function(newVal, oldVal) {
+      console.log(oldVal)
+      this.d = newVal
+    },
+  },
+}
+</script>

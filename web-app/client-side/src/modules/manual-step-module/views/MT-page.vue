@@ -188,6 +188,13 @@ export default {
                         name: 'richText',
                         col: 12,
                       },
+                      {
+                        type: 'AutoCompleteComponent',
+                        name: 'autocomplete',
+                        items : ['foo', 'bar', 'fizz', 'buzz'],
+                        value : [],
+                        col: 12,
+                      },
                       // {
                       //   type: 'ButtonComponent',
                       //   action: 'submit',
@@ -202,6 +209,7 @@ export default {
                       Lname: '',
                       Email: '',
                       richText: '<span style="background-color: rgb(255, 255, 0);">Test</span>',
+                      autocomplete: ['foo','bar']
                     },
                   },
                 ],
