@@ -10,13 +10,11 @@ import AppBuilder from "../../application-builder-module/components/app-builder"
 
 export default {
   name: "InitPage",
-  props: ["item"],
   components: {
     AppBuilder,
   },
   methods: {},
-  mounted() {
-  },
+
   created() {
     //get page config
 
@@ -25,9 +23,18 @@ export default {
         .then((response) => {
           console.log(response);
           this.$refs.appBuilders.setAppData(response.data.data.app);
-          console.log(this.app)
+          console.log(this.$refs.appBuilders);
         })
         .catch((error) => console.error(error));
+  },
+  mounted() {
+    this.$observable.subscribe("initiate", (model) => {
+      console.log(model);
+    });
+    this.$observable.subscribe("formChange", (model) => {
+      console.log(model);
+
+    });
   },
   data() {
     return {

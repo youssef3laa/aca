@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { ValidationProvider } from 'vee-validate'
+import {ValidationProvider} from 'vee-validate'
 
 export default {
   name: 'InputComponent',
@@ -36,6 +36,9 @@ export default {
         value: this.d,
         type: 'inputChange',
       })
+      if (this.field.publish) {
+        this.$observable.fire(this.field.publish, this.d);
+      }
 
       // this.$observable.fire('input', this.d);
     },
