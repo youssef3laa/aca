@@ -35,6 +35,7 @@ import RadioGroupComponent from './radioGroup-component'
 import TextareaComponent from './textarea-component'
 import CheckboxComponent from './checkbox-component'
 import RichtextComponent from './richText-component'
+import AutoCompleteComponent from './autocomplete-component'
 
 export default {
   name: 'FormBuilder',
@@ -47,6 +48,7 @@ export default {
     TextareaComponent,
     CheckboxComponent,
     RichtextComponent,
+    AutoCompleteComponent,
   },
   data() {
     return {
