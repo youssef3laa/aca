@@ -1,0 +1,111 @@
+{
+  "app": {
+    "pages": [
+      {
+        "key": "page1",
+        "sections": [
+          {
+            "key": "section1",
+            "tabs": [
+              {
+                "key": "tab1",
+                "id": 1,
+                "name": "بيانات السياسة"
+              }
+            ],
+            "forms": [
+              {
+                "key": "form1",
+                "publish": "complete",
+                "form": [
+                  {
+                    "key": "input1",
+                    "type": "InputComponent",
+                    "label": "First name",
+                    "name": "Fname",
+                    "col": 4,
+                    "readonly": false,
+                    "rule": "required|minmax:2,25"
+                  },
+                  {
+                    "key": "input1",
+                    "type": "InputComponent",
+                    "label": "Last name",
+                    "name": "Lname",
+                    "col": 4,
+                    "readonly": true
+                  },
+                  {
+                    "key": "input1",
+                    "type": "InputComponent",
+                    "label": "Email Adress",
+                    "name": "Email",
+                    "col": 4,
+                    "readonly": true
+                  }
+                ],
+                "model": {
+                  "Fname": "",
+                  "Lname": "",
+                  "Email": ""
+                }
+              }
+            ]
+          },
+          {
+            "forms": [
+              {
+                "key": "form2",
+                "publish": "compelete",
+                "event": "submit",
+                "form": [
+                  {
+                    "key": "form2Input",
+                    "type": "RadioGroupComponent",
+                    "decisions": [
+                      {
+                        "label": "approve",
+                        "id": 1,
+                        "value": "approve"
+                      },
+                      {
+                        "label": "reject",
+                        "id": 2,
+                        "value": "reject"
+                      },
+                      {
+                        "label": "requestModification",
+                        "id": 3,
+                        "value": "requestModification"
+                      }
+                    ],
+                    "name": "decision",
+                    "label": "decision",
+                    "col": 6
+                  },
+                  {
+                    "type": "TextareaComponent",
+                    "label": "comment",
+                    "name": "comment",
+                    "col": 12
+                  },
+                  {
+                    "type": "ButtonComponent",
+                    "label": "submit",
+                    "action": "submit",
+                    "name": "submit",
+                    "col": 4
+                  }
+                ],
+                "model": {
+                  "decision": "",
+                  "comment": ""
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
