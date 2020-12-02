@@ -24,7 +24,7 @@ Vue.use(VueRouter)
 //   }
 // ]
 
-var allRoutes = []
+let allRoutes = [];
 allRoutes = allRoutes.concat(LoginRoutes, AdminRoutes, DemoRoutes, ManualStep, {
   path: '/',
   name: 'Home',

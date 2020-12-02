@@ -1,44 +1,50 @@
 <template>
-  <div>
-    <v-container>
-      <validation-observer ref="observer">
-        <v-row>
-          <!-- <div v-for="(field, key) in forms" :key="key"> -->
-          <v-col
-            v-for="(field, key) in forms.form"
+  <v-container>
+    <validation-observer ref="observer">
+      <v-row>
+        <!-- <div v-for="(field, key) in forms" :key="key"> -->
+        <v-col
+            v-for="(field, key) in forms.inputs"
             :key="key"
             :cols="field.col"
             :md="field.col"
-          >
-            <component
+        >
+          <component
+              :is="field.type"
+              v-if="formModel"
+              :field="field"
+              :val="formModel[field.name]"
+              v-on:update="updateText"
+          ></component>
+
+          <component
+              :is="field.type"
+              v-else
               :field="field"
               v-on:update="updateText"
-              :val="formModel[field.name]"
-              :is="field.type"
-            ></component>
-          </v-col>
+          ></component>
+        </v-col>
 
-          <!-- </div> -->
-        </v-row>
-      </validation-observer>
-      <!-- <ButtonComponent v-on="click"/> -->
-    </v-container>
-  </div>
+        <!-- </div> -->
+      </v-row>
+    </validation-observer>
+    <!-- <ButtonComponent v-on="click"/> -->
+  </v-container>
 </template>
 
 <script>
-import { ValidationObserver } from 'vee-validate'
-import InputComponent from './input-component'
-import ButtonComponent from './button-component'
-import TableComponent from './table-component'
-import RadioGroupComponent from './radioGroup-component'
-import TextareaComponent from './textarea-component'
-import CheckboxComponent from './checkbox-component'
-import RichtextComponent from './richText-component'
-import AutoCompleteComponent from './autocomplete-component'
+import {ValidationObserver} from "vee-validate";
+import InputComponent from "./input-component";
+import ButtonComponent from "./button-component";
+import TableComponent from "./table-component";
+import RadioGroupComponent from "./radioGroup-component";
+import TextareaComponent from "./textarea-component";
+import CheckboxComponent from "./checkbox-component";
+import RichtextComponent from "./richText-component";
+import AutoCompleteComponent from "./autocomplete-component";
 
 export default {
-  name: 'FormBuilder',
+  name: "FormBuilder",
   components: {
     InputComponent,
     ValidationObserver,
@@ -53,55 +59,51 @@ export default {
   data() {
     return {
       formModel: this.model,
-      content: '',
-    }
+      content: "",
+    };
   },
   methods: {
-    updateText: function(data) {
+    updateText: function (data) {
       // console.log(data)
-      this.forms.model['_valid'] = !this.$refs['observer'].flags.invalid
+      if (this.forms.model)
+        this.forms.model["_valid"] = !this.$refs["observer"].flags.invalid;
 
-      if (data.name && data.value) this.forms.model[data.name] = data.value
+      if (data.name && data.value) this.forms.model[data.name] = data.value;
 
-      if (
-        this.forms.publish &&
-        data.action &&
-        this.forms.event == 'submit' &&
-        data.action == 'submit'
-      ) {
+      if (data.type == "ButtonComponent" && data.publish) {
+        this.$observable.fire(data.publish, {
+          model: this.forms.model,
+          valid: !this.$refs["observer"].flags.invalid,
+        });
+      } else if (this.forms.publish) {
         this.$observable.fire(this.forms.publish, {
           model: this.forms.model,
-          valid: !this.$refs['observer'].flags.invalid,
-        })
-      } else if (!this.$refs['observer'].flags.invalid) {
-        if (this.forms.publish && !this.forms.event) {
-          this.$observable.fire(this.forms.publish, this.forms.model)
-        }
-        // this.$emit('modelChange', this.forms.model)
+          valid: !this.$refs["observer"].flags.invalid,
+        });
       }
-      // console.log(this.model);
     },
-    saveValue: function() {},
+    saveValue: function () {
+    },
   },
-  props: ['forms', 'model'],
+  props: ["forms", "model"],
   created() {
-    var self = this
+    var self = this;
     if (this.forms.subscribe) {
-      console.log('subscribe')
-      this.$observable.subscribe(this.forms.subscribe, function(data) {
-        if (data.type == 'modelUpdate') {
-          var keys = Object.keys(data.model)
+      console.log("subscribe");
+      this.$observable.subscribe(this.forms.subscribe, function (data) {
+        if (data.type == "modelUpdate") {
+          var keys = Object.keys(data.model);
           keys.forEach((key, index) => {
-            console.log(index)
-            self.formModel[key] = data.model[key]
-          })
-          self.formModel.serial_num = data.model.serial_num
+            console.log(index);
+            self.formModel[key] = data.model[key];
+          });
+          self.formModel.serial_num = data.model.serial_num;
         }
-        console.log(data)
-      })
+        console.log(data);
+      });
     }
   },
-}
+};
 </script>
 
 <style></style>

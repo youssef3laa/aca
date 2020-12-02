@@ -1,0 +1,68 @@
+{
+  "app": {
+    "pages": [
+      {
+        "sections": [
+          {
+            "tabs": [
+              {
+                "key": "tab1",
+                "id": 1,
+                "name": "بيانات السياسة"
+              }
+            ],
+            "forms": [
+              {
+                "publish": "formChange",
+                "inputs": [
+                  {
+                    "type": "inputComponent",
+                    "label": "firstName",
+                    "name": "Fname",
+                    "col": 4,
+                    "readonly": false,
+                    "rule": "required|minmax:2,25"
+                  },
+                  {
+                    "type": "InputComponent",
+                    "label": "Last name",
+                    "name": "Lname",
+                    "col": 4,
+                    "readonly": false
+                  },
+                  {
+                    "type": "InputComponent",
+                    "label": "Email Adress",
+                    "name": "Email",
+                    "col": 4,
+                    "readonly": false
+                  }
+                ],
+                "model": {
+                  "Fname": "",
+                  "Lname": "",
+                  "Email": ""
+                }
+              }
+            ]
+          },
+          {
+            "forms": [
+              {
+                "inputs": [
+                  {
+                    "type": "ButtonComponent",
+                    "publish": "initiate",
+                    "label": "submit",
+                    "name": "submit",
+                    "col": 4
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
