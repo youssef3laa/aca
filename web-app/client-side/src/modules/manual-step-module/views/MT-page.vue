@@ -157,7 +157,7 @@ export default {
                   {
                     key: 'form1',
                     publish: 'complete',
-                    form: [
+                    inputs: [
                       {
                         key: 'input1',
                         type: 'InputComponent',
@@ -221,7 +221,7 @@ export default {
                     key: 'form2',
                     publish: 'compelete',
                     event: 'submit',
-                    form: [
+                    inputs: [
                       {
                         key: 'form2Input',
                         type: 'RadioGroupComponent',

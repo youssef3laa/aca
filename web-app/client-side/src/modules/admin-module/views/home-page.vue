@@ -51,7 +51,7 @@ export default {
                   {
                     publish: 'submit',
                     event: 'submit',
-                    form: [
+                    inputs: [
                       {
                         type: 'InputComponent',
                         label: 'First name',
@@ -101,7 +101,7 @@ export default {
                 ],
                 forms: [
                   {
-                    form: [
+                    inputs: [
                       {
                         type: 'TableComponent',
                         name: 'taskTable',
