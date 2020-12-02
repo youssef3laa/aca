@@ -6,7 +6,7 @@
     v-slot="{ errors }"
     :vid="field.name"
   >
-    <v-text-field v-model="d" @input="addInput" :disabled="readonly">
+    <v-text-field v-model="d" @input="onValueChange" @change="onChange" :disabled="readonly">
       <template #label>
         <span v-t="field.label"></span>
       </template>
@@ -31,23 +31,25 @@ export default {
     }
   },
   methods: {
-    addInput: function() {
+    onValueChange: function(){
+       if (this.field.publish) {
+        this.$observable.fire(this.field.publish, this.d);
+      }
+    },
+    onChange: function() {
       this.$emit('update', {
         name: this.field.name,
         value: this.d,
         type: 'inputChange',
       })
-      if (this.field.publish) {
-        this.$observable.fire(this.field.publish, this.d);
-      }
+     
 
       // this.$observable.fire('input', this.d);
     },
   },
   props: ['val', 'field'],
   watch: {
-    val: function(newVal, oldVal) {
-      console.log(oldVal)
+    val: function(newVal) {
       this.d = newVal
     },
   },

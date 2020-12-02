@@ -187,6 +187,7 @@ export default {
                         type: 'RichtextComponent',
                         name: 'richText',
                         col: 12,
+                        rule:'required'
                       },
                       {
                         type: 'AutoCompleteComponent',
