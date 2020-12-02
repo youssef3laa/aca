@@ -1,9 +1,8 @@
 <template>
-  <vue-editor v-model="content"></vue-editor>
+  <vue-editor v-validate="'required'" v-model="content" @text-change="test"></vue-editor>
 </template>
 
 <script>
-
 import { VueEditor } from 'vue2-editor'
 export default {
   name: 'richtextComponent',
@@ -13,11 +12,22 @@ export default {
       content: this.val,
     }
   },
+  methods: {
+    test: function() {
+      console.log('text changed')
+    },
+  },
   props: ['val', 'field'],
   watch: {
     val: function(newVal, oldVal) {
       console.log(oldVal)
-      this.d = newVal
+      this.val = newVal
+    },
+  },
+  $_veeValidate: {
+    // fetch the current value from the innerValue defined in the component data.
+    value() {
+      return this.content
     },
   },
 }

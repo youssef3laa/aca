@@ -4,6 +4,7 @@
     :name="field.name"
     :rules="field.rule"
     v-slot="{ errors }"
+    :vid="field.name"
   >
     <v-text-field v-model="d" @input="addInput" :disabled="readonly">
       <template #label>
@@ -26,7 +27,7 @@ export default {
     return {
       eventName: this.field.eventName,
       d: this.val,
-      readonly: this.field.readonly
+      readonly: this.field.readonly,
     }
   },
   methods: {
@@ -42,10 +43,10 @@ export default {
   },
   props: ['val', 'field'],
   watch: {
-    val: function(newVal, oldVal){
-      console.log(oldVal);
-      this.d = newVal;
-    }
-  }
+    val: function(newVal, oldVal) {
+      console.log(oldVal)
+      this.d = newVal
+    },
+  },
 }
 </script>

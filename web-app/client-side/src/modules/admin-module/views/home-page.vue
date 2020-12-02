@@ -2,11 +2,11 @@
   <div>
     <!-- <TheNavbar /> -->
     <!-- <v-app id="inspire"> -->
-      <v-container>
-        <AppBuilder :app="app" />
-      </v-container>
+    <v-container>
+      <AppBuilder :app="app" />
+    </v-container>
 
-      <v-container> <ApprovalCard /> </v-container>
+    <v-container> <ApprovalCard /> </v-container>
     <!-- </v-app> -->
   </div>
 </template>
@@ -16,6 +16,15 @@
 import AppBuilder from '../../application-builder-module/components/app-builder'
 import http from '../../core-module/services/http'
 import ApprovalCard from '../../approval-card-module/Approval-component'
+import { extend } from 'vee-validate'
+
+extend('password', {
+  params: ['target'],
+  validate(value, { target }) {
+    return value === target
+  },
+  message: 'Password confirmation does not match',
+})
 
 export default {
   name: 'HomePage',
@@ -56,7 +65,8 @@ export default {
                         label: 'Last name',
                         name: 'Lname',
                         col: 4,
-                        rule: 'required|minmax:2,25',
+                        rule: 'required|password:@Fname',
+                        // rule: 'required|minmax:2,25',
                       },
                       {
                         type: 'InputComponent',
