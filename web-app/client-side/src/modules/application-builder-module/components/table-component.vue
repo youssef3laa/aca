@@ -23,22 +23,30 @@ export default {
     }
   },
   methods: {
-    edit: function(item) {
-      console.log(item)
+    edit: function (item) {
+      console.log("item obj in table", item)
       // console.log(item.TaskData.ApplicationData.inputSchemaFragment.entityId)
       // TaskData.ApplicationData.inputSchemaFragment
       let pageKey = item.TaskId
+      console.log(pageKey);
+
 
       // console.log(item.TaskData.ApplicationData.inputSchemaFragment)
       // this.$route.params(item);
       // if (pageKey) router.push({ path: pageKey, props:{item:item}  })
-      router.push({ name: 'MT', params: { taskId: pageKey,item: item } })
+
+      let taskUrl = item.TaskData.ApplicationData.inputSchemaFragment.taskUrl
+      router.push({
+        name: taskUrl,
+        params: {taskId: pageKey, taskUrl: taskUrl}
+      })
+
       // this.$observable.fire('BPItem', item)
     },
   },
   props: ['val', 'field'],
   watch: {
-    val: function(newVal, oldVal) {
+    val: function (newVal, oldVal) {
       console.log(oldVal)
       this.d = newVal
     },

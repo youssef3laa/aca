@@ -1,0 +1,104 @@
+{
+  "app": {
+    "pages": [
+      {
+        "sections": [
+          {
+            "tabs": [
+              {
+                "key": "tab1",
+                "id": 1,
+                "name": "بيانات السياسة"
+              }
+            ],
+            "forms": [{
+  "key": "form1",
+  "publish": "formChange",
+  "inputs": [
+    {
+      "type": "inputComponent",
+      "label": "firstName",
+      "name": "Fname",
+      "col": 4,
+      "readonly": false,
+      "rule": "required|minmax:2,25"
+    },
+    {
+      "type": "InputComponent",
+      "label": "Last name",
+      "name": "Lname",
+      "col": 4,
+      "readonly": false
+    },
+    {
+      "type": "InputComponent",
+      "label": "Email Adress",
+      "name": "Email",
+      "col": 4,
+      "readonly": false
+    }
+  ],
+  "model": {
+    "Fname": "",
+    "Lname": "",
+    "Email": ""
+  }
+}
+
+            ]
+          },
+
+          {
+            "forms": [
+              {
+                "inputs": [
+                  {
+                    "key": "form2Input",
+                    "type": "RadioGroupComponent",
+                    "decisions": [
+                      {
+                        "label": "approve",
+                        "id": 1,
+                        "value": "approve"
+                      },
+                      {
+                        "label": "reject",
+                        "id": 2,
+                        "value": "reject"
+                      },
+                      {
+                        "label": "requestModification",
+                        "id": 3,
+                        "value": "requestModification"
+                      }
+                    ],
+                    "name": "decision",
+                    "label": "decision",
+                    "col": 6
+                  },
+                  {
+                    "type": "TextareaComponent",
+                    "label": "comment",
+                    "name": "comment",
+                    "col": 12
+                  },
+                  {
+                    "type": "ButtonComponent",
+                    "publish": "completeStep",
+                    "name": "submit",
+                    "label": "submit",
+                    "col": 4
+                  }
+                ],
+                "model": {
+                  "decision": "",
+                  "comment": ""
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

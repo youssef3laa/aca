@@ -1,10 +1,10 @@
 <template>
   <!-- <v-text-field @input="$emit('input', $event.target.value)"> -->
   <validation-provider
-    :name="field.name"
-    :rules="field.rule"
-    v-slot="{ errors }"
-    :vid="field.name"
+      :name="field.name"
+      :rules="field.rule"
+      v-slot="{ errors }"
+      :vid="field.name"
   >
     <v-text-field v-model="d" @input="addInput" :disabled="readonly">
       <template #label>
@@ -16,10 +16,10 @@
 </template>
 
 <script>
-import {ValidationProvider} from 'vee-validate'
+import {ValidationProvider} from "vee-validate";
 
 export default {
-  name: 'InputComponent',
+  name: "InputComponent",
   components: {
     ValidationProvider,
   },
@@ -28,15 +28,17 @@ export default {
       eventName: this.field.eventName,
       d: this.val,
       readonly: this.field.readonly,
-    }
+    };
   },
   methods: {
-    addInput: function() {
-      this.$emit('update', {
+    addInput: function () {
+      // console.log("addInput", event.target.value);
+      // console.log("addInput", this.d);
+      this.$emit("update", {
         name: this.field.name,
         value: this.d,
-        type: 'inputChange',
-      })
+        type: "inputChange",
+      });
       if (this.field.publish) {
         this.$observable.fire(this.field.publish, this.d);
       }
@@ -44,12 +46,14 @@ export default {
       // this.$observable.fire('input', this.d);
     },
   },
-  props: ['val', 'field'],
+  props: ["val", "field"],
   watch: {
-    val: function(newVal, oldVal) {
-      console.log(oldVal)
-      this.d = newVal
+    val: function (newVal) {
+      this.d = newVal;
     },
+    // d: function (newVal, oldVal) {
+    //   console.log(newVal, oldVal);
+    // }
   },
-}
+};
 </script>

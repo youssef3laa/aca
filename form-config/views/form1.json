@@ -1,4 +1,6 @@
 {
+  "key": "form1",
+  "publish": "formChange",
   "inputs": [
     {
       "type": "inputComponent",

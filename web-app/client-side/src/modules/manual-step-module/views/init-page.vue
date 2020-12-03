@@ -16,29 +16,36 @@ export default {
   methods: {},
 
   created() {
-    //get page config
-
     http
         .get("/user/form/page1")
         .then((response) => {
-          console.log(response);
           this.$refs.appBuilders.setAppData(response.data.data.app);
-          console.log(this.$refs.appBuilders);
         })
         .catch((error) => console.error(error));
   },
   mounted() {
-    this.$observable.subscribe("initiate", (model) => {
-      console.log(model);
+    this.$observable.subscribe("initiate", () => {
+      console.log(this.formModel);
+      if (this.formModel.valid) {
+        http
+            .post("employee/initiate/", this.formModel.model)
+            .then((response) => {
+              console.log(response);
+              console.log("process initiated");
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+      }
     });
     this.$observable.subscribe("formChange", (model) => {
-      console.log(model);
-
+      this.formModel = model;
     });
   },
   data() {
     return {
       app: {},
+      formModel: {},
     };
   },
 };

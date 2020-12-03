@@ -1,64 +1,66 @@
 <template>
   <v-container>
     <div v-for="(page, key) in appData.pages" :key="key">
-      <PageBuilder v-on:modelChange="dataChange" :page="page" /></div
-  ></v-container>
+      <PageBuilder v-on:modelChange="dataChange" :page="page"/>
+    </div
+    >
+  </v-container>
 </template>
 
 <script>
 import PageBuilder from './page-builder'
+
 export default {
   name: 'AppBuilder',
-  components: { PageBuilder },
+  components: {PageBuilder},
   data() {
     return {
       appData: this.app,
+      positions: {}
     }
   },
   methods: {
-    dataChange: function(model) {
+    dataChange: function (model) {
       console.log('App Builder')
       console.log(model)
     },
 
-    setAppData: function(data) {
+    setAppData: function (data) {
       this.appData = data
     },
-    setModelData: function(key, obj) {
-      // app - pages - sections : forms
-      // app - pages - sections : tabs
 
-      console.log("setModelData is called");
-
-      // pages loop
-      for (let i = 0; i < this.app.pages.length; i++) {
-        const page = this.app.pages[i]
+    findModelData: function (key){
+      for (let i = 0; i < this.appData.pages.length; i++) {
+        const page = this.appData.pages[i]
         console.log(page)
         if (page.sections) {
           for (let j = 0; j < page.sections.length; j++) {
             const section = page.sections[j]
-            console.log(section)
             if (section.forms) {
               for (let k = 0; k < section.forms.length; k++) {
                 const form = section.forms[k]
-                console.log(form)
-                if (form.key == key) {
-                  for (let property in obj) {
-                    console.log(property)
-                    form.model[property] = obj[property]
-                  }
+                if (form.key === key) {
+                  this.positions[key] = [i, j, k];
+
                 }
               }
             }
           }
         }
       }
-      // for app.pages {
-      //   let page = pages[i]
-      // }
+    },
 
-      console.log(key)
-      console.log(obj)
+    getModelData: function (key){
+      if (!this.positions[key]) this.findModelData(key);
+      return this.appData.pages[this.positions[key][0]].sections[this.positions[key][1]].forms[this.positions[key][2]].model;
+    },
+    setModelData: function (key, obj) {
+      if (!this.positions[key]) this.findModelData(key);
+      var form =  this.appData.pages[this.positions[key][0]].sections[this.positions[key][1]].forms[this.positions[key][2]]
+      for (let property in obj) {
+        form.model[property] = obj[property]
+      }
+
     },
   },
 

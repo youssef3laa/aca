@@ -4,24 +4,24 @@
       <v-row>
         <!-- <div v-for="(field, key) in forms" :key="key"> -->
         <v-col
-            v-for="(field, key) in forms.inputs"
-            :key="key"
-            :cols="field.col"
-            :md="field.col"
+          v-for="(field, key) in forms.inputs"
+          :key="key"
+          :cols="field.col"
+          :md="field.col"
         >
           <component
-              :is="field.type"
-              v-if="formModel"
-              :field="field"
-              :val="formModel[field.name]"
-              v-on:update="updateText"
+            :is="field.type"
+            v-if="formModel"
+            :field="field"
+            :val="formModel[field.name]"
+            v-on:update="updateText"
           ></component>
 
           <component
-              :is="field.type"
-              v-else
-              :field="field"
-              v-on:update="updateText"
+            :is="field.type"
+            v-else
+            :field="field"
+            v-on:update="updateText"
           ></component>
         </v-col>
 
@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import {ValidationObserver} from "vee-validate";
+import { ValidationObserver } from "vee-validate";
 import InputComponent from "./input-component";
 import ButtonComponent from "./button-component";
 import TableComponent from "./table-component";
@@ -82,8 +82,7 @@ export default {
         });
       }
     },
-    saveValue: function () {
-    },
+    saveValue: function () {},
   },
   props: ["forms", "model"],
   created() {
