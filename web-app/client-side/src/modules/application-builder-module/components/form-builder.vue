@@ -23,6 +23,7 @@
             :field="field"
             v-on:update="updateText"
           ></component>
+
         </v-col>
 
         <!-- </div> -->
@@ -33,18 +34,18 @@
 </template>
 
 <script>
-import { ValidationObserver } from "vee-validate";
-import InputComponent from "./input-component";
-import ButtonComponent from "./button-component";
-import TableComponent from "./table-component";
-import RadioGroupComponent from "./radioGroup-component";
-import TextareaComponent from "./textarea-component";
-import CheckboxComponent from "./checkbox-component";
-import RichtextComponent from "./richText-component";
-import AutoCompleteComponent from "./autocomplete-component";
+import { ValidationObserver } from 'vee-validate'
+import InputComponent from './input-component'
+import ButtonComponent from './button-component'
+import TableComponent from './table-component'
+import RadioGroupComponent from './radio-group-component'
+import TextareaComponent from './textarea-component'
+import CheckboxComponent from './checkbox-component'
+import RichtextComponent from './rich-text-component'
+import AutoCompleteComponent from './autocomplete-component'
 
 export default {
-  name: "FormBuilder",
+  name: 'FormBuilder',
   components: {
     InputComponent,
     ValidationObserver,
@@ -59,50 +60,58 @@ export default {
   data() {
     return {
       formModel: this.model,
-      content: "",
-    };
+      content: '',
+    }
   },
   methods: {
-    updateText: function (data) {
+    updateText: async function(data) {
       // console.log(data)
+      
+      if (data.name && data.value) this.forms.model[data.name] = data.value
+
       if (this.forms.model)
-        this.forms.model["_valid"] = !this.$refs["observer"].flags.invalid;
+        this.forms.model['_valid'] = !this.$refs['observer']['_data'].flags.invalid
 
-      if (data.name && data.value) this.forms.model[data.name] = data.value;
+      console.log(this.$refs['observer'].errors[data.name])
+      console.log(this.$refs['observer']['_data'].flags)
+      // this.$refs['observer'].validateWithInfo().then((val)=> console.log(val))
+      let res = await this.$refs.observer.validate();
+      console.log(res);
 
-      if (data.type == "ButtonComponent" && data.publish) {
+
+      if (data.type == 'ButtonComponent' && data.publish) {
         this.$observable.fire(data.publish, {
           model: this.forms.model,
-          valid: !this.$refs["observer"].flags.invalid,
-        });
+          valid: !this.$refs['observer'].flags.invalid,
+        })
       } else if (this.forms.publish) {
         this.$observable.fire(this.forms.publish, {
           model: this.forms.model,
-          valid: !this.$refs["observer"].flags.invalid,
-        });
+          valid: !this.$refs['observer'].flags.invalid,
+        })
       }
     },
-    saveValue: function () {},
+    saveValue: function() {},
   },
-  props: ["forms", "model"],
+  props: ['forms', 'model'],
   created() {
-    var self = this;
+    var self = this
     if (this.forms.subscribe) {
-      console.log("subscribe");
-      this.$observable.subscribe(this.forms.subscribe, function (data) {
-        if (data.type == "modelUpdate") {
-          var keys = Object.keys(data.model);
+      console.log('subscribe')
+      this.$observable.subscribe(this.forms.subscribe, function(data) {
+        if (data.type == 'modelUpdate') {
+          var keys = Object.keys(data.model)
           keys.forEach((key, index) => {
-            console.log(index);
-            self.formModel[key] = data.model[key];
-          });
-          self.formModel.serial_num = data.model.serial_num;
+            console.log(index)
+            self.formModel[key] = data.model[key]
+          })
+          self.formModel.serial_num = data.model.serial_num
         }
-        console.log(data);
-      });
+        console.log(data)
+      })
     }
   },
-};
+}
 </script>
 
 <style></style>
