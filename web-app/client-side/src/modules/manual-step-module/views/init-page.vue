@@ -10,28 +10,42 @@ import AppBuilder from "../../application-builder-module/components/app-builder"
 
 export default {
   name: "InitPage",
-  props: ["item"],
   components: {
     AppBuilder,
   },
   methods: {},
-  mounted() {
-  },
-  created() {
-    //get page config
 
+  created() {
     http
         .get("/user/form/page1")
         .then((response) => {
-          console.log(response);
           this.$refs.appBuilders.setAppData(response.data.data.app);
-          console.log(this.app)
         })
         .catch((error) => console.error(error));
+  },
+  mounted() {
+    this.$observable.subscribe("initiate", () => {
+      console.log(this.formModel);
+      if (this.formModel.valid) {
+        http
+            .post("employee/initiate/", this.formModel.model)
+            .then((response) => {
+              console.log(response);
+              console.log("process initiated");
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+      }
+    });
+    this.$observable.subscribe("formChange", (model) => {
+      this.formModel = model;
+    });
   },
   data() {
     return {
       app: {},
+      formModel: {},
     };
   },
 };

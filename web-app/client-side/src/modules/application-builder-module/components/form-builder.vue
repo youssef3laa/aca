@@ -1,29 +1,36 @@
 <template>
-  <div>
-    <v-container>
-      <validation-observer ref="observer">
-        <v-row>
-          <!-- <div v-for="(field, key) in forms" :key="key"> -->
-          <v-col
-            v-for="(field, key) in forms.form"
-            :key="key"
-            :cols="field.col"
-            :md="field.col"
-          >
-            <component
-              :field="field"
-              v-on:update="updateText"
-              :val="formModel[field.name]"
-              :is="field.type"
-            ></component>
-          </v-col>
+  <v-container>
+    <validation-observer ref="observer">
+      <v-row>
+        <!-- <div v-for="(field, key) in forms" :key="key"> -->
+        <v-col
+          v-for="(field, key) in forms.inputs"
+          :key="key"
+          :cols="field.col"
+          :md="field.col"
+        >
+          <component
+            :is="field.type"
+            v-if="formModel"
+            :field="field"
+            :val="formModel[field.name]"
+            v-on:update="updateText"
+          ></component>
 
-          <!-- </div> -->
-        </v-row>
-      </validation-observer>
-      <!-- <ButtonComponent v-on="click"/> -->
-    </v-container>
-  </div>
+          <component
+            :is="field.type"
+            v-else
+            :field="field"
+            v-on:update="updateText"
+          ></component>
+
+        </v-col>
+
+        <!-- </div> -->
+      </v-row>
+    </validation-observer>
+    <!-- <ButtonComponent v-on="click"/> -->
+  </v-container>
 </template>
 
 <script>
@@ -31,10 +38,10 @@ import { ValidationObserver } from 'vee-validate'
 import InputComponent from './input-component'
 import ButtonComponent from './button-component'
 import TableComponent from './table-component'
-import RadioGroupComponent from './radioGroup-component'
+import RadioGroupComponent from './radio-group-component'
 import TextareaComponent from './textarea-component'
 import CheckboxComponent from './checkbox-component'
-import RichtextComponent from './richText-component'
+import RichtextComponent from './rich-text-component'
 import AutoCompleteComponent from './autocomplete-component'
 
 export default {
@@ -57,29 +64,32 @@ export default {
     }
   },
   methods: {
-    updateText: function(data) {
+    updateText: async function(data) {
       // console.log(data)
-      this.forms.model['_valid'] = !this.$refs['observer'].flags.invalid
-
+      
       if (data.name && data.value) this.forms.model[data.name] = data.value
 
-      if (
-        this.forms.publish &&
-        data.action &&
-        this.forms.event == 'submit' &&
-        data.action == 'submit'
-      ) {
+      if (this.forms.model)
+        this.forms.model['_valid'] = !this.$refs['observer']['_data'].flags.invalid
+
+      console.log(this.$refs['observer'].errors[data.name])
+      console.log(this.$refs['observer']['_data'].flags)
+      // this.$refs['observer'].validateWithInfo().then((val)=> console.log(val))
+      let res = await this.$refs.observer.validate();
+      console.log(res);
+
+
+      if (data.type == 'ButtonComponent' && data.publish) {
+        this.$observable.fire(data.publish, {
+          model: this.forms.model,
+          valid: !this.$refs['observer'].flags.invalid,
+        })
+      } else if (this.forms.publish) {
         this.$observable.fire(this.forms.publish, {
           model: this.forms.model,
           valid: !this.$refs['observer'].flags.invalid,
         })
-      } else if (!this.$refs['observer'].flags.invalid) {
-        if (this.forms.publish && !this.forms.event) {
-          this.$observable.fire(this.forms.publish, this.forms.model)
-        }
-        // this.$emit('modelChange', this.forms.model)
       }
-      // console.log(this.model);
     },
     saveValue: function() {},
   },

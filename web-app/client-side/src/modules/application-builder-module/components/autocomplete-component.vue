@@ -7,7 +7,7 @@
     chips
     deletable-chips
     small-chips
-    label="field"
+    :label="field.name"
     multiple
     clearable
     v-on:change="test"
@@ -35,7 +35,7 @@ export default {
   watch: {
     val: function(newVal, oldVal) {
       console.log(oldVal)
-      this.d = newVal
+      this.val = newVal
     },
   },
 }

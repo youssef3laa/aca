@@ -1,17 +1,17 @@
 package com.asset.appwork.controller;
 
+import com.asset.appwork.AppBuilder;
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.cordys.CordysManagement;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.otds.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.model.FormConfig;
-import com.asset.appwork.repository.FormConfigRepository;
 import com.asset.appwork.response.AppResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,18 +32,20 @@ public class UserController {
     TokenService tokenService;
     @Autowired
     CordysManagement cordysManagement;
-
     @Autowired
-    FormConfigRepository formConfigRepository;
+    Environment environment;
+
 
     @GetMapping("/form/{key}")
     public ResponseEntity<AppResponse<JsonNode>> getForm(@PathVariable("key") String key) {
+        String appBuild = environment.getProperty("build.app");
+        if (appBuild.equals("true"))  new AppBuilder(environment.getProperty("form.config")).run(key);
+
         AppResponse.ResponseBuilder<JsonNode> responseBuilder = AppResponse.builder();
-        Optional<FormConfig> formConfigOptional = formConfigRepository.findByKey(key);
 
-        if (!formConfigOptional.isPresent()) return responseBuilder.build().getResponseEntity();
+        String rootStr = environment.getProperty("form.config");
 
-        try (FileReader fileReader = new FileReader(new File(formConfigOptional.get().getPath()))) {
+        try (FileReader fileReader = new FileReader(new File(rootStr + "\\output\\" + key + ".json"))) {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode outputData = mapper.readTree(fileReader);
             // mesh same3

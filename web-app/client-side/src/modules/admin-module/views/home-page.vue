@@ -1,28 +1,28 @@
 <template>
   <div>
-    <!-- <TheNavbar /> -->
-    <!-- <v-app id="inspire"> -->
-      <v-container>
-        <AppBuilder :app="app" />
-      </v-container>
-
-      <v-container> <ApprovalCard /> </v-container>
-    <!-- </v-app> -->
+    <v-container>
+      <AppBuilder :app="app"/>
+    </v-container>
   </div>
 </template>
 
 <script>
-// import TheNavbar from '../../core-module/components/the-nav-bar'
 import AppBuilder from '../../application-builder-module/components/app-builder'
 import http from '../../core-module/services/http'
-import ApprovalCard from '../../approval-card-module/Approval-component'
+import {extend} from 'vee-validate'
+
+extend('password', {
+  params: ['target'],
+  validate(value, {target}) {
+    return value === target
+  },
+  message: 'Password confirmation does not match',
+})
 
 export default {
   name: 'HomePage',
   components: {
-    // TheNavbar,
     AppBuilder,
-    ApprovalCard,
   },
   data() {
     return {
@@ -42,7 +42,7 @@ export default {
                   {
                     publish: 'submit',
                     event: 'submit',
-                    form: [
+                    inputs: [
                       {
                         type: 'InputComponent',
                         label: 'First name',
@@ -56,7 +56,8 @@ export default {
                         label: 'Last name',
                         name: 'Lname',
                         col: 4,
-                        rule: 'required|minmax:2,25',
+                        rule: 'required|password:@Fname',
+                        // rule: 'required|minmax:2,25',
                       },
                       {
                         type: 'InputComponent',
@@ -91,7 +92,7 @@ export default {
                 ],
                 forms: [
                   {
-                    form: [
+                    inputs: [
                       {
                         type: 'TableComponent',
                         name: 'taskTable',
@@ -144,7 +145,7 @@ export default {
     }
   },
   methods: {
-    getTasks: function() {
+    getTasks: function () {
       http.get('workflow/human/tasks').then((response) => {
         console.log(response)
         var data = JSON.parse(response.data.data)
@@ -157,21 +158,21 @@ export default {
     },
   },
 
-  mounted: function() {
+  mounted: function () {
     this.getTasks()
     this.$observable.subscribe('submit', (model) => {
       console.log(model)
       this.getTasks()
       if (model.valid) {
         http
-          .post('employee/initiate/', model.model)
-          .then((response) => {
-            console.log(response)
-            this.getTasks()
-          })
-          .catch((error) => {
-            console.error(error)
-          })
+            .post('employee/initiate/', model.model)
+            .then((response) => {
+              console.log(response)
+              this.getTasks()
+            })
+            .catch((error) => {
+              console.error(error)
+            })
       }
     })
   },

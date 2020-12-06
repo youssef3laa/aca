@@ -10,7 +10,7 @@ export default {
   props: ['val', 'field'],
   methods: {
     submit: function() {
-      this.$emit('update',{type: 'buttonClick', action: this.field.action})
+      this.$emit('update', {type: 'ButtonComponent', action: this.field.action, publish: this.field.publish})
       // this.$observable.subscribe(this.field.eventName)
     },
   },

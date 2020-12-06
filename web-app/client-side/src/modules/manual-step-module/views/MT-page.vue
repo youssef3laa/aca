@@ -157,7 +157,7 @@ export default {
                   {
                     key: 'form1',
                     publish: 'complete',
-                    form: [
+                    inputs: [
                       {
                         key: 'input1',
                         type: 'InputComponent',
@@ -187,6 +187,7 @@ export default {
                         type: 'RichtextComponent',
                         name: 'richText',
                         col: 12,
+                        rule:'required'
                       },
                       {
                         type: 'AutoCompleteComponent',
@@ -221,7 +222,7 @@ export default {
                     key: 'form2',
                     publish: 'compelete',
                     event: 'submit',
-                    form: [
+                    inputs: [
                       {
                         key: 'form2Input',
                         type: 'RadioGroupComponent',
