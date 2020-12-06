@@ -1,7 +1,7 @@
 package com.asset.appwork.config;
 
 import com.asset.appwork.dto.Account;
-import com.asset.appwork.enums.ResponseCode;
+import com.asset.appwork.otds.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;

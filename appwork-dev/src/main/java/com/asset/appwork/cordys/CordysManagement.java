@@ -1,6 +1,7 @@
 package com.asset.appwork.cordys;
 
-import com.asset.appwork.enums.ResponseCode;
+import com.asset.appwork.otds.Otds;
+import com.asset.appwork.otds.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.util.Http;
 import com.asset.appwork.util.SystemUtil;
@@ -117,21 +118,12 @@ public class CordysManagement {
         }
 
         public User create(String username, String password) throws JsonProcessingException, AppworkException {
-
-            String SAMLart = login(username, password);
+            String SAMLart = Otds.login(username, password);
             if (SAMLart == null) throw new AppworkException("INVALID_CREDENTIALS", ResponseCode.INVALID_AUTH);
             User user = new User(SAMLart, url);
             updateLastActiveTime(user);
             concurrentHashMap.put(SAMLart, user);
             return user;
-        }
-
-        private String login(String username, String passowrd) throws JsonProcessingException {
-            String otdsURL = "http://appworks-dev:8080/otdsws/rest/authentication/credentials";
-
-            String data = "{\"userName\" : \""+username+"\", \"password\" : \"" + passowrd + "\" }";
-            Http http = new Http().setDoAuthentication(true).setContentType(Http.ContentType.JSON_REQUEST).setData(data).post(otdsURL);
-            return SystemUtil.readJSONField(http.getResponse(), "ticket");
         }
 
         private void updateLastActiveTime(User user){

@@ -1,6 +1,6 @@
 package com.asset.appwork.response;
 
-import com.asset.appwork.enums.ResponseCode;
+import com.asset.appwork.otds.enums.ResponseCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

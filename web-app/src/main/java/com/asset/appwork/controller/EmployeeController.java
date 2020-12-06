@@ -2,7 +2,7 @@ package com.asset.appwork.controller;
 
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
-import com.asset.appwork.enums.ResponseCode;
+import com.asset.appwork.otds.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.util.CordysUtil;
