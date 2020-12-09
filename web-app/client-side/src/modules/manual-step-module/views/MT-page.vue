@@ -190,12 +190,22 @@ export default {
                         rule:'required'
                       },
                       {
+                        type: 'InputFileComponent',
+                        name: 'inputFile',
+                        col: 12,
+                      },
+                      {
                         type: 'AutoCompleteComponent',
                         name: 'autocomplete',
                         items : ['foo', 'bar', 'fizz', 'buzz'],
                         value : [],
                         col: 12,
                       },
+                      {
+                        type: 'SelectComponent',
+                        name: 'selectComponent',
+                        col : 4
+                      }
                       // {
                       //   type: 'ButtonComponent',
                       //   action: 'submit',

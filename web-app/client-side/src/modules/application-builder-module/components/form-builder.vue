@@ -43,6 +43,8 @@ import TextareaComponent from './textarea-component'
 import CheckboxComponent from './checkbox-component'
 import RichtextComponent from './rich-text-component'
 import AutoCompleteComponent from './autocomplete-component'
+import InputFileComponent from './input-file-component'
+import SelectComponent from './select-component'
 
 export default {
   name: 'FormBuilder',
@@ -56,6 +58,8 @@ export default {
     CheckboxComponent,
     RichtextComponent,
     AutoCompleteComponent,
+    InputFileComponent,
+    SelectComponent
   },
   data() {
     return {

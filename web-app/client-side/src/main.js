@@ -7,6 +7,7 @@ import router from './router'
 import { ValidationProvider } from 'vee-validate'
 import axios from '../node_modules/axios'
 
+
 Vue.component('ValidationProvider', ValidationProvider)
 Vue.component('axios', () => {})
 
