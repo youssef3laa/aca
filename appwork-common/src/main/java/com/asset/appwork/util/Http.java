@@ -109,9 +109,6 @@ public class Http {
 
             method.setRequestEntity(setRequestEntity());
             statusCode = this.client.executeMethod(method);
-            System.out.println("******************************");
-            System.out.println(statusCode);
-            System.out.println("******************************");
             response = method.getResponseBodyAsString();
 
         } catch (IOException e) {

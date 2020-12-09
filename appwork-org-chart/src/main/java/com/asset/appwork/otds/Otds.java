@@ -486,7 +486,7 @@ public final class Otds {
         return http.getResponse();
     }
 
-    class CustomAttribute {
+    static class CustomAttribute {
         private String type;
         private String name;
         private String value;
@@ -523,8 +523,5 @@ public final class Otds {
     }
 
     public static void main(String[] args) throws JsonProcessingException, UnsupportedEncodingException {
-        Otds otds = new Otds("Admin", "Asset99a");
-
-        System.out.println(Otds.login("Admin", "Asset99a"));
     }
 }
