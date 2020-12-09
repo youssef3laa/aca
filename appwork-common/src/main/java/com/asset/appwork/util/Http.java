@@ -4,10 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.params.HttpMethodParams;
@@ -79,6 +76,22 @@ public class Http {
         return this;
     }
 
+    public Http delete(String url) {
+        DeleteMethod method = new DeleteMethod(url);
+        if (!headers.isEmpty()) headers.forEach(headerVar -> {
+            method.addRequestHeader(headerVar);
+        });
+
+        try {
+            statusCode = this.client.executeMethod(method);
+            response = method.getResponseBodyAsString();
+
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return this;
+    }
+
     public Http setDoAuthentication(boolean doAuthentication){
         this.doAuthentication = doAuthentication;
         return this;
@@ -86,6 +99,26 @@ public class Http {
 
     public Http post(String url){
         PostMethod method = new PostMethod(url);
+        if (doAuthentication) method.setDoAuthentication(doAuthentication);
+
+        try {
+
+            if (!headers.isEmpty()) headers.forEach(headerVar -> {
+                method.addRequestHeader(headerVar);
+            });
+
+            method.setRequestEntity(setRequestEntity());
+            statusCode = this.client.executeMethod(method);
+            response = method.getResponseBodyAsString();
+
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return this;
+    }
+
+    public Http put(String url){
+        PutMethod method = new PutMethod(url);
         if (doAuthentication) method.setDoAuthentication(doAuthentication);
 
         try {

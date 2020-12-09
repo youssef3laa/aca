@@ -1,4 +1,4 @@
-package com.asset.appwork.enums;
+package com.asset.appwork.otds.enums;
 
 import java.util.Arrays;
 

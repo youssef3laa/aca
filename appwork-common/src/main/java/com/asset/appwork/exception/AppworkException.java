@@ -1,6 +1,6 @@
 package com.asset.appwork.exception;
 
-import com.asset.appwork.enums.ResponseCode;
+import com.asset.appwork.otds.enums.ResponseCode;
 
 /**
  * Created by karim on 10/29/20.

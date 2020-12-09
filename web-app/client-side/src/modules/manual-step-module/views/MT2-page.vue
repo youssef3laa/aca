@@ -7,6 +7,7 @@
 <script>
 import AppBuilder from "@/modules/application-builder-module/components/app-builder";
 import http from "@/modules/core-module/services/http";
+import mixins from "@/modules/core-module/services/mixins";
 
 export default {
   name: "MT2-page",
@@ -16,17 +17,8 @@ export default {
 
     // ApprovalCard,
   },
-
+  mixins: [mixins],
   methods: {
-    getPageConfig: function () {
-      http
-          .get("/user/form/" + this.taskUrl)
-          .then((response) => {
-            this.$refs.appBuilders.setAppData(response.data.data.app);
-            this.claimTask();
-          })
-          .catch((error) => console.error(error));
-    },
     readEntity: function (entityId) {
       http
           .get(
@@ -68,17 +60,6 @@ export default {
             console.error(error)
           })
     },
-    claimTask: function () {
-      http
-          .post('/workflow/task/claim', this.taskId)
-          .then((response) => {
-            console.log(response)
-            this.getTaskData()
-          })
-          .catch((error) => {
-            console.error(error)
-          })
-    },
     completeStep: function (approvalCardModel) {
       var output = {
         TaskId: this.taskId,
@@ -101,8 +82,6 @@ export default {
     }
   },
   mounted() {
-
-
     this.$observable.subscribe('completeStep', (model) => {
       console.log("completeStep", model)
       // console.log("completeStep", this.$refs.appBuilders)
@@ -111,7 +90,6 @@ export default {
         this.completeStep(model);
       }
     })
-
   },
   created() {
     this.taskId = this.$route.params.taskId
