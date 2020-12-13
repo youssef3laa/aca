@@ -10,6 +10,12 @@ const REQUEST = axios.create({
   },
 })
 
+function resetHeaders() {
+  REQUEST.defaults.headers = {
+    'Content-Type': 'application/json',
+    'X-TenantID': 'TenantOne'
+  }
+}
 export default {
   addHeader(key, value) {
     REQUEST.defaults.headers[key] = value
@@ -22,6 +28,7 @@ export default {
     return REQUEST.post(url, data, {
       transformResponse: [
         function(response) {
+          resetHeaders();
           if (response.data) return JSON.parse(response.data)
           return JSON.parse(response)
         },
@@ -34,6 +41,7 @@ export default {
       REQUEST.defaults.headers['X-Auth-Token'] = Vue.prototype.$user.getSAMLart()
     }
     return REQUEST.get(url)
+
   },
 
   handleError(error) {

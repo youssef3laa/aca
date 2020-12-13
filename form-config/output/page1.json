@@ -13,8 +13,8 @@
             ],
             "forms": [
               {
-                "publish": "formChange",
                 "key": "form1",
+                "publish": "formChange",
                 "inputs": [
                   {
                     "type": "inputComponent",
