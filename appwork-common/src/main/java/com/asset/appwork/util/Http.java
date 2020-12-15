@@ -43,6 +43,10 @@ public class Http {
         return this;
     }
 
+    public Integer getStatusCode() {
+        return this.statusCode;
+    }
+
     public String getResponse() {
         return this.response;
     }
@@ -92,12 +96,12 @@ public class Http {
         return this;
     }
 
-    public Http setDoAuthentication(boolean doAuthentication){
+    public Http setDoAuthentication(boolean doAuthentication) {
         this.doAuthentication = doAuthentication;
         return this;
     }
 
-    public Http post(String url){
+    public Http post(String url) {
         PostMethod method = new PostMethod(url);
         if (doAuthentication) method.setDoAuthentication(doAuthentication);
 
@@ -117,7 +121,7 @@ public class Http {
         return this;
     }
 
-    public Http put(String url){
+    public Http put(String url) {
         PutMethod method = new PutMethod(url);
         if (doAuthentication) method.setDoAuthentication(doAuthentication);
 
@@ -153,7 +157,6 @@ public class Http {
         this.contentType = requestType;
         return this;
     }
-
 
     public enum ContentType {
         XML_REQUEST("text/xml"),
