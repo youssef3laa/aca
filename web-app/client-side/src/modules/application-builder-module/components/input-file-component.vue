@@ -85,7 +85,7 @@ export default {
       const formData = new FormData()
       this.files.forEach((file) => formData.append('file', file))
       // formData.append('file', this.files);
-      formData.append('parentId', '2000')
+      formData.append('parentId', '577193')
       Http.addHeader('Content-Type', 'multipart/form-data')
       Http.post('/document/upload', formData)
         .then((response) => console.log(response))

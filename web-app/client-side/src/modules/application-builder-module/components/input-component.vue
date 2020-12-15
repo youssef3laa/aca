@@ -6,7 +6,7 @@
       v-slot="{ errors }"
       :vid="field.name"
   >
-    <v-text-field v-model="d" @input="onValueChange" @change="onChange" :disabled="readonly">
+    <v-text-field v-model="d" @input="onValueChange" @change="onChange" :disabled="readonly" outlined color="outline">
       <template #label>
         <span v-t="field.label"></span>
       </template>

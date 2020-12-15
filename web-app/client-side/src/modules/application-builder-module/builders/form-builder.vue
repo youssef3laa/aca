@@ -35,16 +35,16 @@
 
 <script>
 import { ValidationObserver } from 'vee-validate'
-import InputComponent from './input-component'
-import ButtonComponent from './button-component'
-import TableComponent from './table-component'
-import RadioGroupComponent from './radio-group-component'
-import TextareaComponent from './textarea-component'
-import CheckboxComponent from './checkbox-component'
-import RichtextComponent from './rich-text-component'
-import AutoCompleteComponent from './autocomplete-component'
-import InputFileComponent from './input-file-component'
-import SelectComponent from './select-component'
+import InputComponent from '../components/input-component'
+import ButtonComponent from '../components/button-component'
+import TableComponent from '../components/table-component'
+import RadioGroupComponent from '../components/radio-group-component'
+import TextareaComponent from '../components/textarea-component'
+import CheckboxComponent from '../components/checkbox-component'
+import RichtextComponent from '../components/rich-text-component'
+import AutoCompleteComponent from '../components/autocomplete-component'
+import InputFileComponent from '../components/input-file-component'
+import SelectComponent from '../components/select-component'
 
 export default {
   name: 'FormBuilder',
