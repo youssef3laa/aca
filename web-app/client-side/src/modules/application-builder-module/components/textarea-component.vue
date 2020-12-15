@@ -2,10 +2,12 @@
   <v-textarea
     row
     background-color="grey lighten-2"
-    color="cyan"
+    color="outline"
     label="Label"
     v-model="d"
     @input="addInput"
+    outlined 
+
   ></v-textarea>
 </template>
 <script>

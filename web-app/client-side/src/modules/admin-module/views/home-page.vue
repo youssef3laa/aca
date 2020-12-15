@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import AppBuilder from '../../application-builder-module/components/app-builder'
+import AppBuilder from '../../application-builder-module/builders/app-builder'
 import http from '../../core-module/services/http'
 import {extend} from 'vee-validate'
 

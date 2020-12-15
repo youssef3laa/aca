@@ -11,7 +11,7 @@
 <script>
 import http from '../../core-module/services/http'
 // import {ref} from 'vue'
-import AppBuilder from '../../application-builder-module/components/app-builder'
+import AppBuilder from '../../application-builder-module/builders/app-builder'
 // import ApprovalCard from '../../approval-card-module/Approval-component'
 
 export default {
@@ -145,15 +145,109 @@ export default {
             key: 'page1',
             sections: [
               {
+                key: 'title',
+                name: 'بيانات المكاتبة',
+                actions: ['save', 'complete', 'cancel'],
+              },
+              {
                 key: 'section1',
                 tabs: [
                   {
                     key: 'tab1',
                     id: 1,
-                    name: 'بيانات السياسة',
+                    name: 'البيانات الأساسية',
+                  },
+                  {
+                    key: 'tab2',
+                    id: 2,
+                    name: 'المرفقات',
                   },
                 ],
                 forms: [
+                  {
+                    key: 'form1',
+                    publish: 'complete',
+                    inputs: [
+                      // {
+                      //   key: 'input1',
+                      //   type: 'InputComponent',
+                      //   label: 'First name',
+                      //   name: 'Fname',
+                      //   col: 4,
+                      //   readonly: false,
+                      //   rule: 'required|minmax:2,25',
+                      // },
+                      // {
+                      //   key: 'input1',
+                      //   type: 'InputComponent',
+                      //   label: 'Last name',
+                      //   name: 'Lname',
+                      //   col: 4,
+                      //   readonly: true,
+                      // },
+                      // {
+                      //   key: 'input1',
+                      //   type: 'InputComponent',
+                      //   label: 'Email Adress',
+                      //   name: 'Email',
+                      //   col: 4,
+                      //   readonly: true,
+                      // },
+                      // {
+                      //   type: 'RichtextComponent',
+                      //   name: 'richText',
+                      //   col: 12,
+                      //   rule: 'required',
+                      // },
+                      // {
+                      //   type: 'InputFileComponent',
+                      //   name: 'inputFile',
+                      //   col: 12,
+                      // },
+                      {
+                        type: 'AutoCompleteComponent',
+                        name: 'receiverEntityName',
+                        items: ['foo', 'bar', 'fizz', 'buzz'],
+                        value: [],
+                        col: 4,
+                      },
+                      {
+                        type: 'AutoCompleteComponent',
+                        name: 'receiverMethod',
+                        items: ['foo', 'bar', 'fizz', 'buzz'],
+                        value: [],
+                        col: 4,
+                      },
+                      {
+                        type: 'AutoCompleteComponent',
+                        name: 'typeOfWork',
+                        items: ['foo', 'bar', 'fizz', 'buzz'],
+                        value: [],
+                        col: 4,
+                      },
+                      // {
+                      //   type: 'SelectComponent',
+                      //   name: 'selectComponent',
+                      //   col: 4,
+                      // },
+                      // {
+                      //   type: 'ButtonComponent',
+                      //   action: 'submit',
+                      //   label: 'submit',
+                      //   name: 'submitBtn',
+                      //   col: 4,
+                      //   rule: 'required|minmax:2,25',
+                      // },
+                    ],
+                    model: {
+                      // Fname: '',
+                      // Lname: '',
+                      // Email: '',
+                      // richText:
+                      //   '<span style="background-color: rgb(255, 255, 0);">Test</span>',
+                      // autocomplete: ['foo', 'bar'],
+                    },
+                  },
                   {
                     key: 'form1',
                     publish: 'complete',
@@ -167,60 +261,9 @@ export default {
                         readonly: false,
                         rule: 'required|minmax:2,25',
                       },
-                      {
-                        key: 'input1',
-                        type: 'InputComponent',
-                        label: 'Last name',
-                        name: 'Lname',
-                        col: 4,
-                        readonly: true,
-                      },
-                      {
-                        key: 'input1',
-                        type: 'InputComponent',
-                        label: 'Email Adress',
-                        name: 'Email',
-                        col: 4,
-                        readonly: true,
-                      },
-                      {
-                        type: 'RichtextComponent',
-                        name: 'richText',
-                        col: 12,
-                        rule:'required'
-                      },
-                      {
-                        type: 'InputFileComponent',
-                        name: 'inputFile',
-                        col: 12,
-                      },
-                      {
-                        type: 'AutoCompleteComponent',
-                        name: 'autocomplete',
-                        items : ['foo', 'bar', 'fizz', 'buzz'],
-                        value : [],
-                        col: 12,
-                      },
-                      {
-                        type: 'SelectComponent',
-                        name: 'selectComponent',
-                        col : 4
-                      }
-                      // {
-                      //   type: 'ButtonComponent',
-                      //   action: 'submit',
-                      //   label: 'submit',
-                      //   name: 'submitBtn',
-                      //   col: 4,
-                      //   rule: 'required|minmax:2,25',
-                      // },
                     ],
                     model: {
                       Fname: '',
-                      Lname: '',
-                      Email: '',
-                      richText: '<span style="background-color: rgb(255, 255, 0);">Test</span>',
-                      autocomplete: ['foo','bar']
                     },
                   },
                 ],

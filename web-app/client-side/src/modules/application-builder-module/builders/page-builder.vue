@@ -1,9 +1,9 @@
 <template>
-  <v-container>
+  <span>
     <div v-for="(section, key) in page.sections" :key="key">
       <SectionBuilder v-on:modelChange="dataChange" :section="section" />
     </div>
-  </v-container>
+  </span>
 </template>
 
 <script>
@@ -19,9 +19,7 @@ export default {
       console.log('Page Builder')
       console.log(model)
       this.$emit('modelChange', model)
-    }
-   
+    },
   },
-  
 }
 </script>

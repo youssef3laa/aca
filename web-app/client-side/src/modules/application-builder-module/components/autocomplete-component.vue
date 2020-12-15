@@ -11,6 +11,7 @@
     multiple
     clearable
     v-on:change="test"
+    color="outline"
   ></v-autocomplete>
 </template>
 

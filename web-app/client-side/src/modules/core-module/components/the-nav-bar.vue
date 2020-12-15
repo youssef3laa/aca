@@ -1,8 +1,16 @@
 <template>
   <div>
     <v-app-bar
+      style="background : white"
       :style="[$vuetify.rtl ? { direction: 'rtl' } : { direction: 'ltr' }]"
     >
+      <template v-if="$vuetify.breakpoint.smAndUp">
+        <v-app-bar-nav-icon
+          class="mx-1"
+          @click="drawer = !drawer"
+        ></v-app-bar-nav-icon>
+      </template>
+      <v-spacer></v-spacer>
       <div style="width: 200px">
         <router-link :to="{ name: 'Home' }">
           <v-img
@@ -13,11 +21,10 @@
           </v-img>
         </router-link>
       </div>
-
       <v-spacer></v-spacer>
 
       <template v-if="$vuetify.breakpoint.smAndUp">
-        <v-toolbar-items>
+        <!-- <v-toolbar-items>
           <v-btn text>Link 1</v-btn>
         </v-toolbar-items>
         <v-btn icon>
@@ -28,11 +35,7 @@
         </v-btn>
         <v-btn icon>
           <v-icon>mdi-plus-circle</v-icon>
-        </v-btn>
-        <v-app-bar-nav-icon
-          class="mx-1"
-          @click="drawer = !drawer"
-        ></v-app-bar-nav-icon>
+        </v-btn> -->
       </template>
     </v-app-bar>
     <v-navigation-drawer
