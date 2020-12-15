@@ -1,5 +1,6 @@
 package com.asset.appwork.util;
 
+import com.asset.appwork.otds.enums.ResponseCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +24,16 @@ import java.util.List;
  * Created by karim on 10/26/20.
  */
 public class SystemUtil {
+
+    public static ResponseCode getResponseCodeFromInt(Integer code) throws NullPointerException {
+        for (ResponseCode c : ResponseCode.values()) {
+            if (c.getCode() == code) {
+                return c;
+            }
+        }
+        return null;
+    }
+
     public static String readJSONField(String json, String name) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(json);

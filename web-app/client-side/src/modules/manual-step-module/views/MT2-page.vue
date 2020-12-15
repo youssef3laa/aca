@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import AppBuilder from "@/modules/application-builder-module/components/app-builder";
+import AppBuilder from "@/modules/application-builder-module/builders/app-builder";
 import http from "@/modules/core-module/services/http";
 import mixins from "@/modules/core-module/services/mixins";
 

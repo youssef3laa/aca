@@ -20,6 +20,7 @@ const vuetify = new Vuetify({
         accent: '#fffcf2',
         anchor: '#8c9eff',
         error: '#b71c1c',
+        outline : '#0278ae'
       },
       dark: {
         background: '#072742',
