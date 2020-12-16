@@ -3,17 +3,19 @@ package com.asset.appwork.controller;
 
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
-import com.asset.appwork.otds.enums.ResponseCode;
+import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.response.AppResponse;
-import com.asset.appwork.util.CordysUtil;
+import com.asset.appwork.service.CordysService;
 import com.asset.appwork.util.SystemUtil;
-import com.asset.appwork.webservice.Entity;
+import com.asset.appwork.platform.soap.Entity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/entity")
@@ -23,7 +25,7 @@ public class EntityController {
     @Autowired
     TokenService tokenService;
     @Autowired
-    CordysUtil cordysUtil;
+    CordysService cordysService;
 
     @SuppressWarnings("DuplicatedCode")
     @GetMapping("/read")
@@ -36,7 +38,7 @@ public class EntityController {
             Entity entity = new Entity();
             Account account = tokenService.get(token);
             if (account != null) {
-                String response = cordysUtil.sendRequest(account, entity.readEntity(account.getSAMLart(), projectName, entityName, entityId));
+                String response = cordysService.sendRequest(account, entity.readEntity(account.getSAMLart(), projectName, entityName, entityId));
                 response = SystemUtil.convertXMLtoJSON(response);
                 respBuilder.data(SystemUtil.convertStringToJsonNode(response));
             }
@@ -46,6 +48,8 @@ public class EntityController {
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return respBuilder.build().getResponseEntity();
     }

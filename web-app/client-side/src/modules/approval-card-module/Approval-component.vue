@@ -3,10 +3,10 @@
     <v-container>
       <v-card flat>
         <v-card-title> ملاحظات أحمد عزت</v-card-title>
-        <v-radio-group v-model="ApprovalCardDecision" row>
+        <v-radio-entity v-model="ApprovalCardDecision" row>
           <v-radio label="Option 1" value="approve"></v-radio>
           <v-radio label="Option 2" value="reject"></v-radio>
-        </v-radio-group>
+        </v-radio-entity>
         <v-container>
           <v-textarea
             row

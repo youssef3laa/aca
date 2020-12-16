@@ -10,7 +10,7 @@
             filled
             disabled
           ></v-textarea>
-      <v-radio-group
+      <v-radio-entity
         v-model="decision" row>
         <v-radio
           label="Yes"
@@ -20,7 +20,7 @@
           label="No"
           value="no"
         ></v-radio>
-      </v-radio-group>
+      </v-radio-entity>
       <v-btn
           elevation="2" v-on:click="complete"
       >Complete</v-btn>

@@ -81,12 +81,7 @@
             <artifactId>java-jwt</artifactId>
             <version>3.11.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.asset.appwork.cs</groupId>
-            <artifactId>appwork-cs</artifactId>
-            <version>2.4.1</version>
-            <scope>compile</scope>
-        </dependency>
+
 
     </dependencies>
 

@@ -16,7 +16,7 @@
       <span class="red--text">{{ errors[0] }}</span>
 
       <!-- Errors: {{ errors }} -->
-      <!-- <span class="input-group-addon">
+      <!-- <span class="input-entity-addon">
         "Error"
       </span>
       <span v-show="errors.any()" class="text-danger m-t-xs">

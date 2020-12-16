@@ -1,12 +1,11 @@
 package com.asset.appwork.controller;
 
 import com.asset.appwork.config.TokenService;
-import com.asset.appwork.cs.AppworkCSOperations;
-import com.asset.appwork.dto.Account;
-import com.asset.appwork.dto.DocumentQuery;
-import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.otds.enums.ResponseCode;
 import com.asset.appwork.response.AppResponse;
+import com.asset.appwork.dto.Account;
+import com.asset.appwork.cs.AppworkCSOperations;
+import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -60,7 +59,7 @@ public class DocumentsController {
     @GetMapping("/list/{parentId}")
     public ResponseEntity<AppResponse<JsonNode>> listSubNodes(@RequestHeader("X-Auth-Token") String token,
                                                               @PathVariable("parentId") String parentId,
-                                                              DocumentQuery documentQuery) {
+                                                              AppworkCSOperations.DocumentQuery documentQuery) {
 
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {

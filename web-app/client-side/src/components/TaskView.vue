@@ -8,10 +8,10 @@
       filled
       disabled
     ></v-textarea>
-    <v-radio-group v-model="decision" row>
+    <v-radio-entity v-model="decision" row>
       <v-radio label="Yes" value="yes"></v-radio>
       <v-radio label="No" value="no"></v-radio>
-    </v-radio-group>
+    </v-radio-entity>
     <v-btn elevation="2" @click="submit">Complete</v-btn>
   </v-container>
 </template>
