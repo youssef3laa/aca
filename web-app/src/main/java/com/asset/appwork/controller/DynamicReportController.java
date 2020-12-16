@@ -5,7 +5,7 @@ package com.asset.appwork.controller;
  */
 
 import com.asset.appwork.QueryBuilder;
-import com.asset.appwork.otds.enums.ResponseCode;
+import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
