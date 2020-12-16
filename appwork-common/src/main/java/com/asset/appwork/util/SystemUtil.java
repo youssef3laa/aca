@@ -54,11 +54,29 @@ public class SystemUtil {
         return json != null ? mapper.readTree(json) : null;
     }
 
+    public static List<?> readJSONArray(String json, String name) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(json);
+        jsonNode = jsonNode.get(name);
+        return (jsonNode == null ? null : mapper.convertValue(jsonNode, ArrayList.class));
+    }
+
     public static String readJSONObject(String json, String name) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(json);
         jsonNode = jsonNode.get(name);
         return (jsonNode == null ? null : jsonNode.toPrettyString());
+    }
+
+    public static String writeObjectIntoString(Object object) {
+        String result = null;
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            result = mapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     public static Document convertStringToXMLDocument(String data) {
