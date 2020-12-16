@@ -17,6 +17,7 @@ public class Individual {
     @Id
     Long Id;
     String nameArabic;
+    String nameEnglish;
     String positionArabic;
     String phone;
     String mobile;

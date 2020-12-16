@@ -8,21 +8,13 @@ import com.asset.appwork.QueryBuilder;
 import com.asset.appwork.otds.enums.ResponseCode;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.util.SystemUtil;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.hibernate.Criteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
-import javax.persistence.StoredProcedureQuery;
-import javax.persistence.criteria.*;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.List;
 
 
