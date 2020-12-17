@@ -5,6 +5,7 @@ package com.asset.appwork.controller;
  */
 
 import com.asset.appwork.QueryBuilder;
+import com.asset.appwork.dto.Filter;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.util.SystemUtil;
@@ -27,23 +28,19 @@ public class DynamicReportController {
     EntityManager entityManager;
 
     @GetMapping("/get")
-    public ResponseEntity<AppResponse<ObjectNode>> getForm(@RequestBody() String key) {
+    public ResponseEntity<AppResponse<ObjectNode>> getForm(@RequestBody() Filter key) {
         AppResponse.ResponseBuilder<ObjectNode> responseBuilder = AppResponse.builder();
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode result = mapper.createObjectNode();
-
         try{
             QueryBuilder queryBuilder = new QueryBuilder(entityManager);
             List<?> list = queryBuilder.runQuery(key);
-
             result.put("Result", SystemUtil.writeObjectIntoString(list));
-
             responseBuilder.status(ResponseCode.SUCCESS);
             return responseBuilder.data(result).build().getResponseEntity();
         }catch (Exception e){
             e.printStackTrace();
-            result.put("Error",e.getMessage());
-            responseBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            responseBuilder.status(ResponseCode.QUERY_BUILDER_FAILURE);
         }
         return responseBuilder.data(result).build().getResponseEntity();
     }
