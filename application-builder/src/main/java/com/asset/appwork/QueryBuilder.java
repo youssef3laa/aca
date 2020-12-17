@@ -1,36 +1,34 @@
 package com.asset.appwork;
 
+import com.asset.appwork.dto.Filter;
+import com.asset.appwork.enums.ResponseCode;
+import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.util.SystemUtil;
-import org.hibernate.Criteria;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.PrivateKey;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by omaradl on 12/15/2020.
  */
-public class QueryBuilder {
+public class QueryBuilder<T> {
+    List<T> data;
     private static EntityManager entityManager;
 
     public QueryBuilder(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
-    public List<?> runQuery(String queryJson) throws Exception {
-        List<?> result = new ArrayList<>();
-        String tableName = SystemUtil.readJSONField(queryJson, "table");
-
-        if (tableName != null) {
-            Class<?> tableClass = Class.forName("com.asset.appwork.model." + tableName);
+    public List<T> runQuery(Filter filter) throws AppworkException {
+        try {
             // Create query from certain table:
-
+            Class<?> tableClass = Class.forName("com.asset.appwork.model." + filter.getTable());
             CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
             CriteriaQuery query = criteriaBuilder.createQuery();
             Root<?> root = query.from(tableClass);
@@ -38,123 +36,146 @@ public class QueryBuilder {
             ArrayList<Selection> columnsSelection = new ArrayList<>();
 
             // Add aggregation functions
-            List<?> aggregationList = SystemUtil.readJSONArray(queryJson, "aggregations");
-            if (aggregationList != null) {
-                for (Object aggregation : aggregationList) {
-                    String aggregationFunction = ((String) aggregation).split(":")[0];
-                    String aggregationBy = ((String) aggregation).split(":")[1];
-
-                    Method method = CriteriaBuilder.class.getMethod(aggregationFunction, Expression.class);
-                    Selection aggregationExpression = (Selection) method.invoke(criteriaBuilder, root.get(aggregationBy));
-                    aggregationExpression.alias(aggregationFunction + "_" + aggregationBy);
-
-                    columnsSelection.add(aggregationExpression);
-                }
-            }
+            ArrayList<Selection> aggregationSelections = createAggregations(filter.getAggregations(), criteriaBuilder, root);
+            columnsSelection.addAll(aggregationSelections);
 
             // Add columns
-            List<?> columns = SystemUtil.readJSONArray(queryJson, "columns");
-            if (columns != null) {
-                for (Object column : columns) {
-                    columnsSelection.add(root.get((String) column).alias((String) column));
-                }
-            }
+            filter.getColumns().stream().forEach( s -> columnsSelection.add(root.get(s).alias(s)) );
 
             // Add Where
-            List<?> conditions = SystemUtil.readJSONArray(queryJson, "where");
-            if(conditions != null){
-                ArrayList<Predicate> predicates = new ArrayList<>();
-                for(Object condition : conditions) {
-                    String conditionString = (String) condition;
-                    Predicate predicate = null;
-                    if(conditionString.startsWith("or:")){
-                        String[] orConditions = conditionString.split(":");
-                        if(orConditions.length > 1){
-                            Predicate[] orPredicates = new Predicate[orConditions.length-1];
-                            for(int i = 1; i < orConditions.length;  i++){
-                                orPredicates[i-1] = createPredicate(criteriaBuilder, root, orConditions[i]);
-                            }
-                            predicate = criteriaBuilder.or(orPredicates);
-                        }
-                    }else if(conditionString.startsWith("not:")){
-                        String[] notConditions = conditionString.split(":");
-                        if(notConditions.length > 1) {
-                            predicate = createPredicate(criteriaBuilder, root, notConditions[1]);
-                        }
-                    }else {
-                        predicate = createPredicate(criteriaBuilder, root, conditionString);
-                    }
-                    if(predicate != null){
-                        predicates.add(predicate);
-                    }
-                }
-                if(predicates.size() > 0){
-                   Predicate[] predicatesArray = predicates.toArray(new Predicate[predicates.size()]);
-                   query.where(predicatesArray);
-                }
+            ArrayList<Predicate> predicates = createWhereConditions(filter.getWhere(), criteriaBuilder, root);
+            if (predicates.size() > 0) {
+                Predicate[] predicatesArray = predicates.toArray(new Predicate[predicates.size()]);
+                query.where(predicatesArray);
             }
 
             // Add Group By
-            List<?> groupByList = SystemUtil.readJSONArray(queryJson, "groupBy");
-            if (groupByList != null) {
-                ArrayList<Selection> groupBySelection = new ArrayList<>();
-                for (Object groupBy : groupByList) {
-                    groupBySelection.add(root.get(((String) groupBy)));
-                }
-                if (groupBySelection.size() > 0) {
-                    query.groupBy(groupBySelection);
-                }
-            }
+            ArrayList<Selection> groupBySelection = new ArrayList<>();
+            filter.getGroupBy().stream().forEach( s-> groupBySelection.add(root.get(s)) );
+            query.groupBy(groupBySelection);
 
             // Run query
             if (columnsSelection.size() > 0) {
                 query.multiselect(columnsSelection);
                 List<?> list = entityManager.createQuery(query).getResultList();
-                result = addAliasToList(list, columnsSelection);
+                data = addAliasToList(list, columnsSelection);
             } else {
                 query.select(root);
-                result = entityManager.createQuery(query).getResultList();
+                data = entityManager.createQuery(query).getResultList();
             }
+
+            return data;
+
+        }catch (Exception e){
+            throw new AppworkException(e.getMessage(), ResponseCode.QUERY_BUILDER_FAILURE);
         }
 
-        return result;
     }
 
-    private List<LinkedHashMap> addAliasToList(List<?> list, ArrayList<Selection> columns) {
-        List<LinkedHashMap> result = new ArrayList<>();
+    private List<T> addAliasToList(List<?> list, ArrayList<Selection> columns) {
+        List<T> result = new ArrayList<>();
 
-        for (int listIndex = 0; listIndex < list.size(); listIndex++) {
+        list.stream().forEach(l -> {
             LinkedHashMap<String, Object> row = new LinkedHashMap<>();
-            for (int columnNumber = 0; columnNumber < columns.size(); columnNumber++) {
-                String columnName = columns.get(columnNumber).getAlias();
+            int[] columnIndex = { 0 };
+            columns.stream().forEach(column -> {
+                String columnName = column.getAlias();
                 Object value = null;
-                if (list.get(listIndex).getClass() != Object[].class) {
-                    value = list.get(listIndex);
+                if(l.getClass() != Object[].class){
+                    value = l;
                 } else {
-                    value = ((Object[]) list.get(listIndex))[columnNumber];
+                    value = ((Object[]) l)[columnIndex[0]];
                 }
                 row.put(columnName, value);
-            }
-            result.add(row);
-        }
+                columnIndex[0]++;
+            });
+            result.add((T)row);
+        });
+//        for (int listIndex = 0; listIndex < list.size(); listIndex++) {
+//            LinkedHashMap<String, Object> row = new LinkedHashMap<>();
+//            for (int columnNumber = 0; columnNumber < columns.size(); columnNumber++) {
+//                String columnName = columns.get(columnNumber).getAlias();
+//                Object value = null;
+//                if (list.get(listIndex).getClass() != Object[].class) {
+//                    value = list.get(listIndex);
+//                } else {
+//                    value = ((Object[]) list.get(listIndex))[columnNumber];
+//                }
+//                row.put(columnName, value);
+//            }
+//            result.add(row);
+//        }
 
         return result;
     }
 
-    private Predicate createPredicate(CriteriaBuilder criteriaBuilder, Root root, String condition){
-        try {
-            int conditionLength = condition.split(",").length;
-            if(conditionLength == 3) {
-                String conditionFunction = condition.split(",")[0];
-                String column = condition.split(",")[1];
-                String value = condition.split(",")[2];
-                Method method = CriteriaBuilder.class.getMethod(conditionFunction, Expression.class, getRequiredClassFromFunction(conditionFunction));
-                return (Predicate) method.invoke(criteriaBuilder, root.get(column), value);
+    private ArrayList<Selection> createAggregations(List<LinkedHashMap> aggregations, CriteriaBuilder criteriaBuilder, Root root){
+        ArrayList<Selection> selections = new ArrayList<>();
+        aggregations.stream().filter(s -> s.containsKey("function") && s.containsKey("column")).forEach(aggregation -> {
+            try {
+                String aggregationFunction = (String) aggregation.get("function");
+                String aggregationBy = (String) aggregation.get("column");
+
+                Method method = CriteriaBuilder.class.getMethod(aggregationFunction, Expression.class);
+                Selection aggregationExpression = (Selection) method.invoke(criteriaBuilder, root.get(aggregationBy));
+                aggregationExpression.alias(aggregationFunction + "_" + aggregationBy);
+
+                selections.add(aggregationExpression);
+            } catch (Exception e){
+                e.printStackTrace();
+                return;
             }
-            return null;
+        });
+        return selections;
+    }
+
+    private ArrayList<Predicate> createWhereConditions(List<LinkedHashMap> conditions, CriteriaBuilder criteriaBuilder, Root root){
+        ArrayList<Predicate> predicates = new ArrayList<>();
+        conditions.stream().forEach(condition -> {
+            try {
+                if(condition.containsKey("or")){
+                    ArrayList<Predicate> orPredicates = null;
+                    orPredicates = createWhereConditions( (List<LinkedHashMap>) condition.get("or"),criteriaBuilder,root);
+                    Predicate[] orPredicatesArray = orPredicates.toArray(new Predicate[orPredicates.size()]);
+                    predicates.add(criteriaBuilder.or(orPredicatesArray));
+                }else if(condition.containsKey("and")){
+                    ArrayList<Predicate> andPredicates = createWhereConditions( (List<LinkedHashMap>) condition.get("and"),criteriaBuilder,root);
+                    Predicate[] andPredicatesArray = andPredicates.toArray(new Predicate[andPredicates.size()]);
+                    predicates.add(criteriaBuilder.and(andPredicatesArray));
+                }else{
+                    Optional<Predicate> predicate = createPredicate(criteriaBuilder, root, condition);
+                    if(predicate.isPresent()){
+                        predicates.add(predicate.get());
+                    }
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+                return;
+            }
+        });
+        return predicates;
+    }
+
+    private Optional<Predicate> createPredicate(CriteriaBuilder criteriaBuilder, Root root, LinkedHashMap condition) throws AppworkException{
+        try {
+            Optional<Predicate> predicate = null;
+            if(condition.containsKey("type") && condition.containsKey("column")){
+                String conditionFunction = (String) condition.get("type");
+                String column = (String) condition.get("column");
+
+                if (condition.containsKey("value")){
+                    String value = (String) condition.get("value");
+                    Method method = CriteriaBuilder.class.getMethod(conditionFunction, Expression.class, getRequiredClassFromFunction(conditionFunction));
+                    predicate = Optional.ofNullable((Predicate) method.invoke(criteriaBuilder, root.get(column), value));
+                }else if(condition.containsKey("column2")){
+                    String column2 = (String) condition.get("column");
+                    Method method = CriteriaBuilder.class.getMethod(conditionFunction, Expression.class, Expression.class);
+                    predicate = Optional.ofNullable((Predicate) method.invoke(criteriaBuilder, root.get(column), root.get(column2)));
+                }
+            }
+            return predicate;
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new AppworkException(e.getMessage(),ResponseCode.QUERY_BUILDER_FAILURE);
         }
     }
 
@@ -173,7 +194,6 @@ public class QueryBuilder {
         }
     }
 }
-
 
 // Add Sort By
 //            List<?> sortByList = SystemUtil.readJSONArray(queryJson, "sortBy");
@@ -208,3 +228,50 @@ public class QueryBuilder {
 //                Class<?> neededType = Class.forName(root.get(column).getJavaType().getCanonicalName());
 //                return criteriaBuilder.between(root.get(column),(Comparable)neededType.cast(value1),(Comparable)neededType.cast(value2));
 //            }else
+//            =========== Old Creation Of Where Conditions ====================
+//            List<?> conditions = SystemUtil.readJSONArray(queryJson, "where");
+//            if(conditions != null){
+//                ArrayList<Predicate> predicates = new ArrayList<>();
+//                for(Object condition : conditions) {
+//                    String conditionString = (String) condition;
+//                    Predicate predicate = null;
+//                    if(conditionString.startsWith("or:")){
+//                        String[] orConditions = conditionString.split(":");
+//                        if(orConditions.length > 1){
+//                            Predicate[] orPredicates = new Predicate[orConditions.length-1];
+//                            for(int i = 1; i < orConditions.length;  i++){
+//                                orPredicates[i-1] = createPredicate(criteriaBuilder, root, orConditions[i]);
+//                            }
+//                            predicate = criteriaBuilder.or(orPredicates);
+//                        }
+//                    }else if(conditionString.startsWith("not:")){
+//                        String[] notConditions = conditionString.split(":");
+//                        if(notConditions.length == 2) {
+//                            predicate = createPredicate(criteriaBuilder, root, notConditions[1]);
+//                        }
+//                    }else {
+//                        predicate = createPredicate(criteriaBuilder, root, conditionString);
+//                    }
+//                    if(predicate != null){
+//                        predicates.add(predicate);
+//                    }
+//                }
+//                if(predicates.size() > 0){
+//                    Predicate[] predicatesArray = predicates.toArray(new Predicate[predicates.size()]);
+//                    query.where(predicatesArray);
+//                }
+//            }
+//            ======================= Old creation of Aggregations ===================
+//            if (aggregationList != null) {
+//                for (Object aggregation : aggregationList) {
+//                    String aggregationFunction = ((String) aggregation).split(":")[0];
+//                    String aggregationBy = ((String) aggregation).split(":")[1];
+//
+//                    Method method = CriteriaBuilder.class.getMethod(aggregationFunction, Expression.class);
+//                    Selection aggregationExpression = (Selection) method.invoke(criteriaBuilder, root.get(aggregationBy));
+//                    aggregationExpression.alias(aggregationFunction + "_" + aggregationBy);
+//
+//                    columnsSelection.add(aggregationExpression);
+//                }
+//            }
+

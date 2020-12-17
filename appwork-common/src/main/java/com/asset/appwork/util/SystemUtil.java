@@ -58,7 +58,16 @@ public class SystemUtil {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(json);
         jsonNode = jsonNode.get(name);
-        return (jsonNode == null ? null : mapper.convertValue(jsonNode, ArrayList.class));
+        if(jsonNode != null){
+            if(jsonNode.isArray()){
+                return mapper.convertValue(jsonNode, ArrayList.class);
+            }else{
+                ArrayList<LinkedHashMap> arrayList = new ArrayList<>();
+                arrayList.add(mapper.convertValue(jsonNode,LinkedHashMap.class));
+                return arrayList;
+            }
+        }
+        return null;
     }
 
     public static String readJSONObject(String json, String name) throws JsonProcessingException {
@@ -210,6 +219,5 @@ public class SystemUtil {
             return resultMap;
         }
     }
-
 
 }
