@@ -12,9 +12,16 @@
     </v-tabs>
     <v-tabs-items v-model="tab" v-if="section.tabs">
       <v-tab-item v-for="formData in section.forms" :key="formData.id">
-        <v-card flat >
+        <v-card flat>
           <span v-if="formData.resizable">
-            <Multipane class="vertical-panes" layout="vertical" >
+            <splitpanes class="default-theme" dir="rtl">
+              <pane v-bind:style="{'background': form.background}" v-for="(form,index) in formData.resizable.forms" :key="index">
+                <span dir="rtl">
+                  <FormBuilder :forms="form" :model="form.model" />
+                </span>
+              </pane>
+            </splitpanes>
+            <!-- <Multipane class="vertical-panes" layout="vertical">
               <div
                 class="pane"
                 :style="{
@@ -24,7 +31,7 @@
                 <FormBuilder :forms="formData" :model="formData.model" />
               </div>
               <MultipaneResizer></MultipaneResizer>
-            </Multipane>
+            </Multipane> -->
           </span>
           <span v-else>
             <FormBuilder :forms="formData" :model="formData.model" />
@@ -38,7 +45,40 @@
   <!-- </v-container> -->
 </template>
 
+<script>
+import FormBuilder from './form-builder'
+import { Splitpanes, Pane } from 'splitpanes'
+import 'splitpanes/dist/splitpanes.css'
+// import { Multipane, MultipaneResizer } from 'vue-multipane'
+export default {
+  tab: null,
+  name: 'TabBuilder',
+  components: {
+    FormBuilder,
+    Splitpanes,
+    Pane,
+    // Multipane,
+    // MultipaneResizer,
+  },
+  data() {
+    return {
+      tab: null,
+    }
+  },
+  mounted() {
+    console.log(this.section.tabs)
+  },
+  props: ['section'],
+}
+</script>
+
 <style>
+.splitpanes.default-theme .splitpanes__splitter:after, .splitpanes.default-theme .splitpanes__splitter:before{
+background-color: #d1d1d1;
+}
+/* .splitpanes.default-theme .splitpanes__pane {
+  background: transparent!important;
+} */
 .vertical-panes {
   width: 100%;
   height: 400px;
@@ -72,26 +112,3 @@
   border-bottom: 2px solid #e1e1e1;
 }
 </style>
-
-<script>
-import FormBuilder from './form-builder'
-import { Multipane, MultipaneResizer } from 'vue-multipane'
-export default {
-  tab: null,
-  name: 'TabBuilder',
-  components: {
-    FormBuilder,
-    Multipane,
-    MultipaneResizer,
-  },
-  data() {
-    return {
-      tab: null,
-    }
-  },
-  mounted() {
-    console.log(this.section.tabs)
-  },
-  props: ['section'],
-}
-</script>

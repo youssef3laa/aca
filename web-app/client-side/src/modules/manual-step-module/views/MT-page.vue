@@ -150,6 +150,7 @@ export default {
                 actions: ['cancel', 'save', 'complete'],
               },
               {
+                numOfResizable: 2,
                 key: 'section1',
                 tabs: [
                   {
@@ -205,15 +206,44 @@ export default {
                     model: {},
                   },
                   {
+                    resizable: {
+                      forms: [
+                        {
+                          background: 'white',
+                          inputs: [
+                            {
+                              type: 'InputFileComponent',
+                              name: 'inputFile',
+                              col: 12,
+                            },
+                          ],
+                          model: {
+                            inputFile: '',
+                          },
+                        },
+                        {
+                           background: 'grey',
+                          inputs: [
+                            {
+                              type: 'InputFileComponent',
+                              name: 'inputFile',
+                              col: 12,
+                            },
+                          ],
+                          model: {
+                            inputFile: '',
+                          },
+                        },
+                      ],
+                    },
                     width: '50%',
-                    resizable: true,
                     key: 'form2',
                     publish: 'complete',
                     inputs: [
                       {
                         type: 'InputFileComponent',
                         name: 'inputFile',
-                        col:12,
+                        col: 12,
                       },
                     ],
                     model: {
