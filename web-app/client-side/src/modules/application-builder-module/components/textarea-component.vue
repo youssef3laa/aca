@@ -1,9 +1,9 @@
 <template>
+   <!-- background-color="grey lighten-2" -->
   <v-textarea
     row
-    background-color="grey lighten-2"
     color="outline"
-    label="Label"
+    :label="field.label"
     v-model="d"
     @input="addInput"
     outlined 

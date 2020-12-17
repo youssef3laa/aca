@@ -45,6 +45,7 @@ import RichtextComponent from '../components/rich-text-component'
 import AutoCompleteComponent from '../components/autocomplete-component'
 import InputFileComponent from '../components/input-file-component'
 import SelectComponent from '../components/select-component'
+import DatePickerComponent from '../components/datePicker-component'
 
 export default {
   name: 'FormBuilder',
@@ -59,7 +60,8 @@ export default {
     RichtextComponent,
     AutoCompleteComponent,
     InputFileComponent,
-    SelectComponent
+    SelectComponent,
+    DatePickerComponent
   },
   data() {
     return {

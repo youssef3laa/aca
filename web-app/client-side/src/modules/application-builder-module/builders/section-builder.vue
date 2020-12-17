@@ -29,24 +29,23 @@
         <v-spacer></v-spacer>
         <v-col class="text-left">
           <span v-for="(action, index) in section.actions" :key="index">
-            <span v-if="action == 'save'" class="actions-contianer">
-              <v-icon>
-                mdi-minus-circle
-              </v-icon>
-              حفظ
-              </span
-            >
-            <span v-if="action == 'complete'" class="actions-contianer">
-              <v-icon>
-                mdi-checkbox-marked-circle
-              </v-icon>
-              إرسال
-            </span>
             <span v-if="action == 'cancel'" class="actions-contianer">
               <v-icon>
                 mdi-cancel
               </v-icon>
               إلغاء
+            </span>
+            <span v-if="action == 'save'" class="actions-contianer">
+              <v-icon>
+                mdi-minus-circle
+              </v-icon>
+              حفظ
+            </span>
+            <span v-if="action == 'complete'" class="actions-contianer">
+              <v-icon>
+                mdi-checkbox-marked-circle
+              </v-icon>
+              إرسال
             </span>
           </span>
         </v-col>
@@ -81,7 +80,7 @@ export default {
 }
 </script>
 <style>
-.actions-contianer{
+.actions-contianer {
   border-radius: 10px;
   background: white;
   margin: 5px;

@@ -41,3 +41,8 @@ export default {
   },
 }
 </script>
+<style >
+  .v-select__slot{
+    padding: 7px 12px;
+  }
+</style>

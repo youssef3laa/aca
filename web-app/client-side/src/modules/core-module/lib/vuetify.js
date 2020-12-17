@@ -17,7 +17,7 @@ const vuetify = new Vuetify({
         background: '#072742',
         primary: '#072742',
         secondary: '#1a4573',
-        accent: '#fffcf2',
+        // accent: '#fffcf2',
         anchor: '#8c9eff',
         error: '#b71c1c',
         outline : '#0278ae'

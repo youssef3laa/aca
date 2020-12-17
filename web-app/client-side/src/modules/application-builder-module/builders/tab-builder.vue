@@ -8,13 +8,28 @@
           mdi-account
         </v-icon>
         {{ tab.name }}
-        </v-tab >
+      </v-tab>
     </v-tabs>
     <v-tabs-items v-model="tab" v-if="section.tabs">
       <v-tab-item v-for="formData in section.forms" :key="formData.id">
-        <v-card flat>
+        <v-card flat >
+          <span v-if="formData.resizable">
+            <Multipane class="vertical-panes" layout="vertical" >
+              <div
+                class="pane"
+                :style="{
+                  width: formData.width,
+                }"
+              >
+                <FormBuilder :forms="formData" :model="formData.model" />
+              </div>
+              <MultipaneResizer></MultipaneResizer>
+            </Multipane>
+          </span>
+          <span v-else>
+            <FormBuilder :forms="formData" :model="formData.model" />
+          </span>
           <!-- <v-card-text v-text="formData.inputs.name"></v-card-text> -->
-          <FormBuilder :forms="formData" :model="formData.model" />
         </v-card>
       </v-tab-item>
     </v-tabs-items>
@@ -24,28 +39,58 @@
 </template>
 
 <style>
+.vertical-panes {
+  width: 100%;
+  height: 400px;
+  border: 1px solid #ccc;
+}
+.vertical-panes > .pane {
+  text-align: left;
+  padding: 15px;
+  overflow: hidden;
+  background: #eee;
+}
+.vertical-panes > .pane ~ .pane {
+  border-left: 1px solid #ccc;
+}
 .v-tabs-bar.v-tabs-bar--is-mobile .v-tab {
-    margin: 0px !important;
+  margin: 0px !important;
 }
 
- .v-application--is-rtl .v-tabs--align-with-title > .v-tabs-bar:not(.v-tabs-bar--show-arrows):not(.v-slide-group--is-overflowing) > .v-slide-group__wrapper > .v-tabs-bar__content > .v-tabs-slider-wrapper + .v-tab {
-   margin: 0px !important;
- }
+.v-application--is-rtl
+  .v-tabs--align-with-title
+  > .v-tabs-bar:not(.v-tabs-bar--show-arrows):not(.v-slide-group--is-overflowing)
+  > .v-slide-group__wrapper
+  > .v-tabs-bar__content
+  > .v-tabs-slider-wrapper
+  + .v-tab {
+  margin: 0px !important;
+}
+.v-tabs {
+  border-top-left-radius: 6px !important;
+  border-top-right-radius: 6px !important;
+  border-bottom: 2px solid #e1e1e1;
+}
 </style>
 
 <script>
 import FormBuilder from './form-builder'
-
+import { Multipane, MultipaneResizer } from 'vue-multipane'
 export default {
   tab: null,
   name: 'TabBuilder',
   components: {
     FormBuilder,
+    Multipane,
+    MultipaneResizer,
   },
   data() {
     return {
       tab: null,
     }
+  },
+  mounted() {
+    console.log(this.section.tabs)
   },
   props: ['section'],
 }

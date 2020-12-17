@@ -1,57 +1,70 @@
 <template>
-  <v-sheet
-    tabindex="0"
-    title="Click to grap a file from your PC!"
-    color="indigo lighten-4"
-    width="100%"
-    height="200"
-    class="pa-2"
-  >
-    <input type="file" style="display:none" />
-    <span>Drag and Drop File!</span>
-    <!-- <v-data-table
-      :headers="tableHeaders"
-      :items="files"
-      item-key="id"
-      :show-select="false"
-      :disable-pagination="true"
-      :hide-default-footer="true"
-      class="page__table"
+  <div>
+    <v-container
+      title="Click to grap a file from your PC!"
+      style="border: 2px dashed #94bed6 !important; border-radius: 6px; background-color:#f2f7fa"
     >
-      <template v-slot:body="props">
-        <draggable :list="props.items" tag="tbody">
-          <tr v-for="(file, index) in props.items" :key="index"> 
-            <td>
-              <v-icon small class="page__grab-icon">
-                mdi-arrow-all
-              </v-icon>
-            </td>
-            <td>{{file[0].name}}</td>
-            <td>
-              <v-icon small >
-                mdi-pencil
-              </v-icon>
-            </td>
-          </tr>
-        </draggable>
-      </template>
-    </v-data-table> -->
+      <input type="file" style="display:none" />
 
-    <draggable tag="ul" :list="files">
-      <li
-        v-for="(file, index) in files"
-        :key="index"
-        draggable
-        class="drop-zone"
-        @drop="onDrop($event)"
-        @dragstart="startDrag($event, file)"
-        @dragover.prevent
-        @dragenter.prevent
-      >
-        {{ file.name }}
-      </li>
-    </draggable>
-  </v-sheet>
+      <v-row align="center" justify="center">
+        <v-icon color="outline" style="margin: 10px 10px 0 0; padding:5px 10px"
+          >mdi-cloud-upload</v-icon
+        >
+      </v-row>
+      <v-row align="center" justify="center">
+        <span style="margin: 10px 10px 0 0; padding:5px 10px"
+          >قم بتحميل الملفات أو <a color="outline">اضغط هنا</a></span
+        >
+      </v-row>
+    </v-container>
+    <br />
+    <span>الملفات</span>
+    <v-container>
+      <!-- <draggable tag="ul" :list="files">
+        <li
+          v-for="(file, index) in files"
+          :key="index"
+          draggable
+          class="drop-zone"
+          @drop="onDrop($event)"
+          @dragstart="startDrag($event, file)"
+          @dragover.prevent
+          @dragenter.prevent
+        >
+          {{ file.name }}
+        </li>
+      </draggable> -->
+      <draggable tag="div" :list="files">
+        <div
+          class="card"
+          v-for="(file, index) in files"
+          :key="index"
+          draggable
+          @drop="onDrop($event)"
+          @dragstart="startDrag($event, file)"
+          @dragover.prevent
+          @dragenter.prevent
+        >
+          <v-row>
+            <v-col :cols="2">
+              <v-icon>
+                mdi-file-pdf-outline
+              </v-icon>
+            </v-col>
+            <v-col :cols="8">
+              {{ file.name }} <br />
+              {{ file.size }}
+            </v-col>
+            <v-col :cols="2">
+              <v-icon color="#ea9cb3">
+                mdi-delete-circle-outline
+              </v-icon>
+            </v-col>
+          </v-row>
+        </div>
+      </draggable>
+    </v-container>
+  </div>
 </template>
 
 <script>
@@ -93,8 +106,8 @@ export default {
     },
   },
   mounted() {
-    const dropzone = this.$el
-    const fileupload = this.$el.firstElementChild
+    const dropzone = this.$el.firstElementChild
+    const fileupload = dropzone.firstElementChild
     // console.log(fileupload)
     if (dropzone) {
       dropzone.addEventListener('dragenter', (e) => {
@@ -156,3 +169,42 @@ export default {
   },
 }
 </script>
+<style>
+.card {
+  border: 2px solid #d6d6d6;
+  border-radius: 6px;
+  margin: 10px;
+}
+
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+  border: 2px solid #0278ae;
+}
+</style>
+<!-- <v-data-table
+      :headers="tableHeaders"
+      :items="files"
+      item-key="id"
+      :show-select="false"
+      :disable-pagination="true"
+      :hide-default-footer="true"
+      class="page__table"
+    >
+      <template v-slot:body="props">
+        <draggable :list="props.items" tag="tbody">
+          <tr v-for="(file, index) in props.items" :key="index"> 
+            <td>
+              <v-icon small class="page__grab-icon">
+                mdi-arrow-all
+              </v-icon>
+            </td>
+            <td>{{file[0].name}}</td>
+            <td>
+              <v-icon small >
+                mdi-pencil
+              </v-icon>
+            </td>
+          </tr>
+        </draggable>
+      </template>
+    </v-data-table> -->

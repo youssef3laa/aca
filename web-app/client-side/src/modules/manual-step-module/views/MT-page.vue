@@ -147,7 +147,7 @@ export default {
               {
                 key: 'title',
                 name: 'بيانات المكاتبة',
-                actions: ['save', 'complete', 'cancel'],
+                actions: ['cancel', 'save', 'complete'],
               },
               {
                 key: 'section1',
@@ -168,42 +168,6 @@ export default {
                     key: 'form1',
                     publish: 'complete',
                     inputs: [
-                      // {
-                      //   key: 'input1',
-                      //   type: 'InputComponent',
-                      //   label: 'First name',
-                      //   name: 'Fname',
-                      //   col: 4,
-                      //   readonly: false,
-                      //   rule: 'required|minmax:2,25',
-                      // },
-                      // {
-                      //   key: 'input1',
-                      //   type: 'InputComponent',
-                      //   label: 'Last name',
-                      //   name: 'Lname',
-                      //   col: 4,
-                      //   readonly: true,
-                      // },
-                      // {
-                      //   key: 'input1',
-                      //   type: 'InputComponent',
-                      //   label: 'Email Adress',
-                      //   name: 'Email',
-                      //   col: 4,
-                      //   readonly: true,
-                      // },
-                      // {
-                      //   type: 'RichtextComponent',
-                      //   name: 'richText',
-                      //   col: 12,
-                      //   rule: 'required',
-                      // },
-                      // {
-                      //   type: 'InputFileComponent',
-                      //   name: 'inputFile',
-                      //   col: 12,
-                      // },
                       {
                         type: 'AutoCompleteComponent',
                         name: 'receiverEntityName',
@@ -225,122 +189,35 @@ export default {
                         value: [],
                         col: 4,
                       },
-                      // {
-                      //   type: 'SelectComponent',
-                      //   name: 'selectComponent',
-                      //   col: 4,
-                      // },
-                      // {
-                      //   type: 'ButtonComponent',
-                      //   action: 'submit',
-                      //   label: 'submit',
-                      //   name: 'submitBtn',
-                      //   col: 4,
-                      //   rule: 'required|minmax:2,25',
-                      // },
+                      {
+                        type: 'TextareaComponent',
+                        label: 'subjectSummary',
+                        name: 'subjectSummary',
+                        col: 12,
+                      },
+                      {
+                        type: 'DatePickerComponent',
+                        label: 'subjectDate',
+                        name: 'subjectDate',
+                        col: 4,
+                      },
                     ],
-                    model: {
-                      // Fname: '',
-                      // Lname: '',
-                      // Email: '',
-                      // richText:
-                      //   '<span style="background-color: rgb(255, 255, 0);">Test</span>',
-                      // autocomplete: ['foo', 'bar'],
-                    },
+                    model: {},
                   },
                   {
-                    key: 'form1',
+                    width: '50%',
+                    resizable: true,
+                    key: 'form2',
                     publish: 'complete',
                     inputs: [
                       {
-                        key: 'input1',
-                        type: 'InputComponent',
-                        label: 'First name',
-                        name: 'Fname',
-                        col: 4,
-                        readonly: false,
-                        rule: 'required|minmax:2,25',
+                        type: 'InputFileComponent',
+                        name: 'inputFile',
+                        col:12,
                       },
                     ],
                     model: {
                       Fname: '',
-                    },
-                  },
-                ],
-              },
-
-              {
-                forms: [
-                  {
-                    key: 'form2',
-                    publish: 'compelete',
-                    event: 'submit',
-                    inputs: [
-                      {
-                        key: 'form2Input',
-                        type: 'RadioGroupComponent',
-                        decisions: [
-                          {
-                            label: 'approve',
-                            id: 1,
-                            value: 'approve',
-                          },
-                          {
-                            label: 'reject',
-                            id: 2,
-                            value: 'reject',
-                          },
-                          {
-                            label: 'requestModification',
-                            id: 3,
-                            value: 'requestModification',
-                          },
-                        ],
-                        name: 'decision',
-                        label: 'decision',
-                        col: 6,
-                      },
-                      {
-                        key: 'form2Input',
-                        type: 'CheckboxComponent',
-                        decisions: [
-                          {
-                            label: 'approve',
-                            id: 1,
-                            value: 'approve',
-                          },
-                          {
-                            label: 'reject',
-                            id: 2,
-                            value: 'reject',
-                          },
-                          {
-                            label: 'requestModification',
-                            id: 3,
-                            value: 'requestModification',
-                          },
-                        ],
-                        name: 'decision',
-                        label: 'decision',
-                        col: 6,
-                      },
-                      {
-                        type: 'TextareaComponent',
-                        label: 'comment',
-                        name: 'comment',
-                        col: 12,
-                      },
-                      {
-                        type: 'ButtonComponent',
-                        label: 'submit',
-                        action: 'submit',
-                        name: 'submit',
-                        col: 4,
-                      },
-                    ],
-                    model: {
-                      decision: '',
-                      comment: '',
                     },
                   },
                 ],
