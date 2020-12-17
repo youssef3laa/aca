@@ -1,18 +1,22 @@
 <template>
   <v-autocomplete
-    v-model="value"
-    :items="items"
-    outlined
-    dense
-    chips
-    deletable-chips
-    small-chips
-    :label="field.name"
-    multiple
-    clearable
-    v-on:change="test"
-    color="outline"
-  ></v-autocomplete>
+      v-model="value"
+      :items="items"
+      chips
+      clearable
+      color="outline"
+      deletable-chips
+      dense
+      outlined
+      small-chips
+      v-on:change="autocompleteChange"
+  >
+    <template #label>
+      <span v-t="field.name"></span>
+    </template>
+
+  </v-autocomplete>
+  <!--  multiple-->
 </template>
 
 <script>
@@ -28,21 +32,26 @@ export default {
     }
   },
   methods: {
-    test: function() {
+    autocompleteChange: function () {
       console.log(this.value)
+      this.$emit('update', {
+        name: this.field.name,
+        value: this.value,
+        type: 'autocompleteChange'
+      })
     },
   },
   props: ['val', 'field'],
   watch: {
-    val: function(newVal, oldVal) {
+    val: function (newVal, oldVal) {
       console.log(oldVal)
       this.val = newVal
     },
   },
 }
 </script>
-<style >
-  .v-select__slot{
-    padding: 7px 12px;
-  }
+<style>
+.v-select__slot {
+  padding: 7px 12px;
+}
 </style>

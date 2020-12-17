@@ -1,9 +1,12 @@
 {
-    "message": "مرحبا i18n !!",
-    "username" : "اسم المستخدم",
-    "password" : "كلمه المرور",
-    "currentLanguage" : "عربي",
-    "login" : "تسجيل دخول",
-    "CANNOT_CONNECT_TO_SERVER":  "خطأ في الإتصال بالسيرفر",
-    "INVALID_CREDENTIALS": "برجاء التأكد من اسم المستخدم و كلمه المرور"
-  }
+  "message": "مرحبا i18n !!",
+  "username": "اسم المستخدم",
+  "password": "كلمه المرور",
+  "currentLanguage": "عربي",
+  "requestDate": "تاريخ الطلب",
+  "receiver": "التوجيه",
+  "notes": "الملاحظات",
+  "login": "تسجيل دخول",
+  "CANNOT_CONNECT_TO_SERVER": "خطأ في الإتصال بالسيرفر",
+  "INVALID_CREDENTIALS": "برجاء التأكد من اسم المستخدم و كلمه المرور"
+}
