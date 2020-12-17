@@ -2,10 +2,10 @@ package com.asset.appwork.controller;
 
 import com.asset.appwork.AppBuilder;
 import com.asset.appwork.config.TokenService;
-import com.asset.appwork.cordys.CordysManagement;
 import com.asset.appwork.dto.Account;
-import com.asset.appwork.otds.enums.ResponseCode;
+import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.orgchart.UserManagement;
 import com.asset.appwork.response.AppResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,7 +30,7 @@ public class UserController {
     @Autowired
     TokenService tokenService;
     @Autowired
-    CordysManagement cordysManagement;
+    UserManagement userManagement;
     @Autowired
     Environment environment;
 
@@ -61,13 +61,14 @@ public class UserController {
 
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
-            CordysManagement.User user = cordysManagement.getUser(account.getUsername().trim(), account.getPassword(), account.getOrganization().trim());
-            account.setSAMLart(user.getSAMLart());
+             userManagement.create(account);
             respBuilder.data(tokenService.generate(account));
         } catch (JsonProcessingException e) {
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (AppworkException e) {
             respBuilder.status(e.getCode());
+        } catch (IOException e) {
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         return respBuilder.build().getResponseEntity();

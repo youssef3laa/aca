@@ -2,12 +2,12 @@ package com.asset.appwork.controller;
 
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
-import com.asset.appwork.otds.enums.ResponseCode;
+import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.response.AppResponse;
-import com.asset.appwork.util.CordysUtil;
+import com.asset.appwork.service.CordysService;
 import com.asset.appwork.util.SystemUtil;
-import com.asset.appwork.webservice.Workflow;
+import com.asset.appwork.platform.soap.Workflow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.io.IOException;
 
 /**
  * Created by karim on 11/4/20.
@@ -27,7 +29,7 @@ public class WorkflowController {
     @Autowired
     TokenService tokenService;
     @Autowired
-    CordysUtil cordysUtil;
+    CordysService cordysService;
 
     @GetMapping("/human/tasks")
     public ResponseEntity<AppResponse<String>> getHumanTask(@RequestHeader("X-Auth-Token") String token) {
@@ -36,7 +38,7 @@ public class WorkflowController {
             Workflow workflow = new Workflow();
             Account account = tokenService.get(token);
             if (account != null) {
-                String response = cordysUtil.sendRequest(account, workflow.getHumanTasks(account.getSAMLart()));
+                String response = cordysService.sendRequest(account, workflow.getHumanTasks(account.getSAMLart()));
                 Document document = SystemUtil.convertStringToXMLDocument(response);
                 NodeList tasks = document.getElementsByTagName("NOTF_TASK_INSTANCE");
                 String data = "{\n" +
@@ -58,6 +60,8 @@ public class WorkflowController {
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return respBuilder.build().getResponseEntity();
     }
@@ -74,7 +78,7 @@ public class WorkflowController {
             taskData = SystemUtil.convertJSONtoXML(taskData);
             taskData = SystemUtil.addNameSpaceToXML(taskData, nameSpace);
             if (account != null) {
-                String response = cordysUtil.sendRequest(account, workflow.performTaskAction(account.getSAMLart(), taskId, "COMPLETE", "", taskData));
+                String response = cordysService.sendRequest(account, workflow.performTaskAction(account.getSAMLart(), taskId, "COMPLETE", "", taskData));
                 respBuilder.data(response);
             }
         } catch (JsonProcessingException e) {
@@ -94,7 +98,7 @@ public class WorkflowController {
             Workflow workflow = new Workflow();
             Account account = tokenService.get(token);
             if (account != null) {
-                String response = cordysUtil.sendRequest(account, workflow.getTask(account.getSAMLart(), taskId));
+                String response = cordysService.sendRequest(account, workflow.getTask(account.getSAMLart(), taskId));
                 System.out.println(response);
 
                 Document document = SystemUtil.convertStringToXMLDocument(response);
@@ -105,7 +109,7 @@ public class WorkflowController {
                     String taskState = SystemUtil.readJSONField(response, "State");
                     if (taskState != null) {
                         if (!taskState.equals("ASSIGNED")) {
-                            response = cordysUtil.sendRequest(account, workflow.claimTask(account.getSAMLart(), taskId));
+                            response = cordysService.sendRequest(account, workflow.claimTask(account.getSAMLart(), taskId));
                         } else {
                             response = "Task is already claimed.";
                         }
@@ -135,7 +139,7 @@ public class WorkflowController {
             Workflow workflow = new Workflow();
             Account account = tokenService.get(token);
             if (account != null) {
-                String response = cordysUtil.sendRequest(account, workflow.getTask(account.getSAMLart(), taskId));
+                String response = cordysService.sendRequest(account, workflow.getTask(account.getSAMLart(), taskId));
                 System.out.println(response);
                 response = SystemUtil.convertXMLtoJSON(response);
                 responseBuilder.data(SystemUtil.convertStringToJsonNode(response));
@@ -146,6 +150,8 @@ public class WorkflowController {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
 
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return responseBuilder.build().getResponseEntity();
 

@@ -1,5 +1,5 @@
 <template>
-  <v-radio-group v-model="decision" row>
+  <v-radio-entity v-model="decision" row>
     <v-radio
       v-for="(decision, key) in ApprovalCardDecision"
       :key="key"
@@ -8,7 +8,7 @@
       @click="test"
     >
     </v-radio>
-  </v-radio-group>
+  </v-radio-entity>
 </template>
 
 <script>

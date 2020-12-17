@@ -14,4 +14,9 @@ public class User {
     @Column(name="UserEntityId")
     long id;
     String DisplayName;
+
+
+    public String toString(){
+        return "";
+    }
 }
