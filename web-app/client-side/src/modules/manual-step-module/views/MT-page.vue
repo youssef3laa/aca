@@ -157,11 +157,13 @@ export default {
                     key: 'tab1',
                     id: 1,
                     name: 'البيانات الأساسية',
+                    icon: "far fa-file-alt"
                   },
                   {
                     key: 'tab2',
                     id: 2,
                     name: 'المرفقات',
+                    icon: "fas fa-paperclip"
                   },
                 ],
                 forms: [

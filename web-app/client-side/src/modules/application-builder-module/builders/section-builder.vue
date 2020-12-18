@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container style="padding-top: 0; padding-bottom:0">
     <TabBuilder
       :section="section"
       v-on:modelChange="dataChange"
@@ -12,38 +12,38 @@
           <FormBuilder :forms="formData" :model="formData.model" />
         </v-card>
       </span>
-      <v-row v-else>
+      <v-row v-else style="height: 80px;">
         <v-col>
           <h1>
             <button
-              style="background:white; border-radius:4px; text:center;"
+              style="background:transparent; width: 45px; height: 45px"
               @click="goBack"
             >
-              <v-icon right>
+              <v-icon style="background-color: white;width: inherit; height: inherit;border-radius: 5px;" right>
                 mdi-arrow-right
               </v-icon>
             </button>
-            {{ section.name }}
+            <span style="margin-left:15px;margin-right:15px">{{ section.name }}</span>
           </h1>
         </v-col>
         <v-spacer></v-spacer>
-        <v-col class="text-left">
+        <v-col style="padding-top: 20px; padding-bottom:0" class="text-left">
           <span v-for="(action, index) in section.actions" :key="index">
             <span v-if="action == 'cancel'" class="actions-contianer">
-              <v-icon>
-                mdi-cancel
+              <v-icon color="error">
+                far fa-times-circle
               </v-icon>
               إلغاء
             </span>
             <span v-if="action == 'save'" class="actions-contianer">
-              <v-icon>
-                mdi-minus-circle
+              <v-icon color="info">
+                far fa-save
               </v-icon>
               حفظ
             </span>
             <span v-if="action == 'complete'" class="actions-contianer">
-              <v-icon>
-                mdi-checkbox-marked-circle
+              <v-icon color="info">
+                far fa-paper-plane
               </v-icon>
               إرسال
             </span>
@@ -81,9 +81,9 @@ export default {
 </script>
 <style>
 .actions-contianer {
-  border-radius: 10px;
+  border-radius: 5px;
   background: white;
-  margin: 5px;
-  padding: 5px;
+  margin: 0 20px 0 0;
+  padding: 10px 15px;
 }
 </style>

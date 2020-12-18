@@ -2,6 +2,8 @@
   <div>
     <v-app-bar
       style="background : white"
+      height="100"
+      flat
       :style="[$vuetify.rtl ? { direction: 'rtl' } : { direction: 'ltr' }]"
     >
       <template v-if="$vuetify.breakpoint.smAndUp">
@@ -11,11 +13,11 @@
         ></v-app-bar-nav-icon>
       </template>
       <v-spacer></v-spacer>
-      <div style="width: 200px">
+      <div style="width: 250px">
         <router-link :to="{ name: 'Home' }">
           <v-img
             contain
-            width="200px"
+            width="250px"
             src="https://www.aca.gov.eg/style%20library/img/mainLogo.png"
           >
           </v-img>

@@ -1,17 +1,17 @@
 <template>
   <!-- <v-container> -->
   <span>
-    <v-tabs v-model="tab" align-with-title>
-      <v-tabs-slider color="outline"></v-tabs-slider>
+    <v-tabs v-model="tab" align-with-title height="90">
+      <v-tabs-slider color="info"></v-tabs-slider>
       <v-tab v-for="tab in section.tabs" :key="tab.id">
-        <v-icon right color="outline">
-          mdi-account
+        <v-icon right color="info" >
+          {{tab.icon}}
         </v-icon>
-        {{ tab.name }}
+        <span class="tab-name">{{ tab.name }}</span>
       </v-tab>
     </v-tabs>
     <v-tabs-items v-model="tab" v-if="section.tabs">
-      <v-tab-item v-for="formData in section.forms" :key="formData.id">
+      <v-tab-item   v-for="formData in section.forms" :key="formData.id">
         <v-card flat>
           <span v-if="formData.resizable">
             <splitpanes class="default-theme" dir="rtl">
@@ -73,8 +73,22 @@ export default {
 </script>
 
 <style>
+.v-tab--active {
+  background: rgba(2, 120, 174, 0.1);
+}
+
+.tab-name {
+  margin: 0 10px 0 10px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.v-tab--active {
+  background:'#0278ae';
+}
+
 .splitpanes.default-theme .splitpanes__splitter:after, .splitpanes.default-theme .splitpanes__splitter:before{
-background-color: #d1d1d1;
+  background-color: #d1d1d1;
 }
 /* .splitpanes.default-theme .splitpanes__pane {
   background: transparent!important;
