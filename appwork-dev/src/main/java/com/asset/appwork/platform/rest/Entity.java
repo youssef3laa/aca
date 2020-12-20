@@ -9,32 +9,27 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class Entity {
 
     Account account;
     String apiBaseUrl;
     String entityName;
-//    API api;
 
     public Entity(Account account, String apiBaseUrl, String entityName) {
         this.account = account;
         this.apiBaseUrl = apiBaseUrl;
         this.entityName = entityName;
     }
-//    public Entity setUrl(API api){
-//        this.api = api;
-//        return this;
-//    }
 
     public <T> String create(T data){
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
                 .setData("{" +
-                        "  \"Properties\": {" +
-                            data.toString() +
-                        "  }" +
+                        "  \"Properties\": " +
+                                data.toString() +
                         "}")
                 .post(this.apiBaseUrl + String.format(API.ADD.getUrl(), this.entityName));
         return http.getResponse();
@@ -45,7 +40,7 @@ public class Entity {
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
                 .get(this.apiBaseUrl + String.format(API.ITEM.getUrl(), this.entityName, id.toString()));
-        return http.getResponse();
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
     public String readList(String listName) {
@@ -54,7 +49,7 @@ public class Entity {
                 .setHeader("SAMLart", this.account.getSAMLart())
                 .setData("{}")
                 .post(this.apiBaseUrl + String.format(API.LIST.getUrl(), this.entityName, listName));
-        return http.getResponse();
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
     public <T> String update(Long id, T data){
@@ -62,9 +57,8 @@ public class Entity {
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
                 .setData("{" +
-                        "  \"Properties\": {" +
-                        data.toString() +
-                        "  }" +
+                        "  \"Properties\": " +
+                                data.toString() +
                         "}")
                 .put(this.apiBaseUrl + String.format(API.ITEM.getUrl(), this.entityName, id.toString()));
         return http.getResponse();
@@ -106,26 +100,10 @@ public class Entity {
         }
     }
 
-//    private enum RELATION {
-//        POSITION("Position"),
-//        ;
-//
-//        private final String relation;
-//
-//        RELATION(String relation) {
-//            this.relation = relation;
-//        }
-//
-//        public String getAsString() {
-//            return this.relation;
-//        }
-//    }
-
 
     public static void main(String[] args) throws IOException, AppworkException {
-        // Added role Identity Administrator and Identity Push Service temporary to admin user
         Entity entity = new Entity(new UserManagement().create("admin", "Asset99a"),
-                "http://appworks-aca.local:8080/home/system/app/entityRestService/api/AssetACA/",
+                "http://appworks-aca:8080/home/aca/app/entityRestService/api/AssetACA",
                 "OrganizationalUnit");
         System.out.println(entity.readById(65538L));
     }

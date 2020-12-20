@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.springframework.core.env.Environment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -164,6 +165,12 @@ public class SystemUtil {
 
     public static String getJsonByPtrExpr(String json, String jsonPtrExpr) throws IOException {
         return new ObjectMapper().readTree(json).at(jsonPtrExpr).asText();
+    }
+
+    public static String generateRestAPIBaseUrl(Environment env, String solution) {
+        return env.getProperty("server.request") + "://" + env.getProperty("appwork.domain") + ":" +
+                env.getProperty("appwork.port") + "/home/" + env.getProperty("appwork.organization") +
+                "/app/entityRestService/api/" + solution;
     }
 
     public static class FixedUntypedObjectDeserializer extends UntypedObjectDeserializer {
