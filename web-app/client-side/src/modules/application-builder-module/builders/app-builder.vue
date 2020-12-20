@@ -31,7 +31,6 @@ export default {
     findModelData: function(key) {
       for (let i = 0; i < this.appData.pages.length; i++) {
         const page = this.appData.pages[i]
-        console.log(page)
         if (page.sections) {
           for (let j = 0; j < page.sections.length; j++) {
             const section = page.sections[j]

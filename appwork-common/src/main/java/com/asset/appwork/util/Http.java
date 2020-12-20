@@ -28,6 +28,7 @@ public class Http {
     Integer statusCode;
     String response;
     boolean doAuthentication;
+    boolean isSuccess;
 
     public Http() {
         this.client = new HttpClient();
@@ -64,6 +65,10 @@ public class Http {
         return this;
     }
 
+    public boolean isSuccess() {
+        return isSuccess;
+    }
+
     public Http get(String url) {
         GetMethod method = new GetMethod(url);
         if (!headers.isEmpty()) headers.forEach(headerVar -> {
@@ -73,8 +78,11 @@ public class Http {
         try {
             statusCode = this.client.executeMethod(method);
             response = method.getResponseBodyAsString();
+            if (method.getStatusCode() > 299 ) isSuccess= false;
 
         } catch (IOException e) {
+            // @TODO log file
+            isSuccess = false;
             log.error(e.getMessage());
         }
         return this;
