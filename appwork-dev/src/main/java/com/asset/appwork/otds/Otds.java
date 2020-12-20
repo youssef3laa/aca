@@ -19,6 +19,7 @@ public final class Otds {
     public static final String DEFAULT_USER_PASSWORD = "Asset99a";
     public static final String USER_ROLE_FORMAT = "cn=%s,ou=Root,ou=" + PARTITION + ",ou=IdentityProviders,dc=identity,dc=opentext,dc=net";
     public static final String UNIT_FORMAT = "ou=%s,ou=Root,ou=" + PARTITION + ",ou=IdentityProviders,dc=identity,dc=opentext,dc=net";
+//    public static final String otdsResourceId = "28d637ee-6e3f-4daf-a278-34356f22656b";
 
     private String ticket = "";
 
@@ -80,6 +81,7 @@ public final class Otds {
                 .setData("{" +
                         "    \"userName\": \"" + userName + "\"," +
                         "    \"password\": \"" + password + "\"" +
+//                        "    \"targetResourceId\": \"" + otdsResourceId + "\"" +
                         "}")
                 .post(url);
         return SystemUtil.readJSONField(http.getResponse(), "ticket");

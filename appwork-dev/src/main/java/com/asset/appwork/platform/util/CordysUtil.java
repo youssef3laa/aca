@@ -22,7 +22,7 @@ public class CordysUtil {
 
     public String sendRequest(Account account, String message) throws JsonProcessingException, AppworkException {
         // @TODO Add URL
-        Http http = new Http().setDoAuthentication(true).setContentType(Http.ContentType.XML_REQUEST).setData(message).post(cordysUrl+"?SAMLart="+account.getTicket());
+        Http http = new Http().setDoAuthentication(true).setHeader("SAMLart", account.getSAMLart()).setContentType(Http.ContentType.XML_REQUEST).setData(message).post(cordysUrl);
         // @TODO re-login
         return http.getResponse();
     }
