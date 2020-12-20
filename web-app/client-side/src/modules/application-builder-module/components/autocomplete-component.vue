@@ -1,7 +1,7 @@
 <template>
   <v-autocomplete
       v-model="value"
-      :items="items"
+      :items="items.list"
       chips
       clearable
       color="outline"
@@ -26,14 +26,16 @@ export default {
     return {
       //   items: ['foo', 'bar', 'fizz', 'buzz'],
       //   values: ['foo', 'bar'],
-      items: this.field.items,
+      items: this.val,
       //   value: this.field.value,
-      value: this.val,
+      value: this.val.value,
     }
   },
   methods: {
     autocompleteChange: function () {
       console.log(this.value)
+      console.log(this.val)
+      console.log(this.items.list)
       this.$emit('update', {
         name: this.field.name,
         value: this.value,

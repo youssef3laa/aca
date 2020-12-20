@@ -157,13 +157,13 @@ export default {
                     key: 'tab1',
                     id: 1,
                     name: 'البيانات الأساسية',
-                    icon: "far fa-file-alt"
+                    icon: 'far fa-file-alt',
                   },
                   {
                     key: 'tab2',
                     id: 2,
                     name: 'المرفقات',
-                    icon: "fas fa-paperclip"
+                    icon: 'fas fa-paperclip',
                   },
                 ],
                 forms: [
@@ -174,22 +174,22 @@ export default {
                       {
                         type: 'AutoCompleteComponent',
                         name: 'receiverEntityName',
-                        items: ['foo', 'bar', 'fizz', 'buzz'],
-                        value: [],
+                        // items: ['foo', 'bar', 'fizz', 'buzz'],
+                        // value: [],
                         col: 4,
                       },
                       {
                         type: 'AutoCompleteComponent',
                         name: 'receiverMethod',
-                        items: ['foo', 'bar', 'fizz', 'buzz'],
-                        value: [],
+                        // items: ['foo', 'bar', 'fizz', 'buzz'],
+                        // value: [],
                         col: 4,
                       },
                       {
                         type: 'AutoCompleteComponent',
                         name: 'typeOfWork',
-                        items: ['foo', 'bar', 'fizz', 'buzz'],
-                        value: [],
+                        // items: ['foo', 'bar', 'fizz', 'buzz'],
+                        // value: [],
                         col: 4,
                       },
                       {
@@ -205,7 +205,71 @@ export default {
                         col: 4,
                       },
                     ],
-                    model: {},
+                    model: {
+                      receiverEntityName: {
+                        list: [
+                          {
+                            value: 1,
+                            text: 'foo',
+                          },
+                          {
+                            value: 2,
+                            text: 'bar',
+                          },
+                          {
+                            value: 3,
+                            text: 'fizz',
+                          },
+                          {
+                            value: 4,
+                            text: 'buzz',
+                          },
+                        ],
+                        value : 1,
+                      },
+                      receiverMethod: {
+                        list: [
+                          {
+                            value: 1,
+                            text: 'foo',
+                          },
+                          {
+                            value: 2,
+                            text: 'bar',
+                          },
+                          {
+                            value: 3,
+                            text: 'fizz',
+                          },
+                          {
+                            value: 4,
+                            text: 'buzz',
+                          },
+                        ],
+                         value : 2,
+                      },
+                      typeOfWork: {
+                        list: [
+                          {
+                            value: 1,
+                            text: 'foo',
+                          },
+                          {
+                            value: 2,
+                            text: 'bar',
+                          },
+                          {
+                            value: 3,
+                            text: 'fizz',
+                          },
+                          {
+                            value: 4,
+                            text: 'buzz',
+                          },
+                        ],
+                         value : 3,
+                      },
+                    },
                   },
                   {
                     resizable: {
@@ -224,7 +288,7 @@ export default {
                           },
                         },
                         {
-                           background: 'grey',
+                          background: 'grey',
                           inputs: [
                             {
                               type: 'InputFileComponent',
