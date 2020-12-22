@@ -36,18 +36,24 @@ export default {
       console.log(this.value)
       console.log(this.val)
       console.log(this.items.list)
+      const list = this.items.list
+      const selectedObject = list.filter(el => el.value === this.value)[0]
+      // console.log("selectedObject", selectedObject)
       this.$emit('update', {
         name: this.field.name,
         value: this.value,
-        type: 'autocompleteChange'
+        type: 'autocompleteChange',
+        selectedObject
       })
     },
   },
   props: ['val', 'field'],
   watch: {
     val: function (newVal, oldVal) {
+
       console.log(oldVal)
       this.val = newVal
+      console.log("val", this.val)
     },
   },
 }

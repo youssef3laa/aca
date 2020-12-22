@@ -1,5 +1,6 @@
 package com.asset.appwork.controller;
 
+import com.asset.appwork.ModuleRouting;
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
@@ -39,6 +40,11 @@ public class ProcessController {
                     SystemUtil.generateRestAPIBaseUrl(environment,"AssetGeneralACA")
                     ,entityName);
             String entityCreateResponse = entity.create(entityModel);
+
+            //Get Next Step
+            ModuleRouting moduleRouting = new ModuleRouting(environment.getProperty("process.config"),"process-1");
+            String nextStep = moduleRouting.calculateNextStep("init","Aly");
+            respBuilder.data(nextStep);
 
             // Process Initiation
             String params = SystemUtil.readJSONObject(requestJson, "processModel");

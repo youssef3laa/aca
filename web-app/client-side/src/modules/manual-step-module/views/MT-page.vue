@@ -209,23 +209,25 @@ export default {
                       receiverEntityName: {
                         list: [
                           {
-                            value: 1,
-                            text: 'foo',
+                            "text": "رئيس الجهاز",
+                            "value": "cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+                            "code": "HUNIT",
+                            "name" : "رئيس الجهاز"
                           },
                           {
-                            value: 2,
-                            text: 'bar',
+                            "text": "رئيس القطاع",
+                            "value": "cn=AbdElHakim@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+                            "code": "HSEC",
+                            "name" : "رئيس القطاع"
                           },
                           {
-                            value: 3,
-                            text: 'fizz',
-                          },
-                          {
-                            value: 4,
-                            text: 'buzz',
-                          },
+                            "text": "رئيس إدارة مكتب",
+                            "value": "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+                            "code": "HOFC",
+                            "name" : "رئيس إدارة مكتب"
+                          }
                         ],
-                        value : 1,
+                        value : "cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
                       },
                       receiverMethod: {
                         list: [

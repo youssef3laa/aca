@@ -1,0 +1,44 @@
+{
+    "processName": "Process1",
+    "steps": {
+        "init": {
+            "hasAutocomplete": true,
+            "roleFilter": "role",
+            "unitFilter": "unit",
+            "userFilter": "user",
+            "page": "process-init",
+            "condition": "condition",
+            "nextStep": 
+                {
+                    "abdallah": "stepRG"
+                }
+            
+        },
+        "stepRG": {
+            "hasAutocomplete": true,
+            "roleFilter": "role",
+            "unitFilter": "unit",
+            "userFilter": "user",
+            "page": "process-stepRG",
+            "condition": "condition",
+            "nextStep": 
+                {
+                    "abdallah": "stepRG"
+                }
+            
+        },
+        "stepRQ": {
+            "hasAutocomplete": true,
+            "roleFilter": "role",
+            "unitFilter": "unit",
+            "userFilter": "user",
+            "page": "process-stepRQ",
+            "condition": "condition",
+            "nextStep": 
+                {
+                    "abdallah": "stepRG"
+                }
+            
+        }
+    }
+}
