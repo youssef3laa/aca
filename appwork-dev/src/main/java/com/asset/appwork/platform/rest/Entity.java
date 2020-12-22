@@ -99,13 +99,4 @@ public class Entity {
             return this.url;
         }
     }
-
-
-    public static void main(String[] args) throws IOException, AppworkException {
-        Entity entity = new Entity(new UserManagement().create("admin", "Asset99a"),
-                "http://appworks-aca:8080/home/aca/app/entityRestService/api/AssetACA",
-                "OrganizationalUnit");
-        System.out.println(entity.readById(65538L));
-    }
-
 }

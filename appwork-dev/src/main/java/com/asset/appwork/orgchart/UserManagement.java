@@ -24,7 +24,10 @@ public class UserManagement {
     Environment environment;
 
     public void create(Account account) throws IOException, AppworkException {
-        String ticket = Otds.login(account.getUsername(), account.getPassword());
+        String ticket = Otds.login(environment, "{" +
+                "    \"userName\": \"" + account.getUsername() + "\"," +
+                "    \"password\": \"" + account.getPassword() + "\"" +
+                "}");
         if (ticket == null) throw new AppworkException("INVALID_CREDENTIALS", ResponseCode.INVALID_AUTH);
         String SAMLart = getSAMLart(ticket);
         account.setSAMLart(SAMLart);
@@ -32,7 +35,10 @@ public class UserManagement {
     }
 
     public Account create(String username, String password) throws IOException, AppworkException {
-        String ticket = Otds.login(username, password);
+        String ticket = Otds.login(environment, "{" +
+                "    \"userName\": \"" + username + "\"," +
+                "    \"password\": \"" + password + "\"" +
+                "}");
         if (ticket == null) throw new AppworkException("INVALID_CREDENTIALS", ResponseCode.INVALID_AUTH);
         String SAMLart = getSAMLart(ticket);
 

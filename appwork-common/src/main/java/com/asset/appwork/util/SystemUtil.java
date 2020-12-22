@@ -167,10 +167,19 @@ public class SystemUtil {
         return new ObjectMapper().readTree(json).at(jsonPtrExpr).asText();
     }
 
+    public static String generateOtdsAPIBaseUrl(Environment env) {
+        return String.format("%s://%s:%s/otdsws/rest", env.getProperty("otds.request"), env.getProperty("otds.domain"),
+                env.getProperty("otds.port"));
+    }
+
+    public static String generateOtdsRoleUserCN(Environment env, String name) {
+        return String.format("cn=%s,ou=Root,ou=%s,ou=IdentityProviders,dc=identity,dc=opentext,dc=net", name, env.getProperty("otds.partition"));
+    }
+
     public static String generateRestAPIBaseUrl(Environment env, String solution) {
-        return env.getProperty("server.request") + "://" + env.getProperty("appwork.domain") + ":" +
-                env.getProperty("appwork.port") + "/home/" + env.getProperty("appwork.organization") +
-                "/app/entityRestService/api/" + solution;
+        return String.format("%s://%s:%s/home/%s/app/entityRestService/api/%s", env.getProperty("server.request"),
+                env.getProperty("appwork.domain"), env.getProperty("appwork.port"), env.getProperty("appwork.organization"),
+                solution);
     }
 
     public static class FixedUntypedObjectDeserializer extends UntypedObjectDeserializer {

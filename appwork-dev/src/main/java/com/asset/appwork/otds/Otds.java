@@ -1,9 +1,11 @@
 package com.asset.appwork.otds;
 
+import com.asset.appwork.dto.Account;
 import com.asset.appwork.util.Http;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.env.Environment;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -11,22 +13,194 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public final class Otds {
-    public static final String HOST = "appworks-aca";
-    public static final String PORT = "8080";
-    public static final String API_BASE_URL = "http://" + HOST + ":" + PORT + "/otdsws/rest";
-    public static final String PARTITION = "aw.aca";
-    public static final String DEFAULT_EMAIL_PROVIDER = "@asset.aca.gov.eg";
-    public static final String DEFAULT_USER_PASSWORD = "Asset99a";
-    public static final String USER_ROLE_FORMAT = "cn=%s,ou=Root,ou=" + PARTITION + ",ou=IdentityProviders,dc=identity,dc=opentext,dc=net";
-    public static final String UNIT_FORMAT = "ou=%s,ou=Root,ou=" + PARTITION + ",ou=IdentityProviders,dc=identity,dc=opentext,dc=net";
-//    public static final String otdsResourceId = "28d637ee-6e3f-4daf-a278-34356f22656b";
+    Account account;
+    String apiBaseUrl;
+    String partition;
 
-    private String ticket = "";
+    public Otds(Account account, String apiBaseUrl, String partition) {
+        this.account = account;
+        this.apiBaseUrl = apiBaseUrl;
+        this.partition = partition;
+    }
+
+    public String getPartition() {
+        return this.partition;
+    }
+
+    public static <T> String login(Environment env, T data) throws JsonProcessingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setData(data.toString())
+                .post(SystemUtil.generateOtdsAPIBaseUrl(env) + API.LOGIN.getUrl());
+        return SystemUtil.readJSONField(http.getResponse(), "ticket");
+    }
+
+    public <T> String consolidate(T data) {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .setData(data.toString())
+                .post(this.apiBaseUrl + API.CONSOLIDATION_CONSOLIDATE.getUrl());
+
+        return http.getResponse();
+    }
+
+    public <T> String createRole(T data) {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .setData(data.toString())
+                .post(this.apiBaseUrl + API.ROLES_CREATE.getUrl());
+
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public String deleteRoleByRoleName(String roleName) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .delete(this.apiBaseUrl + String.format(API.ROLES_DELETE.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+        return http.getResponse();
+    }
+
+    public <T> String updateRoleByRoleName(String oldRoleName, T data) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .setData(data.toString())
+                .put(this.apiBaseUrl + String.format(API.ROLES_UPDATE.getUrl(), URLEncoder.encode(oldRoleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public String getAllRoles() throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .get(this.apiBaseUrl + String.format(API.ROLES_GET_ALL.getUrl(), URLEncoder.encode(String.format("where_partition_name=%s", this.partition), StandardCharsets.UTF_8.name())));
+
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public String getRoleByRoleName(String roleName) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .get(this.apiBaseUrl + String.format(API.ROLES_GET.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public String getMembersAssignedToRoleByRoleName(String roleName) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .get(this.apiBaseUrl + String.format(API.ROLES_GET_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public <T> String assignMembersToRole(String roleName, T data) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .setData(data.toString())
+                .post(this.apiBaseUrl + String.format(API.ROLES_ASSIGN_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+
+        return http.getResponse();
+    }
+
+    public <T> String unAssignMembersFromRole(String roleName, T data) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .setData(data.toString())
+                .post(this.apiBaseUrl + String.format(API.ROLES_UNASSIGN_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+
+        return http.getResponse();
+    }
+
+    public <T> String assignRolesToRole(String roleName, T data) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .setData(data.toString())
+                .post(this.apiBaseUrl + String.format(API.ROLES_ASSIGN_ROLES.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+
+        return http.getResponse();
+    }
+
+    public <T> String unAssignRolesFromRole(String roleName, T data) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .setData(data.toString())
+                .post(this.apiBaseUrl + String.format(API.ROLES_UNASSIGN_ROLES.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+
+        return http.getResponse();
+    }
+
+    public String getUsersAssignedToRoleByRoleId(String roleName) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .get(this.apiBaseUrl + String.format(API.ROLES_GET_USERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public <T> String resetPassword(String username, T data) {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .setData(data.toString())
+                .put(this.apiBaseUrl + String.format(API.USERS_RESET_PASSWORD.getUrl(), username));
+        return http.getResponse();
+    }
+
+    public <T> String createUser(T data) throws JsonProcessingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .setData(data.toString())
+                .post(this.apiBaseUrl + API.USERS_CREATE.getUrl());
+
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public String getAllUsers() throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .get(this.apiBaseUrl + API.USERS_GET_ALL.getUrl() + "?" + URLEncoder.encode(String.format("where_partition_name=%s", this.partition), StandardCharsets.UTF_8.name()));
+
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public String getUserByUserName(String userName) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .get(this.apiBaseUrl + String.format(API.USERS_GET.getUrl(), URLEncoder.encode(userName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public <T> String updateUserByUserName(String oldUsername, T data) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .setData(data.toString())
+                .put(this.apiBaseUrl + String.format(API.USERS_UPDATE.getUrl(), URLEncoder.encode(oldUsername + "@" + this.partition, StandardCharsets.UTF_8.name())));
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public String deleteUserByUserName(String username) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .delete(this.apiBaseUrl + String.format(API.USERS_DELETE.getUrl(), URLEncoder.encode(username + "@" + this.partition, StandardCharsets.UTF_8.name())));
+        return http.getResponse();
+    }
+
+    public String getAllRolesAssignedToUserByUserName(String username) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .get(this.apiBaseUrl + String.format(API.USERS_GET_ROLES.getUrl(), URLEncoder.encode(username + "@" + this.partition, StandardCharsets.UTF_8.name())));
+
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public <T> String assignUserToRoleByUserId(String username, T data) throws UnsupportedEncodingException, JsonProcessingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .setData(data.toString())
+                .post(this.apiBaseUrl + String.format(API.USERS_ASSIGN_ROLE.getUrl(), URLEncoder.encode(username + "@" + this.partition, StandardCharsets.UTF_8.name())));
+        return http.getResponse();
+    }
+
 
     private enum API {
         LOGIN("/authentication/credentials"),
         CONSOLIDATION_CONSOLIDATE("/consolidation"),
-        ROLES_ASSIGN_CUSTOM_ATTRIBUTE("/roles/%s/attribute"),
         ROLES_ASSIGN_MEMBERS("/roles/%s/members"),
         ROLES_ASSIGN_ROLES("/roles/%s/roles"),
         ROLES_CREATE("/roles"),
@@ -35,19 +209,9 @@ public final class Otds {
         ROLES_GET_ALL("/roles"),
         ROLES_GET_MEMBERS("/roles/%s/members"),
         ROLES_GET_USERS("/roles/%s/users"),
-        ROLES_UNASSIGN_CUSTOM_ATTRIBUTE("/roles/%s/attribute/deletionset"),
         ROLES_UNASSIGN_MEMBERS("/roles/%s/members/deletionset"),
         ROLES_UNASSIGN_ROLES("/roles/%s/roles/deletionset"),
         ROLES_UPDATE("/roles/%s"),
-        ORGUNITS_CREATE("/orgunits"),
-        ORGUNITS_DELETE("/orgunits/%s"),
-        ORGUNITS_GET("/orgunits/%s"),
-        ORGUNITS_GET_CHILDREN("/orgunits/%s/children"),
-        ORGUNITS_GET_PARENTS("/orgunits/%s/parents"),
-        ORGUNITS_GET_ROLES("/orgunits/%s/roles"),
-        ORGUNITS_GET_ROOT("/orgunits"),
-        ORGUNITS_GET_USERS("/orgunits/%s/users"),
-        ORGUNITS_UPDATE("/orgunits/%s"),
         USERS_ASSIGN_ROLE("/users/%s/roles"),
         USERS_CREATE("/users"),
         USERS_DELETE("/users/%s"),
@@ -59,465 +223,11 @@ public final class Otds {
 
         private final String url;
         API(String url) {
-            this.url = API_BASE_URL + url;
+            this.url = url;
         }
 
         public String getUrl() {
             return this.url;
         }
-    }
-
-    public Otds(String username, String password) throws JsonProcessingException {
-       this(login(username, password));
-    }
-
-    public Otds(String ticket) throws JsonProcessingException {
-        this.ticket = ticket;
-    }
-
-    public static String login(String userName, String password) throws JsonProcessingException {
-        String url = API.LOGIN.getUrl();
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setData("{" +
-                        "    \"userName\": \"" + userName + "\"," +
-                        "    \"password\": \"" + password + "\"" +
-//                        "    \"targetResourceId\": \"" + otdsResourceId + "\"" +
-                        "}")
-                .post(url);
-        return SystemUtil.readJSONField(http.getResponse(), "ticket");
-    }
-
-    public static String login(String userName, String password, String resourceId) throws JsonProcessingException {
-        String url = API.LOGIN.getUrl();
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setData("{" +
-                        "    \"userName\": \"" + userName + "\"," +
-                        "    \"password\": \"" + password + "\"," +
-                        "    \"targetResourceId\": \"" + resourceId + "\"" +
-                        "}")
-                .post(url);
-        return SystemUtil.readJSONField(http.getResponse(), "ticket");
-    }
-
-    public String consolidate(String objectToConsolidateDN) {
-        String url = API.CONSOLIDATION_CONSOLIDATE.getUrl();
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "    \"objectToConsolidate\": \"" + objectToConsolidateDN + "\"" +
-                        "}")
-                .post(url);
-        return http.getResponse();
-    }
-
-    public String assignCustomAttributeToRole(String roleName, List<CustomAttribute> attrs) throws UnsupportedEncodingException, JsonProcessingException {
-        String url = String.format(API.ROLES_ASSIGN_CUSTOM_ATTRIBUTE.getUrl(), URLEncoder.encode(roleName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-
-        String attrsStr = new ObjectMapper().writeValueAsString(attrs);
-
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "    \"customAttributeList\": " +
-                        attrsStr +
-                        "}")
-                .post(url);
-
-        return http.getResponse();
-    }
-
-    public String unAssignCustomAttributeFromRole(String roleName, List<CustomAttribute> attrs) throws UnsupportedEncodingException, JsonProcessingException {
-        String url = String.format(API.ROLES_UNASSIGN_CUSTOM_ATTRIBUTE.getUrl(), URLEncoder.encode(roleName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-
-        String attrsStr = new ObjectMapper().writeValueAsString(attrs);
-
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "    \"customAttributeList\": " +
-                        attrsStr +
-                        "}")
-                .post(url);
-
-        return http.getResponse();
-    }
-
-    // TODO: Add more details to be added
-    public String createRole(String roleName) {
-        String url = API.ROLES_CREATE.getUrl();
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "    \"userPartitionID\": \"" + PARTITION + "\"," +
-                        "    \"name\": \"" + roleName + "\"" +
-                        "}")
-                .post(url);
-
-        return http.getResponse();
-    }
-
-
-    public String deleteRoleByRoleId(String roleName) throws UnsupportedEncodingException {
-        String url = String.format(API.ROLES_DELETE.getUrl(), URLEncoder.encode(roleName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .delete(url);
-        return http.getResponse();
-    }
-
-    // TODO: Add more details to be added
-    public String updateRoleByRoleId(String oldRoleName, String newRoleName) throws UnsupportedEncodingException {
-        String url = String.format(API.ROLES_UPDATE.getUrl(), URLEncoder.encode(oldRoleName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "    \"userPartitionID\": \"" + PARTITION + "\"," +
-                        "    \"name\": \"" + newRoleName + "\"" +
-                        "}")
-                .put(url);
-        return http.getResponse();
-    }
-
-    public String getAllRoles() throws UnsupportedEncodingException {
-        String url = String.format(API.ROLES_GET_ALL.getUrl(), URLEncoder.encode(String.format("where_partition_name=%s", PARTITION), StandardCharsets.UTF_8.name()));
-        System.out.println(url);
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .get(url);
-
-//        return SystemUtil.readJSONField(http.getResponse(), "users");
-        return http.getResponse();
-    }
-
-    public String getRoleByRoleId(String roleName) throws UnsupportedEncodingException {
-        String url = String.format(API.ROLES_GET.getUrl(), URLEncoder.encode(roleName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .get(url);
-        return http.getResponse();
-    }
-
-    public String getMembersAssignedToRoleByRoleId(String roleName) throws UnsupportedEncodingException {
-        String url = String.format(API.ROLES_GET_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .get(url);
-
-//        return SystemUtil.readJSONField(http.getResponse(), "users");
-        return http.getResponse();
-    }
-
-    public String assignMembersToRole(String roleName, List<String> memberDNs) throws UnsupportedEncodingException, JsonProcessingException {
-        String url = String.format(API.ROLES_ASSIGN_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-
-        String membersStr = new ObjectMapper().writeValueAsString(memberDNs);
-
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "    \"stringList\": " +
-                        membersStr +
-                        "}")
-                .post(url);
-
-        return http.getResponse();
-    }
-
-    public String unAssignMembersFromRole(String roleName, List<String> memberDNs) throws UnsupportedEncodingException, JsonProcessingException {
-        String url = String.format(API.ROLES_UNASSIGN_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-
-        String membersStr = new ObjectMapper().writeValueAsString(memberDNs);
-
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "    \"stringList\": " +
-                        membersStr +
-                        "}")
-                .post(url);
-
-        return http.getResponse();
-    }
-
-    public String assignRolesToRole(String roleName, List<String> rolesDNs) throws UnsupportedEncodingException, JsonProcessingException {
-        String url = String.format(API.ROLES_ASSIGN_ROLES.getUrl(), URLEncoder.encode(roleName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-
-        String rolesStr = new ObjectMapper().writeValueAsString(rolesDNs);
-
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "    \"stringList\": " +
-                        rolesStr +
-                        "}")
-                .post(url);
-
-        return http.getResponse();
-    }
-
-    public String unAssignRolesFromRole(String roleName, List<String> rolesDNs) throws UnsupportedEncodingException, JsonProcessingException {
-        String url = String.format(API.ROLES_UNASSIGN_ROLES.getUrl(), URLEncoder.encode(roleName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-
-        String rolesStr = new ObjectMapper().writeValueAsString(rolesDNs);
-
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "    \"stringList\": " +
-                        rolesStr +
-                        "}")
-                .post(url);
-
-        return http.getResponse();
-    }
-
-    public String getUsersAssignedToRoleByRoleId(String roleName) throws UnsupportedEncodingException {
-        String url = String.format(API.ROLES_GET_USERS.getUrl(), URLEncoder.encode(roleName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .get(url);
-
-//        return SystemUtil.readJSONField(http.getResponse(), "users");
-        return http.getResponse();
-    }
-
-    public String getRootOrgUnit() throws UnsupportedEncodingException {
-        String url = API.ORGUNITS_GET_ROOT.getUrl() + "?" + URLEncoder.encode(String.format("where_partition_name=%s", PARTITION), StandardCharsets.UTF_8.name());
-        System.out.println(url);
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .get(url);
-
-//        return SystemUtil.readJSONField(http.getResponse(), "users");
-        return http.getResponse();
-    }
-
-    // TODO: Add more details to be added
-    public String createOrgUnit(String unitName) {
-        String url = API.ORGUNITS_CREATE.getUrl();
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "\"userPartitionID\": \"" + PARTITION + "\"," +
-                        "\"name\": \"" + unitName + "\"" +
-                        "}")
-                .post(url);
-
-        return http.getResponse();
-    }
-
-    public String getOrgUnitByName(String unitName) throws UnsupportedEncodingException {
-        String url = String.format(API.ORGUNITS_GET.getUrl(), URLEncoder.encode(String.format(UNIT_FORMAT, unitName), StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .get(url);
-        return http.getResponse();
-    }
-
-    // Check response error (works with an error)
-    // TODO: Add more details to be added
-    public String updateOrgUnit(String oldUnitName, String newUnitName) throws UnsupportedEncodingException {
-        String url = String.format(API.ORGUNITS_UPDATE.getUrl(), URLEncoder.encode(String.format(UNIT_FORMAT, oldUnitName), StandardCharsets.UTF_8.name()));
-        System.out.println(url);
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "\"userPartitionID\": \"" + PARTITION + "\"," +
-                        "\"name\": \"" + newUnitName + "\"" +
-                        "}")
-                .put(url);
-        return http.getResponse();
-    }
-
-    public String deleteOrgUnitByName(String unitName) throws UnsupportedEncodingException {
-        String url = String.format(API.ORGUNITS_DELETE.getUrl(), URLEncoder.encode(String.format(UNIT_FORMAT, unitName), StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .delete(url);
-        return http.getResponse();
-    }
-
-    public String getOrgUnitChildrenByName(String unitName) throws UnsupportedEncodingException {
-        String url = String.format(API.ORGUNITS_GET_CHILDREN.getUrl(), URLEncoder.encode(String.format(UNIT_FORMAT, unitName), StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .get(url);
-        return http.getResponse();
-    }
-
-    public String getOrgUnitParentsByName(String unitName) throws UnsupportedEncodingException {
-        String url = String.format(API.ORGUNITS_GET_PARENTS.getUrl(), URLEncoder.encode(String.format(UNIT_FORMAT, unitName), StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .get(url);
-        return http.getResponse();
-    }
-
-    public String getOrgUnitRolesByName(String unitName) throws UnsupportedEncodingException {
-        String url = String.format(API.ORGUNITS_GET_ROLES.getUrl(), URLEncoder.encode(String.format(UNIT_FORMAT, unitName), StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .get(url);
-        return http.getResponse();
-    }
-
-    public String getOrgUnitUsersByName(String unitName) throws UnsupportedEncodingException {
-        String url = String.format(API.ORGUNITS_GET_USERS.getUrl(), URLEncoder.encode(String.format(UNIT_FORMAT, unitName), StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .get(url);
-        return http.getResponse();
-    }
-
-    public String resetPassword(String userId, String password) {
-        String url = String.format(API.USERS_RESET_PASSWORD.getUrl(), userId);
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "\"password\": \"" + password + "\"" +
-                        "}")
-                .put(url);
-        return http.getResponse();
-    }
-
-    // TODO: Add more details to be added
-    public String createUser(String username, String password) throws JsonProcessingException {
-        String url = API.USERS_CREATE.getUrl();
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "\"userPartitionID\": \"" + PARTITION + "\"," +
-                        "\"name\": \"" + username + "\"," +
-                        "\"values\": [" +
-                        "{" +
-                        "\"name\": \"" + "mail" + "\"," +
-                        "\"values\": [" +
-                        "\"" + username + DEFAULT_EMAIL_PROVIDER + "\"" +
-                        "]" +
-                        "}" +
-                        "]" +
-                        "}")
-                .post(url);
-
-        String response = http.getResponse();
-        this.resetPassword(SystemUtil.readJSONField(response, "id"), password);
-//        this.consolidate(SystemUtil.readJSONField(response, "location"));
-        return response;
-    }
-    public String createUser(String username) throws JsonProcessingException {
-        return this.createUser(username, DEFAULT_USER_PASSWORD);
-    }
-
-    public String getAllUsers() throws UnsupportedEncodingException {
-        String url = API.USERS_GET_ALL.getUrl() + "?" + URLEncoder.encode(String.format("where_partition_name=%s", PARTITION), StandardCharsets.UTF_8.name());
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .get(url);
-
-//        return SystemUtil.readJSONField(http.getResponse(), "users");
-        return http.getResponse();
-    }
-
-    public String getUserByUserId(String userName) throws UnsupportedEncodingException {
-        String url = String.format(API.USERS_GET.getUrl(), URLEncoder.encode(userName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .get(url);
-        return http.getResponse();
-    }
-
-    // TODO: Add more details to be added
-    public String updateUserByUserId(String oldUserId, String newUserId) throws UnsupportedEncodingException {
-        String url = String.format(API.USERS_UPDATE.getUrl(), URLEncoder.encode(oldUserId + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "\"userPartitionID\": \"" + PARTITION + "\"," +
-                        "\"name\": \"" + newUserId + "\"," +
-                        "\"values\": [" +
-                        "{" +
-                        "\"name\": \"" + "mail" + "\"," +
-                        "\"values\": [" +
-                        "\"" + newUserId + DEFAULT_EMAIL_PROVIDER + "\"" +
-                        "]" +
-                        "}" +
-                        "]" +
-                        "}")
-                .put(url);
-        return http.getResponse();
-    }
-
-    public String deleteUserByUserId(String userName) throws UnsupportedEncodingException {
-        String url = String.format(API.USERS_DELETE.getUrl(), URLEncoder.encode(userName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .delete(url);
-        return http.getResponse();
-    }
-
-    public String getAllRolesAssignedToUserByUserId(String userName) throws UnsupportedEncodingException {
-        String url = String.format(API.USERS_GET_ROLES.getUrl(), URLEncoder.encode(userName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .get(url);
-
-//        return SystemUtil.readJSONField(http.getResponse(), "users");
-        return http.getResponse();
-    }
-
-    public String assignUserToRoleByUserId(String userName, List<String> roles) throws UnsupportedEncodingException, JsonProcessingException {
-        String url = String.format(API.USERS_ASSIGN_ROLE.getUrl(), URLEncoder.encode(userName + "@" + PARTITION, StandardCharsets.UTF_8.name()));
-
-        String rolesStr = new ObjectMapper().writeValueAsString(roles);
-
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", ticket)
-                .setData("{" +
-                        "\"stringList\": " +
-                        rolesStr +
-                        "}")
-                .post(url);
-        return http.getResponse();
-    }
-
-    static class CustomAttribute {
-        private String type;
-        private String name;
-        private String value;
-
-        public CustomAttribute(String type, String name, String value) {
-            this.type = type;
-            this.name = name;
-            this.value = value;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-    }
-
-    public static void main(String[] args) throws JsonProcessingException, UnsupportedEncodingException {
-        Otds otds = new Otds("admin", "Asset99a");
-        System.out.println(otds.createRole("JavaRoleTest"));
     }
 }
