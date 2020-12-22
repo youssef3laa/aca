@@ -1,5 +1,5 @@
 {
-    "processName": "Process1",
+    "processName": "process-1",
     "steps": {
         "init": {
             "hasAutocomplete": true,
@@ -10,7 +10,9 @@
             "condition": "condition",
             "nextStep": 
                 {
-                    "abdallah": "stepRG"
+                    "HUNIT": "stepRG",
+                    "HSEC": "stepRQ",
+                    "HOFC": "stepRE"
                 }
             
         },
@@ -33,6 +35,19 @@
             "unitFilter": "unit",
             "userFilter": "user",
             "page": "process-stepRQ",
+            "condition": "condition",
+            "nextStep": 
+                {
+                    "abdallah": "stepRG"
+                }
+            
+        },
+        "stepRE": {
+            "hasAutocomplete": true,
+            "roleFilter": "role",
+            "unitFilter": "unit",
+            "userFilter": "user",
+            "page": "process-stepRE",
             "condition": "condition",
             "nextStep": 
                 {

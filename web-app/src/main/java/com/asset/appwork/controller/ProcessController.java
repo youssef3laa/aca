@@ -1,15 +1,17 @@
 package com.asset.appwork.controller;
 
-import com.asset.appwork.ModuleRouting;
+import com.asset.appwork.orgchart.ModuleRouting;
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.platform.rest.Entity;
+import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.platform.rest.Entity;
-import com.asset.appwork.platform.soap.Process;
+import com.asset.appwork.model.RequestEntity;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.util.SystemUtil;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
@@ -27,32 +29,38 @@ public class ProcessController {
     @Autowired
     Environment environment;
 
+    // TODO: READ ON STATIC INNER CLASSES
+    @Data
+    private static class Request{
+        RequestEntity requestEntity;
+        OutputSchema processModel;
+    }
+
     @PostMapping("/initiate")
-    public ResponseEntity<AppResponse<String>> initiate(@RequestHeader("X-Auth-Token") String token, @RequestBody String requestJson) {
+    public ResponseEntity<AppResponse<String>> initiate(@RequestHeader("X-Auth-Token") String token, @RequestBody Request requestJson) {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
+
             Account account = tokenService.get(token);
 
             // Entity Creation
-            String entityName = SystemUtil.readJSONField(requestJson, "entityName");
-            String entityModel = SystemUtil.readJSONObject(requestJson, "entityModel");
+            String entityName = "ACA_Entity_request";
             Entity entity = new Entity(account,
                     SystemUtil.generateRestAPIBaseUrl(environment,"AssetGeneralACA")
                     ,entityName);
-            String entityCreateResponse = entity.create(entityModel);
+            String entityCreateResponse = entity.create(requestJson.requestEntity);
 
             //Get Next Step
-            ModuleRouting moduleRouting = new ModuleRouting(environment.getProperty("process.config"),"process-1");
-            String nextStep = moduleRouting.calculateNextStep("init","Aly");
-            respBuilder.data(nextStep);
+            requestJson.processModel.setProcess("process-1");
+            requestJson.processModel.setStepId("init");
 
-            // Process Initiation
-            String params = SystemUtil.readJSONObject(requestJson, "processModel");
-            params = SystemUtil.convertJSONtoXML(params);
-            String processInitiateMessage = new Process().initiate(account.getTicket(), "ACA_BP_processRouting", params);
-            String response = cordysService.sendRequest(account,
-                    processInitiateMessage);
-            respBuilder.data(response);
+            String config = SystemUtil.readFile(environment.getProperty("process.config") + "\\" + requestJson.processModel.getProcess() + ".json");
+            String cordysUrl = cordysService.getCordysUrl();
+
+            ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, config);
+            moduleRouting.goToNext(requestJson.processModel);
+            respBuilder.data("success");
+
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());

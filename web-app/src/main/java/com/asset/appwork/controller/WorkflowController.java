@@ -38,7 +38,7 @@ public class WorkflowController {
             Workflow workflow = new Workflow();
             Account account = tokenService.get(token);
             if (account != null) {
-                String response = cordysService.sendRequest(account, workflow.getHumanTasks(account.getSAMLart()));
+                String response = cordysService.sendRequest(account, workflow.getHumanTasks());
                 Document document = SystemUtil.convertStringToXMLDocument(response);
                 NodeList tasks = document.getElementsByTagName("NOTF_TASK_INSTANCE");
                 String data = "{\n" +
@@ -51,7 +51,7 @@ public class WorkflowController {
                     data = data.substring(0, data.length() - 2);
                 }
 //                data += "]";
-                data += "]}";
+                data += "]\n}";
                 respBuilder.data(data);
             }
         } catch (JsonProcessingException e) {

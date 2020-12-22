@@ -4,13 +4,8 @@ package com.asset.appwork.platform.soap;
  * Created by karim on 11/3/20.
  */
 public class Workflow {
-    public String getHumanTasks(String ticket){
+    public String getHumanTasks(){
         return "<SOAP:Envelope xmlns:SOAP=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-                "  <SOAP:Header>\n" +
-                "    <OTAuthentication xmlns=\"urn:api.bpm.opentext.com\">\n" +
-                "      <AuthenticationToken>"+ticket+"</AuthenticationToken>\n" +
-                "    </OTAuthentication>\n" +
-                "  </SOAP:Header>\n" +
                 "  <SOAP:Body>\n" +
                 "    <GetHumanTasks xmlns=\"http://schemas.cordys.com/notification/workflow/1.0\" countOnly=\"false\">\n" +
                 "      <ns0:Query xmlns:ns0=\"http://schemas.cordys.com/cql/1.0\">\n" +

@@ -22,9 +22,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -76,6 +74,13 @@ public class SystemUtil {
         JsonNode jsonNode = mapper.readTree(json);
         jsonNode = jsonNode.get(name);
         return (jsonNode == null ? null : jsonNode.toPrettyString());
+    }
+
+    public static Object readJSONObject(String json, String name, Class objectClass) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(json);
+        jsonNode = jsonNode.get(name);
+        return (jsonNode == null ? null : mapper.convertValue(jsonNode, objectClass));
     }
 
     public static String writeObjectIntoString(Object object) {
@@ -180,6 +185,20 @@ public class SystemUtil {
         return String.format("%s://%s:%s/home/%s/app/entityRestService/api/%s", env.getProperty("server.request"),
                 env.getProperty("appwork.domain"), env.getProperty("appwork.port"), env.getProperty("appwork.organization"),
                 solution);
+    }
+
+    public static String readFile(String rootPath) throws IOException {
+        StringBuilder fileContent = new StringBuilder();
+        String line;
+        try (FileReader fr = new FileReader(rootPath);
+             BufferedReader br = new BufferedReader(fr)) {
+            while ((line = br.readLine()) != null) {
+                fileContent.append(line);
+                fileContent.append(System.lineSeparator());
+            }
+
+        }
+        return fileContent.toString();
     }
 
     public static class FixedUntypedObjectDeserializer extends UntypedObjectDeserializer {

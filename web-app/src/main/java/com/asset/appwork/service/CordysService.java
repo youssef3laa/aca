@@ -33,4 +33,8 @@ public class CordysService {
         return cordysUtil.sendRequest(account, message);
     }
 
+    public String getCordysUrl(){
+        return environment.getProperty("server.request")+"://"+environment.getProperty("appwork.domain")+":"+environment.getProperty("appwork.port")+"/home/"+environment.getProperty("appwork.organization")+"/"+environment.getProperty("appwork.gateway");
+    }
+
 }

@@ -25,19 +25,18 @@ export default {
     completeStep: function () {
       console.log("complete-step-clicked");
       var model = this.$refs.appBuilder.getModelData("form1");
-      console.log(model);
       if (model._valid) {
         var obj = {
-          entityName: "ACA_Entity_request",
-          entityModel: {
-            RequestDate: model.requestDate,
-            Receiver: model.receiver.name,
-            Notes: model.notes,
+          requestEntity: {
+            requestDate: model.requestDate,
+            receiver: model.receiver.text,
+            notes: model.notes,
           },
           processModel: {
-            assignedCN: model.receiver.cn,
-            assignedType: model.receiver.type,
-          },
+            code: model.receiver.code,
+            assignedCN: model.receiver.value,
+            decision: "approve",
+          }
         };
         this.initiateProcess(obj);
       }

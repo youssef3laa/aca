@@ -57,34 +57,20 @@
                                         "list": [
                                             {
                                                 "text": "رئيس الجهاز",
-                                                "value": {
-                                                    "name" : "رئيس الجهاز",
-                                                    "type" : "user",
-                                                    "cn" : "cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local"
-                                                }
+                                                "value": "cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+                                                "code": "HUNIT"
                                             },
                                             {
                                                 "text": "رئيس القطاع",
-                                                "value": {
-                                                    "name" : "رئيس القطاع",
-                                                    "type" : "user",
-                                                    "cn" : "cn=AbdElHakim@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local"
-                                                }
+                                                "value": "cn=AbdElHakim@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+                                                "code": "HSEC"
                                             },
                                             {
                                                 "text": "رئيس إدارة\\مكتب",
-                                                "value": {
-                                                    "name" : "رئيس إدارة\\مكتب",
-                                                    "type" : "user",
-                                                    "cn" : "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local"
-                                                }
+                                                "value": "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+                                                "code": "HOFC"
                                             }
-                                        ],
-                                        "value": {
-                                            "name" : "رئيس الجهاز",
-                                            "type" : "user",
-                                            "cn" : "cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local"
-                                        }
+                                        ]
                                     },
                                     "requestDate": "",
                                     "notes": ""

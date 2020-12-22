@@ -41,9 +41,8 @@ export default {
       // console.log("selectedObject", selectedObject)
       this.$emit('update', {
         name: this.field.name,
-        value: this.value,
-        type: 'autocompleteChange',
-        selectedObject
+        value: selectedObject,
+        type: 'autocompleteChange'
       })
     },
   },
