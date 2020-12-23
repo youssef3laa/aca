@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface GroupRepository extends GenericRepository<Group, Long>{
-    Group findByGroupCode(String groupCode);
-    List<Group> findByGroupCodeIn(Collection<String> groupCode);
+    Group findByName(String name);
+    List<Group> findByNameIn(Collection<String> name);
 }

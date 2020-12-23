@@ -181,6 +181,10 @@ public class SystemUtil {
         return String.format("cn=%s,ou=Root,ou=%s,ou=IdentityProviders,dc=identity,dc=opentext,dc=net", name, env.getProperty("otds.partition"));
     }
 
+    public static String generatePlatformRoleCN(Environment env, String roleName) {
+        return String.format("cn=%s,cn=organizational roles,o=%s,cn=cordys,cn=defaultInst,o=appworks-aca.local", roleName, env.getProperty("appwork.organization"));
+    }
+
     public static String generateRestAPIBaseUrl(Environment env, String solution) {
         return String.format("%s://%s:%s/home/%s/app/entityRestService/api/%s", env.getProperty("server.request"),
                 env.getProperty("appwork.domain"), env.getProperty("appwork.port"), env.getProperty("appwork.organization"),

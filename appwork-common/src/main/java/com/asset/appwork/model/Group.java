@@ -15,7 +15,7 @@ public class Group {
     @Column(name="Id")
     long id;
     @Column(name="Name")
-    String Name;
+    String name;
     @Column(name="Description")
     String description;
     @Column(name="Name_en")
@@ -39,11 +39,11 @@ public class Group {
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public String getDescription() {

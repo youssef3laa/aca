@@ -264,6 +264,27 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @PostMapping("/group/create")
+    public ResponseEntity<AppResponse<JsonNode>> createGroup(@RequestHeader("X-Auth-Token") String token,
+                                                             @RequestBody String props
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account != null) {
+                Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
+                respBuilder.data(SystemUtil.convertStringToJsonNode(otds.createGroup(props)));
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
 
     @GetMapping("/group/read/{id}")
     public ResponseEntity<AppResponse<JsonNode>> readGroup(@RequestHeader("X-Auth-Token") String token,
@@ -294,7 +315,7 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account != null) {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByGroupCode(code).toString()));
+                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByName(code).toString()));
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -314,7 +335,7 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account != null) {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByGroupCodeIn(Arrays.asList(codes.split(","))).toString()));
+                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByNameIn(Arrays.asList(codes.split(","))).toString()));
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -387,88 +408,66 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-
-    @PostMapping("/role/create")
-    public ResponseEntity<AppResponse<JsonNode>> createRole(@RequestHeader("X-Auth-Token") String token,
-                                                            @RequestBody String props
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
-                respBuilder.data(SystemUtil.convertStringToJsonNode(otds.createRole(props)));
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-    @PutMapping("/role/update/{roleName}")
-    public ResponseEntity<AppResponse<JsonNode>> updateRole(@RequestHeader("X-Auth-Token") String token,
-                                                            @PathVariable("roleName")String roleName,
-                                                            @RequestBody String props
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
-                respBuilder.data(SystemUtil.convertStringToJsonNode(otds.updateRoleByRoleName(roleName, props)));
-            }
-        } catch (AppworkException | UnsupportedEncodingException | JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-    @DeleteMapping("/role/delete/{roleName}")
-    public ResponseEntity<AppResponse<JsonNode>> deleteRole(@RequestHeader("X-Auth-Token") String token,
-                                                                 @PathVariable("roleName") String roleName
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
-                respBuilder.data(SystemUtil.convertStringToJsonNode(otds.deleteRoleByRoleName(roleName)));
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-    @GetMapping("/role/read/all")
-    public ResponseEntity<AppResponse<JsonNode>> readAllRoles(@RequestHeader("X-Auth-Token") String token
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
-                respBuilder.data(SystemUtil.convertStringToJsonNode(otds.getAllRoles()));
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return respBuilder.build().getResponseEntity();
-    }
+//    @PutMapping("/role/update/{roleName}")
+//    public ResponseEntity<AppResponse<JsonNode>> updateRole(@RequestHeader("X-Auth-Token") String token,
+//                                                            @PathVariable("roleName")String roleName,
+//                                                            @RequestBody String props
+//    ) {
+//        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+//        try {
+//            Account account = tokenService.get(token);
+//            if (account != null) {
+//                Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
+//                respBuilder.data(SystemUtil.convertStringToJsonNode(otds.updateRoleByRoleName(roleName, props)));
+//            }
+//        } catch (AppworkException | UnsupportedEncodingException | JsonProcessingException e) {
+//            e.printStackTrace();
+//        }
+//        return respBuilder.build().getResponseEntity();
+//    }
+//
+//    @DeleteMapping("/role/delete/{roleName}")
+//    public ResponseEntity<AppResponse<JsonNode>> deleteRole(@RequestHeader("X-Auth-Token") String token,
+//                                                                 @PathVariable("roleName") String roleName
+//    ) {
+//        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+//        try {
+//            Account account = tokenService.get(token);
+//            if (account != null) {
+//                Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
+//                respBuilder.data(SystemUtil.convertStringToJsonNode(otds.deleteRoleByRoleName(roleName)));
+//            }
+//        } catch (JsonProcessingException e) {
+//            e.printStackTrace();
+//            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+//        } catch (AppworkException e) {
+//            e.printStackTrace();
+//            respBuilder.status(e.getCode());
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//        return respBuilder.build().getResponseEntity();
+//    }
+//
+//    @GetMapping("/role/read/all")
+//    public ResponseEntity<AppResponse<JsonNode>> readAllRoles(@RequestHeader("X-Auth-Token") String token
+//    ) {
+//        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+//        try {
+//            Account account = tokenService.get(token);
+//            if (account != null) {
+//                Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
+//                respBuilder.data(SystemUtil.convertStringToJsonNode(otds.getAllRoles()));
+//            }
+//        } catch (JsonProcessingException e) {
+//            e.printStackTrace();
+//            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+//        } catch (AppworkException e) {
+//            e.printStackTrace();
+//            respBuilder.status(e.getCode());
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//        return respBuilder.build().getResponseEntity();
+//    }
 }

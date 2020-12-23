@@ -43,93 +43,93 @@ public final class Otds {
         return http.getResponse();
     }
 
-    public <T> String createRole(T data) {
+    public <T> String createGroup(T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .post(this.apiBaseUrl + API.ROLES_CREATE.getUrl());
+                .post(this.apiBaseUrl + API.GROUPS_CREATE.getUrl());
 
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public String deleteRoleByRoleName(String roleName) throws UnsupportedEncodingException {
+    public String deleteGroupByGroupName(String roleName) throws UnsupportedEncodingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
-                .delete(this.apiBaseUrl + String.format(API.ROLES_DELETE.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .delete(this.apiBaseUrl + String.format(API.GROUPS_DELETE.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
         return http.getResponse();
     }
 
-    public <T> String updateRoleByRoleName(String oldRoleName, T data) throws UnsupportedEncodingException {
+    public <T> String updateGroupByGroupName(String oldGroupName, T data) throws UnsupportedEncodingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .put(this.apiBaseUrl + String.format(API.ROLES_UPDATE.getUrl(), URLEncoder.encode(oldRoleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .put(this.apiBaseUrl + String.format(API.GROUPS_UPDATE.getUrl(), URLEncoder.encode(oldGroupName + "@" + this.partition, StandardCharsets.UTF_8.name())));
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public String getAllRoles() throws UnsupportedEncodingException {
+    public String getAllGroups() throws UnsupportedEncodingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
-                .get(this.apiBaseUrl + String.format(API.ROLES_GET_ALL.getUrl(), URLEncoder.encode(String.format("where_partition_name=%s", this.partition), StandardCharsets.UTF_8.name())));
-
-        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-    }
-
-    public String getRoleByRoleName(String roleName) throws UnsupportedEncodingException {
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", this.account.getTicket())
-                .get(this.apiBaseUrl + String.format(API.ROLES_GET.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
-        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-    }
-
-    public String getMembersAssignedToRoleByRoleName(String roleName) throws UnsupportedEncodingException {
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", this.account.getTicket())
-                .get(this.apiBaseUrl + String.format(API.ROLES_GET_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .get(this.apiBaseUrl + String.format(API.GROUPS_GET_ALL.getUrl(), URLEncoder.encode(String.format("where_partition_name=%s", this.partition), StandardCharsets.UTF_8.name())));
 
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public <T> String assignMembersToRole(String roleName, T data) throws UnsupportedEncodingException {
+    public String getGroupByGroupName(String roleName) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .get(this.apiBaseUrl + String.format(API.GROUPS_GET.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public String getMembersAssignedToGroupByGroupName(String roleName) throws UnsupportedEncodingException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .get(this.apiBaseUrl + String.format(API.GROUPS_GET_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public <T> String assignMembersToGroup(String roleName, T data) throws UnsupportedEncodingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .post(this.apiBaseUrl + String.format(API.ROLES_ASSIGN_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .post(this.apiBaseUrl + String.format(API.GROUPS_ASSIGN_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
         return http.getResponse();
     }
 
-    public <T> String unAssignMembersFromRole(String roleName, T data) throws UnsupportedEncodingException {
+    public <T> String unAssignMembersFromGroup(String roleName, T data) throws UnsupportedEncodingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .post(this.apiBaseUrl + String.format(API.ROLES_UNASSIGN_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .post(this.apiBaseUrl + String.format(API.GROUPS_UNASSIGN_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
         return http.getResponse();
     }
 
-    public <T> String assignRolesToRole(String roleName, T data) throws UnsupportedEncodingException {
+    public <T> String assignGroupsToGroup(String roleName, T data) throws UnsupportedEncodingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .post(this.apiBaseUrl + String.format(API.ROLES_ASSIGN_ROLES.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .post(this.apiBaseUrl + String.format(API.GROUPS_ASSIGN_GROUPS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
         return http.getResponse();
     }
 
-    public <T> String unAssignRolesFromRole(String roleName, T data) throws UnsupportedEncodingException {
+    public <T> String unAssignGroupsFromGroup(String roleName, T data) throws UnsupportedEncodingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .post(this.apiBaseUrl + String.format(API.ROLES_UNASSIGN_ROLES.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .post(this.apiBaseUrl + String.format(API.GROUPS_UNASSIGN_GROUPS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
         return http.getResponse();
     }
 
-    public String getUsersAssignedToRoleByRoleId(String roleName) throws UnsupportedEncodingException {
+    public String getUsersAssignedToGroupByGroupId(String roleName) throws UnsupportedEncodingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
-                .get(this.apiBaseUrl + String.format(API.ROLES_GET_USERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .get(this.apiBaseUrl + String.format(API.GROUPS_GET_USERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
@@ -181,19 +181,19 @@ public final class Otds {
         return http.getResponse();
     }
 
-    public String getAllRolesAssignedToUserByUserName(String username) throws UnsupportedEncodingException {
+    public String getAllGroupsAssignedToUserByUserName(String username) throws UnsupportedEncodingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
-                .get(this.apiBaseUrl + String.format(API.USERS_GET_ROLES.getUrl(), URLEncoder.encode(username + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .get(this.apiBaseUrl + String.format(API.USERS_GET_GROUPS.getUrl(), URLEncoder.encode(username + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public <T> String assignUserToRoleByUserId(String username, T data) throws UnsupportedEncodingException, JsonProcessingException {
+    public <T> String assignUserToGroupByUserId(String username, T data) throws UnsupportedEncodingException, JsonProcessingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .post(this.apiBaseUrl + String.format(API.USERS_ASSIGN_ROLE.getUrl(), URLEncoder.encode(username + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .post(this.apiBaseUrl + String.format(API.USERS_ASSIGN_GROUP.getUrl(), URLEncoder.encode(username + "@" + this.partition, StandardCharsets.UTF_8.name())));
         return http.getResponse();
     }
 
@@ -201,23 +201,23 @@ public final class Otds {
     private enum API {
         LOGIN("/authentication/credentials"),
         CONSOLIDATION_CONSOLIDATE("/consolidation"),
-        ROLES_ASSIGN_MEMBERS("/roles/%s/members"),
-        ROLES_ASSIGN_ROLES("/roles/%s/roles"),
-        ROLES_CREATE("/roles"),
-        ROLES_DELETE("/roles/%s"),
-        ROLES_GET("/roles/%s"),
-        ROLES_GET_ALL("/roles"),
-        ROLES_GET_MEMBERS("/roles/%s/members"),
-        ROLES_GET_USERS("/roles/%s/users"),
-        ROLES_UNASSIGN_MEMBERS("/roles/%s/members/deletionset"),
-        ROLES_UNASSIGN_ROLES("/roles/%s/roles/deletionset"),
-        ROLES_UPDATE("/roles/%s"),
-        USERS_ASSIGN_ROLE("/users/%s/roles"),
+        GROUPS_ASSIGN_MEMBERS("/groups/%s/members"),
+        GROUPS_ASSIGN_GROUPS("/groups/%s/groups"),
+        GROUPS_CREATE("/groups"),
+        GROUPS_DELETE("/groups/%s"),
+        GROUPS_GET("/groups/%s"),
+        GROUPS_GET_ALL("/groups"),
+        GROUPS_GET_MEMBERS("/groups/%s/members"),
+        GROUPS_GET_USERS("/groups/%s/users"),
+        GROUPS_UNASSIGN_MEMBERS("/groups/%s/members/deletionset"),
+        GROUPS_UNASSIGN_GROUPS("/groups/%s/groups/deletionset"),
+        GROUPS_UPDATE("/groups/%s"),
+        USERS_ASSIGN_GROUP("/users/%s/memberof"),
         USERS_CREATE("/users"),
         USERS_DELETE("/users/%s"),
         USERS_GET("/users/%s"),
         USERS_GET_ALL("/users"),
-        USERS_GET_ROLES("/users/%s/roles"),
+        USERS_GET_GROUPS("/users/%s/memberof"),
         USERS_RESET_PASSWORD("/users/%s/password"),
         USERS_UPDATE("/users/%s");
 
