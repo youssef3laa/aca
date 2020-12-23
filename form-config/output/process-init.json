@@ -70,7 +70,8 @@
                                                 "value": "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
                                                 "code": "HOFC"
                                             }
-                                        ]
+                                        ],
+                                        "value" : "cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local"
                                     },
                                     "requestDate": "",
                                     "notes": ""

@@ -33,16 +33,15 @@
                                 "publish": "form1Change",
                                 "inputs": [
                                     {
-                                        "type": "AutoCompleteComponent",
+                                        "type": "InputComponent",
+                                        "label": "receiver",
                                         "name": "receiver",
-                                        "rule": "required",
                                         "col": "6"
                                     },
                                     {
-                                        "type": "DatePickerComponent",
+                                        "type": "InputComponent",
                                         "label": "requestDate",
                                         "name": "requestDate",
-                                        "rule": "required",
                                         "col": "6"
                                     },
                                     {
@@ -53,26 +52,7 @@
                                     }
                                 ],
                                 "model": {
-                                    "receiver": {
-                                        "list": [
-                                            {
-                                                "text": "رئيس الجهاز",
-                                                "value": "cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
-                                                "code": "HUNIT"
-                                            },
-                                            {
-                                                "text": "رئيس القطاع",
-                                                "value": "cn=AbdElHakim@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
-                                                "code": "HSEC"
-                                            },
-                                            {
-                                                "text": "رئيس إدارة\\مكتب",
-                                                "value": "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
-                                                "code": "HOFC"
-                                            }
-                                        ],
-                                        "value" : "cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local"
-                                    },
+                                    "receiver": "",
                                     "requestDate": "",
                                     "notes": ""
                                 }

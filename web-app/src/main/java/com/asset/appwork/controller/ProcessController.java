@@ -40,7 +40,6 @@ public class ProcessController {
     public ResponseEntity<AppResponse<String>> initiate(@RequestHeader("X-Auth-Token") String token, @RequestBody Request requestJson) {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
-
             Account account = tokenService.get(token);
 
             // Entity Creation
@@ -49,10 +48,13 @@ public class ProcessController {
                     SystemUtil.generateRestAPIBaseUrl(environment,"AssetGeneralACA")
                     ,entityName);
             String entityCreateResponse = entity.create(requestJson.requestEntity);
+            String entityId = SystemUtil.getJsonByPtrExpr(entityCreateResponse, "/Identity/Id");
 
             //Get Next Step
             requestJson.processModel.setProcess("process-1");
             requestJson.processModel.setStepId("init");
+            requestJson.processModel.setEntityName(entityName);
+            requestJson.processModel.setEntityId(entityId);
 
             String config = SystemUtil.readFile(environment.getProperty("process.config") + "\\" + requestJson.processModel.getProcess() + ".json");
             String cordysUrl = cordysService.getCordysUrl();
@@ -60,7 +62,6 @@ public class ProcessController {
             ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, config);
             moduleRouting.goToNext(requestJson.processModel);
             respBuilder.data("success");
-
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
@@ -71,4 +72,28 @@ public class ProcessController {
 
         return respBuilder.build().getResponseEntity();
     }
+
+    @PostMapping("/complete")
+    public ResponseEntity<AppResponse<String>> complete(@RequestHeader("X-Auth-Token") String token, @RequestBody OutputSchema outputSchema) {
+        AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+
+            String config = SystemUtil.readFile(environment.getProperty("process.config") + "\\" + outputSchema.getProcess() + ".json");
+            String cordysUrl = cordysService.getCordysUrl();
+
+            ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, config);
+            moduleRouting.goToNext(outputSchema);
+            respBuilder.data("success");
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        } catch (Exception e){
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+
+        return respBuilder.build().getResponseEntity();
+    }
+
 }

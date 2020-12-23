@@ -115,7 +115,7 @@ export default {
                           },
                           {
                             text: 'Process Name',
-                            value: 'ProcessName',
+                            value: 'TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process',
                           },
                           {
                             text: 'Date',
