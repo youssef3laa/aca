@@ -7,11 +7,13 @@ import com.asset.appwork.platform.soap.Process;
 import com.asset.appwork.platform.soap.Workflow;
 import com.asset.appwork.platform.util.CordysUtil;
 import com.asset.appwork.schema.OutputSchema;
+import com.asset.appwork.util.ReflectionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import lombok.Data;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ModuleRouting {
     String config;
@@ -24,35 +26,46 @@ public class ModuleRouting {
         this.cordysUrl= cordysUrl;
     }
 
-    private void calculateNextStep( OutputSchema outputSchema) throws AppworkException {
+    private <T> void calculateNextStep( T outputSchema) throws AppworkException {
         try {
             String nextStep = "";
 
             RoutingConfig routingConfig = generateRoutingConfig();
 
             // Condition On decision and code to get next step
-            String currentStepId = outputSchema.getStepId();
-            String codeSelected = outputSchema.getCode();
-            if(routingConfig.getSteps().get(currentStepId).getNextStep().containsKey(codeSelected)){
-                nextStep = routingConfig.getSteps().get(currentStepId).getNextStep().get(codeSelected);
+            String[] currentStepId = {""};
+            String[] codeSelected = {""};
+             ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s)->{
+                currentStepId[0] = (String) s;
+             }).ifPresent("getCode", (s) -> {
+                 codeSelected[0] = (String) s;
+             });
+//             outputSchema.getStepId();
+
+            if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
+                nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
 
                 String nextPage = routingConfig.getSteps().get(nextStep).getPage();
-                outputSchema.setPage(nextPage);
+                //TODO: Create Setter function in reflection class
+                ((OutputSchema)outputSchema).setPage(nextPage);
             }else {
                 nextStep = "break";
             }
 
-            outputSchema.setStepId(nextStep);
+            ((OutputSchema)outputSchema).setStepId(nextStep);
         }catch (Exception e){
             e.printStackTrace();
             throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
         }
     }
 
-    public void goToNext( OutputSchema outputSchema) throws AppworkException {
-        String currentStepId = outputSchema.getStepId();
+    public <T> void goToNext( T outputSchema) throws AppworkException {
+        String[] currentStepId = {""};
+        ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s)->{
+            currentStepId[0] = (String) s;
+        });
         calculateNextStep(outputSchema);
-        if (currentStepId.equals("init")) initiateProcess(outputSchema);
+        if (currentStepId[0].equals("init")) initiateProcess(outputSchema);
         else completeWorkflow(outputSchema);
 
     }
@@ -64,10 +77,13 @@ public class ModuleRouting {
     }
 
 
-    private void initiateProcess( OutputSchema outputSchema) throws AppworkException {
+    private <T> void initiateProcess( T outputSchema) throws AppworkException {
         try {
-            String params = outputSchema.getXML();
-            String processInitiateMessage = new Process().initiate(params);
+            String[] params = {""};
+            ReflectionUtil.of(outputSchema).ifPresent("getXML", (s)->{
+                params[0] = (String) s;
+            });
+            String processInitiateMessage = new Process().initiate(params[0]);
             CordysUtil cordysUtil = new CordysUtil(cordysUrl);
             cordysUtil.sendRequest(account, processInitiateMessage);
         }catch (Exception e){
@@ -76,10 +92,16 @@ public class ModuleRouting {
         }
     }
 
-    private void completeWorkflow(OutputSchema outputSchema) throws AppworkException {
+    private <T> void completeWorkflow(T outputSchema) throws AppworkException {
         try {
-            String data = outputSchema.getXMLWithNameSpace();
-            String completeWorkflowMessage = new Workflow().performTaskAction(outputSchema.getTaskId(), "COMPLETE","", data);
+            String[] data = {""};
+            String[] taskId = {""};
+            ReflectionUtil.of(outputSchema).ifPresent("getXMLWithNameSpace", (s)->{
+                data[0] = (String) s;
+            }).ifPresent("getTaskId", (s)->{
+                taskId[0] = (String) s;
+            });
+            String completeWorkflowMessage = new Workflow().performTaskAction(taskId[0], "COMPLETE","", data[0]);
             CordysUtil cordysUtil = new CordysUtil(cordysUrl);
             cordysUtil.sendRequest(account, completeWorkflowMessage);
         }catch (Exception e){
