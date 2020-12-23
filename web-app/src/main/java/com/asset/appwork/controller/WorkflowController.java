@@ -78,7 +78,7 @@ public class WorkflowController {
             taskData = SystemUtil.convertJSONtoXML(taskData);
             taskData = SystemUtil.addNameSpaceToXML(taskData, nameSpace);
             if (account != null) {
-                String response = cordysService.sendRequest(account, workflow.performTaskAction(account.getSAMLart(), taskId, "COMPLETE", "", taskData));
+                String response = cordysService.sendRequest(account, workflow.performTaskAction(taskId, "COMPLETE", "", taskData));
                 respBuilder.data(response);
             }
         } catch (JsonProcessingException e) {

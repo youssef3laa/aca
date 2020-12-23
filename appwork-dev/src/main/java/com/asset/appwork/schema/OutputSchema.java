@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class OutputSchema {
+    String taskId;
     String process;
     String stepId;
     String assignedCN;
@@ -12,6 +13,9 @@ public class OutputSchema {
     String subBP;
     String decision;
     String code;
+    String entityName;
+    String entityId;
+    String page;
 
     public String getAssignedType() {
         if(assignedCN.contains("cn=organizational users")){
@@ -31,11 +35,25 @@ public class OutputSchema {
     }
 
     public String getXML(){
-        return  "<assignedCN>"+this.assignedCN+"</assignedCN>\n"+
+        return  "<assignedCN>"+removeNull(this.assignedCN)+"</assignedCN>\n"+
                 "<assignedType>"+this.getAssignedType()+"</assignedType>\n"+
-                "<stepId>"+this.stepId+"</stepId>\n"+
-                "<process>"+this.process+"</process>\n"+
-                "<subBP>"+this.subBP+"</subBP>"+
-                "<breakProcess>"+this.breakProcess+"</breakProcess>\n";
+                "<stepId>"+removeNull(this.stepId)+"</stepId>\n"+
+                "<process>"+removeNull(this.process)+"</process>\n"+
+                "<subBP>"+removeNull(this.subBP)+"</subBP>"+
+                "<entityName>"+removeNull(this.entityName)+"</entityName>"+
+                "<entityId>"+removeNull(this.entityId)+"</entityId>"+
+                "<page>"+removeNull(this.page)+"</page>"+
+                "<breakProcess>"+removeNull(this.breakProcess)+"</breakProcess>\n";
+    }
+
+    public String getXMLWithNameSpace(){
+        return "<ACA_ProcessRouting_OutputSchemaFragment xmlns=\"http://schemas.cordys.com/\">"+
+                    getXML()+
+                "</ACA_ProcessRouting_OutputSchemaFragment>\n";
+    }
+
+    private String removeNull(Object object){
+        if(object == null) return "";
+        return object.toString();
     }
 }

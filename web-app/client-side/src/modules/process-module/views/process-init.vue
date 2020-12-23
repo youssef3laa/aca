@@ -29,12 +29,12 @@ export default {
         var obj = {
           requestEntity: {
             requestDate: model.requestDate,
-            receiver: model.receiver.text,
+            receiver: model.receiver.value.text,
             notes: model.notes,
           },
           processModel: {
-            code: model.receiver.code,
-            assignedCN: model.receiver.value,
+            code: model.receiver.value.code,
+            assignedCN: model.receiver.value.value,
             decision: "approve",
           }
         };

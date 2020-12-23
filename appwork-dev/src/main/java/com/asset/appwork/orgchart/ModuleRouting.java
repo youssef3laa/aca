@@ -4,6 +4,7 @@ import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.platform.soap.Process;
+import com.asset.appwork.platform.soap.Workflow;
 import com.asset.appwork.platform.util.CordysUtil;
 import com.asset.appwork.schema.OutputSchema;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,6 +35,9 @@ public class ModuleRouting {
             String codeSelected = outputSchema.getCode();
             if(routingConfig.getSteps().get(currentStepId).getNextStep().containsKey(codeSelected)){
                 nextStep = routingConfig.getSteps().get(currentStepId).getNextStep().get(codeSelected);
+
+                String nextPage = routingConfig.getSteps().get(nextStep).getPage();
+                outputSchema.setPage(nextPage);
             }else {
                 nextStep = "break";
             }
@@ -46,9 +50,10 @@ public class ModuleRouting {
     }
 
     public void goToNext( OutputSchema outputSchema) throws AppworkException {
-        calculateNextStep( outputSchema);
-        if (outputSchema.getStepId().equals("init")) initiateProcess(outputSchema);
-        else completeWorkflow();
+        String currentStepId = outputSchema.getStepId();
+        calculateNextStep(outputSchema);
+        if (currentStepId.equals("init")) initiateProcess(outputSchema);
+        else completeWorkflow(outputSchema);
 
     }
 
@@ -71,8 +76,16 @@ public class ModuleRouting {
         }
     }
 
-    private void completeWorkflow() {
-
+    private void completeWorkflow(OutputSchema outputSchema) throws AppworkException {
+        try {
+            String data = outputSchema.getXMLWithNameSpace();
+            String completeWorkflowMessage = new Workflow().performTaskAction(outputSchema.getTaskId(), "COMPLETE","", data);
+            CordysUtil cordysUtil = new CordysUtil(cordysUrl);
+            cordysUtil.sendRequest(account, completeWorkflowMessage);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
+        }
     }
 
     @Data
@@ -88,34 +101,5 @@ public class ModuleRouting {
         String page;
         String condition;
         HashMap<String,String> nextStep;
-        //TODO Convert To Pair
-        //List<Pair<String,String>> nextStep;
-
     }
-
-//    static class PairSerializer extends JsonSerializer<Pair> {
-//
-//        @Override
-//        public void serialize(
-//                Pair pair,
-//                JsonGenerator jsonGenerator,
-//                SerializerProvider serializerProvider) throws IOException {
-//            jsonGenerator.writeStartArray(2);
-//            jsonGenerator.writeObject(pair.getKey());
-//            jsonGenerator.writeObject(pair.getValue());
-//            jsonGenerator.writeEndArray();
-//        }
-//    }
-//
-//    static class PairDeserializer extends JsonDeserializer<Pair> {
-//
-//        @Override
-//        public Pair deserialize(
-//                JsonParser jsonParser,
-//                DeserializationContext deserializationContext) throws IOException {
-//            final Object[] array = jsonParser.readValueAs(Object[].class);
-//            Pair pair = new Pair(array[0], array[1]);
-//            return pair;
-//        }
-//    }
 }

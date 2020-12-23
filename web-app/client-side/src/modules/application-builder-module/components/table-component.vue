@@ -35,10 +35,15 @@ export default {
       // this.$route.params(item);
       // if (pageKey) router.push({ path: pageKey, props:{item:item}  })
 
-      let taskUrl = item.TaskData.ApplicationData.inputSchemaFragment.taskUrl
+      // let taskUrl = item.TaskData.ApplicationData.inputSchemaFragment.taskUrl
+      // router.push({
+      //   name: 'taskUrl',
+      //   params: {taskId: pageKey, taskUrl: taskUrl}
+      // })
+
       router.push({
-        name: taskUrl,
-        params: {taskId: pageKey, taskUrl: taskUrl}
+        name: 'process-step',
+        params: {taskId: pageKey}
       })
 
       // this.$observable.fire('BPItem', item)

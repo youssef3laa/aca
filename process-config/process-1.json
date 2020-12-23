@@ -3,9 +3,7 @@
     "steps": {
         "init": {
             "hasAutocomplete": true,
-            "roleFilter": "role",
-            "unitFilter": "unit",
-            "userFilter": "user",
+            "roleFilter": "get/org/roles/HUNIT,HSEC,HOFC",
             "page": "process-init",
             "condition": "condition",
             "nextStep": 
@@ -14,46 +12,37 @@
                     "HSEC": "stepRQ",
                     "HOFC": "stepRE"
                 }
-            
         },
         "stepRG": {
             "hasAutocomplete": true,
-            "roleFilter": "role",
-            "unitFilter": "unit",
-            "userFilter": "user",
-            "page": "process-stepRG",
+            "roleFilter": "get/org/roles/up",
+            "page": "process-init",
             "condition": "condition",
             "nextStep": 
                 {
-                    "abdallah": "stepRG"
+                    "HSEC": "stepRQ"
                 }
-            
         },
         "stepRQ": {
             "hasAutocomplete": true,
-            "roleFilter": "role",
-            "unitFilter": "unit",
-            "userFilter": "user",
-            "page": "process-stepRQ",
+            "roleFilter": "get/org/roles/up",
+            "page": "process-init",
             "condition": "condition",
             "nextStep": 
                 {
-                    "abdallah": "stepRG"
+                    "HOFC": "stepRE"
                 }
-            
         },
         "stepRE": {
             "hasAutocomplete": true,
-            "roleFilter": "role",
-            "unitFilter": "unit",
-            "userFilter": "user",
-            "page": "process-stepRE",
+            "roleFilter": "get/org/roles/HGRP,MEM",
+            "page": "process-init",
             "condition": "condition",
             "nextStep": 
                 {
-                    "abdallah": "stepRG"
-                }
-            
+                    "HGRP": "stepRM",
+                    "MEM": "stepMM"
+                }    
         }
     }
 }

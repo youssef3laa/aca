@@ -29,6 +29,7 @@ export default {
       items: this.val,
       //   value: this.field.value,
       value: this.val.value,
+      
     }
   },
   methods: {
@@ -41,7 +42,10 @@ export default {
       // console.log("selectedObject", selectedObject)
       this.$emit('update', {
         name: this.field.name,
-        value: selectedObject,
+        value: {
+          list: list,
+          value: selectedObject
+        },
         type: 'autocompleteChange'
       })
     },
@@ -51,7 +55,9 @@ export default {
     val: function (newVal, oldVal) {
 
       console.log(oldVal)
-      this.val = newVal
+      // this.val = newVal
+      this.items = newVal;
+      this.value = newVal.value
       console.log("val", this.val)
     },
   },
