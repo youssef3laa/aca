@@ -315,11 +315,20 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account != null) {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByName(code).toString()));
+                groupRepository.findByName(code).ifPresentOrElse((group -> {
+                    try {
+                        respBuilder.data(SystemUtil.convertStringToJsonNode(group.toString()));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }), () -> {
+                    try {
+                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
@@ -335,11 +344,21 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account != null) {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByNameIn(Arrays.asList(codes.split(","))).toString()));
+
+                groupRepository.findByNameIn(Arrays.asList(codes.split(","))).ifPresentOrElse((groups -> {
+                    try {
+                        respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }), () -> {
+                    try {
+                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
