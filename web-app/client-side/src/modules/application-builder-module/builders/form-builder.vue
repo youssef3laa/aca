@@ -23,7 +23,6 @@
             :field="field"
             v-on:update="updateText"
           ></component>
-
         </v-col>
 
         <!-- </div> -->
@@ -46,6 +45,7 @@ import AutoCompleteComponent from '../components/autocomplete-component'
 import InputFileComponent from '../components/input-file-component'
 import SelectComponent from '../components/select-component'
 import DatePickerComponent from '../components/datePicker-component'
+import ApprovalComponent from '../components/approvalCard-component'
 
 export default {
   name: 'FormBuilder',
@@ -61,7 +61,8 @@ export default {
     AutoCompleteComponent,
     InputFileComponent,
     SelectComponent,
-    DatePickerComponent
+    DatePickerComponent,
+    ApprovalComponent,
   },
   data() {
     return {
@@ -71,19 +72,19 @@ export default {
   },
   methods: {
     updateText: async function(data) {
-      // console.log(data)
-      
+       console.log(data)
+
       if (data.name && data.value) this.forms.model[data.name] = data.value
 
       if (this.forms.model)
-        this.forms.model['_valid'] = !this.$refs['observer']['_data'].flags.invalid
+        this.forms.model['_valid'] = !this.$refs['observer']['_data'].flags
+          .invalid
 
       console.log(this.$refs['observer'].errors[data.name])
       console.log(this.$refs['observer']['_data'].flags)
       // this.$refs['observer'].validateWithInfo().then((val)=> console.log(val))
-      let res = await this.$refs.observer.validate();
-      console.log(res);
-
+      let res = await this.$refs.observer.validate()
+      console.log(res)
 
       if (data.type == 'ButtonComponent' && data.publish) {
         this.$observable.fire(data.publish, {

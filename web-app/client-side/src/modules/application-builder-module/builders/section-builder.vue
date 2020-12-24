@@ -9,39 +9,83 @@
       <span v-if="section.forms">
         <v-card flat v-for="formData in section.forms" :key="formData.id">
           <!-- <v-card-text v-text="formData.form.name"></v-card-text> -->
-          <FormBuilder :forms="formData" :model="formData.model" />
+          <span
+            v-if="!section.type == 'collapse' && !section.type == 'approval'"
+          >
+            <FormBuilder :forms="formData" :model="formData.model" />
+          </span>
+          <span v-if="section.type == 'collapse'">
+            <v-expansion-panels>
+              <v-expansion-panel>
+                <v-expansion-panel-header>
+                  <template>
+                    <v-row no-gutters>
+                      <v-col cols="4">
+                        {{ section.name }}
+                      </v-col>
+                      <v-col cols="8" class="text--secondary"> </v-col>
+                    </v-row>
+                  </template>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <span v-for="formData in section.forms" :key="formData.id">
+                    <FormBuilder :forms="formData" :model="formData.model" />
+                  </span>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+            <!-- <FormBuilder :forms="formData" :model="formData.model" /> -->
+          </span>
         </v-card>
       </span>
-      <v-row v-else style="height: 80px;">
+      <br>
+      <v-row v-if="section.type == 'title'" style="height: 80px;">
         <v-col>
           <h1>
             <button
               style="background:transparent; width: 45px; height: 45px"
               @click="goBack"
             >
-              <v-icon style="background-color: white;width: inherit; height: inherit;border-radius: 5px;" right>
+              <v-icon
+                style="background-color: white;width: inherit; height: inherit;border-radius: 5px;"
+                right
+              >
                 mdi-arrow-right
               </v-icon>
             </button>
-            <span style="margin-left:15px;margin-right:15px">{{ section.name }}</span>
+            <span style="margin-left:15px;margin-right:15px">{{
+              section.name
+            }}</span>
           </h1>
         </v-col>
         <v-spacer></v-spacer>
         <v-col style="padding-top: 20px; padding-bottom:0" class="text-left">
           <span v-for="(action, index) in section.actions" :key="index">
-            <span v-if="action == 'cancel'" @click="cancelStep" class="actions-contianer">
+            <span
+              v-if="action == 'cancel'"
+              @click="cancelStep"
+              class="actions-contianer"
+            >
               <v-icon color="error">
                 far fa-times-circle
               </v-icon>
               إلغاء
             </span>
-            <span v-if="action == 'save'" @click="saveStep" class="actions-contianer">
+            <span
+              v-if="action == 'save'"
+              @click="saveStep"
+              class="actions-contianer"
+            >
               <v-icon color="info">
                 far fa-save
               </v-icon>
               حفظ
             </span>
-            <span v-if="action == 'complete'" @click="completeStep" class="actions-contianer">
+            <span
+              v-if="action == 'complete'"
+              @click="completeStep"
+              class="actions-contianer"
+            >
               <v-icon color="info">
                 far fa-paper-plane
               </v-icon>
@@ -50,6 +94,12 @@
           </span>
         </v-col>
       </v-row>
+      <br>
+      <span v-if="section.type == 'approval'">
+        <v-card flat v-for="formData in section.forms" :key="formData.id">
+          <FormBuilder :forms="formData" :model="formData.model" />
+        </v-card>
+      </span>
     </span>
   </v-container>
 </template>
@@ -72,15 +122,15 @@ export default {
     goBack: function() {
       this.$router.back()
     },
-    completeStep: function () {
-       this.$observable.fire("complete-step");
+    completeStep: function() {
+      this.$observable.fire('complete-step')
     },
-    saveStep: function () {
-       this.$observable.fire("save-step");
+    saveStep: function() {
+      this.$observable.fire('save-step')
     },
-    cancelStep: function () {
-       this.$observable.fire("cancel-step");
-    }
+    cancelStep: function() {
+      this.$observable.fire('cancel-step')
+    },
   },
   data() {
     return {}
