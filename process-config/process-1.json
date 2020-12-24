@@ -3,46 +3,42 @@
     "steps": {
         "init": {
             "hasAutocomplete": true,
-            "roleFilter": "get/org/roles/HUNIT,HSEC,HOFC",
+            "roleFilter": "org/group/findByCodes/HUNIT,HSEC,HOFC",
             "page": "process-init",
             "condition": "condition",
-            "nextStep": 
-                {
-                    "HUNIT": "stepRG",
-                    "HSEC": "stepRQ",
-                    "HOFC": "stepRE"
-                }
+            "nextStep": {
+                "HUNIT": "stepRG",
+                "HSEC": "stepRQ",
+                "HOFC": "stepRE"
+            }
         },
         "stepRG": {
             "hasAutocomplete": true,
             "roleFilter": "get/org/roles/up",
-            "page": "process-init",
+            "page": "process-step-RG",
             "condition": "condition",
-            "nextStep": 
-                {
-                    "HSEC": "stepRQ"
-                }
+            "nextStep": {
+                "HSEC": "stepRQ"
+            }
         },
         "stepRQ": {
             "hasAutocomplete": true,
             "roleFilter": "get/org/roles/up",
-            "page": "process-init",
+            "page": "process-step-RQ",
             "condition": "condition",
-            "nextStep": 
-                {
-                    "HOFC": "stepRE"
-                }
+            "nextStep": {
+                "HOFC": "stepRE"
+            }
         },
         "stepRE": {
             "hasAutocomplete": true,
             "roleFilter": "get/org/roles/HGRP,MEM",
-            "page": "process-init",
+            "page": "process-step-RE",
             "condition": "condition",
-            "nextStep": 
-                {
-                    "HGRP": "stepRM",
-                    "MEM": "stepMM"
-                }    
+            "nextStep": {
+                "HGRP": "stepRM",
+                "MEM": "stepMM"
+            }
         }
     }
 }

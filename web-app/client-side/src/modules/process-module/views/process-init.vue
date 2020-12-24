@@ -34,8 +34,7 @@ export default {
           },
           processModel: {
             code: model.receiver.value.code,
-            assignedCN: model.receiver.value.value,
-            decision: "approve",
+            assignedCN: model.receiver.value.value
           }
         };
         this.initiateProcess(obj);

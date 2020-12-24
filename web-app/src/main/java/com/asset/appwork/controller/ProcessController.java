@@ -1,14 +1,14 @@
 package com.asset.appwork.controller;
 
-import com.asset.appwork.orgchart.ModuleRouting;
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
-import com.asset.appwork.platform.rest.Entity;
-import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.RequestEntity;
+import com.asset.appwork.orgchart.ModuleRouting;
+import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.response.AppResponse;
+import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.util.SystemUtil;
 import lombok.Data;
@@ -78,11 +78,12 @@ public class ProcessController {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-
+            String entityName = "ACA_Entity_request";
+            outputSchema.setEntityName(entityName);
             String config = SystemUtil.readFile(environment.getProperty("process.config") + "\\" + outputSchema.getProcess() + ".json");
             String cordysUrl = cordysService.getCordysUrl();
 
-            ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, config);
+            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config);
             moduleRouting.goToNext(outputSchema);
             respBuilder.data("success");
         } catch (AppworkException e) {

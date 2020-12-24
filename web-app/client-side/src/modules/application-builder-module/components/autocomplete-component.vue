@@ -29,15 +29,16 @@ export default {
       items: this.val,
       //   value: this.field.value,
       value: this.val.value,
-      
+
     }
   },
   methods: {
     autocompleteChange: function () {
-      console.log(this.value)
-      console.log(this.val)
-      console.log(this.items.list)
+      // console.log(this.value)
+      // console.log(this.val)
+      // console.log(this.items.list)
       const list = this.items.list
+      if (!list) return;
       const selectedObject = list.filter(el => el.value === this.value)[0]
       // console.log("selectedObject", selectedObject)
       this.$emit('update', {
@@ -61,6 +62,9 @@ export default {
       console.log("val", this.val)
     },
   },
+  mounted() {
+    this.autocompleteChange();
+  }
 }
 </script>
 <style>

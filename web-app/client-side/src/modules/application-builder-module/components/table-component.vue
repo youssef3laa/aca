@@ -25,26 +25,16 @@ export default {
   methods: {
     edit: function (item) {
       console.log("item obj in table", item)
-      // console.log(item.TaskData.ApplicationData.inputSchemaFragment.entityId)
-      // TaskData.ApplicationData.inputSchemaFragment
-      let pageKey = item.TaskId
-      console.log(pageKey);
+      try {
+        let taskId = item.TaskId, page = item.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.page;
+        router.push({
+          name: page,
+          params: {taskId: taskId}
+        })
+      } catch (e) {
+        console.error(e);
+      }
 
-
-      // console.log(item.TaskData.ApplicationData.inputSchemaFragment)
-      // this.$route.params(item);
-      // if (pageKey) router.push({ path: pageKey, props:{item:item}  })
-
-      // let taskUrl = item.TaskData.ApplicationData.inputSchemaFragment.taskUrl
-      // router.push({
-      //   name: 'taskUrl',
-      //   params: {taskId: pageKey, taskUrl: taskUrl}
-      // })
-
-      router.push({
-        name: 'process-step',
-        params: {taskId: pageKey}
-      })
 
       // this.$observable.fire('BPItem', item)
     },
