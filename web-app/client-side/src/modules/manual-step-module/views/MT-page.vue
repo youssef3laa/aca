@@ -145,7 +145,7 @@ export default {
             key: 'page1',
             sections: [
               {
-                key: 'title',
+                type: 'title',
                 name: 'بيانات المكاتبة',
                 actions: ['cancel', 'save', 'complete'],
               },
@@ -209,25 +209,29 @@ export default {
                       receiverEntityName: {
                         list: [
                           {
-                            "text": "رئيس الجهاز",
-                            "value": "cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
-                            "code": "HUNIT",
-                            "name" : "رئيس الجهاز"
+                            text: 'رئيس الجهاز',
+                            value:
+                              'cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local',
+                            code: 'HUNIT',
+                            name: 'رئيس الجهاز',
                           },
                           {
-                            "text": "رئيس القطاع",
-                            "value": "cn=AbdElHakim@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
-                            "code": "HSEC",
-                            "name" : "رئيس القطاع"
+                            text: 'رئيس القطاع',
+                            value:
+                              'cn=AbdElHakim@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local',
+                            code: 'HSEC',
+                            name: 'رئيس القطاع',
                           },
                           {
-                            "text": "رئيس إدارة مكتب",
-                            "value": "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
-                            "code": "HOFC",
-                            "name" : "رئيس إدارة مكتب"
-                          }
+                            text: 'رئيس إدارة مكتب',
+                            value:
+                              'cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local',
+                            code: 'HOFC',
+                            name: 'رئيس إدارة مكتب',
+                          },
                         ],
-                        value : "cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+                        value:
+                          'cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local',
                       },
                       receiverMethod: {
                         list: [
@@ -248,7 +252,7 @@ export default {
                             text: 'buzz',
                           },
                         ],
-                         value : 2,
+                        value: 2,
                       },
                       typeOfWork: {
                         list: [
@@ -269,7 +273,7 @@ export default {
                             text: 'buzz',
                           },
                         ],
-                         value : 3,
+                        value: 3,
                       },
                     },
                   },
@@ -317,6 +321,69 @@ export default {
                     model: {
                       Fname: '',
                     },
+                  },
+                ],
+              },
+              {
+                type: 'collapse',
+                name: 'جهة الإختصاص',
+                forms: [
+                  {
+                    key: 'form1',
+                    publish: 'complete',
+                    inputs: [
+                      {
+                        type: 'InputComponent',
+                        name: 'receiverEntityName',
+                        label: 'subjectSummary',
+                        col: 4,
+                      },
+                      {
+                        type: 'InputComponent',
+                        name: 'receiverEntityName',
+                        label: 'subjectSummary',
+                        col: 4,
+                      },
+                      {
+                        type: 'InputComponent',
+                        name: 'receiverEntityName',
+                        label: 'subjectSummary',
+                        col: 4,
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: 'approval',
+                name: 'الموافقة على الطلب',
+                forms: [
+                  {
+                    key: 'ApprovalForm',
+                    inputs: [
+                      {
+                        type: 'ApprovalComponent',
+                        title: 'الرجاء الموافقة على الطلب',
+                        "commentLabel" : "ملاحظات",
+                        name : "approval",
+                        actions : [
+                          {
+                            value : "approve",
+                            label : "الموافقة على الطلب"
+                          },
+                          {
+                            value : "reject",
+                            "label" : "رفض الطلب"
+                          },
+                        ]
+                      },
+                    ],
+                    model : {
+                      "approval" : {
+                        ApprovalCardDecision : "",
+                        comment : ""
+                      },
+                    }
                   },
                 ],
               },
