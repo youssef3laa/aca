@@ -126,13 +126,36 @@ public class Entity {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    // Change IdentityTargetId to Long?
-    public String addToOneRelation(Long groupId, String withEntity, Platform.IdentityTargetId relationId) throws JsonProcessingException {
+    public <T> String addRelation(Long parentId, String relationName, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
-                .setData(new ObjectMapper().writeValueAsString(relationId))
-                .put(this.apiBaseUrl + String.format(API.TO_ONE_RELATION.getUrl(), this.entityName, groupId.toString(), withEntity));
+                .setData(data.toString())
+                .put(this.apiBaseUrl + String.format(API.ONE_RELATION.getUrl(), this.entityName, parentId.toString(), relationName));
+        return http.getResponse();
+    }
+
+    public <T> String readToManyRelation(Long parentId, String relationName) {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("X-Requested-With", "XMLHttpRequest")
+                .setHeader("SAMLart", this.account.getSAMLart())
+                .get(this.apiBaseUrl + String.format(API.ONE_RELATION.getUrl(), this.entityName, parentId.toString(), relationName));
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    public <T> String deleteToOneRelation(Long parentId, String relationName) {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("X-Requested-With", "XMLHttpRequest")
+                .setHeader("SAMLart", this.account.getSAMLart())
+                .delete(this.apiBaseUrl + String.format(API.ONE_RELATION.getUrl(), this.entityName, parentId.toString(), relationName));
+        return http.getResponse();
+    }
+
+    public <T> String deleteToManyRelation(Long parentId, String relationName) {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("X-Requested-With", "XMLHttpRequest")
+                .setHeader("SAMLart", this.account.getSAMLart())
+                .delete(this.apiBaseUrl + String.format(API.MANY_RELATION.getUrl(), this.entityName, parentId.toString(), relationName));
         return http.getResponse();
     }
 
@@ -144,8 +167,8 @@ public class Entity {
         CHILD_ITEM("/entities/%s/items/%s/childEntities/%s/items/%s"),
         READ_CHILD_ITEMS("/entities/%s/items/%s/childEntities/%s"),
         LIST_CHILD("/entities/%s/childEntities/%s/lists/%s"),
-        TO_ONE_RELATION("/entities/%s/items/%s/relationships/%s"),
-        TO_MANY_RELATION("/entities/%s/items/%s/relationships/%s/targets/%s");
+        ONE_RELATION("/entities/%s/items/%s/relationships/%s"),
+        MANY_RELATION("/entities/%s/items/%s/relationships/%s/targets/%s");
 
         private final String url;
 
