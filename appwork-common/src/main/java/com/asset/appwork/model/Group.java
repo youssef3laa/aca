@@ -1,74 +1,28 @@
 package com.asset.appwork.model;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-//import javax.persistence.Table;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import java.util.Collection;
+import java.util.HashSet;
 
-@Entity(name = "O9OpenTextEntityIdentityComponentsIdentity")
-//@Table(name = "O9OpenTextEntityIdentityComponentsIdentity")
-public class Group {
-    @Id
-    @Column(name="Id")
-    long id;
-    @Column(name="Name")
-    String name;
-    @Column(name="Description")
-    String description;
-    @Column(name="Name_en")
-    String name_en;
-    @Column(name="Name_ar")
-    String name_ar;
-    @Column(name="GroupCode")
+@Entity(name = "Group")
+@Table(name = "O9OpenTextEntityIdentityComponentsIdentity")
+public class Group extends BaseIdentity<Group> {
+    @Column(name = "GroupCode")
     String groupCode;
-
-    @SneakyThrows
-    public String toString(){
-        return new ObjectMapper().writeValueAsString(this);
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getName_en() {
-        return name_en;
-    }
-
-    public void setName_en(String name_en) {
-        this.name_en = name_en;
-    }
-
-    public String getName_ar() {
-        return name_ar;
-    }
-
-    public void setName_ar(String name_ar) {
-        this.name_ar = name_ar;
-    }
+    @Column(name = "Head")
+    Boolean isHeadRole;
+    @Column(name = "Vice")
+    Boolean isViceRole;
+    @ManyToMany(mappedBy = "group")
+    @JsonManagedReference
+    @JsonProperty("units")
+    private Collection<Unit> unit = new HashSet<>();
 
     public String getGroupCode() {
         return groupCode;
@@ -76,5 +30,29 @@ public class Group {
 
     public void setGroupCode(String groupCode) {
         this.groupCode = groupCode;
+    }
+
+    public Boolean getHeadRole() {
+        return isHeadRole;
+    }
+
+    public void setHeadRole(Boolean headRole) {
+        isHeadRole = headRole;
+    }
+
+    public Boolean getViceRole() {
+        return isViceRole;
+    }
+
+    public void setViceRole(Boolean viceRole) {
+        isViceRole = viceRole;
+    }
+
+    public Collection<Unit> getUnit() {
+        return unit;
+    }
+
+    public void setUnit(Collection<Unit> units) {
+        this.unit = units;
     }
 }
