@@ -17,6 +17,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/process")
 
@@ -43,31 +45,29 @@ public class ProcessController {
             Account account = tokenService.get(token);
 
             // Entity Creation
-            String entityName = "ACA_Entity_request";
             Entity entity = new Entity(account,
                     SystemUtil.generateRestAPIBaseUrl(environment,"AssetGeneralACA")
-                    ,entityName);
-            String entityCreateResponse = entity.create(requestJson.requestEntity);
-            String entityId = SystemUtil.getJsonByPtrExpr(entityCreateResponse, "/Identity/Id");
+                    ,"ACA_Entity_request");
+            Long entityId = entity.create(requestJson.requestEntity);
 
             //Get Next Step
             requestJson.processModel.setProcess("process-1");
             requestJson.processModel.setStepId("init");
-            requestJson.processModel.setEntityName(entityName);
-            requestJson.processModel.setEntityId(entityId);
+            requestJson.processModel.setEntityName("ACA_Entity_request");
+            requestJson.processModel.setEntityId(entityId.toString());
 
-            String config = SystemUtil.readFile(environment.getProperty("process.config") + "\\" + requestJson.processModel.getProcess() + ".json");
+            String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
+            String config = SystemUtil.readFile(filePath);
             String cordysUrl = cordysService.getCordysUrl();
 
             ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, config);
-            moduleRouting.goToNext(requestJson.processModel);
-            respBuilder.data("success");
+            String response = moduleRouting.goToNext(requestJson.processModel);
+            respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
-        } catch (Exception e){
+        }  catch (IOException e) {
             e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         return respBuilder.build().getResponseEntity();
@@ -78,14 +78,14 @@ public class ProcessController {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            String entityName = "ACA_Entity_request";
-            outputSchema.setEntityName(entityName);
-            String config = SystemUtil.readFile(environment.getProperty("process.config") + "\\" + outputSchema.getProcess() + ".json");
+
+            String filePath = outputSchema.getProcessFilePath(environment.getProperty("process.config"));
+            String config = SystemUtil.readFile(filePath);
             String cordysUrl = cordysService.getCordysUrl();
 
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config);
-            moduleRouting.goToNext(outputSchema);
-            respBuilder.data("success");
+            ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, config);
+            String response=  moduleRouting.goToNext(outputSchema);
+            respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
