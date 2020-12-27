@@ -61,19 +61,21 @@ export default {
     this.$observable.subscribe("complete-step", () => {
       console.log("complete-step-clicked");
       console.log(this.$refs.appBuilder);
-      var model = this.$refs.appBuilder.getModelData("form1");
-      if (model._valid) {
-        var data = {
-          taskId: this.taskId,
-          entityId: this.inputSchema.entityId,
-          stepId: this.inputSchema.stepId,
-          process: this.inputSchema.process,
-          code: "HOFC",
-          assignedCN: "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
-          decision: "approve",
-        };
-        this.completeStep(data);
-      }
+      // var model =
+      let model = this.$refs.appBuilder.getModelData("form1");
+      console.log(model);
+      // if (model._valid) {
+      //   var data = {
+      //     taskId: this.taskId,
+      //     entityId: this.inputSchema.entityId,
+      //     stepId: this.inputSchema.stepId,
+      //     process: this.inputSchema.process,
+      //     code: "HOFC",
+      //     assignedCN: "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+      //     decision: "approve",
+      //   };
+      //   this.completeStep(data);
+      // }
     });
   },
 

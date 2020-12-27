@@ -13,8 +13,8 @@
             }
         },
         "stepRG": {
-            "hasAutocomplete": true,
-            "roleFilter": "get/org/roles/up",
+            "hasAutocomplete": false,
+            "roleFilter": "org/group/findByCodes/HUNIT,HSEC",
             "page": "process-step-RG",
             "condition": "condition",
             "nextStep": {

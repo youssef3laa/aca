@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <AppBuilder ref="appBuilder" :app="app" />
+    <AppBuilder ref="appBuilder" :app="app"/>
   </v-container>
 </template>
 
@@ -23,25 +23,28 @@ export default {
   },
   methods: {
     completeStep: function () {
-      console.log("complete-step-clicked");
-      var model = this.$refs.appBuilder.getModelData("form1");
-      if (model._valid) {
-        var obj = {
-          requestEntity: {
-            requestDate: model.requestDate,
-            receiver: model.receiver.value.text,
-            notes: model.notes,
-          },
-          processModel: {
-            code: model.receiver.value.code,
-            assignedCN: model.receiver.value.value
-          }
-        };
-        this.initiateProcess(obj);
+      let model = this.$refs.appBuilder.getModelData("form1");
+      if (!model._valid) {
+        //@TODO show warining
+        return;
       }
+
+      let obj = {
+        requestEntity: {
+          requestDate: model.requestDate,
+          receiver: model.receiver.value.text,
+          notes: model.notes,
+        },
+        processModel: {
+          code: model.receiver.value.code,
+          assignedCN: model.receiver.value.value
+        }
+      };
+      this.initiateProcess(obj);
     },
   },
-  mounted() {},
+  mounted() {
+  },
   data() {
     return {
       app: {},

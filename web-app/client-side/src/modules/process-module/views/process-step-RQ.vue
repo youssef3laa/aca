@@ -59,10 +59,12 @@ export default {
     this.getTaskData(this.taskId);
 
     this.$observable.subscribe("complete-step", () => {
-      console.log("complete-step-clicked");
-      console.log(this.$refs.appBuilder);
       var model = this.$refs.appBuilder.getModelData("form1");
-      if (model._valid) {
+      if (!model._valid){
+        //@TODO show warning
+        return;
+      }
+
         var data = {
           taskId: this.taskId,
           entityId: this.inputSchema.entityId,
@@ -73,7 +75,6 @@ export default {
           decision: "approve",
         };
         this.completeStep(data);
-      }
     });
   },
 
