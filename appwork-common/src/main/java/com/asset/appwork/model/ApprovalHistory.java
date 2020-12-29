@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @Table(name = "O9AssetGeneralACAACA_Entity_approval_history")
 public class ApprovalHistory {
     @Id
-    Long Id;
+    Long id;
 
     String decision;
     String comment;

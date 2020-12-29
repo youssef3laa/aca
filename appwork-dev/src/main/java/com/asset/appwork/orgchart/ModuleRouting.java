@@ -1,19 +1,19 @@
 package com.asset.appwork.orgchart;
 
 import com.asset.appwork.dto.Account;
-import com.asset.appwork.dto.ApprovalHistory;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.platform.rest.Entity;
+import com.asset.appwork.model.ApprovalHistory;
 import com.asset.appwork.platform.soap.Process;
 import com.asset.appwork.platform.soap.Workflow;
 import com.asset.appwork.platform.util.CordysUtil;
+import com.asset.appwork.repository.ApprovalHistoryRepository;
 import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.util.ReflectionUtil;
-import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
@@ -22,6 +22,9 @@ public class ModuleRouting {
     Account account;
     String cordysUrl;
     String restAPIBaseUrl;
+
+    @Autowired
+    ApprovalHistoryRepository approvalHistoryRepository;
 
     public ModuleRouting(Account account,  String cordysUrl, String restAPIBaseUrl, String config) throws AppworkException {
         this.config = config;
@@ -168,37 +171,15 @@ public class ModuleRouting {
     }
 
     private <T> String calculateFromApprovalHistory(T outputSchema) throws JsonProcessingException {
-        String[] processId = {""}; //"000C292D-1114-A1EB-9217-3FF5C7814E9C"
-        ReflectionUtil.of(outputSchema).ifPresent("getProcessId", (s)->{
-            processId[0] = (String) s;
+        String[] process = {""}; //"000C292D-1114-A1EB-9217-3FF5C7814E9C"
+        String[] entityId = {""};
+        ReflectionUtil.of(outputSchema).ifPresent("getProcess", (s)->{
+            process[0] = (String) s;
+        }).ifPresent("getEntityId", (s) -> {
+            entityId[0] = (String) s;
         });
 
-        Entity entity = new Entity(account, restAPIBaseUrl, "ACA_Entity_approval_history");
-        String list = entity.readList("ProcessHistory",
-                "{\n" +
-                        "  \"top\": 1,\n" +
-                        "  \"parameters\": {\n" +
-                        "    \"Properties.processId\": {\n" +
-                        "      \"name\": \"\",\n" +
-                        "      \"comparison\": {\n" +
-                        "        \"value\": \""+ processId[0] +"\",\n" +
-                        "        \"operator\": \"EQ\"\n" +
-                        "      }\n" +
-                        "    }\n" +
-                        "  },\n" +
-                        "  \"orderBy\": [{\n" +
-                        "    \"name\": \"Identity.Id\",\n" +
-                        "    \"sortType\": \"Desc\"\n" +
-                        "  }],\n" +
-                        "  \"select\": []\n" +
-                        "}");
-
-        list = SystemUtil.readJSONObject(list, "_embedded");
-        List<ApprovalHistory> histories = SystemUtil.readJSONArray(list, "ProcessHistory", ApprovalHistory.class);
-        if (histories.size() > 0) {
-            ((OutputSchema)outputSchema).setAssignedCN(histories.get(0).getProperties().getUserCN());
-            return histories.get(0).getProperties().getStepId();
-        }
+        Optional<ApprovalHistory> approvalHistory = approvalHistoryRepository.findTop1ByProcessNameAndEntityIdOrderByIdDesc(process[0], entityId[0]);
 
         return "break";
     }

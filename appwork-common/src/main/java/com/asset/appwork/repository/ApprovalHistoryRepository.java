@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface ApprovalHistoryRepository extends GenericRepository<ApprovalHistory, Long> {
     Optional<List<ApprovalHistory>> findByProcessNameAndEntityId(String processName, String entityId);
+
+    Optional<ApprovalHistory> findTop1ByProcessNameAndEntityIdOrderByIdDesc(String processName, String entityId);
 }
