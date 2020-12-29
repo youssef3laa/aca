@@ -6,6 +6,7 @@ import AdminRoutes from '../modules/admin-module/router/router'
 import DemoRoutes from '../modules/demo-module/router/router'
 import ManualStep from '../modules/manual-step-module/router/router'
 import ProcessRoutes from '../modules/process-module/router/router'
+import HistoryRoutes from '../modules/history-module/router/router'
 
 Vue.use(VueRouter)
 
@@ -27,7 +28,7 @@ Vue.use(VueRouter)
 
 let allRoutes = [];
 allRoutes = allRoutes.concat(LoginRoutes, AdminRoutes, DemoRoutes,
-    ManualStep, ProcessRoutes, {
+    ManualStep, ProcessRoutes, HistoryRoutes,{
         path: '/',
         name: 'Home',
         component: Home,

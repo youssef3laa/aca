@@ -47,6 +47,14 @@ export default {
                 console.log(response);
             })
             .catch((error) => console.error(error));
+        },
+        async getHistoryByPid(processId){
+            await http.get("/history/"+processId)
+            .then((response) => {
+                console.log(response);
+                return response;
+            })
+            .catch((error) => console.error(error));
         }
     }
 }
