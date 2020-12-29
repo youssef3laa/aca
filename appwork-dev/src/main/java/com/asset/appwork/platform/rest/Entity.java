@@ -3,9 +3,11 @@ package com.asset.appwork.platform.rest;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.platform.Platform;
 import com.asset.appwork.util.Http;
+import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class Entity {
@@ -20,7 +22,7 @@ public class Entity {
         this.entityName = entityName;
     }
 
-    public <T> String create(T data){
+    public <T> Long create(T data) throws IOException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
@@ -29,7 +31,9 @@ public class Entity {
                                 data.toString() +
                         "}")
                 .post(this.apiBaseUrl + String.format(API.ADD.getUrl(), this.entityName));
-        return http.getResponse();
+        String response = http.getResponse();
+        Long entityId =  Long.parseLong( SystemUtil.getJsonByPtrExpr(response, "/Identity/Id"));
+        return entityId;
     }
 
     public String readById(Long id) {

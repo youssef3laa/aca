@@ -35,11 +35,11 @@ public class ModuleRouting {
             // Condition On decision and code to get next step
             String[] currentStepId = {""};
             String[] codeSelected = {""};
-             ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s)->{
+            ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s)->{
                 currentStepId[0] = (String) s;
-             }).ifPresent("getCode", (s) -> {
+            }).ifPresent("getCode", (s) -> {
                  codeSelected[0] = (String) s;
-             });
+            });
 //             outputSchema.getStepId();
 
             if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
@@ -59,15 +59,16 @@ public class ModuleRouting {
         }
     }
 
-    public <T> void goToNext( T outputSchema) throws AppworkException {
+    public <T> String goToNext( T outputSchema) throws AppworkException {
         String[] currentStepId = {""};
         ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s)->{
             currentStepId[0] = (String) s;
         });
         calculateNextStep(outputSchema);
-        if (currentStepId[0].equals("init")) initiateProcess(outputSchema);
-        else completeWorkflow(outputSchema);
-
+        if (currentStepId[0].equals("init"))
+            return initiateProcess(outputSchema);
+        else
+            return completeWorkflow(outputSchema);
     }
 
     private RoutingConfig generateRoutingConfig() throws JsonProcessingException {
@@ -77,7 +78,8 @@ public class ModuleRouting {
     }
 
 
-    private <T> void initiateProcess( T outputSchema) throws AppworkException {
+    private <T> String initiateProcess( T outputSchema) throws AppworkException {
+        String response = null;
         try {
             String[] params = {""};
             ReflectionUtil.of(outputSchema).ifPresent("getXML", (s)->{
@@ -85,14 +87,16 @@ public class ModuleRouting {
             });
             String processInitiateMessage = new Process().initiate(params[0]);
             CordysUtil cordysUtil = new CordysUtil(cordysUrl);
-            cordysUtil.sendRequest(account, processInitiateMessage);
+            response =  cordysUtil.sendRequest(account, processInitiateMessage);
         }catch (Exception e){
             e.printStackTrace();
             throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
         }
+        return response;
     }
 
-    private <T> void completeWorkflow(T outputSchema) throws AppworkException {
+    private <T> String completeWorkflow(T outputSchema) throws AppworkException {
+        String response = null;
         try {
             String[] data = {""};
             String[] taskId = {""};
@@ -103,11 +107,12 @@ public class ModuleRouting {
             });
             String completeWorkflowMessage = new Workflow().performTaskAction(taskId[0], "COMPLETE","", data[0]);
             CordysUtil cordysUtil = new CordysUtil(cordysUrl);
-            cordysUtil.sendRequest(account, completeWorkflowMessage);
+            response= cordysUtil.sendRequest(account, completeWorkflowMessage);
         }catch (Exception e){
             e.printStackTrace();
             throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
         }
+        return response;
     }
 
     @Data

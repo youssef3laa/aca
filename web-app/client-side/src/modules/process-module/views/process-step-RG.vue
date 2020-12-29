@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <AppBuilder ref="appBuilder" :app="app" />
+    <AppBuilder ref="appBuilder" :app="app"/>
   </v-container>
 </template>
 
@@ -9,7 +9,7 @@ import formPageMixin from "../../../mixins/formPageMixin";
 import AppBuilder from "../../application-builder-module/builders/app-builder";
 
 export default {
-  name: "process-step",
+  name: "process-step-RG",
   mixins: [formPageMixin],
   components: {
     AppBuilder,
@@ -19,38 +19,38 @@ export default {
     readData: function () {
       console.log("TaskData", this.taskData);
       this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
-    //   let page = this.inputSchema.page;
+      //   let page = this.inputSchema.page;
 
-      this.loadForm("process-init", this.fillForm);
+      this.loadForm("process-stepRG", this.fillForm);
     },
     fillForm: function () {
       let entityName = this.inputSchema.entityName;
       let entityId = this.inputSchema.entityId;
       this.readEntity(entityName, entityId)
-        .then((response) => {
-          let assignedCN = this.inputSchema.assignedCN;
+          .then((response) => {
+            let assignedCN = this.inputSchema.assignedCN;
 
-          response = JSON.parse(response.data.data);
+            response = JSON.parse(response.data.data);
 
-          this.$refs.appBuilder.setModelData("form1", {
-            notes: response.notes,
-            receiver: {
-              list: [
-                {
-                  text: response.receiver,
-                  value: assignedCN,
-                },
-              ],
-              value: assignedCN,
-            },
-            requestDate: response.requestDate.split("Z")[0],
+            this.$refs.appBuilder.setModelData("form1", {
+              notes: response.notes,
+              receiver: {
+                list: [
+                  {
+                    text: response.receiver,
+                    value: assignedCN,
+                  },
+                ],
+                value: assignedCN,
+              },
+              requestDate: response.requestDate.split("Z")[0],
+            });
+
+            console.log("response", response);
+          })
+          .catch((error) => {
+            console.error(error);
           });
-
-          console.log("response", response);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
     },
   },
   async created() {
@@ -64,12 +64,13 @@ export default {
       var model = this.$refs.appBuilder.getModelData("form1");
       if (model._valid) {
         var data = {
-            taskId: this.taskId,
-            stepId: this.inputSchema.stepId,
-            process: this.inputSchema.process,
-            code: "HSEC",
-            assignedCN: "cn=AbdElHakim@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
-            decision: "approve",
+          taskId: this.taskId,
+          entityId: this.inputSchema.entityId,
+          stepId: this.inputSchema.stepId,
+          process: this.inputSchema.process,
+          code: "HSEC",
+          assignedCN: "cn=AbdElHakim@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+          decision: "approve",
         };
         this.completeStep(data);
       }

@@ -9,7 +9,6 @@
                         "name": "بيانات المكاتبة",
                         "actions": [
                             "cancel",
-                            "save",
                             "complete"
                         ]
                     },
@@ -28,48 +27,48 @@
                             }
                         ],
                         "forms": [
-                            {
-                                "key": "form1",
-                                "publish": "form1Change",
-                                "inputs": [
-                                    {
-                                        "type": "InputComponent",
-                                        "label": "receiver",
-                                        "name": "receiver",
-                                        "readonly": true,
-                                        "col": "6"
-                                    },
-                                    {
-                                        "type": "InputComponent",
-                                        "label": "requestDate",
-                                        "name": "requestDate",
-                                        "readonly": true,
-                                        "col": "6"
-                                    },
-                                    {
-                                        "type": "TextareaComponent",
-                                        "label": "notes",
-                                        "name": "notes",
-                                        "readonly": true,
-                                        "col": "12"
-                                    }
-                                ],
-                                "model": {
-                                    "receiver": "",
-                                    "requestDate": "",
-                                    "notes": ""
-                                }
-                            },
-                            {
-                                "width": "50%",
-                                "resizable": "true",
-                                "key": "form2",
-                                "publish": "complete",
-                                "inputs": [
-                                    {
-                                        "type": "InputFileComponent",
-                                        "name": "inputFile",
-                                        "col": "12"
+                          {
+                            "key": "form1",
+                            "publish": "form1Change",
+                            "inputs": [
+                              {
+                                "type": "AutoCompleteComponent",
+                                "name": "receiver",
+                                "rule": "required",
+                                "readonly": true,
+                                "col": "6"
+                              },
+                              {
+                                "type": "InputComponent",
+                                "label": "requestDate",
+                                "name": "requestDate",
+                                "readonly": true,
+                                "col": "6"
+                              },
+                              {
+                                "type": "TextareaComponent",
+                                "label": "notes",
+                                "name": "notes",
+                                "readonly": true,
+                                "col": "12"
+                              }
+                            ],
+                            "model": {
+                              "receiver": "",
+                              "requestDate": "",
+                              "notes": ""
+                            }
+                          },
+                          {
+                            "width": "50%",
+                            "resizable": "true",
+                            "key": "form2",
+                            "publish": "complete",
+                            "inputs": [
+                              {
+                                "type": "InputFileComponent",
+                                "name": "inputFile",
+                                "col": "12"
                                     }
                                 ],
                                 "model": {

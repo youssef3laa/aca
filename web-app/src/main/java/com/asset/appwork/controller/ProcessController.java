@@ -1,14 +1,14 @@
 package com.asset.appwork.controller;
 
-import com.asset.appwork.orgchart.ModuleRouting;
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
-import com.asset.appwork.platform.rest.Entity;
-import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.RequestEntity;
+import com.asset.appwork.orgchart.ModuleRouting;
+import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.response.AppResponse;
+import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.util.SystemUtil;
 import lombok.Data;
@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/process")
@@ -43,31 +45,29 @@ public class ProcessController {
             Account account = tokenService.get(token);
 
             // Entity Creation
-            String entityName = "ACA_Entity_request";
             Entity entity = new Entity(account,
                     SystemUtil.generateRestAPIBaseUrl(environment,"AssetGeneralACA")
-                    ,entityName);
-            String entityCreateResponse = entity.create(requestJson.requestEntity);
-            String entityId = SystemUtil.getJsonByPtrExpr(entityCreateResponse, "/Identity/Id");
+                    ,"ACA_Entity_request");
+            Long entityId = entity.create(requestJson.requestEntity);
 
             //Get Next Step
             requestJson.processModel.setProcess("process-1");
             requestJson.processModel.setStepId("init");
-            requestJson.processModel.setEntityName(entityName);
-            requestJson.processModel.setEntityId(entityId);
+            requestJson.processModel.setEntityName("ACA_Entity_request");
+            requestJson.processModel.setEntityId(entityId.toString());
 
-            String config = SystemUtil.readFile(environment.getProperty("process.config") + "\\" + requestJson.processModel.getProcess() + ".json");
+            String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
+            String config = SystemUtil.readFile(filePath);
             String cordysUrl = cordysService.getCordysUrl();
 
             ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, config);
-            moduleRouting.goToNext(requestJson.processModel);
-            respBuilder.data("success");
+            String response = moduleRouting.goToNext(requestJson.processModel);
+            respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
-        } catch (Exception e){
+        }  catch (IOException e) {
             e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         return respBuilder.build().getResponseEntity();
@@ -79,12 +79,13 @@ public class ProcessController {
         try {
             Account account = tokenService.get(token);
 
-            String config = SystemUtil.readFile(environment.getProperty("process.config") + "\\" + outputSchema.getProcess() + ".json");
+            String filePath = outputSchema.getProcessFilePath(environment.getProperty("process.config"));
+            String config = SystemUtil.readFile(filePath);
             String cordysUrl = cordysService.getCordysUrl();
 
             ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, config);
-            moduleRouting.goToNext(outputSchema);
-            respBuilder.data("success");
+            String response=  moduleRouting.goToNext(outputSchema);
+            respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());

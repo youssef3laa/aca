@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -38,15 +39,15 @@ public class OrgChartController {
     GroupRepository groupRepository;
 
     @PostMapping("/unit/create")
-    public ResponseEntity<AppResponse<JsonNode>> createUnit(@RequestHeader("X-Auth-Token") String token,
+    public ResponseEntity<AppResponse<Long>> createUnit(@RequestHeader("X-Auth-Token") String token,
                                                             @RequestBody String props
     ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        AppResponse.ResponseBuilder<Long> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account != null) {
                 Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.create(props)));
+                respBuilder.data(entity.create(props));
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -54,6 +55,8 @@ public class OrgChartController {
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
+        } catch (IOException e) {
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
         return respBuilder.build().getResponseEntity();
     }

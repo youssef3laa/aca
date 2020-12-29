@@ -12,6 +12,7 @@ public class OutputSchema {
     Boolean breakProcess;
     String subBP;
     String decision;
+    String comment;
     String code;
     String entityName;
     String entityId;
@@ -43,6 +44,8 @@ public class OutputSchema {
                 "<entityName>"+removeNull(this.entityName)+"</entityName>"+
                 "<entityId>"+removeNull(this.entityId)+"</entityId>"+
                 "<page>"+removeNull(this.page)+"</page>"+
+                "<decision>"+removeNull(this.decision)+"</decision>"+
+                "<comment>"+removeNull(this.comment)+"</comment>"+
                 "<breakProcess>"+removeNull(this.breakProcess)+"</breakProcess>\n";
     }
 
@@ -50,6 +53,10 @@ public class OutputSchema {
         return "<ACA_ProcessRouting_OutputSchemaFragment xmlns=\"http://schemas.cordys.com/\">"+
                     getXML()+
                 "</ACA_ProcessRouting_OutputSchemaFragment>\n";
+    }
+
+    public String getProcessFilePath(String basePath){
+        return basePath + "\\" + this.process + ".json";
     }
 
     private String removeNull(Object object){

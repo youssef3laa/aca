@@ -45,6 +45,7 @@ export default {
             http.post("/process/complete", data)
             .then((response) => {
                 console.log(response);
+                window.alert("completed");
             })
             .catch((error) => console.error(error));
         },

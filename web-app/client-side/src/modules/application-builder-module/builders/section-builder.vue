@@ -10,7 +10,7 @@
         <v-card flat v-for="formData in section.forms" :key="formData.id">
           <!-- <v-card-text v-text="formData.form.name"></v-card-text> -->
           <span
-            v-if="!section.type == 'collapse' && !section.type == 'approval'"
+            v-if="section.type != 'collapse'"
           >
             <FormBuilder :forms="formData" :model="formData.model" />
           </span>
@@ -38,7 +38,6 @@
           </span>
         </v-card>
       </span>
-      <br>
       <v-row v-if="section.type == 'title'" style="height: 80px;">
         <v-col>
           <h1>
@@ -94,12 +93,7 @@
           </span>
         </v-col>
       </v-row>
-      <br>
-      <span v-if="section.type == 'approval'">
-        <v-card flat v-for="formData in section.forms" :key="formData.id">
-          <FormBuilder :forms="formData" :model="formData.model" />
-        </v-card>
-      </span>
+
     </span>
   </v-container>
 </template>
