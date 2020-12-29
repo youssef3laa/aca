@@ -207,6 +207,7 @@ export default {
                     ],
                     model: {
                       receiverEntityName: {
+                        url:"test",
                         list: [
                           {
                             text: 'رئيس الجهاز',
