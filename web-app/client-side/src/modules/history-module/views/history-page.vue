@@ -16,11 +16,13 @@ export default {
     components: { appBuilder },
     mixins: [formPageMixin],
     created(){
-        this.getHistoryByPid(this.processID);
+        var x = this.getHistoryByProcessNameandEntityId(this.processName, this.entityId );
+        console.log(x);
     },
     data () {
         return{
-            processID:111,
+            processName:"",
+            entityId:"",
              app: {
         pages: [
           {
@@ -50,17 +52,17 @@ export default {
                             text: 'الاسم',
                             align: 'start',
                             filterable: false,
-                            value: 'name',
+                            value: 'userName',
                           },
                           {
                             text: 'التاريخ',
-                            value: 'date',
+                            value: 'approvalDate',
                           },
                           
                         ],
                         data: [{
-                            name:"test",
-                            date:"test"
+                            userName:"test",
+                            approvalDate:"test"
                         }],
                         search: '',
                       },
