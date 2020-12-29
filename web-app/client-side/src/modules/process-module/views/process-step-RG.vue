@@ -61,19 +61,20 @@ export default {
     this.$observable.subscribe("complete-step", () => {
       console.log("complete-step-clicked");
       console.log(this.$refs.appBuilder);
-      var model = this.$refs.appBuilder.getModelData("form1");
-      if (model._valid) {
+      // var model = this.$refs.appBuilder.getModelData("form1");
+      // if (model._valid) {
         var data = {
           taskId: this.taskId,
           entityId: this.inputSchema.entityId,
           stepId: this.inputSchema.stepId,
           process: this.inputSchema.process,
-          code: "HSEC",
+          code: "send",
           assignedCN: "cn=AbdElHakim@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
           decision: "approve",
+          comment: "comment ahoh",
         };
         this.completeStep(data);
-      }
+      // }
     });
   },
 

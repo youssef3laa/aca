@@ -63,18 +63,21 @@ export default {
       console.log(this.$refs.appBuilder);
       // var model =
       let model = this.$refs.appBuilder.getModelData("form1");
-      console.log(model);
+      let approvalModel = this.$refs.appBuilder.getModelData("ApprovalForm");
+      console.log("MODEL:",model);
+      console.log("APPROVAL MODEL",approvalModel);
       // if (model._valid) {
-      //   var data = {
-      //     taskId: this.taskId,
-      //     entityId: this.inputSchema.entityId,
-      //     stepId: this.inputSchema.stepId,
-      //     process: this.inputSchema.process,
-      //     code: "HOFC",
-      //     assignedCN: "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
-      //     decision: "approve",
-      //   };
-      //   this.completeStep(data);
+        var data = {
+          taskId: this.taskId,
+          entityId: this.inputSchema.entityId,
+          stepId: this.inputSchema.stepId,
+          process: this.inputSchema.process,
+          code: approvalModel.approval.decision,
+          assignedCN: "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+          decision: approvalModel.approval.decision,
+          comment: approvalModel.approval.comment,
+        };
+        this.completeStep(data);
       // }
     });
   },

@@ -69,6 +69,23 @@ public class SystemUtil {
         return null;
     }
 
+    public static <T> List<T> readJSONArray(String json, String name, Class<T> type) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(json);
+        jsonNode = jsonNode.get(name);
+        if(jsonNode != null){
+            if(jsonNode.isArray()){
+                return mapper.convertValue(jsonNode, mapper.getTypeFactory().constructCollectionType(List.class, type));
+//                return mapper.convertValue(jsonNode, List.class);
+            }else{
+                ArrayList<T> arrayList = new ArrayList<>();
+                arrayList.add(mapper.convertValue(jsonNode,type));
+                return arrayList;
+            }
+        }
+        return null;
+    }
+
     public static String readJSONObject(String json, String name) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(json);
