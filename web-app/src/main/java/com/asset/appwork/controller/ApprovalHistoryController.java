@@ -5,6 +5,7 @@ import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.ApprovalHistory;
+import com.asset.appwork.platform.soap.ApprovalHistorySOAP;
 import com.asset.appwork.repository.ApprovalHistoryRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
@@ -38,7 +39,7 @@ public class ApprovalHistoryController {
         try {
             Account account = tokenService.get(token);
             if(account != null){
-                String response = cordysService.sendRequest(account, new ApprovalHistorySoap.createHistory(approvalHistory));
+                String response = cordysService.sendRequest(account, new ApprovalHistorySOAP().createHistoryApproval(approvalHistory));
                 respBuilder.data(response);
             }
         } catch (JsonProcessingException e) {
