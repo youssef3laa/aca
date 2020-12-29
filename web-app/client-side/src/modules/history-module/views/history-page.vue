@@ -16,7 +16,7 @@ export default {
     components: { appBuilder },
     mixins: [formPageMixin],
     created(){
-        var x = this.getHistoryByProcessNameandEntityId(this.processName, this.entityId );
+        var x = this.getHistoryByProcessNameAndEntityId(this.processName, this.entityId );
         console.log(x);
     },
     data () {

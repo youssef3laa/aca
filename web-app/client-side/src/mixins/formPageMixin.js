@@ -48,9 +48,9 @@ export default {
             })
             .catch((error) => console.error(error));
         },
-        async getHistoryByPid(processName, entityId){
+        async getHistoryByProcessNameAndEntityId(processName, entityId){
             try{
-                var response  =  await http.get("/history/"+processName/entityId);
+                var response  =  await http.get("/history/"+processName+"/"+entityId);
                 return response.data.json();
             }
             catch(error){
