@@ -43,24 +43,22 @@ public class ProcessController {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
+            String restAPIBaseUrl = SystemUtil.generateRestAPIBaseUrl(environment,"AssetGeneralACA");
+            String cordysUrl = cordysService.getCordysUrl();
 
             // Entity Creation
             Entity entity = new Entity(account,
-                    SystemUtil.generateRestAPIBaseUrl(environment,"AssetGeneralACA")
-                    ,"ACA_Entity_request");
+                    restAPIBaseUrl
+                    , requestJson.processModel.getEntityName());
             Long entityId = entity.create(requestJson.requestEntity);
 
             //Get Next Step
-            requestJson.processModel.setProcess("process-1");
-            requestJson.processModel.setStepId("init");
-            requestJson.processModel.setEntityName("ACA_Entity_request");
             requestJson.processModel.setEntityId(entityId.toString());
 
             String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
             String config = SystemUtil.readFile(filePath);
-            String cordysUrl = cordysService.getCordysUrl();
 
-            ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, config);
+            ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, restAPIBaseUrl, config);
             String response = moduleRouting.goToNext(requestJson.processModel);
             respBuilder.data(response);
         } catch (AppworkException e) {
@@ -78,12 +76,13 @@ public class ProcessController {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
+            String cordysUrl = cordysService.getCordysUrl();
+            String restAPIBaseUrl = SystemUtil.generateRestAPIBaseUrl(environment,"AssetGeneralACA");
 
             String filePath = outputSchema.getProcessFilePath(environment.getProperty("process.config"));
             String config = SystemUtil.readFile(filePath);
-            String cordysUrl = cordysService.getCordysUrl();
 
-            ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, config);
+            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, restAPIBaseUrl, config);
             String response=  moduleRouting.goToNext(outputSchema);
             respBuilder.data(response);
         } catch (AppworkException e) {

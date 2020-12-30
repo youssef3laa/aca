@@ -36,6 +36,9 @@ export default {
           notes: model.notes,
         },
         processModel: {
+          process: "process-1",
+          stepId: "init",
+          entityName: "ACA_Entity_request",
           code: model.receiver.value.code,
           assignedCN: model.receiver.value.value
         }

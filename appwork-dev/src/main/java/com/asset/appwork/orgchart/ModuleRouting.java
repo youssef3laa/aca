@@ -3,60 +3,55 @@ package com.asset.appwork.orgchart;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.model.ApprovalHistory;
 import com.asset.appwork.platform.soap.Process;
 import com.asset.appwork.platform.soap.Workflow;
 import com.asset.appwork.platform.util.CordysUtil;
+import com.asset.appwork.repository.ApprovalHistoryRepository;
 import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.util.ReflectionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ModuleRouting {
     String config;
     Account account;
     String cordysUrl;
+    String restAPIBaseUrl;
 
-    public ModuleRouting(Account account, String cordysUrl, String config) throws AppworkException {
+    @Autowired
+    ApprovalHistoryRepository approvalHistoryRepository;
+
+    public ModuleRouting(Account account,  String cordysUrl, String restAPIBaseUrl, String config) throws AppworkException {
         this.config = config;
         this.account = account;
         this.cordysUrl= cordysUrl;
+        this.restAPIBaseUrl = restAPIBaseUrl;
     }
 
-    private <T> void calculateNextStep( T outputSchema) throws AppworkException {
-        try {
-            String nextStep = "";
+    @Data
+    static class RoutingConfig {
+        Map<String,StepConfig> steps;
+        String processName;
+    }
 
-            RoutingConfig routingConfig = generateRoutingConfig();
+    @Data
+    static class StepConfig {
+        boolean hasAutocomplete;
+        String roleFilter, unitFilter, userFilter;
+        String page;
+        String condition;
+        HashMap<String,String> nextStep;
+    }
 
-            // Condition On decision and code to get next step
-            String[] currentStepId = {""};
-            String[] codeSelected = {""};
-            ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s)->{
-                currentStepId[0] = (String) s;
-            }).ifPresent("getCode", (s) -> {
-                 codeSelected[0] = (String) s;
-            });
-//             outputSchema.getStepId();
-
-            if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
-                nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
-
-                String nextPage = routingConfig.getSteps().get(nextStep).getPage();
-                //TODO: Create Setter function in reflection class
-                ((OutputSchema)outputSchema).setPage(nextPage);
-            }else {
-                nextStep = "break";
-            }
-
-            ((OutputSchema)outputSchema).setStepId(nextStep);
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
-        }
+    private RoutingConfig generateRoutingConfig() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(config);
+        return objectMapper.convertValue(jsonNode, RoutingConfig.class);
     }
 
     public <T> String goToNext( T outputSchema) throws AppworkException {
@@ -70,13 +65,6 @@ public class ModuleRouting {
         else
             return completeWorkflow(outputSchema);
     }
-
-    private RoutingConfig generateRoutingConfig() throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(config);
-        return objectMapper.convertValue(jsonNode, RoutingConfig.class);
-    }
-
 
     private <T> String initiateProcess( T outputSchema) throws AppworkException {
         String response = null;
@@ -115,18 +103,84 @@ public class ModuleRouting {
         return response;
     }
 
-    @Data
-    static class RoutingConfig {
-        Map<String,StepConfig> steps;
-        String processName;
+    private <T> void calculateNextStep( T outputSchema) throws AppworkException {
+        //TODO: Create Setter function in reflection class
+        try {
+            String nextStep = "";
+            String nextPage = "";
+
+            RoutingConfig routingConfig = generateRoutingConfig();
+
+            String[] currentStepId = {""};
+            String[] codeSelected = {""};
+
+            ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s)->{
+                currentStepId[0] = (String) s;
+            }).ifPresent("getCode", (s) -> {
+                 codeSelected[0] = (String) s;
+            });
+
+            if(codeSelected[0].equals("approve")){
+                // If assignee code in next steps
+                // Else go to parent step
+                String assigneeCode = calculateNextAssignee(outputSchema);
+
+                if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(assigneeCode)){
+                    nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(assigneeCode);
+                } else if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
+                    nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
+                }
+
+            } else if(codeSelected[0].equals("requestModification")){
+                // If code selected and is in nextSteps
+                // go to specific step
+                // Else get previous step from approval history
+                if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
+                    nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
+                }else {
+                    nextStep = calculateFromApprovalHistory(outputSchema);
+                }
+
+            } else if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
+                nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
+
+            } else if(codeSelected[0].equals("reject")){
+                nextStep = "break";
+            }
+
+            if(nextStep.isEmpty()){
+                nextStep = "break";
+            }
+
+            if(!nextStep.equals("break")){
+                nextPage = routingConfig.getSteps().get(nextStep).getPage();
+                ((OutputSchema)outputSchema).setPage(nextPage);
+            }
+
+            ((OutputSchema)outputSchema).setStepId(nextStep);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
+        }
     }
 
-    @Data
-    static class StepConfig {
-        boolean hasAutocomplete;
-        String roleFilter, unitFilter, userFilter;
-        String page;
-        String condition;
-        HashMap<String,String> nextStep;
+    private <T> String calculateNextAssignee(T outputSchema){
+        ((OutputSchema)outputSchema).setAssignedCN("cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local");
+        String assigneeCode = "HIROLE";
+        return assigneeCode;
+    }
+
+    private <T> String calculateFromApprovalHistory(T outputSchema) throws JsonProcessingException {
+        String[] process = {""}; //"000C292D-1114-A1EB-9217-3FF5C7814E9C"
+        String[] entityId = {""};
+        ReflectionUtil.of(outputSchema).ifPresent("getProcess", (s)->{
+            process[0] = (String) s;
+        }).ifPresent("getEntityId", (s) -> {
+            entityId[0] = (String) s;
+        });
+
+        Optional<ApprovalHistory> approvalHistory = approvalHistoryRepository.findTop1ByProcessNameAndEntityIdOrderByIdDesc(process[0], entityId[0]);
+
+        return "break";
     }
 }

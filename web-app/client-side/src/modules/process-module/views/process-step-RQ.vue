@@ -59,22 +59,23 @@ export default {
     this.getTaskData(this.taskId);
 
     this.$observable.subscribe("complete-step", () => {
-      var model = this.$refs.appBuilder.getModelData("form1");
-      if (!model._valid){
-        //@TODO show warning
-        return;
-      }
+      // var model = this.$refs.appBuilder.getModelData("form1");
+      // if (!model._valid){
+      //   //@TODO show warning
+      //   return;
+      // }
 
-        var data = {
-          taskId: this.taskId,
-          entityId: this.inputSchema.entityId,
-          stepId: this.inputSchema.stepId,
-          process: this.inputSchema.process,
-          code: "HOFC",
-          assignedCN: "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
-          decision: "approve",
-        };
-        this.completeStep(data);
+      var data = {
+        taskId: this.taskId,
+        entityId: this.inputSchema.entityId,
+        stepId: this.inputSchema.stepId,
+        process: this.inputSchema.process,
+        code: "send",
+        assignedCN: "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+        decision: "approve",
+        comment: "comment ra2es qeta3",
+      };
+      this.completeStep(data);
     });
   },
 

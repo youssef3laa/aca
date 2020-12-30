@@ -17,6 +17,7 @@ public class OutputSchema {
     String entityName;
     String entityId;
     String page;
+    String processId;
 
     public String getAssignedType() {
         if(assignedCN.contains("cn=organizational users")){

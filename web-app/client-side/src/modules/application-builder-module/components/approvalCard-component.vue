@@ -2,7 +2,7 @@
   <div>
     <v-card flat>
       <v-card-title> {{ field.title }} </v-card-title>
-      <v-radio-group v-model="ApprovalCardDecision" row>
+      <v-radio-group v-model="decision" row>
         <v-radio
           v-for="(action, index) in field.actions"
           :key="index"
@@ -30,7 +30,7 @@
 export default {
   data() {
     return {
-      ApprovalCardDecision: this.val.ApprovalCardDecision,
+      decision: this.val.decision,
       comment: this.val.comment,
     }
   },
@@ -39,13 +39,13 @@ export default {
       this.$emit('update', {
         name: this.field.name,
         value: {
-          ApprovalCardDecision: this.ApprovalCardDecision,
+          decision: this.decision,
           comment: this.comment,
         },
       })
     //   if (this.field.publish) {
-    //     this.$observable.fire(this.field.publish, this.ApprovalCardDecision)
-    //     console.log(this.ApprovalCardDecision)
+    //     this.$observable.fire(this.field.publish, this.decision)
+    //     console.log(this.decision)
     //   }
     },
   },

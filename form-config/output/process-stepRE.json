@@ -128,6 +128,10 @@
                                                 "label": "الموافقة على الطلب"
                                             },
                                             {
+                                                "value": "requestModification",
+                                                "label": "طلب تعديل"
+                                            },
+                                            {
                                                 "value": "reject",
                                                 "label": "رفض الطلب"
                                             }
@@ -136,7 +140,7 @@
                                 ],
                                 "model": {
                                     "approval": {
-                                        "ApprovalCardDecision": "",
+                                        "decision": "",
                                         "comment": ""
                                     }
                                 }
