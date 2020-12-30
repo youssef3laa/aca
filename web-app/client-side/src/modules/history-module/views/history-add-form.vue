@@ -26,10 +26,10 @@
 </template>
 
 <script>
-import formPageMixin from '../../../mixins/formPageMixin'
+import historyMixin from '../mixin/historyMixin'
 
 export default {
-    mixins:[formPageMixin],
+    mixins:[historyMixin],
     data(){
         return {
             history:{},

@@ -10,11 +10,11 @@
 
 <script>
 import appBuilder from '../../application-builder-module/builders/app-builder.vue'
-import formPageMixin from '../../../mixins/formPageMixin'
+import historyMixin from '../mixin/historyMixin'
 export default {
     name: 'historyView',
     components: { appBuilder },
-    mixins: [formPageMixin],
+    mixins: [historyMixin],
     created(){
         var x = this.getHistoryByProcessNameAndEntityId(this.processName, this.entityId );
         console.log(x);

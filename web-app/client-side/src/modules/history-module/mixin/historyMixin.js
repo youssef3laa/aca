@@ -1,6 +1,6 @@
-import http from "../modules/core-module/services/http";
+import http from "../../core-module/services/http";
 
-export default{
+export default {
 
     methods:{
         async getHistoryByProcessNameAndEntityId(processName, entityId){
