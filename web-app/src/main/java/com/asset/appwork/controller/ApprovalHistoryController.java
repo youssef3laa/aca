@@ -40,7 +40,7 @@ public class ApprovalHistoryController {
             Account account = tokenService.get(token);
             if(account == null) throw new AppworkException("", ResponseCode.UNAUTHORIZED);
 
-            String response = cordysService.sendRequest(account, new ApprovalHistorySoap.createHistory(approvalHistory));
+            String response = cordysService.sendRequest(account, new ApprovalHistorySOAP().createHistoryApproval(approvalHistory));
             respBuilder.data(response);
 
         } catch (JsonProcessingException e) {
