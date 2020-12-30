@@ -33,14 +33,15 @@ public class ApprovalHistoryController {
     ApprovalHistoryRepository historyRepository;
 
     @PostMapping("/create")
-    public ResponseEntity<AppResponse<String>> createHistory(@RequestHeader("X-Auth-Token") String token,@RequestBody() ApprovalHistory approvalHistory){//Dorry
+    public ResponseEntity<AppResponse<String>> createHistory(@RequestHeader("X-Auth-Token") String token,@RequestBody() ApprovalHistory approvalHistory){
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if(account != null){
-                String response = cordysService.sendRequest(account, new ApprovalHistorySoap.createHistory(approvalHistory));
-                respBuilder.data(response);
-            }
+            if(account == null) throw new AppworkException("", ResponseCode.UNAUTHORIZED);
+
+            String response = cordysService.sendRequest(account, new ApprovalHistorySoap.createHistory(approvalHistory));
+            respBuilder.data(response);
+
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -51,7 +52,7 @@ public class ApprovalHistoryController {
         }
         return respBuilder.build().getResponseEntity();
     }
-// entity = object = table
+
     @PostMapping("/{entityId}/{processType}")
     public ResponseEntity<AppResponse<List<ApprovalHistory>>> readHistory(@RequestHeader("X-Auth-Token") String token,
                                                                           @PathVariable("entityId") String entityId,
@@ -63,11 +64,8 @@ public class ApprovalHistoryController {
             if (account == null) throw new AppworkException("", ResponseCode.UNAUTHORIZED);
 
             Optional<List<ApprovalHistory>> histories = historyRepository.findByProcessNameAndEntityId(processName, entityId);
-            if(histories.isPresent()){
-                respBuilder.data(histories.get());
-            }else {
-                throw new AppworkException("", ResponseCode.NO_CONTENT);
-            }
+            if(!histories.isPresent()) throw new AppworkException("", ResponseCode.NO_CONTENT);
+            respBuilder.data(histories.get());
 
         } catch (AppworkException e) {
             e.printStackTrace();
