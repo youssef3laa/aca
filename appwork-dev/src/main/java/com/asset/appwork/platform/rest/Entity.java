@@ -53,6 +53,15 @@ public class Entity {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
+    public <T> String readList(String listName, T data) {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("X-Requested-With", "XMLHttpRequest")
+                .setHeader("SAMLart", this.account.getSAMLart())
+                .setData(data.toString())
+                .post(this.apiBaseUrl + String.format(API.LIST.getUrl(), this.entityName, listName));
+        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
     public <T> String update(Long id, T data){
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")

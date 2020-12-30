@@ -4,7 +4,7 @@
         "init": {
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HUNIT,HSEC,HOFC",
-            "page": "process-init",
+            "page": "init-process",
             "condition": "condition",
             "nextStep": {
                 "HUNIT": "stepRG",
@@ -18,7 +18,7 @@
             "page": "process-step-RG",
             "condition": "condition",
             "nextStep": {
-                "HSEC": "stepRQ"
+                "approve": "stepRQ"
             }
         },
         "stepRQ": {
@@ -27,7 +27,7 @@
             "page": "process-step-RQ",
             "condition": "condition",
             "nextStep": {
-                "HOFC": "stepRE"
+                "approve": "stepRE"
             }
         },
         "stepRE": {
@@ -36,8 +36,45 @@
             "page": "process-step-RE",
             "condition": "condition",
             "nextStep": {
-                "HGRP": "stepRM",
-                "MEM": "stepMM"
+                "approve": "stepRM"
+            }
+        },
+        "stepRM": {
+            "hasAutocomplete": true,
+            "roleFilter": "get/org/roles/HGRP,MEM",
+            "page": "process-step-RE",
+            "condition": "condition",
+            "nextStep": {
+                "approve": "stepMM"
+            }
+        },
+        "stepMM": {
+            "hasAutocomplete": true,
+            "roleFilter": "get/org/roles/HGRP,MEM",
+            "page": "process-step-RE",
+            "condition": "condition",
+            "nextStep": {
+                "approve": "stepApprovals"
+            }
+        },
+        "stepApprovals": {
+            "hasAutocomplete": true,
+            "roleFilter": "get/org/roles/HGRP,MEM",
+            "page": "process-step-RE",
+            "condition": "condition",
+            "nextStep": {
+                "HIROLE": "stepAD",
+                "approve": "stepApprovals",
+                "LOROLE": "stepMM"
+            }
+        },
+        "stepAD": {
+            "hasAutocomplete": true,
+            "roleFilter": "get/org/roles/HGRP,MEM",
+            "page": "process-step-RE",
+            "condition": "condition",
+            "nextStep": {
+                "approve": "stepMM"
             }
         }
     }
