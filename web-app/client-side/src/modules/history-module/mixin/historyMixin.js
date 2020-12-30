@@ -6,7 +6,7 @@ export default {
         async getHistoryByProcessNameAndEntityId(processName, entityId){
             try{
                 var response  =  await http.get("/history/"+processName+"/"+entityId);
-                return response.data.json();
+                return response.data.data;
             }
             catch(error){
                 console.error(error);

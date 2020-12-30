@@ -18,6 +18,7 @@ public class ApprovalHistory {
 
     String decision;
     String comment;
+    String approvalDate;
     String userCN;
     String entityId;
     String processName;
