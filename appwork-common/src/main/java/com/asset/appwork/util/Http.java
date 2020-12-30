@@ -28,7 +28,7 @@ public class Http {
     Integer statusCode;
     String response;
     boolean doAuthentication;
-    boolean isSuccess;
+    boolean isSuccess = true;
 
     public Http() {
         this.client = new HttpClient();
@@ -78,7 +78,7 @@ public class Http {
         try {
             statusCode = this.client.executeMethod(method);
             response = method.getResponseBodyAsString();
-            if (method.getStatusCode() > 299 ) isSuccess= false;
+            if (method.getStatusCode() > 299) isSuccess = false;
 
         } catch (IOException e) {
             // @TODO log file
@@ -97,9 +97,12 @@ public class Http {
         try {
             statusCode = this.client.executeMethod(method);
             response = method.getResponseBodyAsString();
+            if (method.getStatusCode() > 299) isSuccess = false;
+
 
         } catch (IOException e) {
             log.error(e.getMessage());
+            isSuccess = false;
         }
         return this;
     }
@@ -122,9 +125,11 @@ public class Http {
             method.setRequestEntity(setRequestEntity());
             statusCode = this.client.executeMethod(method);
             response = method.getResponseBodyAsString();
+            if (method.getStatusCode() > 299) isSuccess = false;
 
         } catch (IOException e) {
             log.error(e.getMessage());
+            isSuccess = false;
         }
         return this;
     }
@@ -142,8 +147,10 @@ public class Http {
             method.setRequestEntity(setRequestEntity());
             statusCode = this.client.executeMethod(method);
             response = method.getResponseBodyAsString();
+            if (method.getStatusCode() > 299) isSuccess = false;
 
         } catch (IOException e) {
+            isSuccess = false;
             log.error(e.getMessage());
         }
         return this;

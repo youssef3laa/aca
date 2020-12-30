@@ -27,11 +27,7 @@ public class OutputSchema {
     }
 
     public void setStepId(String stepId){
-        if(stepId.equals("break")){
-            this.breakProcess = true;
-        }else{
-            this.breakProcess = false;
-        }
+        this.breakProcess = stepId.equals("break");
         this.stepId = stepId;
     }
 

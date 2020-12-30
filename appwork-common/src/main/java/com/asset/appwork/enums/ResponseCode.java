@@ -18,7 +18,9 @@ public enum ResponseCode {
     ALREADY_EXIST(250, "Is Already Exist", HttpStatus.CONFLICT),
 
 
-    /** Client errors **/
+    /**
+     * Client errors
+     **/
     BAD_REQUEST(400, "Bad Request", HttpStatus.BAD_REQUEST),
     UNAUTHORIZED(401, "UNAUTHORIZED", HttpStatus.UNAUTHORIZED),
     PAYMENT_REQUIRED(402, "Payment Required", HttpStatus.PAYMENT_REQUIRED),
@@ -28,6 +30,7 @@ public enum ResponseCode {
     REQUEST_TIMEOUT(408, "Request Timeout", HttpStatus.REQUEST_TIMEOUT),
     UNSUPPORTED_MEDIA_TYPE(415, "Unsupported Media Type", HttpStatus.UNSUPPORTED_MEDIA_TYPE),
     LOGIN_ERROR(499, "Method Not Allowed", HttpStatus.METHOD_NOT_ALLOWED),
+    DUPLICATION_CONFLICT(409, "The request could not be completed as item is already exists", HttpStatus.METHOD_NOT_ALLOWED),
 
 
     // Define all custom Profile errors request, Start from 450 To 499
@@ -46,13 +49,13 @@ public enum ResponseCode {
     // Define More Detailed Failure Response, Start from 550 To 599
     NO_DATA_SAVED(501, "INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR),
     GENERAL_FAILURE(555, "INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR),
-    QUERY_BUILDER_FAILURE(556, "QUERY_BUILDER_ERROR",HttpStatus.INTERNAL_SERVER_ERROR),
-    MODULE_ROUTING_FAILURE(557, "MODULE_ROUTING_FAILURE",HttpStatus.INTERNAL_SERVER_ERROR);
+    QUERY_BUILDER_FAILURE(556, "QUERY_BUILDER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR),
+    MODULE_ROUTING_FAILURE(557, "MODULE_ROUTING_FAILURE", HttpStatus.INTERNAL_SERVER_ERROR);
 
 
-    private int code;
-    private String message;
-    private HttpStatus httpStatus;
+    private final int code;
+    private final String message;
+    private final HttpStatus httpStatus;
 
     ResponseCode(int code, String message, HttpStatus httpStatus) {
         this.code = code;

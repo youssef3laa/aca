@@ -30,7 +30,7 @@ import java.util.*;
  */
 public class SystemUtil {
 
-    public static ResponseCode getResponseCodeFromInt(Integer code) throws NullPointerException {
+    public static ResponseCode getResponseCodeFromInt(Integer code) {
         for (ResponseCode c : ResponseCode.values()) {
             if (c.getCode() == code) {
                 return c;
