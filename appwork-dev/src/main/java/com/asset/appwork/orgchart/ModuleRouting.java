@@ -18,19 +18,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 
 public class ModuleRouting {
+    private final String breakString = "break";
+    private final String approveString = "approve";
+    private final String requestModificationString = "requestModification";
+    private final String rejectString = "reject";
+
     String config;
     Account account;
     String cordysUrl;
-    String restAPIBaseUrl;
-
-    @Autowired
     ApprovalHistoryRepository approvalHistoryRepository;
 
-    public ModuleRouting(Account account,  String cordysUrl, String restAPIBaseUrl, String config) throws AppworkException {
+    public ModuleRouting(Account account,  String cordysUrl, String config, ApprovalHistoryRepository approvalHistoryRepository) throws AppworkException {
         this.config = config;
         this.account = account;
         this.cordysUrl= cordysUrl;
-        this.restAPIBaseUrl = restAPIBaseUrl;
+        this.approvalHistoryRepository = approvalHistoryRepository;
     }
 
     @Data
@@ -113,46 +115,53 @@ public class ModuleRouting {
 
             String[] currentStepId = {""};
             String[] codeSelected = {""};
+            String[] parentHistoryId = {""};
 
             ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s)->{
                 currentStepId[0] = (String) s;
             }).ifPresent("getCode", (s) -> {
                  codeSelected[0] = (String) s;
+            }).ifPresent("getParentHistoryId", (s) -> {
+                parentHistoryId[0] = (String) s;
             });
 
-            if(codeSelected[0].equals("approve")){
+            ((OutputSchema)outputSchema).setParentHistoryId(null);
+
+            if(codeSelected[0].contains(approveString)){
                 // If assignee code in next steps
                 // Else go to parent step
                 String assigneeCode = calculateNextAssignee(outputSchema);
 
                 if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(assigneeCode)){
+                    ((OutputSchema)outputSchema).setAssignedCN("cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local");
                     nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(assigneeCode);
                 } else if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
                     nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
                 }
 
-            } else if(codeSelected[0].equals("requestModification")){
+            } else if(codeSelected[0].contains(requestModificationString)){
                 // If code selected and is in nextSteps
                 // go to specific step
                 // Else get previous step from approval history
                 if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
+                    ((OutputSchema)outputSchema).setParentHistoryId(parentHistoryId[0]);
                     nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
                 }else {
-                    nextStep = calculateFromApprovalHistory(outputSchema);
+                    nextStep = calculateFromApprovalHistory(outputSchema,parentHistoryId[0]);
                 }
 
             } else if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
                 nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
 
-            } else if(codeSelected[0].equals("reject")){
-                nextStep = "break";
+            } else if(codeSelected[0].contains(rejectString)){
+                nextStep = breakString;
             }
 
             if(nextStep.isEmpty()){
-                nextStep = "break";
+                nextStep = breakString;
             }
 
-            if(!nextStep.equals("break")){
+            if(!nextStep.equals(breakString)){
                 nextPage = routingConfig.getSteps().get(nextStep).getPage();
                 ((OutputSchema)outputSchema).setPage(nextPage);
             }
@@ -165,22 +174,28 @@ public class ModuleRouting {
     }
 
     private <T> String calculateNextAssignee(T outputSchema){
-        ((OutputSchema)outputSchema).setAssignedCN("cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local");
         String assigneeCode = "HIROLE";
         return assigneeCode;
     }
 
-    private <T> String calculateFromApprovalHistory(T outputSchema) throws JsonProcessingException {
-        String[] process = {""}; //"000C292D-1114-A1EB-9217-3FF5C7814E9C"
-        String[] entityId = {""};
-        ReflectionUtil.of(outputSchema).ifPresent("getProcess", (s)->{
-            process[0] = (String) s;
-        }).ifPresent("getEntityId", (s) -> {
-            entityId[0] = (String) s;
-        });
+    private <T> String calculateFromApprovalHistory(T outputSchema,String parentHistoryId) throws JsonProcessingException {
+//        String[] process = {""};
+//        String[] entityId = {""};
+//        ReflectionUtil.of(outputSchema).ifPresent("getProcess", (s)->{
+//            process[0] = (String) s;
+//        }).ifPresent("getEntityId", (s) -> {
+//            entityId[0] = (String) s;
+//        });
+//        Optional<ApprovalHistory> approvalHistory = this.approvalHistoryRepository.findTop1ByProcessNameAndEntityIdOrderByIdDesc(process[0], entityId[0]);
 
-        Optional<ApprovalHistory> approvalHistory = approvalHistoryRepository.findTop1ByProcessNameAndEntityIdOrderByIdDesc(process[0], entityId[0]);
+        Optional<ApprovalHistory> approvalHistory = this.approvalHistoryRepository.findById(Long.parseLong(parentHistoryId));
 
-        return "break";
+        if(approvalHistory.isPresent()){
+            ((OutputSchema)outputSchema).setParentHistoryId(approvalHistory.get().getParent());
+            ((OutputSchema)outputSchema).setAssignedCN(approvalHistory.get().getUserCN());
+            return approvalHistory.get().getStepId();
+        }
+
+        return breakString;
     }
 }
