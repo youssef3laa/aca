@@ -55,7 +55,7 @@ public class ApprovalHistoryController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @PostMapping("/{entityId}/{processType}")
+    @GetMapping("/{processName}/{entityId}")
     public ResponseEntity<AppResponse<List<ApprovalHistory>>> readHistory(@RequestHeader("X-Auth-Token") String token,
                                                                           @PathVariable("entityId") String entityId,
                                                                           @PathVariable("processName") String processName) {
