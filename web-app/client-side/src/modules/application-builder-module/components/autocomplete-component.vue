@@ -11,6 +11,7 @@
     small-chips
     v-on:change="autocompleteChange"
     :search-input.sync="search"
+    :loading="loading"
   >
     <template #label>
       <span v-t="field.name"></span>
@@ -31,13 +32,36 @@ export default {
       //   value: this.field.value,
       value: this.val.value,
       search: null,
+      loading: false,
     };
   },
   methods: {
+    fetch(v, url) {
+      http
+        .get(url)
+        .then((response) => {
+          const res = response.data.data.map((el) => {
+            let obj = {
+              name: el["name_ar"],
+              value: el["groupCode"],
+              text: el["name_ar"],
+              code: el["groupCode"],
+            };
+            return obj;
+          });
+          this.items.list = res.filter((e) => {
+            console.log(e);
+            return (e.name || "").indexOf(v || "") > -1;
+          });
+          this.loading = false;
+        })
+        .catch((err) => console.log(err));
+    },
+    querySelections(v, url) {
+      this.loading = true;
+      this.fetch(v, url)
+    },
     autocompleteChange: function () {
-      // console.log(this.value)
-      // console.log(this.val)
-      // console.log(this.items.list)
       const list = this.items.list;
       if (!list) return;
       const selectedObject = list.filter((el) => el.value === this.value)[0];
@@ -52,7 +76,6 @@ export default {
       });
     },
   },
-  props: ["val", "field"],
   watch: {
     val: function (newVal, oldVal) {
       console.log(oldVal);
@@ -61,35 +84,19 @@ export default {
       this.value = newVal.value;
       console.log("val", this.val);
     },
-    search: function () {
-      console.log(this.search);
+    search: function (val) {
       if (this.val.url) {
-        this.items.list = null;
-
-        http
-          .get("/org/group/findByCodes/HADA,HADS")
-          .then((response) => {
-            const res = response.data.data.map((el) => {
-              let obj = {
-                name: el["name_ar"],
-                value: el["groupCode"],
-                text: el["name_ar"],
-                code: el["groupCode"],
-              };
-              return obj;
-            });
-            this.items.list = res;
-          })
-          .catch((err) => console.log(err));
-
-        console.log(this.items.list);
+        val && val !== this.value && this.querySelections(val, this.val.url);
       }
     },
   },
   mounted() {
-    console.log(this.val);
+    if (this.val.url) {
+      this.fetch(null, this.val.url)
+    }
     // this.autocompleteChange();
   },
+  props: ["val", "field"],
 };
 </script>
 <style>
