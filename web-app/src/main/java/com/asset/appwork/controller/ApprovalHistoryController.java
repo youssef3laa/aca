@@ -38,7 +38,7 @@ public class ApprovalHistoryController {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if(account == null) throw new AppworkException("", ResponseCode.UNAUTHORIZED);
+            if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
             String response = cordysService.sendRequest(account, new ApprovalHistorySOAP().createHistoryApproval(approvalHistory));
             respBuilder.data(response);
@@ -48,6 +48,7 @@ public class ApprovalHistoryController {
             e.printStackTrace();
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (AppworkException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
             respBuilder.status(e.getCode());
         }
@@ -62,16 +63,18 @@ public class ApprovalHistoryController {
         try {
             Account account = tokenService.get(token);
 
-            if (account == null) throw new AppworkException("", ResponseCode.UNAUTHORIZED);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            Optional<List<ApprovalHistory>> histories = historyRepository.findByProcessNameAndEntityId(processName, entityId);
-            if(!histories.isPresent()) throw new AppworkException("", ResponseCode.NO_CONTENT);
-            respBuilder.data(histories.get());
+            List<ApprovalHistory> histories = historyRepository.findByProcessNameAndEntityId(processName, entityId);
+            if(histories.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
+            respBuilder.data(histories);
 
         } catch (AppworkException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
             respBuilder.status(e.getCode());
         } catch (Exception e) {
+            log.error(e.getMessage());
             e.printStackTrace();
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
