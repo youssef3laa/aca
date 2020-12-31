@@ -18,6 +18,7 @@ public class OutputSchema {
     String entityId;
     String page;
     String processId;
+    String parentHistoryId;
 
     public String getAssignedType() {
         if(assignedCN.contains("cn=organizational users")){
@@ -28,11 +29,7 @@ public class OutputSchema {
     }
 
     public void setStepId(String stepId){
-        if(stepId.equals("break")){
-            this.breakProcess = true;
-        }else{
-            this.breakProcess = false;
-        }
+        this.breakProcess = stepId.equals("break");
         this.stepId = stepId;
     }
 
@@ -44,6 +41,7 @@ public class OutputSchema {
                 "<subBP>"+removeNull(this.subBP)+"</subBP>"+
                 "<entityName>"+removeNull(this.entityName)+"</entityName>"+
                 "<entityId>"+removeNull(this.entityId)+"</entityId>"+
+                "<parentHistoryId>"+removeNull(this.parentHistoryId)+"</parentHistoryId>"+
                 "<page>"+removeNull(this.page)+"</page>"+
                 "<decision>"+removeNull(this.decision)+"</decision>"+
                 "<comment>"+removeNull(this.comment)+"</comment>"+
