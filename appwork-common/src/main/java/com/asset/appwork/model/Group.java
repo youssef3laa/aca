@@ -3,10 +3,7 @@ package com.asset.appwork.model;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -19,6 +16,8 @@ public class Group extends BaseIdentity<Group> {
     Boolean isHeadRole;
     @Column(name = "Vice")
     Boolean isViceRole;
+    @Transient
+    String cn;
     @ManyToMany(mappedBy = "group")
     @JsonManagedReference
     @JsonProperty("units")
@@ -55,4 +54,6 @@ public class Group extends BaseIdentity<Group> {
     public void setUnit(Collection<Unit> units) {
         this.unit = units;
     }
+
+    public String getCN() { return "cn="+this.name+",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local"; }
 }

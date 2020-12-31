@@ -12,6 +12,7 @@ import com.asset.appwork.repository.ApprovalHistoryRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.service.CordysService;
+import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.util.SystemUtil;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,8 @@ public class ProcessController {
     Environment environment;
     @Autowired
     ApprovalHistoryRepository approvalHistoryRepository;
+    @Autowired
+    OrgChartService orgChartService;
 
     // TODO: READ ON STATIC INNER CLASSES
     @Data
@@ -64,7 +67,7 @@ public class ProcessController {
             String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
             String config = SystemUtil.readFile(filePath);
 
-            ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, config, approvalHistoryRepository);
+            ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, config, approvalHistoryRepository, orgChartService);
             String response = moduleRouting.goToNext(requestJson.processModel);
             respBuilder.data(response);
         } catch (AppworkException e) {
@@ -87,7 +90,7 @@ public class ProcessController {
             String filePath = outputSchema.getProcessFilePath(environment.getProperty("process.config"));
             String config = SystemUtil.readFile(filePath);
 
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
+            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository, orgChartService);
             String response=  moduleRouting.goToNext(outputSchema);
             respBuilder.data(response);
         } catch (AppworkException e) {
