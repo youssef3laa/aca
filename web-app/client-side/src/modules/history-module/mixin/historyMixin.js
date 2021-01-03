@@ -13,8 +13,9 @@ export default {
             }
         },
         async setHistory(data){
+            console.log(data);
             try{
-                var response = await http.post("/history",data);
+                var response = await http.post("/history/create",data);
                 console.log(response.data);
             }
             catch (err){
