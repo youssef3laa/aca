@@ -6,6 +6,8 @@
 
 <script>
 import AppBuilder from "../../application-builder-module/builders/app-builder";
+import Http from "http";
+// import Http from "../../core-module/services/http"
 
 export default {
   name: "attachment",
@@ -17,6 +19,7 @@ export default {
       app: {
         pages: [
           {
+            key: "page1",
             sections: [
               {
                 numOfResizable: 2,
@@ -32,6 +35,7 @@ export default {
                 ],
                 forms: [
                   {
+                    key: "form1",
                     resizable: {
                       forms: [
                         {
@@ -49,7 +53,7 @@ export default {
                         },
                         {
                           key: 'iframeObj',
-                          background: 'grey',
+                          background: 'white',
                           inputs: [
                             {
                               type: 'IframeComponent',
@@ -59,7 +63,7 @@ export default {
                           ],
                           model: {
                             iframeObj: {
-                              src: "http://appworks-dev/otcs/cs.exe?func=brava.bravaviewer&nodeid=586038&viewType=1&nexturl=%2Fotcs%2Fcs%2Eexe%3Ffunc%3Dll%26objid%3D577193%26objAction%3Dbrowse%26sort%3Dname%26viewType%3D1",
+                              src: "",
                             },
                           },
                         },
@@ -73,19 +77,73 @@ export default {
         ],
       },
     };
-  },
+  }
+  ,
   created() {
-    this.$observable.subscribe('open-file-brava', (fileId) => {
+    this.$observable.subscribe('open-file-brava', async (fileId) => {
       console.log(fileId);
-      // this.$refs.appBuilder.setModelData('iframeObj', {
-      //   iframeObj: {
-      //     src: 'http://cs/otcs/cs.exe?func=ll&objid=577193&objAction=browse&sort=name&viewType=1',
+      let userToken;
+      try {
+        userToken = await Http.post("http://appworks-dev:8080/otdsws/rest/authentication/credentials", {
+          "userName": "admin",
+          "password": "Asset99a",
+          "ticketType": "OTDSTICKET"
+        });
+        console.log(userToken);
+      } catch (e) {
+        console.log(e);
+      }
+      this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
+          'http://appworks-dev/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
+      // this.$refs.appBuilder.appendForm("section2", {
+      //   key: "form3",
+      //   inputs: [
+      //     {
+      //       type: 'InputComponent',
+      //       name: 'receiverEntityName',
+      //       col: 4,
+      //     },
+      //   ],
+      //   model: {
+      //     receiverEntityName: '',
       //   },
       // })
-      this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
-          'http://cs/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&OpenInNewWin=_blank&NewWinParam=resizable&viewType=1&nexturl=%2Fotcs%2Fcs%2Eexe%3Ffunc%3Dllworkspace';
+      // this.$refs.appBuilder.appendSection("page1", {
+      //   key: 'section3',
+      //   tabs: [
+      //     {
+      //       key: 'tab3',
+      //       id: 2,
+      //       name: 'new tab',
+      //       icon: 'fas fa-paperclip',
+      //     }
+      //
+      //   ],
+      //   forms: [
+      //     {
+      //       key: "form3",
+      //       inputs: [
+      //         {
+      //           type: 'InputComponent',
+      //           name: 'receiverEntityName',
+      //           col: 4,
+      //         },
+      //       ],
+      //       model: {
+      //         inputFile: '',
+      //       },
+      //     }
+      //   ],
+      // },)
 
     });
+  }, mounted() {
+    //load list of files
+    // this.$observable.fire('load-files-list', 577193);
+  },
+  updated() {
+    console.log("updated is called")
   }
-};
+}
+;
 </script>

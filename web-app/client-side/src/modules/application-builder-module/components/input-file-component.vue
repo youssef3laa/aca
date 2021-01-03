@@ -4,7 +4,7 @@
         style="border: 2px dashed #94bed6 !important; border-radius: 6px; background-color:#f2f7fa"
         title="Click to grap a file from your PC!"
     >
-      <input style="display:none" type="file"/>
+      <input multiple style="display:none" type="file"/>
 
       <v-row align="center" justify="center">
         <v-icon color="outline" style="margin: 10px 10px 0 0; padding:5px 10px"
@@ -35,9 +35,9 @@
           {{ file.name }}
         </li>
       </draggable> -->
-      <draggable tag="div" :list="files">
+      <draggable :list="filesUploaded" tag="div">
         <div
-            v-for="(file, index) in files"
+            v-for="(file, index) in filesUploaded"
             :key="index"
             class="card"
             draggable
@@ -54,7 +54,7 @@
             </v-col>
             <v-col :cols="8" style="cursor: pointer" @click="openFileInBrave(file)">
               {{ file.name }} <br/>
-              {{ file.size }}
+              {{ file.size_formatted }}
             </v-col>
             <v-col :cols="2" style="cursor: pointer" @click="deleteFile(file)">
               <v-icon color="#ea9cb3">
@@ -76,29 +76,30 @@ export default {
   components: {draggable},
 
   name: 'file-input-component',
+  props: ["val", "field"],
   data() {
     return {
-      filesSelected: '',
+      bwsId: '',
       files: [],
-      filesUploaded: new Map()
+      filesUploaded: []
     }
+  },
+  created() {
+    this.bwsId = 577193;
   },
   methods: {
     openFileInBrave: function (file) {
-      let fileId = this.filesUploaded.get(file.name).results.data.properties.id;
+      let fileId = this.filesUploaded.find(element => element.name === file.name).id;
       this.$observable.fire('open-file-brava', fileId);
     },
     deleteFile: async function (file) {
       console.log();
-      let fileId = this.filesUploaded.get(file.name).results.data.properties.id;
+      let fileId = this.filesUploaded.find(element => element.name === file.name).id;
       try {
         let deleteResponse = await Http.delete('/document/delete/' + fileId);
         console.log(deleteResponse);
-        this.filesUploaded.delete(file.name);
-        this.files = this.files.filter((fileVal) => {
-          console.log(file.name, fileVal);
-          return fileVal.name !== file.name;
-        });
+        this.filesUploaded = this.filesUploaded.filter(element => element.name !== file.name);
+        this.files = this.files.filter((fileVal) => fileVal.name !== file.name);
         console.log(this.files);
       } catch (e) {
         console.error(e)
@@ -121,11 +122,11 @@ export default {
       console.log(this.files)
       const formData = new FormData()
       this.files.forEach((file) => {
-        if (!this.filesUploaded.get(file.name))
+        if (!this.filesUploaded.find(element => element.name === file.name))
           formData.append('file', file)
       })
       // formData.append('file', this.files);
-      formData.append('parentId', '577193')
+      formData.append('parentId', this.bwsId)
       Http.addHeader('Content-Type', 'multipart/form-data')
       Http.post('/document/upload', formData)
           .then((response) => {
@@ -135,8 +136,11 @@ export default {
               const element = data[i];
               for (let key in element) {
                 // eslint-disable-next-line no-prototype-builtins
-                if (element.hasOwnProperty(key))
-                  this.filesUploaded.set(key, element[key]);
+                if (element.hasOwnProperty(key)) {
+                  const fileObj = element[key].results.data.properties;
+                  this.filesUploaded.push(fileObj);
+                  this.files = this.files.filter(fileElement => fileElement.name !== fileObj.name)
+                }
               }
 
             }
@@ -146,11 +150,23 @@ export default {
             console.log(reason)
           })
     },
+    listFiles: async function () {
+      let response;
+      try {
+        response = await Http.get('/document/list/' + this.bwsId + '?fields=properties');
+      } catch (e) {
+        console.log(e);
+      }
+      if (!response) return;
+      // this.filesUploaded=response.data
+      console.log(response);
+    }
   },
   mounted() {
+    console.log("val:", this.field)
+    console.log("field:", this.field)
     const dropzone = this.$el.firstElementChild
     const fileupload = dropzone.firstElementChild
-    // console.log(fileupload)
     if (dropzone) {
       dropzone.addEventListener('dragenter', (e) => {
         e.preventDefault()
@@ -168,46 +184,35 @@ export default {
         e.preventDefault()
         const dragevent = e
         if (dragevent.dataTransfer) {
-          // dragevent.dataTransfer.fi
-          for (var i = 0; i < dragevent.dataTransfer.files.length; i++) {
+          for (let i = 0; i < dragevent.dataTransfer.files.length; i++) {
             console.log(dragevent.dataTransfer.files[i])
             this.files.push(dragevent.dataTransfer.files[i])
           }
           this.uploadFiles()
 
-          // console.log(this.files);
-          //  console.log(dragevent)
-          //  console.log(dragevent.dataTransfer)
         }
       })
       dropzone.addEventListener('click', (e) => {
         console.log(e)
         fileupload.click()
       })
-      // dropzone.addEventListener("keypress", e => {
-      //     e.preventDefault()
-      //     const keyEvent = e
-      //     if (keyEvent.key === "Enter") {
-      //         if (fileupload)
-      //             fileupload.click()
-      //     }
-      // })
+
       if (fileupload) {
         fileupload.addEventListener('change', (e) => {
           const target = e.target
           if (target.files && target.files.length > 0) {
-            for (var i = 0; i < target.files.length; i++) {
+            for (let i = 0; i < target.files.length; i++) {
               console.log(target.files[i])
               this.files.push(target.files[i])
             }
-            // this.files.push(target.files)
-            // console.log(this.files)
-            // this.filesSelected(target.files)
           }
           this.uploadFiles()
         })
       }
     }
+
+    this.listFiles();
+
   },
 }
 </script>

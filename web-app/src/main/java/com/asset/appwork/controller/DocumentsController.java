@@ -87,12 +87,15 @@ public class DocumentsController {
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
             Http http = appworkCSOperations.getSubNodes(parentId, documentQuery);
             respBuilder.status(SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+            respBuilder.data(SystemUtil.convertStringToJsonNode(http.getResponse()));
         } catch (AppworkException e) {
             e.printStackTrace();
             ObjectNode obj = new ObjectNode(JsonNodeFactory.instance);
             obj.put("error", e.getMessage());
             obj.put("statusCode", ResponseCode.INTERNAL_SERVER_ERROR.getCode());
             respBuilder.data(obj);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
         return respBuilder.build().getResponseEntity();
     }
