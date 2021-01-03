@@ -16,6 +16,7 @@ export default {
             http.post("/process/initiate", data)
                 .then((response) => {
                     console.log(response);
+                    alert("Initiate Complete!");
                 })
                 .catch((error) => console.error(error));
         },
@@ -45,6 +46,7 @@ export default {
             http.post("/process/complete", data)
             .then((response) => {
                 console.log(response);
+                alert("Step Complete!");
             })
             .catch((error) => console.error(error));
         },

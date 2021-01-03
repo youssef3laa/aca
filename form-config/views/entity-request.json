@@ -3,6 +3,13 @@
   "publish": "form1Change",
   "inputs": [
     {
+      "type": "InputComponent",
+      "label": "Step Name",
+      "name": "stepId",
+      "readonly": true,
+      "col": "12"
+    },
+    {
       "type": "AutoCompleteComponent",
       "name": "receiver",
       "rule": "required",
@@ -25,6 +32,7 @@
     }
   ],
   "model": {
+    "stepId": "",
     "receiver": "",
     "requestDate": "",
     "notes": ""

@@ -207,32 +207,12 @@ export default {
                     ],
                     model: {
                       receiverEntityName: {
-                        url:"test",
+                        url:"/org/group/findByCodes/HADA,HADS",
                         list: [
-                          {
-                            text: 'رئيس الجهاز',
-                            value:
-                              'cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local',
-                            code: 'HUNIT',
-                            name: 'رئيس الجهاز',
-                          },
-                          {
-                            text: 'رئيس القطاع',
-                            value:
-                              'cn=AbdElHakim@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local',
-                            code: 'HSEC',
-                            name: 'رئيس القطاع',
-                          },
-                          {
-                            text: 'رئيس إدارة مكتب',
-                            value:
-                              'cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local',
-                            code: 'HOFC',
-                            name: 'رئيس إدارة مكتب',
-                          },
+
                         ],
                         value:
-                          'cn=abdallah@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local',
+                          '',
                       },
                       receiverMethod: {
                         list: [

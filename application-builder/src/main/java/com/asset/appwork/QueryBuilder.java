@@ -91,20 +91,6 @@ public class QueryBuilder<T> {
             });
             result.add((T)row);
         });
-//        for (int listIndex = 0; listIndex < list.size(); listIndex++) {
-//            LinkedHashMap<String, Object> row = new LinkedHashMap<>();
-//            for (int columnNumber = 0; columnNumber < columns.size(); columnNumber++) {
-//                String columnName = columns.get(columnNumber).getAlias();
-//                Object value = null;
-//                if (list.get(listIndex).getClass() != Object[].class) {
-//                    value = list.get(listIndex);
-//                } else {
-//                    value = ((Object[]) list.get(listIndex))[columnNumber];
-//                }
-//                row.put(columnName, value);
-//            }
-//            result.add(row);
-//        }
 
         return result;
     }
@@ -195,7 +181,7 @@ public class QueryBuilder<T> {
     }
 }
 
-// Add Sort By
+//            ============ Add Sort By =============
 //            List<?> sortByList = SystemUtil.readJSONArray(queryJson, "sortBy");
 //            if (sortByList != null) {
 //                ArrayList<Order> sortByOrder = new ArrayList<>();
@@ -228,50 +214,4 @@ public class QueryBuilder<T> {
 //                Class<?> neededType = Class.forName(root.get(column).getJavaType().getCanonicalName());
 //                return criteriaBuilder.between(root.get(column),(Comparable)neededType.cast(value1),(Comparable)neededType.cast(value2));
 //            }else
-//            =========== Old Creation Of Where Conditions ====================
-//            List<?> conditions = SystemUtil.readJSONArray(queryJson, "where");
-//            if(conditions != null){
-//                ArrayList<Predicate> predicates = new ArrayList<>();
-//                for(Object condition : conditions) {
-//                    String conditionString = (String) condition;
-//                    Predicate predicate = null;
-//                    if(conditionString.startsWith("or:")){
-//                        String[] orConditions = conditionString.split(":");
-//                        if(orConditions.length > 1){
-//                            Predicate[] orPredicates = new Predicate[orConditions.length-1];
-//                            for(int i = 1; i < orConditions.length;  i++){
-//                                orPredicates[i-1] = createPredicate(criteriaBuilder, root, orConditions[i]);
-//                            }
-//                            predicate = criteriaBuilder.or(orPredicates);
-//                        }
-//                    }else if(conditionString.startsWith("not:")){
-//                        String[] notConditions = conditionString.split(":");
-//                        if(notConditions.length == 2) {
-//                            predicate = createPredicate(criteriaBuilder, root, notConditions[1]);
-//                        }
-//                    }else {
-//                        predicate = createPredicate(criteriaBuilder, root, conditionString);
-//                    }
-//                    if(predicate != null){
-//                        predicates.add(predicate);
-//                    }
-//                }
-//                if(predicates.size() > 0){
-//                    Predicate[] predicatesArray = predicates.toArray(new Predicate[predicates.size()]);
-//                    query.where(predicatesArray);
-//                }
-//            }
-//            ======================= Old creation of Aggregations ===================
-//            if (aggregationList != null) {
-//                for (Object aggregation : aggregationList) {
-//                    String aggregationFunction = ((String) aggregation).split(":")[0];
-//                    String aggregationBy = ((String) aggregation).split(":")[1];
-//
-//                    Method method = CriteriaBuilder.class.getMethod(aggregationFunction, Expression.class);
-//                    Selection aggregationExpression = (Selection) method.invoke(criteriaBuilder, root.get(aggregationBy));
-//                    aggregationExpression.alias(aggregationFunction + "_" + aggregationBy);
-//
-//                    columnsSelection.add(aggregationExpression);
-//                }
-//            }
 

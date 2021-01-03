@@ -4,24 +4,24 @@
       <v-row>
         <!-- <div v-for="(field, key) in forms" :key="key"> -->
         <v-col
-          v-for="(field, key) in forms.inputs"
-          :key="key"
-          :cols="field.col"
-          :md="field.col"
+            v-for="(field, key) in forms.inputs"
+            :key="key"
+            :cols="field.col"
+            :md="field.col"
         >
           <component
-            :is="field.type"
-            v-if="formModel"
-            :field="field"
-            :val="formModel[field.name]"
-            v-on:update="updateText"
+              :is="field.type"
+              v-if="formModel"
+              :field="field"
+              :val="formModel[field.name]"
+              v-on:update="updateText"
           ></component>
 
           <component
-            :is="field.type"
-            v-else
-            :field="field"
-            v-on:update="updateText"
+              :is="field.type"
+              v-else
+              :field="field"
+              v-on:update="updateText"
           ></component>
         </v-col>
 
@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { ValidationObserver } from 'vee-validate'
+import {ValidationObserver} from 'vee-validate'
 import InputComponent from '../components/input-component'
 import ButtonComponent from '../components/button-component'
 import TableComponent from '../components/table-component'
@@ -47,6 +47,9 @@ import SelectComponent from '../components/select-component'
 import DatePickerComponent from '../components/datePicker-component'
 import ApprovalComponent from '../components/approvalCard-component'
 import MemoComponent from '../components/memo-component'
+import AttachmentComponent from '../components/attachment-component'
+import IframeComponent from '../components/iframe-component'
+
 export default {
   name: 'FormBuilder',
   components: {
@@ -64,6 +67,8 @@ export default {
     DatePickerComponent,
     ApprovalComponent,
     MemoComponent,
+    IframeComponent,
+    AttachmentComponent
   },
   data() {
     return {
@@ -72,14 +77,14 @@ export default {
     }
   },
   methods: {
-    updateText: async function(data) {
-       console.log(data)
+    updateText: async function (data) {
+      console.log(data)
 
       if (data.name && data.value) this.forms.model[data.name] = data.value
 
       if (this.forms.model)
         this.forms.model['_valid'] = !this.$refs['observer']['_data'].flags
-          .invalid
+            .invalid
 
       console.log(this.$refs['observer'].errors[data.name])
       console.log(this.$refs['observer']['_data'].flags)
@@ -99,14 +104,15 @@ export default {
         })
       }
     },
-    saveValue: function() {},
+    saveValue: function () {
+    },
   },
   props: ['forms', 'model'],
   created() {
     var self = this
     if (this.forms.subscribe) {
       console.log('subscribe')
-      this.$observable.subscribe(this.forms.subscribe, function(data) {
+      this.$observable.subscribe(this.forms.subscribe, function (data) {
         if (data.type == 'modelUpdate') {
           var keys = Object.keys(data.model)
           keys.forEach((key, index) => {

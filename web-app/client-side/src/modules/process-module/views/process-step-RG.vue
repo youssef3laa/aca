@@ -28,20 +28,19 @@ export default {
       let entityId = this.inputSchema.entityId;
       this.readEntity(entityName, entityId)
           .then((response) => {
-            let assignedCN = this.inputSchema.assignedCN;
-
             response = JSON.parse(response.data.data);
 
             this.$refs.appBuilder.setModelData("form1", {
+              stepId: this.inputSchema.stepId,
               notes: response.notes,
               receiver: {
                 list: [
                   {
                     text: response.receiver,
-                    value: assignedCN,
+                    value: response.receiver,
                   },
                 ],
-                value: assignedCN,
+                value: response.receiver,
               },
               requestDate: response.requestDate.split("Z")[0],
             });
@@ -63,15 +62,19 @@ export default {
       console.log(this.$refs.appBuilder);
       // var model = this.$refs.appBuilder.getModelData("form1");
       // if (model._valid) {
+        let approvalModel = this.$refs.appBuilder.getModelData("ApprovalForm");
+        
         var data = {
           taskId: this.taskId,
           entityId: this.inputSchema.entityId,
           stepId: this.inputSchema.stepId,
           process: this.inputSchema.process,
-          code: "send",
+          parentHistoryId: this.inputSchema.parentHistoryId,
+
+          code: approvalModel.approval.decision,
           assignedCN: "cn=AbdElHakim@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
-          decision: "approve",
-          comment: "comment ahoh",
+          decision: approvalModel.approval.decision,
+          comment: approvalModel.approval.comment,
         };
         this.completeStep(data);
       // }
