@@ -40,7 +40,7 @@ public class OrgChartController {
 
     @PostMapping("/unit/create")
     public ResponseEntity<AppResponse<Long>> createUnit(@RequestHeader("X-Auth-Token") String token,
-                                                            @RequestBody String props
+                                                        @RequestBody String props
     ) {
         AppResponse.ResponseBuilder<Long> respBuilder = AppResponse.builder();
         try {
@@ -356,7 +356,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @Transactional
+//    @Transactional
     @GetMapping("/unit/{code}/down")
     public ResponseEntity<AppResponse<JsonNode>> getUnitChildrenByCode(@RequestHeader("X-Auth-Token") String token,
                                                                        @PathVariable("code") String code
@@ -392,7 +392,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @Transactional
+//    @Transactional
     @GetMapping("/unit/{code}/up")
     public ResponseEntity<AppResponse<JsonNode>> getUnitParentsByCode(@RequestHeader("X-Auth-Token") String token,
                                                                       @PathVariable("code") String code
@@ -604,7 +604,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @Transactional
+//    @Transactional
     @GetMapping("/group/{code}/down")
     public ResponseEntity<AppResponse<JsonNode>> getGroupUnitChildrenByCode(@RequestHeader("X-Auth-Token") String token,
                                                                             @PathVariable("code") String code
@@ -656,7 +656,37 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @Transactional
+//    @Transactional
+    @GetMapping("/sp/group/{code}/down")
+    public ResponseEntity<AppResponse<JsonNode>> getGroupUnitChildrenByCodeSP(@RequestHeader("X-Auth-Token") String token,
+                                                                            @PathVariable("code") String code
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account != null) {
+                groupRepository.getGroupByCodeAndDirection(code, "down", "").ifPresentOrElse(groups -> {
+                    try {
+                        respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }, () -> {
+                    try {
+                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+//    @Transactional
     @GetMapping("/group/{code}/up")
     public ResponseEntity<AppResponse<JsonNode>> getGroupUnitParentsByCode(@RequestHeader("X-Auth-Token") String
                                                                                    token,
@@ -701,6 +731,36 @@ public class OrgChartController {
                                 e.printStackTrace();
                             }
                         });
+            }
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    //    @Transactional
+    @GetMapping("/sp/group/{code}/up")
+    public ResponseEntity<AppResponse<JsonNode>> getGroupUnitParentsByCodeSP(@RequestHeader("X-Auth-Token") String token,
+                                                                              @PathVariable("code") String code
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account != null) {
+                groupRepository.getGroupByCodeAndDirection(code, "up", "").ifPresentOrElse(groups -> {
+                    try {
+                        respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }, () -> {
+                    try {
+                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
         } catch (AppworkException e) {
             e.printStackTrace();
