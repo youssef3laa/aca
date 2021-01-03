@@ -1,6 +1,7 @@
 package com.asset.appwork.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -21,20 +22,23 @@ public class Unit extends BaseIdentity<Unit> {
             joinColumns = {@JoinColumn(name = "OrganizationIdB06E0FBB7FCC75BD")},
             inverseJoinColumns = {@JoinColumn(name = "Group_Id")}
     )
-    @JsonBackReference
-    @JsonProperty("groups")
+//    @JsonBackReference
+//    @JsonProperty("groups")
+    @JsonIgnore
     Collection<Group> group = new HashSet<>();
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "O9OpenTextEntityIdentityComponentsOrganizationalUnitOrganizationalUnit",
             joinColumns = {@JoinColumn(name = "OrganizationalUnit_Id")}, //TODO: Check rows
             inverseJoinColumns = {@JoinColumn(name = "OrganizationIdA7A9FD625B78137F")}) //TODO: Check rows
-    @JsonBackReference
-    @JsonProperty("parents")
+//    @JsonBackReference
+//    @JsonProperty("parents")
+    @JsonIgnore
     private Collection<Unit> parent = new HashSet<>();
     @ManyToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    @JsonProperty("children")
+//    @JsonManagedReference
+//    @JsonProperty("children")
+    @JsonIgnore
     private Collection<Unit> child = new HashSet<>();
 
     public String getUnitTypeCode() {
