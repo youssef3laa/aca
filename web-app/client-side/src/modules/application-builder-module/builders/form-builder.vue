@@ -46,7 +46,7 @@ import InputFileComponent from '../components/input-file-component'
 import SelectComponent from '../components/select-component'
 import DatePickerComponent from '../components/datePicker-component'
 import ApprovalComponent from '../components/approvalCard-component'
-
+import MemoComponent from '../components/memo-component'
 export default {
   name: 'FormBuilder',
   components: {
@@ -63,6 +63,7 @@ export default {
     SelectComponent,
     DatePickerComponent,
     ApprovalComponent,
+    MemoComponent,
   },
   data() {
     return {
