@@ -1,18 +1,18 @@
 <template>
   <div>
     <v-container>
-      <app-builder ref="appBuilder" :app="app" />
+      <AppBuilder ref="appBuilder" :app="app" />
     </v-container>
   </div>
 </template>
 
 <script>
-import appBuilder from "../../application-builder-module/builders/app-builder";
+import AppBuilder from "../../application-builder-module/builders/app-builder";
 import correspondenceMixin from "../mixin/correspondenceMixin";
 import formPageMixin from "../../../mixins/formPageMixin";
 export default {
   name: "correspondenceView",
-  components: { appBuilder },
+  components: { AppBuilder },
   mixins: [correspondenceMixin, formPageMixin],
 
   methods: {
@@ -61,31 +61,14 @@ export default {
                     inputs: [
                       {
                         type: 'MemoComponent',
-                        name: 'memp',
+                        name: 'نوع مذكرة العرض',
                         subscribe: 'tasks',
                         col: 12,
                       },
                       
                     ],
                     model: {
-                      memo: {
 
-                        // headers: [
-                        //   {
-                        //     text: 'الاسم',
-                        //     align: 'start',
-                        //     filterable: false,
-                        //     value: 'userCN',
-                        //   },
-                        //   {
-                        //     text: 'التاريخ',
-                        //     value: 'approvalDate',
-                        //   },
-
-                        // ],
-                        // data: [],
-                        // search: '',
-                      },
                     },
                   },
                 ],
