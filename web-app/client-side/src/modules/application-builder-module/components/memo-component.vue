@@ -18,72 +18,85 @@
     <v-container>
       <AppBuilder ref="appBuilder" :app="app" />
     </v-container>
+    <v-btn @click="trigger">Submit</v-btn>
   </div>
 </template>
 
 <script>
 import AutocompleteComponent from "./autocomplete-component.vue";
-// import AppBuilder from '../builders/app-builder'
+import memoComponentMixin from "../../../mixins/memoComponentMixin";
+import formPageMixin from "../../../mixins/formPageMixin";
 
 export default {
   components: {
     AppBuilder: () => import("../builders/app-builder"),
     AutocompleteComponent,
   },
+  mixins: [memoComponentMixin, formPageMixin],
 
   data() {
     return {
-      value: null,
-      richText: [2, 1, 6],
-      val: { list: ["form1", "form2"] },
-      app: {
-        pages: [
-          {
-            key: "page1",
-            sections: [
-              {
-                type: "collapse",
-                name: "جهة الإختصاص",
-                forms: [
-                  {
-                    key: "form1",
-                    inputs: [
-                      {
-                        type: "richtextComponent",
-                        col: 12,
-                      },
-                    ],
-                  },
-                ],
-              },
-              {
-                type: "collapse",
-                name: "جهة الإختصاص",
-                forms: [
-                  {
-                    key: "form1",
-                    inputs: [
-                      {
-                        type: "richtextComponent",
-                        col: 12,
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
+      app: {},
+      // app: {
+      //   pages: [
+      //     {
+      //       key: "memoPage",
+      //       sections: [
+      //         {
+      //           type: "collapse",
+      //           name: "نوع النص",
+      //           forms: [
+      //             {
+      //               key: "form1",
+      //               inputs: [
+      //                 {
+      //                   type: "richtextComponent",
+      //                   name: "richtext1",
+      //                   col: 12,
+      //                 },
+      //               ],
+      //               model: {
+      //                 richtext1: "",
+      //               },
+      //             },
+      //           ],
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // },
     };
   },
   props: ["field"],
 
   methods: {
     changeVal: function (event) {
-      this.$refs.appBuilder.setSectionData("page1", {});
-      console.log(event);
-      this.value = event;
+      var selected = event.value.value.text;
+      this.loadForm(selected, this.fillForm);
+      // setTimeout(() => {
+      //   let model = this.$refs.appBuilder.getModelData("form1");
+      //   console.log(model);
+      // }, 100);
+      // let model = this.$refs.appBuilder.getModelData("form1");
+
+      // var sectionsData = this.getMemoSections(event.value.value.text);
+    },
+
+    async fillForm() {
+      var model = await this.getMemoData();
+      this.$refs.appBuilder.setModelData("form1", model);
+      // this.$refs.appBuilder.setModelData("form2", model);
+    },
+    trigger() {
+      let model = this.$refs.appBuilder.getModelData("form1");
+      console.log(model);
+      let data = {
+        requestId: "",
+        JSONId: "form1",
+        memo: [{ Key: "", value: "richtext1" }],
+      };
+
+      this.setMemoData(data);
     },
   },
   computed: {
@@ -97,7 +110,12 @@ export default {
       return response;
     },
     getAutoCompeleteVal() {
-      var val = { list: ["form1", "form2"] };
+      var val = {
+        list: [
+          { value: 1, text: "memo1" },
+          { value: 2, text: "memo2" },
+        ],
+      };
       return val;
     },
   },
