@@ -1,35 +1,35 @@
 <template>
   <v-container style="padding-top: 0; padding-bottom:0">
     <TabBuilder
-      :section="section"
-      v-on:modelChange="dataChange"
-      v-if="section.tabs"
+        v-if="sec.tabs"
+        v-on:modelChange="dataChange"
+        :section="sec"
     />
     <span v-else>
-      <span v-if="section.forms">
-        <v-card flat v-for="formData in section.forms" :key="formData.id">
+      <span v-if="sec.forms">
+        <v-card v-for="formData in sec.forms" :key="formData.id" flat>
           <!-- <v-card-text v-text="formData.form.name"></v-card-text> -->
           <span
-            v-if="section.type != 'collapse'"
+              v-if="sec.type != 'collapse'"
           >
-            <FormBuilder :forms="formData" :model="formData.model" />
+            <FormBuilder :forms="formData" :model="formData.model"/>
           </span>
-          <span v-if="section.type == 'collapse'">
+          <span v-if="sec.type == 'collapse'">
             <v-expansion-panels>
               <v-expansion-panel>
                 <v-expansion-panel-header>
                   <template>
                     <v-row no-gutters>
                       <v-col cols="4">
-                        {{ section.name }}
+                        {{ sec.name }}
                       </v-col>
                       <v-col cols="8" class="text--secondary"> </v-col>
                     </v-row>
                   </template>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                  <span v-for="formData in section.forms" :key="formData.id">
-                    <FormBuilder :forms="formData" :model="formData.model" />
+                  <span v-for="formData in sec.forms" :key="formData.id">
+                    <FormBuilder :forms="formData" :model="formData.model"/>
                   </span>
                 </v-expansion-panel-content>
               </v-expansion-panel>
@@ -38,16 +38,16 @@
           </span>
         </v-card>
       </span>
-      <v-row v-if="section.type == 'title'" style="height: 80px;">
+      <v-row v-if="sec.type == 'title'" style="height: 80px;">
         <v-col>
           <h1>
             <button
-              style="background:transparent; width: 45px; height: 45px"
-              @click="goBack"
+                style="background:transparent; width: 45px; height: 45px"
+                @click="goBack"
             >
               <v-icon
-                style="background-color: white;width: inherit; height: inherit;border-radius: 5px;"
-                right
+                  style="background-color: white;width: inherit; height: inherit;border-radius: 5px;"
+                  right
               >
                 mdi-arrow-right
               </v-icon>
@@ -101,6 +101,7 @@
 <script>
 import TabBuilder from './tab-builder'
 import FormBuilder from './form-builder'
+
 export default {
   name: 'SectionBuilder',
   components: {
@@ -119,15 +120,23 @@ export default {
     completeStep: function() {
       this.$observable.fire('complete-step')
     },
-    saveStep: function() {
+    saveStep: function () {
       this.$observable.fire('save-step')
     },
-    cancelStep: function() {
+    cancelStep: function () {
       this.$observable.fire('cancel-step')
     },
   },
   data() {
-    return {}
+    return {
+      sec: this.section
+    }
+  },
+  watch: {
+    section: function (newVal) {
+      // this.val = newVal
+      this.sec = newVal;
+    }
   },
   props: ['section'],
 }

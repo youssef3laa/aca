@@ -4,33 +4,40 @@ import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.ApprovalHistory;
+import com.asset.appwork.model.Group;
 import com.asset.appwork.platform.soap.Process;
 import com.asset.appwork.platform.soap.Workflow;
 import com.asset.appwork.platform.util.CordysUtil;
 import com.asset.appwork.repository.ApprovalHistoryRepository;
 import com.asset.appwork.schema.OutputSchema;
+import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.util.ReflectionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 public class ModuleRouting {
+    private final String breakString = "break";
+    private final String approveString = "approve";
+    private final String requestModificationString = "requestModification";
+    private final String rejectString = "reject";
+
     String config;
     Account account;
     String cordysUrl;
-    String restAPIBaseUrl;
-
-    @Autowired
     ApprovalHistoryRepository approvalHistoryRepository;
+    OrgChartService orgChartService;
 
-    public ModuleRouting(Account account,  String cordysUrl, String restAPIBaseUrl, String config) throws AppworkException {
+    public ModuleRouting(Account account, String cordysUrl, String config, ApprovalHistoryRepository approvalHistoryRepository, OrgChartService orgChartService) {
         this.config = config;
         this.account = account;
         this.cordysUrl= cordysUrl;
-        this.restAPIBaseUrl = restAPIBaseUrl;
+        this.approvalHistoryRepository = approvalHistoryRepository;
+        this.orgChartService = orgChartService;
     }
 
     @Data
@@ -113,46 +120,57 @@ public class ModuleRouting {
 
             String[] currentStepId = {""};
             String[] codeSelected = {""};
+            String[] parentHistoryId = {""};
 
             ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s)->{
                 currentStepId[0] = (String) s;
             }).ifPresent("getCode", (s) -> {
                  codeSelected[0] = (String) s;
+            }).ifPresent("getParentHistoryId", (s) -> {
+                parentHistoryId[0] = (String) s;
             });
 
-            if(codeSelected[0].equals("approve")){
-                // If assignee code in next steps
-                // Else go to parent step
-                String assigneeCode = calculateNextAssignee(outputSchema);
+            ((OutputSchema)outputSchema).setParentHistoryId(null);
 
-                if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(assigneeCode)){
-                    nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(assigneeCode);
+            // Note: Case Approve
+            if(codeSelected[0].contains(approveString)){
+                 // Note: If assignee code in next steps
+                 //      Else go to parent step
+                Group parent = calculateNextAssignee(outputSchema);
+                if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.getGroupCode())){
+                    ((OutputSchema)outputSchema).setAssignedCN(parent.getCN());
+                    nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.getGroupCode());
                 } else if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
                     nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
                 }
 
-            } else if(codeSelected[0].equals("requestModification")){
-                // If code selected and is in nextSteps
-                // go to specific step
-                // Else get previous step from approval history
+            // Note: Case Request Modification
+            } else if(codeSelected[0].contains(requestModificationString)){
+                 // NOTE:  If code selected and is in nextSteps
+                 //       go to specific step
+                 //       Else get previous step from approval history
                 if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
+                    ((OutputSchema)outputSchema).setParentHistoryId(parentHistoryId[0]);
                     nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
                 }else {
-                    nextStep = calculateFromApprovalHistory(outputSchema);
+                    nextStep = calculateFromApprovalHistory(outputSchema,parentHistoryId[0]);
                 }
 
+            // Note: Else case Code is in Next Steps
             } else if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
                 nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
 
-            } else if(codeSelected[0].equals("reject")){
-                nextStep = "break";
+            // Note: Case Reject
+            } else if(codeSelected[0].contains(rejectString)){
+                nextStep = breakString;
+
             }
 
             if(nextStep.isEmpty()){
-                nextStep = "break";
+                nextStep = breakString;
             }
 
-            if(!nextStep.equals("break")){
+            if(!nextStep.equals(breakString)){
                 nextPage = routingConfig.getSteps().get(nextStep).getPage();
                 ((OutputSchema)outputSchema).setPage(nextPage);
             }
@@ -164,23 +182,29 @@ public class ModuleRouting {
         }
     }
 
-    private <T> String calculateNextAssignee(T outputSchema){
-        ((OutputSchema)outputSchema).setAssignedCN("cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local");
-        String assigneeCode = "HIROLE";
-        return assigneeCode;
+    private <T> Group calculateNextAssignee(T outputSchema) throws AppworkException {
+        String[] codeSelected = {""};
+
+        ReflectionUtil.of(outputSchema).ifPresent("getCode", (s)->{
+            codeSelected[0] = (String) s;
+        });
+        Optional<Group> parent = orgChartService.getGroupParent(codeSelected[0]);
+        if(parent.isPresent()){
+           return parent.get();
+        }else{
+            throw new AppworkException(ResponseCode.NO_CONTENT);
+        }
     }
 
-    private <T> String calculateFromApprovalHistory(T outputSchema) throws JsonProcessingException {
-        String[] process = {""}; //"000C292D-1114-A1EB-9217-3FF5C7814E9C"
-        String[] entityId = {""};
-        ReflectionUtil.of(outputSchema).ifPresent("getProcess", (s)->{
-            process[0] = (String) s;
-        }).ifPresent("getEntityId", (s) -> {
-            entityId[0] = (String) s;
-        });
+    private <T> String calculateFromApprovalHistory(T outputSchema,String parentHistoryId) throws JsonProcessingException {
+        Optional<ApprovalHistory> approvalHistory = this.approvalHistoryRepository.findById(Long.parseLong(parentHistoryId));
 
-        Optional<ApprovalHistory> approvalHistory = approvalHistoryRepository.findTop1ByProcessNameAndEntityIdOrderByIdDesc(process[0], entityId[0]);
+        if(approvalHistory.isPresent()){
+            ((OutputSchema)outputSchema).setParentHistoryId(approvalHistory.get().getParent());
+            ((OutputSchema)outputSchema).setAssignedCN(approvalHistory.get().getUserCN());
+            return approvalHistory.get().getStepId();
+        }
 
-        return "break";
+        return breakString;
     }
 }

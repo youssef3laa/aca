@@ -2,6 +2,8 @@ package com.asset.appwork.repository;
 
 import com.asset.appwork.model.Group;
 import com.asset.appwork.model.Unit;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -18,4 +20,9 @@ public interface GroupRepository extends GenericRepository<Group, Long> {
 
     //TODO: Need Fixing?
     Optional<Collection<Group>> findByUnitIn(Set<Unit> units);
+
+    @Query(value = "{call ACA_ORG_SP_getGroupByCodeAndDirection(:groupCode, :direction, :unitTypeCode)}", nativeQuery = true)
+    Optional<Collection<Group>> getGroupByCodeAndDirection(@Param("groupCode") String groupCode,
+                                                           @Param("direction") String direction,
+                                                           @Param("unitTypeCode") String unitTypeCode);
 }

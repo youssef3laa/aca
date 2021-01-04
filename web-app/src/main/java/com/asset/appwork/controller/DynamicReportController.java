@@ -9,6 +9,7 @@ import com.asset.appwork.dto.Filter;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.util.SystemUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,20 +29,18 @@ public class DynamicReportController {
     EntityManager entityManager;
 
     @GetMapping("/get")
-    public ResponseEntity<AppResponse<ObjectNode>> getForm(@RequestBody() Filter key) {
-        AppResponse.ResponseBuilder<ObjectNode> responseBuilder = AppResponse.builder();
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode result = mapper.createObjectNode();
+    public ResponseEntity<AppResponse<JsonNode>> getForm(@RequestBody() Filter key) {
+        AppResponse.ResponseBuilder<JsonNode> responseBuilder = AppResponse.builder();
         try{
             QueryBuilder queryBuilder = new QueryBuilder(entityManager);
             List<?> list = queryBuilder.runQuery(key);
-            result.put("Result", SystemUtil.writeObjectIntoString(list));
+            String resultString = SystemUtil.writeObjectIntoString(list);
             responseBuilder.status(ResponseCode.SUCCESS);
-            return responseBuilder.data(result).build().getResponseEntity();
+            return responseBuilder.data(SystemUtil.convertStringToJsonNode(resultString)).build().getResponseEntity();
         }catch (Exception e){
             e.printStackTrace();
             responseBuilder.status(ResponseCode.QUERY_BUILDER_FAILURE);
         }
-        return responseBuilder.data(result).build().getResponseEntity();
+        return responseBuilder.build().getResponseEntity();
     }
 }

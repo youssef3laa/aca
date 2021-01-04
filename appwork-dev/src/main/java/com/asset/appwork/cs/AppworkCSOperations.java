@@ -1,9 +1,10 @@
 package com.asset.appwork.cs;
 
 
+import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.util.Http;
+import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Data;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
@@ -26,22 +27,36 @@ public class AppworkCSOperations {
 
 
     public AppworkCSOperations(String userName, String password) {
-        this.userName = userName;
-        this.password = password;
+        this.userName = "admin";
+        this.password = "Asset99a";
     }
 
     //upload, versioning, search, download, brava, viewing, delete, rename, creation folder
-    public CSResponse getNodeDetails(String nodeId) {
+    public Http getNodeDetails(String nodeId) throws AppworkException {
         String urlStr = CS_API.NODE_ACTION.getApiURL() + "/" +
                 nodeId;
         Http http = new Http().setDoAuthentication(true)
                 .basicAuthentication(this.userName, this.password)
                 .setContentType(Http.ContentType.JSON_REQUEST)
                 .get(urlStr);
-        return new CSResponse(http.getResponse(), http.getStatusCode());
+        if (!http.isSuccess())
+            throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return http;
     }
 
-    public CSResponse uploadDocument(byte[] file, String parentId, String fileName, String type) {
+    public Http deleteNode(String nodeId) throws AppworkException {
+        String urlStr = CS_API.NODE_ACTION.getApiURL() + "/" +
+                nodeId;
+        Http http = new Http().setDoAuthentication(true)
+                .basicAuthentication(this.userName, this.password)
+                .setContentType(Http.ContentType.JSON_REQUEST)
+                .delete(urlStr);
+        if (!http.isSuccess())
+            throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return http;
+    }
+
+    public Http uploadDocument(byte[] file, String parentId, String fileName, String type) throws AppworkException {
         String urlStr = CS_API.NODE_ACTION.getApiURL();
         Part[] parts =
                 {
@@ -56,11 +71,14 @@ public class AppworkCSOperations {
                 .setContentType(Http.ContentType.FORM_REQUEST)
                 .setData(parts)
                 .post(urlStr);
-        return new CSResponse(http.getResponse(), http.getStatusCode());
+        if (!http.isSuccess())
+            throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+
+        return http;
     }
 
 
-    public CSResponse getSubNodes(String parentId, DocumentQuery documentQuery) throws JsonProcessingException {
+    public Http getSubNodes(String parentId, DocumentQuery documentQuery) throws AppworkException {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(CS_API.GET_SUB_NODES.getApiURL());
         uriComponentsBuilder.queryParamIfPresent("where_type", Optional.ofNullable(documentQuery.getWhereType()));
         uriComponentsBuilder.queryParamIfPresent("sort", Optional.ofNullable(documentQuery.getSort()));
@@ -72,7 +90,10 @@ public class AppworkCSOperations {
                 .basicAuthentication(this.userName, this.password)
                 .setContentType(Http.ContentType.JSON_REQUEST)
                 .get(uriComponentsBuilder.encode().buildAndExpand(pathVariables).toString());
-        return new CSResponse(http.getResponse(), http.getStatusCode());
+
+        if (!http.isSuccess())
+            throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return http;
     }
 
 
@@ -105,25 +126,7 @@ public class AppworkCSOperations {
 
     }
 
-    public static class CSResponse {
-        private final String response;
-        private final Integer statusCode;
-
-        public CSResponse(String response, Integer statusCode) {
-            this.response = response;
-            this.statusCode = statusCode;
-        }
-
-        public String getResponse() {
-            return response;
-        }
-
-        public Integer getStatusCode() {
-            return statusCode;
-        }
-    }
     @Data
-
     public static class DocumentQuery {
         @JsonProperty("where_type")
         String whereType;

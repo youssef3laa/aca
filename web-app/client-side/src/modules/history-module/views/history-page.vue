@@ -1,69 +1,64 @@
 <template>
-
-    <div>
-        <v-container>
-            <app-builder ref="appBuilder" :app="app" />
-        </v-container>
-    </div>
-  
+  <div>
+    <v-container>
+      <app-builder ref="appBuilder" :app="app" />
+    </v-container>
+  </div>
 </template>
 
 <script>
-import appBuilder from '../../application-builder-module/builders/app-builder'
-import historyMixin from '../mixin/historyMixin'
-import formPageMixin from '../../../mixins/formPageMixin'
+import appBuilder from "../../application-builder-module/builders/app-builder";
+import historyMixin from "../mixin/historyMixin";
+import formPageMixin from "../../../mixins/formPageMixin";
 export default {
-    name: 'historyView',
-    components: { appBuilder },
-    mixins: [historyMixin,formPageMixin],
-     async created(){
-        this.response =  await this.getHistoryByProcessNameAndEntityId(this.processName, this.entityId );
-        console.log("responsyyy",this.response);
-        this.loadForm("approval-history",this.fillForm);
-        // this.fillForm();
+  name: "historyView",
+  components: { appBuilder },
+  mixins: [historyMixin, formPageMixin],
+  async created() {
+    this.response = await this.getHistoryByProcessNameAndEntityId(
+      this.processName,
+      this.entityId
+    );
+    console.log("responsyyy", this.response);
+    this.loadForm("approval-history", this.fillForm);
+    // this.fillForm();
+  },
+
+  methods: {
+    fillForm() {
+      // var response =  this.getHistoryByProcessNameAndEntityId(this.processName, this.entityId );
+
+      this.$refs.appBuilder.setModelData("historyTable", {
+        taskTable: {
+          headers: [
+            {
+              text: "الاسم",
+              align: "start",
+              value: "userCN",
+            },
+            {
+              text: "التاريخ",
+              value: "approvalDate",
+            },
+          ],
+          data: this.response,
+          search: "",
+        },
+      });
     },
+  },
 
-    methods:{ 
-      fillForm(){
-        // var response =  this.getHistoryByProcessNameAndEntityId(this.processName, this.entityId );
-
-        this.$refs.appBuilder.setModelData("historyTable",{
-                      taskTable: {
-                        headers: [
-                          {
-                            text: 'الاسم',
-                            align: 'start',
-                            filالاسمable: false,
-                            value: 'userCN',
-                          },
-                          {
-                            text: 'التاريخ',
-                            value: 'approvalDate',
-                          },
-                          
-                        ],
-                        data: this.response,
-                        search: ''
-                      }});
-          
-
-        
-        
-        
-      }
-    },
-
-    data () {
-        return{
-            response:[] ,
-            processName:"test",
-            entityId:"test",
-            app:{}
+  data() {
+    return {
+      response: [],
+      processName: "test",
+      entityId: "test",
+      app: {},
       //        app: {
       //   pages: [
       //     {
       //       sections: [
-            
+
       //         {
       //           tabs: [
       //             {
@@ -95,7 +90,7 @@ export default {
       //                       text: 'التاريخ',
       //                       value: 'approvalDate',
       //                     },
-                          
+
       //                   ],
       //                   data: [],
       //                   search: '',
@@ -108,14 +103,10 @@ export default {
       //     },
       //   ],
       // },
-    
-
-        }},
-
-    
-}
+    };
+  },
+};
 </script>
 
 <style>
-
 </style>
