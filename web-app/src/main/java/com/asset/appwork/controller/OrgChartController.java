@@ -8,6 +8,7 @@ import com.asset.appwork.otds.Otds;
 import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.repository.GroupRepository;
 import com.asset.appwork.repository.UnitRepository;
+import com.asset.appwork.repository.UserRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,6 +38,8 @@ public class OrgChartController {
     UnitRepository unitRepository;
     @Autowired
     GroupRepository groupRepository;
+    @Autowired
+    UserRepository userRepository;
 
     @PostMapping("/unit/create")
     public ResponseEntity<AppResponse<Long>> createUnit(@RequestHeader("X-Auth-Token") String token,
@@ -356,7 +359,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-//    @Transactional
+    //    @Transactional
     @GetMapping("/unit/{code}/down")
     public ResponseEntity<AppResponse<JsonNode>> getUnitChildrenByCode(@RequestHeader("X-Auth-Token") String token,
                                                                        @PathVariable("code") String code
@@ -392,7 +395,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-//    @Transactional
+    //    @Transactional
     @GetMapping("/unit/{code}/up")
     public ResponseEntity<AppResponse<JsonNode>> getUnitParentsByCode(@RequestHeader("X-Auth-Token") String token,
                                                                       @PathVariable("code") String code
@@ -604,7 +607,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-//    @Transactional
+    //    @Transactional
     @GetMapping("/group/{code}/down")
     public ResponseEntity<AppResponse<JsonNode>> getGroupUnitChildrenByCode(@RequestHeader("X-Auth-Token") String token,
                                                                             @PathVariable("code") String code
@@ -656,10 +659,10 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-//    @Transactional
+    //    @Transactional
     @GetMapping("/sp/group/{code}/down")
     public ResponseEntity<AppResponse<JsonNode>> getGroupUnitChildrenByCodeSP(@RequestHeader("X-Auth-Token") String token,
-                                                                            @PathVariable("code") String code
+                                                                              @PathVariable("code") String code
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
@@ -686,7 +689,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-//    @Transactional
+    //    @Transactional
     @GetMapping("/group/{code}/up")
     public ResponseEntity<AppResponse<JsonNode>> getGroupUnitParentsByCode(@RequestHeader("X-Auth-Token") String
                                                                                    token,
@@ -742,26 +745,27 @@ public class OrgChartController {
     //    @Transactional
     @GetMapping("/sp/group/{code}/up")
     public ResponseEntity<AppResponse<JsonNode>> getGroupUnitParentsByCodeSP(@RequestHeader("X-Auth-Token") String token,
-                                                                              @PathVariable("code") String code
+                                                                             @PathVariable("code") String code
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if (account != null) {
-                groupRepository.getGroupByCodeAndDirection(code, "up", "").ifPresentOrElse(groups -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                }, () -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+
+            groupRepository.getGroupByCodeAndDirection(code, "up", "").ifPresentOrElse(groups -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }, () -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            });
+
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
@@ -823,6 +827,37 @@ public class OrgChartController {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<AppResponse<JsonNode>> getUserByUserId(@RequestHeader("X-Auth-Token") String
+                                                                         token,
+                                                                 @PathVariable("userId") String userId
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            userRepository.findByUserId(userId).ifPresentOrElse( (user) -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(user.toString()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }, () -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            });
+
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
