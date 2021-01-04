@@ -136,11 +136,13 @@ public class ModuleRouting {
             if(codeSelected[0].contains(approveString)){
                  // Note: If assignee code in next steps
                  //      Else go to parent step
-                Group parent = calculateNextAssignee(outputSchema);
-                if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.getGroupCode())){
-                    ((OutputSchema)outputSchema).setAssignedCN(parent.getCN());
-                    nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.getGroupCode());
-                } else if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
+//                Group parent = calculateNextAssignee();
+
+//                if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.getGroupCode())){
+//                    ((OutputSchema)outputSchema).setAssignedCN(parent.getCN());
+//                    nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.getGroupCode());
+//                } else
+                if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
                     nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
                 }
 
@@ -163,7 +165,6 @@ public class ModuleRouting {
             // Note: Case Reject
             } else if(codeSelected[0].contains(rejectString)){
                 nextStep = breakString;
-
             }
 
             if(nextStep.isEmpty()){
@@ -182,12 +183,12 @@ public class ModuleRouting {
         }
     }
 
-    private <T> Group calculateNextAssignee(T outputSchema) throws AppworkException {
+    private <T> Group calculateNextAssignee() throws AppworkException {
         String[] codeSelected = {""};
 
-        ReflectionUtil.of(outputSchema).ifPresent("getCode", (s)->{
-            codeSelected[0] = (String) s;
-        });
+//        ReflectionUtil.of(outputSchema).ifPresent("getCode", (s)->{
+//            codeSelected[0] = (String) s;
+//        });
         Optional<Group> parent = orgChartService.getGroupParent(codeSelected[0]);
         if(parent.isPresent()){
            return parent.get();

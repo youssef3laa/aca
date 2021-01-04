@@ -72,7 +72,6 @@
                             ,
                             {
                                 "width": "50%",
-                                "resizable": "true",
                                 "key": "form2",
                                 "publish": "complete",
                                 "inputs": [
