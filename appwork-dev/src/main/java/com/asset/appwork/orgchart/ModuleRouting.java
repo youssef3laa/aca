@@ -5,6 +5,7 @@ import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.ApprovalHistory;
 import com.asset.appwork.model.Group;
+import com.asset.appwork.model.User;
 import com.asset.appwork.platform.soap.Process;
 import com.asset.appwork.platform.soap.Workflow;
 import com.asset.appwork.platform.util.CordysUtil;
@@ -18,6 +19,7 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 
 public class ModuleRouting {
@@ -136,13 +138,13 @@ public class ModuleRouting {
             if(codeSelected[0].contains(approveString)){
                  // Note: If assignee code in next steps
                  //      Else go to parent step
-//                Group parent = calculateNextAssignee();
+                Optional<Group> parent = calculateNextAssignee();
 
-//                if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.getGroupCode())){
-//                    ((OutputSchema)outputSchema).setAssignedCN(parent.getCN());
-//                    nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.getGroupCode());
-//                } else
-                if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
+                if(parent.isPresent() && routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.get().getGroupCode())){
+                    ((OutputSchema)outputSchema).setAssignedCN(parent.get().getCN());
+                    nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.get().getGroupCode());
+
+                }else if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
                     nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
                 }
 
@@ -183,18 +185,14 @@ public class ModuleRouting {
         }
     }
 
-    private <T> Group calculateNextAssignee() throws AppworkException {
-        String[] codeSelected = {""};
+    private Optional<Group> calculateNextAssignee(){
+        User user = orgChartService.getUserDetails(account.getUsername());
 
-//        ReflectionUtil.of(outputSchema).ifPresent("getCode", (s)->{
-//            codeSelected[0] = (String) s;
-//        });
-        Optional<Group> parent = orgChartService.getGroupParent(codeSelected[0]);
-        if(parent.isPresent()){
-           return parent.get();
-        }else{
-            throw new AppworkException(ResponseCode.NO_CONTENT);
+        Optional<Group> userGroup = user.getGroup().stream().findFirst();
+        if(userGroup.isPresent()){
+            return orgChartService.getGroupParent(userGroup.get().getGroupCode());
         }
+        return Optional.empty();
     }
 
     private <T> String calculateFromApprovalHistory(T outputSchema,String parentHistoryId) throws JsonProcessingException {
