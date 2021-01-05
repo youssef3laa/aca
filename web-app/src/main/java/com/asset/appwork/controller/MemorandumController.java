@@ -5,19 +5,22 @@ import com.asset.appwork.dto.Account;
 import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.model.ApprovalHistory;
-import com.asset.appwork.model.memoValues;
-import com.asset.appwork.model.memorandum;
+import com.asset.appwork.model.Memorandum;
 import com.asset.appwork.platform.soap.memorandumSOAP;
 import com.asset.appwork.repository.MemosRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
+import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -42,9 +45,15 @@ public class MemorandumController {
             Account account = tokenService.get(token);
             if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            String response = cordysService.sendRequest(account, new memorandumSOAP().createMemorandum(memos));
-            String response2 = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memos));
-            respBuilder.data(response);
+            String addRecordToMemorandum = cordysService.sendRequest(account, new memorandumSOAP().createMemorandum(memos));
+
+            String XMLtoJSON = SystemUtil.convertXMLtoJSON(addRecordToMemorandum);
+            ObjectMapper objectMapper = new ObjectMapper();
+            long id = objectMapper.readTree(XMLtoJSON).get("Body").get("CreateACA_Entity_MemosResponse").get("ACA_Entity_Memos").get("ACA_Entity_Memos-id").get("Id").asLong();
+
+            System.out.println(id);
+            String addRecordToMemorandumValues = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memos, id));
+            respBuilder.data(addRecordToMemorandumValues);
 
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
@@ -54,21 +63,22 @@ public class MemorandumController {
             log.error(e.getMessage());
             e.printStackTrace();
             respBuilder.status(e.getCode());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return respBuilder.build().getResponseEntity();
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<AppResponse<List<memorandum>>> getMemorandum(@RequestHeader("X-Auth-Token") String token, @PathVariable("id") String key){
-        AppResponse.ResponseBuilder<List<memorandum>> respBuilder = AppResponse.builder();
+    public ResponseEntity<AppResponse<List<Memorandum>>> getMemorandum(@RequestHeader("X-Auth-Token") String token, @PathVariable("id") String key){
+        AppResponse.ResponseBuilder<List<Memorandum>> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            List<memorandum> s = memosRepository.findAll();
+            List<Memorandum> s = memosRepository.findByJsonId(key);
             if(s.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
             respBuilder.data(s);
-
 
         } catch (AppworkException e) {
             log.error(e.getMessage());

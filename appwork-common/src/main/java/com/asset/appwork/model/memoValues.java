@@ -17,6 +17,4 @@ public class memoValues {
     String jsonKey;
     String value;
 
-//    @OneToOne(mappedBy="memoValues")
-//    private memorandum memorandum;
 }
