@@ -6,8 +6,8 @@
 
 <script>
 import AppBuilder from "../../application-builder-module/builders/app-builder";
-import Http from "http";
-// import Http from "../../core-module/services/http"
+// import Http from "http";
+import Http from "../../core-module/services/http"
 
 export default {
   name: "attachment",
@@ -67,6 +67,7 @@ export default {
                             },
                           },
                         },
+
                       ],
                     },
                   },
@@ -81,6 +82,8 @@ export default {
   ,
   created() {
     this.$observable.subscribe('open-file-brava', async (fileId) => {
+      this.$observable.fire('file-component-skeleton', true)
+
       console.log(fileId);
       let userToken;
       try {
@@ -89,52 +92,15 @@ export default {
           "password": "Asset99a",
           "ticketType": "OTDSTICKET"
         });
+        this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
+            'http://appworks-dev/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
         console.log(userToken);
+        this.$observable.fire('file-component-skeleton', false)
+
       } catch (e) {
         console.log(e);
       }
-      this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
-          'http://appworks-dev/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
-      // this.$refs.appBuilder.appendForm("section2", {
-      //   key: "form3",
-      //   inputs: [
-      //     {
-      //       type: 'InputComponent',
-      //       name: 'receiverEntityName',
-      //       col: 4,
-      //     },
-      //   ],
-      //   model: {
-      //     receiverEntityName: '',
-      //   },
-      // })
-      // this.$refs.appBuilder.appendSection("page1", {
-      //   key: 'section3',
-      //   tabs: [
-      //     {
-      //       key: 'tab3',
-      //       id: 2,
-      //       name: 'new tab',
-      //       icon: 'fas fa-paperclip',
-      //     }
-      //
-      //   ],
-      //   forms: [
-      //     {
-      //       key: "form3",
-      //       inputs: [
-      //         {
-      //           type: 'InputComponent',
-      //           name: 'receiverEntityName',
-      //           col: 4,
-      //         },
-      //       ],
-      //       model: {
-      //         inputFile: '',
-      //       },
-      //     }
-      //   ],
-      // },)
+
 
     });
   }, mounted() {

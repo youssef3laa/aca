@@ -48,6 +48,7 @@ import DatePickerComponent from '../components/datePicker-component'
 import ApprovalComponent from '../components/approvalCard-component'
 import AttachmentComponent from '../components/attachment-component'
 import IframeComponent from '../components/iframe-component'
+import SkeletonLoader from '../components/skeleton-loader-component'
 
 export default {
   name: 'FormBuilder',
@@ -66,6 +67,7 @@ export default {
     DatePickerComponent,
     ApprovalComponent,
     IframeComponent,
+    SkeletonLoader,
     AttachmentComponent
   },
   data() {

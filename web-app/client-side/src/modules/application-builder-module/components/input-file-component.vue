@@ -1,3 +1,4 @@
+<!--suppress EqualityComparisonWithCoercionJS -->
 <template>
   <div>
     <v-container
@@ -21,27 +22,12 @@
     <br/>
     <span>الملفات</span>
     <v-container>
-      <!-- <draggable tag="ul" :list="files">
-        <li
-          v-for="(file, index) in files"
-          :key="index"
-          draggable
-          class="drop-zone"
-          @drop="onDrop($event)"
-          @dragstart="startDrag($event, file)"
-          @dragover.prevent
-          @dragenter.prevent
-        >
-          {{ file.name }}
-        </li>
-      </draggable> -->
       <draggable :animation="150" :list="filesUploaded" :swapThreshold="0.5" tag="div" @change="onChange"
                  @end="onEnd($event)">
         <div
             v-for="(file, index) in filesUploaded"
             :key="index"
             class="card"
-            draggable
             @dragstart="startDrag($event, file)"
             @dragover.prevent
             @dragenter.prevent
@@ -111,11 +97,29 @@ export default {
       this.$observable.fire('open-file-brava', fileId);
     },
     deleteFile: async function (file) {
-      let fileId = this.filesUploaded.find(element => element.name === file.name).id;
+
       try {
-        await Http.delete('/document/delete/' + fileId);
-        this.filesUploaded = this.filesUploaded.filter(element => element.name !== file.name);
-        this.files = this.files.filter((fileVal) => fileVal.name !== file.name);
+        await Http.delete('/document/delete/' + file.id);
+        this.filesUploaded = this.filesUploaded.filter(element => element.id != file.id);
+        this.files = this.files.filter((fileVal) => fileVal.name != file.name);
+        let attachmentSortId;
+        this.attachmentSortList = this.attachmentSortList.filter(value => {
+          if (value.fileId != file.id) {
+            return true;
+          } else {
+            attachmentSortId = value.id;
+            return false
+          }
+        })
+        if (!attachmentSortId) await Http.delete('/document/sort/' + attachmentSortId);
+        let tempArr = [];
+        for (let i = 0; i < this.filesUploaded.length; ++i) {
+          let element = this.filesUploaded[i];
+          let attachmentSortElement = this.attachmentSortList.find(val => val.fileId == element.id);
+          attachmentSortElement.position = i;
+          tempArr.push(attachmentSortElement);
+        }
+        this.updateMultipleAttachmentSortRecords(tempArr);
       } catch (e) {
         console.error(e)
       }
@@ -223,7 +227,7 @@ export default {
       let ids = attachmentSortListsToBeDeleted.map(element => element.id).join(',');
       if (attachmentSortListsToBeDeleted.length > 0) {
         try {
-          await Http.delete('/document/sort/bulk/' + ids, itemsToPost)
+          await Http.delete('/document/sort/bulk/' + ids)
         } catch (e) {
           console.log(e)
         }
