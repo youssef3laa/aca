@@ -2,6 +2,9 @@ package com.asset.appwork.dto;
 
 import lombok.Data;
 
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * Created by karim on 10/29/20.
  */
@@ -9,15 +12,13 @@ import lombok.Data;
 public class Memos {
     String requestId;
     String jsonId;
-    String memorandumId;
     String key;
-    String value;
+    List<String> notes;
 
-    public Memos(String requestId, String jsonId, String memorandumId, String key, String value) {
+    public Memos(String requestId, String jsonId, String key, List notes) {
         this.requestId = requestId;
         this.jsonId = jsonId;
-        this.memorandumId = memorandumId;
         this.key = key;
-        this.value = value;
+        this.notes = notes;
     }
 }

@@ -2,9 +2,9 @@ package com.asset.appwork.model;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Bassel on 3/1/2020.
@@ -17,4 +17,8 @@ public class memorandum {
     Long id;
     String requestId;
     String jsonId;
+
+//    @OneToOne
+//    @JoinColumn(name="Id")
+//    private memoValues memoValues;
 }
