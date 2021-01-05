@@ -46,6 +46,7 @@ import InputFileComponent from '../components/input-file-component'
 import SelectComponent from '../components/select-component'
 import DatePickerComponent from '../components/datePicker-component'
 import ApprovalComponent from '../components/approvalCard-component'
+import MemoComponent from '../components/memo-component'
 import AttachmentComponent from '../components/attachment-component'
 import IframeComponent from '../components/iframe-component'
 import SkeletonLoader from '../components/skeleton-loader-component'
@@ -66,6 +67,7 @@ export default {
     SelectComponent,
     DatePickerComponent,
     ApprovalComponent,
+    MemoComponent,
     IframeComponent,
     SkeletonLoader,
     AttachmentComponent
