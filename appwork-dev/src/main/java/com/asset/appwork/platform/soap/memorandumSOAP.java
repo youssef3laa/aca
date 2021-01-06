@@ -1,10 +1,9 @@
 package com.asset.appwork.platform.soap;
 
 import com.asset.appwork.dto.Memos;
-import com.asset.appwork.model.memoValues;
 
 /**
- * Created by Bassel on 3/1/2020.
+ * Created by Bassel on 3/1/2021.
  */
 public class memorandumSOAP {
 
