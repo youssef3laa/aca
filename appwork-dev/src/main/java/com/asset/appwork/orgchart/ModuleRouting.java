@@ -76,7 +76,7 @@ public class ModuleRouting {
     }
 
     private <T> String initiateProcess( T outputSchema) throws AppworkException {
-        String response = null;
+        String response;
         try {
             String[] params = {""};
             ReflectionUtil.of(outputSchema).ifPresent("getXML", (s)->{
@@ -93,7 +93,7 @@ public class ModuleRouting {
     }
 
     private <T> String completeWorkflow(T outputSchema) throws AppworkException {
-        String response = null;
+        String response;
         try {
             String[] data = {""};
             String[] taskId = {""};
@@ -186,9 +186,10 @@ public class ModuleRouting {
     }
 
     private Optional<Group> calculateNextAssignee(){
-        User user = orgChartService.getUserDetails(account.getUsername());
-
-        Optional<Group> userGroup = user.getGroup().stream().findFirst();
+        Optional<User> user = Optional.ofNullable(orgChartService.getUserDetails(account.getUsername()));
+        System.out.println(user);
+        if(user.isEmpty()) return Optional.empty();
+        Optional<Group> userGroup = user.get().getGroup().stream().findFirst();
         if(userGroup.isPresent()){
             return orgChartService.getGroupParent(userGroup.get().getGroupCode());
         }
