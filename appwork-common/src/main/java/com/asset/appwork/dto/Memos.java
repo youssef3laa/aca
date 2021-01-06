@@ -5,12 +5,6 @@ import lombok.Data;
 import java.util.HashMap;
 import java.util.List;
 
-<<<<<<< HEAD
-=======
-/**
- * Created by Bassel on 4/1/2021.
- */
->>>>>>> 68ee27eaaeeed0ad82a6f006aff81fc7da3c6caa
 @Data
 public class Memos {
     String requestId;
