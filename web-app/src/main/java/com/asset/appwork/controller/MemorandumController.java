@@ -51,7 +51,6 @@ public class MemorandumController {
             ObjectMapper objectMapper = new ObjectMapper();
             long id = objectMapper.readTree(XMLtoJSON).get("Body").get("CreateACA_Entity_MemosResponse").get("ACA_Entity_Memos").get("ACA_Entity_Memos-id").get("Id").asLong();
 
-            System.out.println(id);
             String addRecordToMemorandumValues = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memos, id));
             respBuilder.data(addRecordToMemorandumValues);
 

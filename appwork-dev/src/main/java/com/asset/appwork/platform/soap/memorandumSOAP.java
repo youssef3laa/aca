@@ -24,11 +24,11 @@ public class memorandumSOAP {
 
     public String createMemoValues(Memos memos, long id){
          String notes = "";
-         for(String value: memos.getNotes()) {
+         for(String key: memos.getValues().keySet()) {
              notes += "<ns0:ACA_Entity_MemosValues-create xmlns:ns0=\"http://schemas/AssetGeneralACA/ACA_Entity_MemosValues\">\n" +
                      "  <ns0:memosId>" + id + "</ns0:memosId>\n" +
-                     "  <ns0:jsonKey>" + memos.getKey()+ "</ns0:jsonKey>\n" +
-                     "  <ns0:value>"+ value +"</ns0:value>\n" +
+                     "  <ns0:jsonKey>" + key + "</ns0:jsonKey>\n" +
+                     "  <ns0:value>"+ memos.getValues().get(key) +"</ns0:value>\n" +
                      "</ns0:ACA_Entity_MemosValues-create>\n";
          }
 
