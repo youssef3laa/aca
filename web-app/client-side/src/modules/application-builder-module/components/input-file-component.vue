@@ -35,8 +35,38 @@
           {{ file.name }}
         </li>
       </draggable> -->
+<<<<<<< .mine
+      <v-row>
+        <v-col :cols="12">
+
+        </v-col>
+      </v-row>
+      <draggable tag="div" :list="files" class="row">
+||||||| .r135
+      <draggable tag="div" :list="files">
+=======
       <draggable :list="filesUploaded" tag="div">
+>>>>>>> .r199
         <div
+<<<<<<< .mine
+          class="card col-5"
+          v-for="(file, index) in files"
+          :key="index"
+          draggable
+          @drop="onDrop($event)"
+          @dragstart="startDrag($event, file)"
+          @dragover.prevent
+          @dragenter.prevent
+||||||| .r135
+          class="card"
+          v-for="(file, index) in files"
+          :key="index"
+          draggable
+          @drop="onDrop($event)"
+          @dragstart="startDrag($event, file)"
+          @dragover.prevent
+          @dragenter.prevent
+=======
             v-for="(file, index) in filesUploaded"
             :key="index"
             class="card"
@@ -45,16 +75,30 @@
             @drop="onDrop($event)"
             @dragover.prevent
             @dragenter.prevent
+>>>>>>> .r199
         >
-          <v-row>
+          <v-row class="row">
             <v-col :cols="2">
-              <v-icon>
+              <v-icon class="card-icon">
                 mdi-file-pdf-outline
               </v-icon>
             </v-col>
+<<<<<<< .mine
+            <v-col :cols="8"
+                   class="card-name"
+            >
+
+              {{ file.name }} <br />
+              {{ file.size }}
+||||||| .r135
+            <v-col :cols="8">
+              {{ file.name }} <br />
+              {{ file.size }}
+=======
             <v-col :cols="8" style="cursor: pointer" @click="openFileInBrave(file)">
               {{ file.name }} <br/>
               {{ file.size_formatted }}
+>>>>>>> .r199
             </v-col>
             <v-col :cols="2" style="cursor: pointer" @click="deleteFile(file)">
               <v-icon color="#ea9cb3">
@@ -216,6 +260,39 @@ export default {
   },
 }
 </script>
+<style lang="scss">
+
+/*colors*/
+$color-prim-font:#1A1A2E;
+$color-prim-border:#94bed6; 
+$color-prim-bg: #f2f7fa;
+$color-secondary:#9E9E9E;
+/*fonts */
+$font-12: 12px;
+
+
+
+.input-file-prim{   
+border: 2px dashed $color-prim-border !important;
+border-radius: 6px;
+background-color:$color-prim-bg;
+
+}
+.card-name{
+    font-size: $font-12;
+    color:$color-prim-font;
+}
+.card-icon{
+    height: 40px;
+    padding: 5px;
+    background: lighten($color-secondary, $amount: 30);
+    border-radius: 6px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+    
+</style>
 <style>
 .card {
   border: 2px solid #d6d6d6;
