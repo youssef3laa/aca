@@ -186,7 +186,7 @@ public class ModuleRouting {
     }
 
     private Optional<Group> calculateNextAssignee(){
-        Optional<User> user = Optional.ofNullable(orgChartService.getUserDetails(account.getUsername()));
+        Optional<User> user = orgChartService.getUserDetails(account.getUsername());
         System.out.println(user);
         if(user.isEmpty()) return Optional.empty();
         Optional<Group> userGroup = user.get().getGroup().stream().findFirst();
