@@ -7,10 +7,12 @@
 <script>
 import formPageMixin from "../../../mixins/formPageMixin";
 import AppBuilder from "../../application-builder-module/builders/app-builder";
+import historyMixin from "@/modules/history-module/mixin/historyMixin";
+import Http from "@/modules/core-module/services/http";
 
 export default {
   name: "process-step-RQ",
-  mixins: [formPageMixin],
+  mixins: [formPageMixin, historyMixin],
   components: {
     AppBuilder,
   },
@@ -27,7 +29,7 @@ export default {
       let entityName = this.inputSchema.entityName;
       let entityId = this.inputSchema.entityId;
       this.readEntity(entityName, entityId)
-          .then((response) => {
+          .then(async (response) => {
             response = JSON.parse(response.data.data);
 
             this.$refs.appBuilder.setModelData("form1", {
@@ -43,6 +45,33 @@ export default {
                 value: response.receiver,
               },
               requestDate: response.requestDate.split("Z")[0],
+            });
+            this.approvalsHistoryResponse = await this.getHistoryByProcessNameAndEntityId(
+                this.inputSchema.process,
+                this.inputSchema.entityId
+            );
+            console.log(this.approvalsHistoryResponse);
+            this.$refs.appBuilder.setModelData("historyTable", {
+              taskTable: {
+                headers: [
+                  {
+                    text: "القرار",
+                    align: "start",
+                    value: "decision",
+                  },
+                  {
+                    text: "الاسم",
+                    align: "start",
+                    value: "userCN",
+                  },
+                  {
+                    text: "التاريخ",
+                    value: "approvalDate",
+                  },
+                ],
+                data: this.approvalsHistoryResponse,
+                search: "",
+              },
             });
 
             console.log("response", response);
@@ -79,6 +108,30 @@ export default {
       };
       this.completeStep(data);
     });
+
+    this.$observable.subscribe('open-file-brava', async (fileId) => {
+      this.$observable.fire('file-component-skeleton', true)
+
+      console.log(fileId);
+      let userToken;
+      try {
+        userToken = await Http.post("http://appworks-dev:8080/otdsws/rest/authentication/credentials", {
+          "userName": "admin",
+          "password": "Asset99a",
+          "ticketType": "OTDSTICKET"
+        });
+        this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
+            'http://appworks-dev/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
+        console.log(userToken);
+        this.$observable.fire('file-component-skeleton', false)
+
+      } catch (e) {
+        console.log(e);
+      }
+
+
+    });
+
   },
 
   data() {
@@ -88,6 +141,7 @@ export default {
       inputSchema: {},
       app: {},
       model: {},
+      approvalsHistoryResponse: ''
     };
   },
 };
