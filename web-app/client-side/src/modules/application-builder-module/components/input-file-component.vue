@@ -35,20 +35,13 @@
           {{ file.name }}
         </li>
       </draggable> -->
-<<<<<<< .mine
       <v-row>
         <v-col :cols="12">
 
         </v-col>
       </v-row>
       <draggable tag="div" :list="files" class="row">
-||||||| .r135
-      <draggable tag="div" :list="files">
-=======
-      <draggable :list="filesUploaded" tag="div">
->>>>>>> .r199
         <div
-<<<<<<< .mine
           class="card col-5"
           v-for="(file, index) in files"
           :key="index"
@@ -57,25 +50,6 @@
           @dragstart="startDrag($event, file)"
           @dragover.prevent
           @dragenter.prevent
-||||||| .r135
-          class="card"
-          v-for="(file, index) in files"
-          :key="index"
-          draggable
-          @drop="onDrop($event)"
-          @dragstart="startDrag($event, file)"
-          @dragover.prevent
-          @dragenter.prevent
-=======
-            v-for="(file, index) in filesUploaded"
-            :key="index"
-            class="card"
-            draggable
-            @dragstart="startDrag($event, file)"
-            @drop="onDrop($event)"
-            @dragover.prevent
-            @dragenter.prevent
->>>>>>> .r199
         >
           <v-row class="row">
             <v-col :cols="2">
@@ -83,22 +57,12 @@
                 mdi-file-pdf-outline
               </v-icon>
             </v-col>
-<<<<<<< .mine
             <v-col :cols="8"
                    class="card-name"
             >
 
               {{ file.name }} <br />
               {{ file.size }}
-||||||| .r135
-            <v-col :cols="8">
-              {{ file.name }} <br />
-              {{ file.size }}
-=======
-            <v-col :cols="8" style="cursor: pointer" @click="openFileInBrave(file)">
-              {{ file.name }} <br/>
-              {{ file.size_formatted }}
->>>>>>> .r199
             </v-col>
             <v-col :cols="2" style="cursor: pointer" @click="deleteFile(file)">
               <v-icon color="#ea9cb3">
