@@ -151,6 +151,12 @@ export default {
   margin: 0 20px 0 0;
   padding: 10px 15px;
 }
+<<<<<<< .mine
+.v-expansion-panel-header--active{
+  border-bottom: 1px solid #D1D1D1;
+}
+||||||| .r200
+=======
 .v-expansion-panel__header {
   border: none;
 }
@@ -164,4 +170,5 @@ export default {
   border-top: 1px solid black;
   z-index: -1;
 }
+>>>>>>> .r228
 </style>
