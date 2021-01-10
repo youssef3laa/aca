@@ -1,6 +1,8 @@
 package com.asset.appwork.model;
 
 import lombok.Data;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -12,13 +14,14 @@ import java.util.Set;
 @Entity
 @Data
 @Table(name = "O9AssetGeneralACAACA_Entity_Memos")
-public class memorandum {
+public class Memorandum {
     @Id
     Long id;
     String requestId;
     String jsonId;
 
-//    @OneToOne
-//    @JoinColumn(name="Id")
-//    private memoValues memoValues;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "memosId")
+    private List<memoValues> memoValues;
 }

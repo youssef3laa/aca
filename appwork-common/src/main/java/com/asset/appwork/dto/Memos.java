@@ -5,20 +5,19 @@ import lombok.Data;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by Bassel on 4/1/2021.
- */
 @Data
 public class Memos {
     String requestId;
     String jsonId;
-    String key;
-    List<String> notes;
+    HashMap<String, String> values;
 
-    public Memos(String requestId, String jsonId, String key, List notes) {
+    public Memos(String requestId, String jsonId) {
         this.requestId = requestId;
         this.jsonId = jsonId;
-        this.key = key;
-        this.notes = notes;
     }
+
+    public HashMap<String, String> getValues() { return values; }
+
+    public void setValues(HashMap<String, String> values) { this.values = values; }
+
 }
