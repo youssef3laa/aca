@@ -5,7 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 
 /**
- * Created by Bassel on 3/1/2020.
+ * Created by Bassel on 3/1/2021.
  */
 @Entity
 @Data
@@ -17,6 +17,4 @@ public class memoValues {
     String jsonKey;
     String value;
 
-//    @OneToOne(mappedBy="memoValues")
-//    private memorandum memorandum;
 }

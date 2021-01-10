@@ -22,6 +22,7 @@
     <br/>
     <span>الملفات</span>
     <v-container>
+
       <draggable :animation="150" :list="filesUploaded" :swapThreshold="0.5" tag="div" @change="onChange"
                  @end="onEnd($event)">
         <div
@@ -31,17 +32,19 @@
             @dragstart="startDrag($event, file)"
             @dragover.prevent
             @dragenter.prevent
-
         >
-          <v-row>
+          <v-row class="row">
             <v-col :cols="2">
-              <v-icon>
+              <v-icon class="card-icon">
                 mdi-file-pdf-outline
               </v-icon>
             </v-col>
-            <v-col :cols="8" style="cursor: pointer" @click="openFileInBrave(file)">
-              {{ file.name }} <br/>
-              {{ file.size_formatted }}
+            <v-col :cols="8"
+                   class="card-name"
+            >
+
+              {{ file.name }} <br />
+              {{ file.size }}
             </v-col>
             <v-col :cols="2" style="cursor: pointer" @click="deleteFile(file)">
               <v-icon color="#ea9cb3">
@@ -312,6 +315,39 @@ export default {
   ,
 }
 </script>
+<style lang="scss">
+
+/*colors*/
+$color-prim-font:#1A1A2E;
+$color-prim-border:#94bed6; 
+$color-prim-bg: #f2f7fa;
+$color-secondary:#9E9E9E;
+/*fonts */
+$font-12: 12px;
+
+
+
+.input-file-prim{   
+border: 2px dashed $color-prim-border !important;
+border-radius: 6px;
+background-color:$color-prim-bg;
+
+}
+.card-name{
+    font-size: $font-12;
+    color:$color-prim-font;
+}
+.card-icon{
+    height: 40px;
+    padding: 5px;
+    background: lighten($color-secondary, $amount: 30);
+    border-radius: 6px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+    
+</style>
 <style>
 .card {
   border: 2px solid #d6d6d6;
