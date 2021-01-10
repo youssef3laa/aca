@@ -1,9 +1,6 @@
 package com.asset.appwork.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -16,30 +13,21 @@ public class Unit extends BaseIdentity<Unit> {
     String unitTypeCode;
     @Column(name = "UnitCode")
     String unitCode;
-    @ManyToMany(cascade = {CascadeType.ALL})
-    @JoinTable(
-            name = "O9AssetOrgACAOrganizationalUnitGroup",
-            joinColumns = {@JoinColumn(name = "OrganizationIdB06E0FBB7FCC75BD")},
-            inverseJoinColumns = {@JoinColumn(name = "Group_Id")}
-    )
-//    @JsonBackReference
-//    @JsonProperty("groups")
+    @OneToMany(mappedBy = "unit", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JsonIgnore
-    Collection<Group> group = new HashSet<>();
-    @ManyToMany(cascade = CascadeType.ALL)
+    Collection<Group> group;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
             name = "O9OpenTextEntityIdentityComponentsOrganizationalUnitOrganizationalUnit",
-            joinColumns = {@JoinColumn(name = "OrganizationalUnit_Id")}, //TODO: Check rows
-            inverseJoinColumns = {@JoinColumn(name = "OrganizationIdA7A9FD625B78137F")}) //TODO: Check rows
-//    @JsonBackReference
-//    @JsonProperty("parents")
+            joinColumns = {@JoinColumn(name = "OrganizationIdA7A9FD625B78137F")},
+            inverseJoinColumns = {@JoinColumn(name = "OrganizationalUnit_Id")},
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"OrganizationIdA7A9FD625B78137F", "OrganizationalUnit_Id"})}
+    )
+    @JsonIgnore
+    Collection<Unit> child = new HashSet<>();
+    @ManyToMany(mappedBy = "child", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JsonIgnore
     private Collection<Unit> parent = new HashSet<>();
-    @ManyToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-//    @JsonManagedReference
-//    @JsonProperty("children")
-    @JsonIgnore
-    private Collection<Unit> child = new HashSet<>();
 
     public String getUnitTypeCode() {
         return unitTypeCode;
@@ -81,3 +69,8 @@ public class Unit extends BaseIdentity<Unit> {
         this.child = children;
     }
 }
+
+//    @JsonProperty(value = "", access = JsonProperty.Access.WRITE_ONLY)
+//    @JsonIgnore
+//    @Size(max = 0)
+//    @BatchSize(size = 0)

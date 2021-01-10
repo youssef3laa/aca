@@ -33,6 +33,9 @@ h1 {
   .red--text {
     color: #900 !important;
   }
+  .v-expansion-panel::before{
+    box-shadow: none;
+  }
 }
 .theme--light.v-label {
   color: rgba(0, 0, 0, 0.6);
@@ -40,6 +43,7 @@ h1 {
 .theme--light.v-application {
   background-color: #f2f2f2;
 }
+
 h1 {
   font-size: 26px;
 }

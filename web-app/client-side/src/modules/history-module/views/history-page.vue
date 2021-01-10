@@ -26,8 +26,6 @@ export default {
 
   methods: {
     fillForm() {
-      // var response =  this.getHistoryByProcessNameAndEntityId(this.processName, this.entityId );
-
       this.$refs.appBuilder.setModelData("historyTable", {
         taskTable: {
           headers: [

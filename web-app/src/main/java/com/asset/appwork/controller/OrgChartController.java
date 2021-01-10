@@ -8,17 +8,18 @@ import com.asset.appwork.otds.Otds;
 import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.repository.GroupRepository;
 import com.asset.appwork.repository.UnitRepository;
+import com.asset.appwork.repository.UserRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -26,6 +27,7 @@ import java.util.HashSet;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/org")
 @RestController
+@Slf4j
 public class OrgChartController {
 
     @Autowired
@@ -37,6 +39,8 @@ public class OrgChartController {
     UnitRepository unitRepository;
     @Autowired
     GroupRepository groupRepository;
+    @Autowired
+    UserRepository userRepository;
 
     @PostMapping("/unit/create")
     public ResponseEntity<AppResponse<Long>> createUnit(@RequestHeader("X-Auth-Token") String token,
@@ -45,18 +49,15 @@ public class OrgChartController {
         AppResponse.ResponseBuilder<Long> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-                respBuilder.data(entity.create(props));
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            log.info("Create Unit by: " + account.getUsername());
+            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
+            respBuilder.data(entity.create(props));
         } catch (AppworkException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
             respBuilder.status(e.getCode());
-        } catch (IOException e) {
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
         return respBuilder.build().getResponseEntity();
     }
@@ -68,19 +69,70 @@ public class OrgChartController {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readById(id)));
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            unitRepository.findById(id).ifPresentOrElse(unit -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(unit.toString()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }, () -> {
+                try {
+                    throw new AppworkException(ResponseCode.READ_ENTITY_FAILURE);
+                } catch (AppworkException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
+                    respBuilder.info("errorMessage", e.getMessage());
+                    respBuilder.status(e.getCode());
+                }
+            });
         } catch (AppworkException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
             respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
     }
+
+//    @PutMapping("/unit/update/{id}")
+//    public ResponseEntity<AppResponse<JsonNode>> updateUnit(@RequestHeader("X-Auth-Token") String token,
+//                                                            @PathVariable("id") Long id,
+//                                                            @RequestBody String props
+//    ) {
+//        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+//        try {
+//            Account account = tokenService.get(token);
+//            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+//            unitRepository.findById(id).ifPresentOrElse(unit -> {
+//                String field;
+//                field = SystemUtil.getJsonByPtrExpr(props, "/name");
+//                unit.setName(!(field.equals("")) ? field : unit.getName());
+//                field = SystemUtil.getJsonByPtrExpr(props, "/description");
+//                unit.setDescription(!(field.equals("")) ? field : unit.getDescription());
+//                field = SystemUtil.getJsonByPtrExpr(props, "/unitCode");
+//                unit.setUnitCode(!(field.equals("")) ? field : unit.getUnitCode());
+//                field = SystemUtil.getJsonByPtrExpr(props, "/unitTypeCode");
+//                unit.setUnitTypeCode(!(field.equals("")) ? field : unit.getUnitTypeCode());
+//                unitRepository.save(unit);
+//            }, () -> {
+//                try {
+//                    throw new AppworkException(ResponseCode.UPDATE_ENTITY_FAILURE);
+//                } catch (AppworkException e) {
+//                    log.error(e.getMessage());
+//                    e.printStackTrace();
+//                    respBuilder.info("errorMessage", e.getMessage());
+//                    respBuilder.status(e.getCode());
+//                }
+//            });
+//        } catch (AppworkException e) {
+//            log.error(e.getMessage());
+//            e.printStackTrace();
+//            respBuilder.info("errorMessage", e.getMessage());
+//            respBuilder.status(e.getCode());
+//        }
+//        return respBuilder.build().getResponseEntity();
+//    }
 
     @PutMapping("/unit/update/{id}")
     public String updateUnit(@RequestHeader("X-Auth-Token") String token,
@@ -108,36 +160,33 @@ public class OrgChartController {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.delete(id)));
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            unitRepository.deleteById(id);
         } catch (AppworkException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
             respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
     }
 
-    @PostMapping("/unit/read/list/{listName}")
-    public ResponseEntity<AppResponse<JsonNode>> readUnitList(@RequestHeader("X-Auth-Token") String token,
-                                                              @PathVariable("listName") String listName
+    @PostMapping("/unit/read/list")
+    public ResponseEntity<AppResponse<JsonNode>> readUnitList(@RequestHeader("X-Auth-Token") String token
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readList(listName)));
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(unitRepository.findAll().toString()));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
             }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (AppworkException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
             respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
@@ -151,10 +200,10 @@ public class OrgChartController {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.createChild(unitId, "Position", props)));
-            }
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
+            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.createChild(unitId, "Position", props)));
+
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
@@ -173,10 +222,10 @@ public class OrgChartController {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readChildById(unitId, "Position", id)));
-            }
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
+            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readChildById(unitId, "Position", id)));
+
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
@@ -188,23 +237,22 @@ public class OrgChartController {
     }
 
     @PutMapping("/unit/{unitId}/position/update/{id}")
-    public String updatePosition(@RequestHeader("X-Auth-Token") String token,
-                                 @PathVariable("unitId") Long unitId,
-                                 @PathVariable("id") Long id,
-                                 @RequestBody String props
+    public ResponseEntity<AppResponse<JsonNode>> updatePosition(@RequestHeader("X-Auth-Token") String token,
+                                                                @PathVariable("unitId") Long unitId,
+                                                                @PathVariable("id") Long id,
+                                                                @RequestBody String props
     ) {
-        String response = "";
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-                response = (entity.updateChild(unitId, "Position", id, props) == null) ? "Success" : "Failed";
-            }
-        } catch (AppworkException e) {
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
+            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.updateChild(unitId, "Position", id, props)));
+
+        } catch (AppworkException | JsonProcessingException e) {
             e.printStackTrace();
-            response = "Failed";
         }
-        return response;
+        return respBuilder.build().getResponseEntity();
     }
 
     @DeleteMapping("/unit/{unitId}/position/delete/{id}")
@@ -215,10 +263,9 @@ public class OrgChartController {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.deleteChild(unitId, "Position", id)));
-            }
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
+            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.deleteChild(unitId, "Position", id)));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
@@ -236,13 +283,435 @@ public class OrgChartController {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readChildList("Position", listName)));
-            }
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
+            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readChildList("Position", listName)));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/unit/{code}/down")
+    public ResponseEntity<AppResponse<JsonNode>> getUnitChildrenByCode(@RequestHeader("X-Auth-Token") String token,
+                                                                       @PathVariable("code") String code
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            unitRepository.findByName(code).ifPresentOrElse(
+                    (unit -> {
+                        try {
+                            respBuilder.data(SystemUtil.convertStringToJsonNode(unitRepository.findByParent(unit).toString()));
+                        } catch (JsonProcessingException e) {
+                            e.printStackTrace();
+                        }
+                    }), () -> {
+                        try {
+                            respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                        } catch (JsonProcessingException e) {
+                            e.printStackTrace();
+                        }
+                    });
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/unit/{code}/up")
+    public ResponseEntity<AppResponse<JsonNode>> getUnitParentsByCode(@RequestHeader("X-Auth-Token") String token,
+                                                                      @PathVariable("code") String code
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            unitRepository.findByName(code).ifPresentOrElse((unit -> unitRepository.findByChild(unit).ifPresentOrElse((parentUnit -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(parentUnit.toString()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }), () -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            })), () -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+
+    @PostMapping("/group/create")
+    public ResponseEntity<AppResponse<JsonNode>> createGroup(@RequestHeader("X-Auth-Token") String token,
+                                                             @RequestBody String props
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
+            respBuilder.data(SystemUtil.convertStringToJsonNode(otds.createGroup(props)));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+
+    @GetMapping("/group/read/{id}")
+    public ResponseEntity<AppResponse<JsonNode>> readGroup(@RequestHeader("X-Auth-Token") String token,
+                                                           @PathVariable("id") Long id
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group");
+            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readById(id)));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/group/findByCode/{code}")
+    public ResponseEntity<AppResponse<JsonNode>> findGroupByCode(@RequestHeader("X-Auth-Token") String token,
+                                                                 @PathVariable("code") String code
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            groupRepository.findByName(code).ifPresentOrElse((group -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(group.toString()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }), () -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/group/findByCodes/{codes}")
+    public ResponseEntity<AppResponse<JsonNode>> findGroupByCodes(@RequestHeader("X-Auth-Token") String token,
+                                                                  @PathVariable("codes") String codes
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByNameIn(Arrays.asList(codes.trim().split("\\s*,\\s*"))).toString()));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/group/findByUnitCode/{code}")
+    public ResponseEntity<AppResponse<JsonNode>> findGroupByUnitCode(@RequestHeader("X-Auth-Token") String token,
+                                                                     @PathVariable("code") String code
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            unitRepository.findByName(code).ifPresentOrElse((unit -> groupRepository.findByUnit(unit).ifPresentOrElse((groups -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }), () -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            })), () -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/group/findByUnitCodes/{codes}")
+    public ResponseEntity<AppResponse<JsonNode>> findGroupByUnitCodes(@RequestHeader("X-Auth-Token") String token,
+                                                                      @PathVariable("codes") String codes
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByNameIn(Arrays.asList(codes.trim().split("\\s*,\\s*"))))).toString()));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    //    @Transactional
+    @GetMapping("/group/{code}/down")
+    public ResponseEntity<AppResponse<JsonNode>> getGroupUnitChildrenByCode(@RequestHeader("X-Auth-Token") String token,
+                                                                            @PathVariable("code") String code
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            groupRepository.findByName(code).ifPresentOrElse(
+                    group -> {
+                        try {
+                            respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByParent(group.getUnit()))).toString()));
+                        } catch (JsonProcessingException e) {
+                            e.printStackTrace();
+                        }
+                    }, () -> {
+                        try {
+                            respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                        } catch (JsonProcessingException e) {
+                            e.printStackTrace();
+                        }
+                    });
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    //    @Transactional
+    @GetMapping("/sp/group/{code}/down")
+    public ResponseEntity<AppResponse<JsonNode>> getGroupUnitChildrenByCodeSP(@RequestHeader("X-Auth-Token") String token,
+                                                                              @PathVariable("code") String code
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.getGroupByCodeAndDirection(code, "down", "").toString()));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    //    @Transactional
+    @GetMapping("/group/{code}/up")
+    public ResponseEntity<AppResponse<JsonNode>> getGroupUnitParentsByCode(@RequestHeader("X-Auth-Token") String
+                                                                                   token,
+                                                                           @PathVariable("code") String code
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            groupRepository.findByName(code).ifPresentOrElse(
+                    group -> unitRepository.findByGroup(group).ifPresentOrElse(
+                            unit -> unitRepository.findByChild(unit).ifPresentOrElse(
+                                    parentUnit -> groupRepository.findByUnit(parentUnit).ifPresentOrElse(parentGroup -> {
+                                        try {
+                                            respBuilder.data(SystemUtil.convertStringToJsonNode(parentGroup.toString()));
+                                        } catch (JsonProcessingException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }, () -> {
+                                        try {
+                                            respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                                        } catch (JsonProcessingException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }), () -> {
+                                        try {
+                                            respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                                        } catch (JsonProcessingException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }), () -> {
+                                try {
+                                    respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
+                                }
+                            }), () -> {
+                        try {
+                            respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                        } catch (JsonProcessingException e) {
+                            e.printStackTrace();
+                        }
+                    });
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    //    @Transactional
+    @GetMapping("/sp/group/{code}/up")
+    public ResponseEntity<AppResponse<JsonNode>> getGroupUnitParentsByCodeSP(@RequestHeader("X-Auth-Token") String token,
+                                                                             @PathVariable("code") String code
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.getGroupByCodeAndDirection(code, "up", "").toString()));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @PutMapping("/group/update/{id}")
+    public ResponseEntity<AppResponse<JsonNode>> updateGroup(@RequestHeader("X-Auth-Token") String token,
+                                                             @PathVariable("id") Long id,
+                                                             @RequestBody String props
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group");
+            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.update(id, props)));
+        } catch (AppworkException | JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @DeleteMapping("/group/delete/{id}")
+    public ResponseEntity<AppResponse<JsonNode>> deleteGroup(@RequestHeader("X-Auth-Token") String token,
+                                                             @PathVariable("id") Long id
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group");
+            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.delete(id)));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @PostMapping("/group/read/list/{listName}")
+    public ResponseEntity<AppResponse<JsonNode>> readGroupList(@RequestHeader("X-Auth-Token") String token,
+                                                               @PathVariable("listName") String listName
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group");
+            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readList(listName)));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<AppResponse<JsonNode>> getUserByUserId(@RequestHeader("X-Auth-Token") String
+                                                                         token,
+                                                                 @PathVariable("userId") String userId
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            userRepository.findByUserId(userId).ifPresentOrElse((user) -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(user.toString()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }, () -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            });
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
@@ -257,10 +726,9 @@ public class OrgChartController {
 //        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
 //        try {
 //            Account account = tokenService.get(token);
-//            if (account != null) {
+//            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 //                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
 //                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readChildItems(unitId, "Position")));
-//            }
 //        } catch (JsonProcessingException e) {
 //            e.printStackTrace();
 //            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
@@ -280,7 +748,7 @@ public class OrgChartController {
 //        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
 //        try {
 //            Account account = tokenService.get(token);
-//            if (account != null) {
+//            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 //                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
 //                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readChildById(unitId, "Position", id)));
 //            }
@@ -294,23 +762,21 @@ public class OrgChartController {
 //        return respBuilder.build().getResponseEntity();
 //    }
 //
-    @PutMapping("/unit/{unitId}/relation/group/add")
-    public String updateUnitGroupRelation(@RequestHeader("X-Auth-Token") String token,
-                                          @PathVariable("unitId") Long unitId,
-                                          @RequestBody String props
+    @PutMapping("/group/{groupId}/relation/unit/add")
+    public ResponseEntity<AppResponse<JsonNode>> updateGroupUnitRelation(@RequestHeader("X-Auth-Token") String token,
+                                                                         @PathVariable("groupId") Long groupId,
+                                                                         @RequestBody String props
     ) {
-        String response = "";
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-                response = (entity.addRelation(unitId, "Groups", props) == null) ? "Success" : "Failed";
-            }
-        } catch (AppworkException e) {
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group");
+            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.addRelation(groupId, "Unit", props)));
+        } catch (AppworkException | JsonProcessingException e) {
             e.printStackTrace();
-            response = "Failed";
         }
-        return response;
+        return respBuilder.build().getResponseEntity();
     }
 //
 //    @DeleteMapping("/unit/{unitId}/position/delete/{id}")
@@ -321,10 +787,9 @@ public class OrgChartController {
 //        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
 //        try {
 //            Account account = tokenService.get(token);
-//            if (account != null) {
+//            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 //                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
 //                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.deleteChild(unitId, "Position", id)));
-//            }
 //        } catch (JsonProcessingException e) {
 //            e.printStackTrace();
 //            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
@@ -335,501 +800,6 @@ public class OrgChartController {
 //        return respBuilder.build().getResponseEntity();
 //    }
 
-    @GetMapping("/unit/{unitId}/group/items")
-    public ResponseEntity<AppResponse<JsonNode>> readGroupItems(@RequestHeader("X-Auth-Token") String token,
-                                                                @PathVariable("unitId") Long unitId
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readToManyRelation(unitId, "Groups")));
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-//    @Transactional
-    @GetMapping("/unit/{code}/down")
-    public ResponseEntity<AppResponse<JsonNode>> getUnitChildrenByCode(@RequestHeader("X-Auth-Token") String token,
-                                                                       @PathVariable("code") String code
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                unitRepository.findByName(code).ifPresentOrElse((unit -> unitRepository.findByParent(unit).ifPresentOrElse((units -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode(units.toString()));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                }), () -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                })), () -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-//    @Transactional
-    @GetMapping("/unit/{code}/up")
-    public ResponseEntity<AppResponse<JsonNode>> getUnitParentsByCode(@RequestHeader("X-Auth-Token") String token,
-                                                                      @PathVariable("code") String code
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                unitRepository.findByName(code).ifPresentOrElse((unit -> unitRepository.findByChild(unit).ifPresentOrElse((units -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode(units.toString()));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                }), () -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                })), () -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-
-    @PostMapping("/group/create")
-    public ResponseEntity<AppResponse<JsonNode>> createGroup(@RequestHeader("X-Auth-Token") String token,
-                                                             @RequestBody String props
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
-                respBuilder.data(SystemUtil.convertStringToJsonNode(otds.createGroup(props)));
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-
-    @GetMapping("/group/read/{id}")
-    public ResponseEntity<AppResponse<JsonNode>> readGroup(@RequestHeader("X-Auth-Token") String token,
-                                                           @PathVariable("id") Long id
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group");
-                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readById(id)));
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-    @Transactional
-    @GetMapping("/group/findByCode/{code}")
-    public ResponseEntity<AppResponse<JsonNode>> findGroupByCode(@RequestHeader("X-Auth-Token") String token,
-                                                                 @PathVariable("code") String code
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                groupRepository.findByName(code).ifPresentOrElse((group -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode(group.toString()));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                }), () -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-    @Transactional
-    @GetMapping("/group/findByCodes/{codes}")
-    public ResponseEntity<AppResponse<JsonNode>> findGroupByCodes(@RequestHeader("X-Auth-Token") String token,
-                                                                  @PathVariable("codes") String codes
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                groupRepository.findByNameIn(Arrays.asList(codes.trim().split("\\s*,\\s*"))).ifPresentOrElse((groups -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                }), () -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-    @Transactional
-    @GetMapping("/group/findByUnitCode/{code}")
-    public ResponseEntity<AppResponse<JsonNode>> findGroupByUnitCode(@RequestHeader("X-Auth-Token") String token,
-                                                                     @PathVariable("code") String code
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                unitRepository.findByName(code).ifPresentOrElse((unit -> groupRepository.findByUnit(unit).ifPresentOrElse((groups -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                }), () -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                })), () -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-    @Transactional
-    @GetMapping("/group/findByUnitCodes/{codes}")
-    public ResponseEntity<AppResponse<JsonNode>> findGroupByUnitCodes(@RequestHeader("X-Auth-Token") String token,
-                                                                      @PathVariable("codes") String codes
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                unitRepository.findByNameIn(Arrays.asList(codes.trim().split("\\s*,\\s*"))).ifPresentOrElse((units -> groupRepository.findByUnitIn(new HashSet<>(units)).ifPresentOrElse((groups -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                }), () -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                })), () -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-//    @Transactional
-    @GetMapping("/group/{code}/down")
-    public ResponseEntity<AppResponse<JsonNode>> getGroupUnitChildrenByCode(@RequestHeader("X-Auth-Token") String token,
-                                                                            @PathVariable("code") String code
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                groupRepository.findByName(code).ifPresentOrElse(
-                        group -> unitRepository.findByGroup(group).ifPresentOrElse(
-                                units -> unitRepository.findByParentIn(units).ifPresentOrElse(
-                                        childUnits -> groupRepository.findByUnitIn(new HashSet<>(childUnits)).ifPresentOrElse(
-                                                groups -> {
-                                                    try {
-                                                        respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
-                                                    } catch (JsonProcessingException e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }, () -> {
-                                                    try {
-                                                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                                                    } catch (JsonProcessingException e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }), () -> {
-                                            try {
-                                                respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                                            } catch (JsonProcessingException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }), () -> {
-                                    try {
-                                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                                    } catch (JsonProcessingException e) {
-                                        e.printStackTrace();
-                                    }
-                                }), () -> {
-                            try {
-                                respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                            } catch (JsonProcessingException e) {
-                                e.printStackTrace();
-                            }
-                        });
-            }
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-//    @Transactional
-    @GetMapping("/sp/group/{code}/down")
-    public ResponseEntity<AppResponse<JsonNode>> getGroupUnitChildrenByCodeSP(@RequestHeader("X-Auth-Token") String token,
-                                                                            @PathVariable("code") String code
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                groupRepository.getGroupByCodeAndDirection(code, "down", "").ifPresentOrElse(groups -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                }, () -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-//    @Transactional
-    @GetMapping("/group/{code}/up")
-    public ResponseEntity<AppResponse<JsonNode>> getGroupUnitParentsByCode(@RequestHeader("X-Auth-Token") String
-                                                                                   token,
-                                                                           @PathVariable("code") String code
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                groupRepository.findByName(code).ifPresentOrElse(
-                        group -> unitRepository.findByGroup(group).ifPresentOrElse(
-                                units -> unitRepository.findByChildIn(units).ifPresentOrElse(
-                                        parentUnits -> groupRepository.findByUnitIn(new HashSet<>(parentUnits)).ifPresentOrElse(
-                                                groups -> {
-                                                    try {
-                                                        respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
-                                                    } catch (JsonProcessingException e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }, () -> {
-                                                    try {
-                                                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                                                    } catch (JsonProcessingException e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }), () -> {
-                                            try {
-                                                respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                                            } catch (JsonProcessingException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }), () -> {
-                                    try {
-                                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                                    } catch (JsonProcessingException e) {
-                                        e.printStackTrace();
-                                    }
-                                }), () -> {
-                            try {
-                                respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                            } catch (JsonProcessingException e) {
-                                e.printStackTrace();
-                            }
-                        });
-            }
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-    //    @Transactional
-    @GetMapping("/sp/group/{code}/up")
-    public ResponseEntity<AppResponse<JsonNode>> getGroupUnitParentsByCodeSP(@RequestHeader("X-Auth-Token") String token,
-                                                                              @PathVariable("code") String code
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                groupRepository.getGroupByCodeAndDirection(code, "up", "").ifPresentOrElse(groups -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                }, () -> {
-                    try {
-                        respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-    @PutMapping("/group/update/{id}")
-    public String updateGroup(@RequestHeader("X-Auth-Token") String token,
-                              @PathVariable("id") Long id,
-                              @RequestBody String props
-    ) {
-        String response = "";
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group");
-                response = (entity.update(id, props) == null) ? "Success" : "Failed";
-            }
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            response = "Failed";
-        }
-        return response;
-    }
-
-    @DeleteMapping("/group/delete/{id}")
-    public ResponseEntity<AppResponse<JsonNode>> deleteGroup(@RequestHeader("X-Auth-Token") String token,
-                                                             @PathVariable("id") Long id
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group");
-                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.delete(id)));
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-    @PostMapping("/group/read/list/{listName}")
-    public ResponseEntity<AppResponse<JsonNode>> readGroupList(@RequestHeader("X-Auth-Token") String token,
-                                                               @PathVariable("listName") String listName
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group");
-                respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readList(listName)));
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
 //    @PutMapping("/group/{groupId}/relation/position//add/{id}")
 //    public String addPositionRelationToGroup(@RequestHeader("X-Auth-Token") String token,
 //                                             @PathVariable("groupId")Long groupId,
@@ -838,10 +808,9 @@ public class OrgChartController {
 //        String response = "";
 //        try {
 //            Account account = tokenService.get(token);
-//            if (account != null) {
+//            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 //                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group");
 //                response = (entity.addToOneRelation(groupId, "Position", new Platform.IdentityTargetId(id)) == null)? "Success": "Failed";
-//            }
 //        } catch (AppworkException | JsonProcessingException e) {
 //            e.printStackTrace();
 //            response = "Failed";
@@ -857,10 +826,9 @@ public class OrgChartController {
 //        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
 //        try {
 //            Account account = tokenService.get(token);
-//            if (account != null) {
+//            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 //                Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
 //                respBuilder.data(SystemUtil.convertStringToJsonNode(otds.updateRoleByRoleName(roleName, props)));
-//            }
 //        } catch (AppworkException | UnsupportedEncodingException | JsonProcessingException e) {
 //            e.printStackTrace();
 //        }
@@ -874,10 +842,9 @@ public class OrgChartController {
 //        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
 //        try {
 //            Account account = tokenService.get(token);
-//            if (account != null) {
+//            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 //                Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
 //                respBuilder.data(SystemUtil.convertStringToJsonNode(otds.deleteRoleByRoleName(roleName)));
-//            }
 //        } catch (JsonProcessingException e) {
 //            e.printStackTrace();
 //            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
@@ -896,10 +863,9 @@ public class OrgChartController {
 //        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
 //        try {
 //            Account account = tokenService.get(token);
-//            if (account != null) {
+//            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 //                Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
 //                respBuilder.data(SystemUtil.convertStringToJsonNode(otds.getAllRoles()));
-//            }
 //        } catch (JsonProcessingException e) {
 //            e.printStackTrace();
 //            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);

@@ -1,5 +1,6 @@
 package com.asset.appwork.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
@@ -9,6 +10,7 @@ import javax.persistence.MappedSuperclass;
 import java.util.Optional;
 
 @MappedSuperclass
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class BaseIdentity<T extends BaseIdentity> {
     @Id
     @Column(name = "Id")
