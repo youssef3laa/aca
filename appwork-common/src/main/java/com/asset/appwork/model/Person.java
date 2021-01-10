@@ -1,5 +1,8 @@
 package com.asset.appwork.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -28,6 +31,11 @@ public class Person {
     String mobile;
     @Column(name = "notes")
     String notes;
+
+    @SneakyThrows
+    public String toString() {
+        return new ObjectMapper().writeValueAsString(this);
+    }
 
     public long getId() {
         return id;

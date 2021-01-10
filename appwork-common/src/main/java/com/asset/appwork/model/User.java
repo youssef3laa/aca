@@ -14,7 +14,7 @@ public class User extends BaseIdentity<User> {
     @Column(name = "IdentityDisplayName")
     String displayName;
 
-    @OneToOne(cascade = {CascadeType.ALL})
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(
             name = "toPerson_Id",
             referencedColumnName = "Id"
@@ -22,14 +22,14 @@ public class User extends BaseIdentity<User> {
     @JsonProperty("details")
     Person person;
 
-    @ManyToMany(cascade = {CascadeType.ALL})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
             name = "O9OpenTextEntityIdentityComponentsGroupIdentity",
             joinColumns = {@JoinColumn(name = "Identity_Id")},
             inverseJoinColumns = {@JoinColumn(name = "GroupId9C84CA727C3E880E")}
     )
     @JsonProperty("groups")
-    Collection<Group> group = new HashSet<>();;
+    Collection<Group> group = new HashSet<>();
 
     @Transient
     String cn;
@@ -67,5 +67,7 @@ public class User extends BaseIdentity<User> {
         this.group = group;
     }
 
-    public String getCN() { return "cn=" + this.name + ",cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local"; }
+    public String getCN() {
+        return "cn=" + this.name + ",cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local";
+    }
 }
