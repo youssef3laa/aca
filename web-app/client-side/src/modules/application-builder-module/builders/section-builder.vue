@@ -4,8 +4,9 @@
     <span v-else>
 
       <span v-if="sec.forms">
-        <v-card v-for="formData in sec.forms" :key="formData.id" flat>
+        <v-card v-for="formData in sec.forms" :key="formData.id" flat style="background: transparent">
           <!-- <v-card-text v-text="formData.form.name"></v-card-text> -->
+
       
                     <span v-if="formData.resizable">
             <splitpanes class="default-theme" dir="ltr">
@@ -18,6 +19,7 @@
           </span>
           
           <span v-if="sec.type != 'collapse'">
+
             <FormBuilder :forms="formData" :model="formData.model" />
           </span>
           <span

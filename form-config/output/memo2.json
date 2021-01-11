@@ -1,0 +1,50 @@
+{ "app": {
+   "pages":[
+      {
+         "key":"memoPage",
+         "sections":[
+            {
+               "type":"collapse",
+               "name":"نوع النص",
+               "forms":[
+                  {
+                     "key":"richtext1",
+                     "inputs":[
+                        {
+
+                           "type":"richtextComponent",
+                           "name":"richtext1",
+                           "col":12
+                        }
+                     ],
+                     "model":{
+
+
+                     }
+                  }
+               ]
+            },
+             {
+                           "type":"collapse",
+                           "name":"نوع النص",
+                           "forms":[
+                              {
+                                 "key":"richtext2",
+                                 "inputs":[
+                                    {
+                                       "type":"richtextComponent",
+                                       "name":"richtext2",
+                                       "col":12
+                                    }
+                                 ],
+                                 "model":{
+
+
+                                 }
+                              }
+                           ]
+                        }
+         ]
+      }
+   ]
+}}
