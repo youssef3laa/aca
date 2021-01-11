@@ -40,7 +40,7 @@ export default {
                 })
         },
         readEntity: function(entityName, entityId) {
-            return http.get('/entity/read?&entityName='+ entityName +'&entityId='+entityId)      
+            return http.get('/entity/read?entityName='+ entityName +'&entityId='+entityId)
         },
         completeStep: function(data){
             http.post("/process/complete", data)

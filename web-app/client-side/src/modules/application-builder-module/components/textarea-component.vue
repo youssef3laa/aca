@@ -5,6 +5,7 @@
     color="outline"
     v-model="d"
     @input="addInput"
+    :disabled="readonly"
     outlined
   >
       <template #label>

@@ -3,19 +3,18 @@
     "steps": {
         "init": {
             "hasAutocomplete": true,
-            "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
+            "roleFilter": "org/group/findByCodes/HGCS,HRCA,HCAO",
             "page": "init-process",
             "condition": "condition",
             "nextStep": {
-                "HGCS": "stepRG",
-                "HCCA": "stepRQ",
-                "HTCA": "stepRE",
-                "HTVA": "stepRE"
+                "HRCA": "stepRG",
+                "HGCS": "stepRQ",
+                "HCAO": "stepRE"
             }
         },
         "stepRG": {
             "hasAutocomplete": false,
-            "roleFilter": "org/group/findByCodes/HUNIT,HSEC",
+            "roleFilter": "org/group/findByCodes/HGCS",
             "page": "process-step-RG",
             "condition": "condition",
             "nextStep": {
@@ -24,7 +23,7 @@
         },
         "stepRQ": {
             "hasAutocomplete": true,
-            "roleFilter": "get/org/roles/up",
+            "roleFilter": "org/group/findByCodes/HCAO",
             "page": "process-step-RQ",
             "condition": "condition",
             "nextStep": {
@@ -33,26 +32,27 @@
         },
         "stepRE": {
             "hasAutocomplete": true,
-            "roleFilter": "get/org/roles/HGRP,MEM",
+            "roleFilter": "org/group/findByCodes/HCAG,HCOC",
             "page": "process-step-RE",
             "condition": "condition",
             "nextStep": {
-                "approve": "stepRM"
+                "HCAG": "stepRM",
+                "HCOC": "stepMM"
             }
         },
         "stepRM": {
             "hasAutocomplete": true,
-            "roleFilter": "get/org/roles/HGRP,MEM",
+            "roleFilter": "org/group/findByCodes/HCOC",
             "page": "process-step-RE",
             "condition": "condition",
             "nextStep": {
-                "approve": "stepMM"
+                "HCOC": "stepMM"
             }
         },
         "stepMM": {
             "hasAutocomplete": true,
-            "roleFilter": "get/org/roles/HGRP,MEM",
-            "page": "process-step-RE",
+            "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
+            "page": "process-step-MM",
             "condition": "condition",
             "nextStep": {
                 "approve": "stepApprovals"
@@ -60,7 +60,7 @@
         },
         "stepApprovals": {
             "hasAutocomplete": true,
-            "roleFilter": "get/org/roles/HGRP,MEM",
+            "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
             "page": "process-step-RE",
             "condition": "condition",
             "nextStep": {
@@ -71,7 +71,7 @@
         },
         "stepAD": {
             "hasAutocomplete": true,
-            "roleFilter": "get/org/roles/HGRP,MEM",
+            "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
             "page": "process-step-RE",
             "condition": "condition",
             "nextStep": {

@@ -41,28 +41,28 @@
       "type": "InputComponent",
       "label": "Step Name",
       "name": "stepId",
-      "readonly": true,
+      "readonly": false,
       "col": "12"
     },
     {
       "type": "AutoCompleteComponent",
       "name": "receiver",
       "rule": "required",
-      "readonly": true,
+      "readonly": false,
       "col": "6"
     },
     {
       "type": "InputComponent",
       "label": "requestDate",
       "name": "requestDate",
-      "readonly": true,
+      "readonly": false,
       "col": "6"
     },
     {
       "type": "TextareaComponent",
       "label": "notes",
       "name": "notes",
-      "readonly": true,
+      "readonly": false,
       "col": "12"
     }
   ],

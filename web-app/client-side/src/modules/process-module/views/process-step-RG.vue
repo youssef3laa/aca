@@ -27,6 +27,7 @@ export default {
 
     },
     fillForm: function () {
+      this.$refs.appBuilder.disableSection("section1");
       let entityName = this.inputSchema.entityName;
       let entityId = this.inputSchema.entityId;
       this.readEntity(entityName, entityId)
@@ -37,13 +38,9 @@ export default {
               stepId: this.inputSchema.stepId,
               notes: response.notes,
               receiver: {
-                list: [
-                  {
-                    text: response.receiver,
-                    value: response.receiver,
-                  },
-                ],
-                value: response.receiver,
+                  url: this.inputSchema.roleFilter,
+                  list: [],
+                  value: ""
               },
               requestDate: response.requestDate.split("Z")[0],
             });
@@ -93,7 +90,7 @@ export default {
     this.$observable.subscribe("complete-step", () => {
       console.log("complete-step-clicked");
       console.log(this.$refs.appBuilder);
-      // var model = this.$refs.appBuilder.getModelData("form1");
+      let model = this.$refs.appBuilder.getModelData("form1");
       // if (model._valid) {
       let approvalModel = this.$refs.appBuilder.getModelData("ApprovalForm");
 
@@ -105,7 +102,7 @@ export default {
         parentHistoryId: this.inputSchema.parentHistoryId,
 
         code: approvalModel.approval.decision,
-        assignedCN: "cn=AbdElHakim@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+        assignedCN: model.receiver.value.value,
         decision: approvalModel.approval.decision,
         comment: approvalModel.approval.comment,
       };

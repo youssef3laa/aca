@@ -9,9 +9,36 @@
             :cols="field.col"
             :md="field.col"
         >
+          <v-expansion-panels v-if="forms.type=='collapse'">
+            <v-expansion-panel>
+              <v-expansion-panel-header disable-icon-rotate>
+                <v-row no-gutters>
+                  <v-col cols="4">
+                    <span>{{ forms.name }}</span>
+                    <span class="line"></span>
+                  </v-col>
+                  <v-col cols="8" class="text--secondary"> </v-col>
+                </v-row>
+                <template v-slot:actions>
+                  <v-icon color="error">
+                    mdi-arrow-collapse-down
+                  </v-icon>
+                </template>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+
+                    <component
+                            :is="field.type"
+                            :field="field"
+                            :val="formModel[field.name]"
+                            v-on:update="updateText"
+                    ></component>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
           <component
               :is="field.type"
-              v-if="formModel"
+              v-else-if="formModel"
               :field="field"
               :val="formModel[field.name]"
               v-on:update="updateText"

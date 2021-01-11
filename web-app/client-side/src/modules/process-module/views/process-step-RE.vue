@@ -26,6 +26,7 @@ export default {
       this.loadForm("process-stepRE", this.fillForm);
     },
     fillForm: async function () {
+      this.$refs.appBuilder.disableSection("section1")
       let entityName = this.inputSchema.entityName;
       let entityId = this.inputSchema.entityId;
       this.readEntity(entityName, entityId)
@@ -36,13 +37,9 @@ export default {
               stepId: this.inputSchema.stepId,
               notes: response.notes,
               receiver: {
-                list: [
-                  {
-                    text: response.receiver,
-                    value: response.receiver,
-                  },
-                ],
-                value: response.receiver,
+                url: this.inputSchema.roleFilter,
+                list: [],
+                value: ""
               },
               requestDate: response.requestDate.split("Z")[0],
             });
@@ -102,8 +99,8 @@ export default {
         process: this.inputSchema.process,
         parentHistoryId: this.inputSchema.parentHistoryId,
 
-        code: approvalModel.approval.decision,
-        assignedCN: "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+        code: model.receiver.value.code,
+        assignedCN: model.receiver.value.value,
         decision: approvalModel.approval.decision,
         comment: approvalModel.approval.comment,
       };

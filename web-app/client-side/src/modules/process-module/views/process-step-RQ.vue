@@ -26,6 +26,7 @@ export default {
       this.loadForm("process-stepRQ", this.fillForm);
     },
     fillForm: function () {
+      this.$refs.appBuilder.disableSection("section1");
       let entityName = this.inputSchema.entityName;
       let entityId = this.inputSchema.entityId;
       this.readEntity(entityName, entityId)
@@ -36,13 +37,9 @@ export default {
               stepId: this.inputSchema.stepId,
               notes: response.notes,
               receiver: {
-                list: [
-                  {
-                    text: response.receiver,
-                    value: response.receiver,
-                  },
-                ],
-                value: response.receiver,
+                url: this.inputSchema.roleFilter,
+                list: [],
+                value: ""
               },
               requestDate: response.requestDate.split("Z")[0],
             });
@@ -87,7 +84,7 @@ export default {
     this.getTaskData(this.taskId);
 
     this.$observable.subscribe("complete-step", () => {
-      // var model = this.$refs.appBuilder.getModelData("form1");
+      let model = this.$refs.appBuilder.getModelData("form1");
       // if (!model._valid){
       //   //@TODO show warning
       //   return;
@@ -102,7 +99,7 @@ export default {
         parentHistoryId: this.inputSchema.parentHistoryId,
 
         code: approvalModel.approval.decision,
-        assignedCN: "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+        assignedCN: model.receiver.value.value,
         decision: approvalModel.approval.decision,
         comment: approvalModel.approval.comment,
       };

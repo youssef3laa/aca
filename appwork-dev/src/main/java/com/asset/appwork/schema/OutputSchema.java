@@ -19,6 +19,7 @@ public class OutputSchema {
     String page;
     String processId;
     String parentHistoryId;
+    String roleFilter;
 
     public String getAssignedType() {
         if(assignedCN.contains("cn=organizational users")){
@@ -45,6 +46,7 @@ public class OutputSchema {
                 "<page>"+removeNull(this.page)+"</page>"+
                 "<decision>"+removeNull(this.decision)+"</decision>"+
                 "<comment>"+removeNull(this.comment)+"</comment>"+
+                "<roleFilter>"+removeNull(this.roleFilter)+"</roleFilter>"+
                 "<breakProcess>"+removeNull(this.breakProcess)+"</breakProcess>\n";
     }
 

@@ -26,6 +26,12 @@
             "id": "2",
             "name": "المرفقات",
             "icon": "fas fa-paperclip"
+          },
+          {
+            "key": "tab3",
+            "id": "3",
+            "name": "مذكرة العرض",
+            "icon": "fas fa-paperclip"
           }
         ],
         "sections": [
@@ -61,7 +67,7 @@
                 ],
                 "model": {
                   "receiver": {
-                    "url": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
+                    "url": "org/group/findByCodes/HGCS,HRCA,HCAO",
                     "list": [],
                     "value": ""
                   },
@@ -96,19 +102,113 @@
                       }
                     },
                     {
-                      "background": "white",
-                      "inputs": [
-                        {
-                          "type": "InputFileComponent",
-                          "name": "inputFile",
-                          "col": 12
-                        }
-                      ],
-                      "model": {
-                        "inputFile": ""
-                      }
+                        "key": "section1",
+                        "tabs": [
+                            {
+                                "key": "tab1",
+                                "id": "1",
+                                "name": "البيانات الأساسية"
+                            },
+                            {
+                                "key": "tab2",
+                                "id": "2",
+                                "name": "المرفقات"
+                            }
+                        ],
+                        "forms": [
+                            {
+                                "key": "form1",
+                                "publish": "form1Change",
+                                "inputs": [
+                                    {
+                                        "type": "AutoCompleteComponent",
+                                        "name": "receiver",
+                                        "rule": "required",
+                                        "col": "6"
+                                    },
+                                    {
+                                        "type": "DatePickerComponent",
+                                        "label": "requestDate",
+                                        "name": "requestDate",
+                                        "rule": "required",
+                                        "col": "6"
+                                    },
+                                    {
+                                        "type": "TextareaComponent",
+                                        "label": "notes",
+                                        "name": "notes",
+                                        "col": "12"
+                                    }
+                                ],
+                                "model": {
+                                    "receiver": {
+                                        "url": "org/group/findByCodes/HGCS,HRCA,HCAO",
+                                        "list": [
+                                        ],
+                                        "value": ""
+                                    },
+                                    "requestDate": "",
+                                    "notes": ""
+                                }
+                            },
+                            {
+                                "resizable": {
+                                    "forms": [
+                                        {
+                                            "background": "white",
+                                            "inputs": [
+                                                {
+                                                    "type": "InputFileComponent",
+                                                    "name": "inputFile",
+                                                    "col": 12
+                                                }
+                                            ],
+                                            "model": {
+                                                "inputFile": ""
+                                            }
+                                        },
+                                        {
+                                            "key": "iframeObj",
+                                            "background": "white",
+                                            "inputs": [
+                                                {
+                                                    "type": "IframeComponent",
+                                                    "name": "iframeObj",
+                                                    "col": 12
+                                                }
+                                            ],
+                                            "model": {
+                                                "iframeObj": {
+                                                    "src": ""
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
                     }
                   ]
+                }
+              }
+            ]
+          },
+           {
+             "type": "tab",
+            "tabId": "3",
+            "display": "none",
+            "forms": [
+              {
+                "name" : "القسم الأول",
+                "inputs" : [
+                  {
+                    "type": "MemoComponent",
+                    "name": "نوع مذكرة العرض",
+                    "col": 12
+                  }
+                ],
+                "model": {
+
                 }
               }
             ]
