@@ -4,12 +4,16 @@ import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.model.Position;
+import com.asset.appwork.model.Unit;
 import com.asset.appwork.otds.Otds;
 import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.repository.GroupRepository;
+import com.asset.appwork.repository.PositionRepository;
 import com.asset.appwork.repository.UnitRepository;
 import com.asset.appwork.repository.UserRepository;
 import com.asset.appwork.response.AppResponse;
+import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -41,7 +46,13 @@ public class OrgChartController {
     GroupRepository groupRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    PositionRepository positionRepository;
 
+    @Autowired
+    OrgChartService orgChartService;
+
+    @Transactional
     @PostMapping("/unit/create")
     public ResponseEntity<AppResponse<Long>> createUnit(@RequestHeader("X-Auth-Token") String token,
                                                         @RequestBody String props
@@ -62,6 +73,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Transactional
     @GetMapping("/unit/read/{id}")
     public ResponseEntity<AppResponse<JsonNode>> readUnit(@RequestHeader("X-Auth-Token") String token,
                                                           @PathVariable("id") Long id
@@ -70,7 +82,7 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            unitRepository.findById(id).ifPresentOrElse(unit -> {
+            orgChartService.getUnit(id).ifPresentOrElse(unit -> {
                 try {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(unit.toString()));
                 } catch (JsonProcessingException e) {
@@ -95,64 +107,30 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-//    @PutMapping("/unit/update/{id}")
-//    public ResponseEntity<AppResponse<JsonNode>> updateUnit(@RequestHeader("X-Auth-Token") String token,
-//                                                            @PathVariable("id") Long id,
-//                                                            @RequestBody String props
-//    ) {
-//        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-//        try {
-//            Account account = tokenService.get(token);
-//            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-//            unitRepository.findById(id).ifPresentOrElse(unit -> {
-//                String field;
-//                field = SystemUtil.getJsonByPtrExpr(props, "/name");
-//                unit.setName(!(field.equals("")) ? field : unit.getName());
-//                field = SystemUtil.getJsonByPtrExpr(props, "/description");
-//                unit.setDescription(!(field.equals("")) ? field : unit.getDescription());
-//                field = SystemUtil.getJsonByPtrExpr(props, "/unitCode");
-//                unit.setUnitCode(!(field.equals("")) ? field : unit.getUnitCode());
-//                field = SystemUtil.getJsonByPtrExpr(props, "/unitTypeCode");
-//                unit.setUnitTypeCode(!(field.equals("")) ? field : unit.getUnitTypeCode());
-//                unitRepository.save(unit);
-//            }, () -> {
-//                try {
-//                    throw new AppworkException(ResponseCode.UPDATE_ENTITY_FAILURE);
-//                } catch (AppworkException e) {
-//                    log.error(e.getMessage());
-//                    e.printStackTrace();
-//                    respBuilder.info("errorMessage", e.getMessage());
-//                    respBuilder.status(e.getCode());
-//                }
-//            });
-//        } catch (AppworkException e) {
-//            log.error(e.getMessage());
-//            e.printStackTrace();
-//            respBuilder.info("errorMessage", e.getMessage());
-//            respBuilder.status(e.getCode());
-//        }
-//        return respBuilder.build().getResponseEntity();
-//    }
-
+    @Transactional
     @PutMapping("/unit/update/{id}")
-    public String updateUnit(@RequestHeader("X-Auth-Token") String token,
+    public ResponseEntity<AppResponse<JsonNode>> updateUnit(@RequestHeader("X-Auth-Token") String token,
                              @PathVariable("id") Long id,
                              @RequestBody String props
     ) {
-        String response = "";
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if (account != null) {
-                Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-                response = (entity.update(id, props) == null) ? "Success" : "Failed";
-            }
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
+            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.update(id, props)));
         } catch (AppworkException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
-            response = "Failed";
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
-        return response;
+        return respBuilder.build().getResponseEntity();
     }
 
+    @Transactional
     @DeleteMapping("/unit/delete/{id}")
     public ResponseEntity<AppResponse<JsonNode>> deleteUnit(@RequestHeader("X-Auth-Token") String token,
                                                             @PathVariable("id") Long id
@@ -161,7 +139,7 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            unitRepository.deleteById(id);
+            orgChartService.deleteUnit(id);
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -171,6 +149,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Transactional
     @PostMapping("/unit/read/list")
     public ResponseEntity<AppResponse<JsonNode>> readUnitList(@RequestHeader("X-Auth-Token") String token
     ) {
@@ -179,7 +158,7 @@ public class OrgChartController {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(unitRepository.findAll().toString()));
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUnits().toString()));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
@@ -192,43 +171,53 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Transactional
     @PostMapping("/unit/{unitId}/position/create")
-    public ResponseEntity<AppResponse<JsonNode>> createPosition(@RequestHeader("X-Auth-Token") String token,
+    public ResponseEntity<AppResponse<Long>> createPosition(@RequestHeader("X-Auth-Token") String token,
                                                                 @PathVariable("unitId") Long unitId,
                                                                 @RequestBody String props
     ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        AppResponse.ResponseBuilder<Long> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.createChild(unitId, "Position", props)));
+            respBuilder.data(entity.createChild(unitId, "Position", props));
 
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (AppworkException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
             respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
     }
 
-    @GetMapping("/unit/{unitId}/position/read/{id}")
+    @Transactional
+    @GetMapping("/unit/position/read/{id}")
     public ResponseEntity<AppResponse<JsonNode>> readPosition(@RequestHeader("X-Auth-Token") String token,
-                                                              @PathVariable("unitId") Long unitId,
                                                               @PathVariable("id") Long id
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readChildById(unitId, "Position", id)));
-
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            orgChartService.getPosition(id).ifPresentOrElse(position -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(position.toString()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }, () -> {
+                try {
+                    throw new AppworkException(ResponseCode.READ_ENTITY_FAILURE);
+                } catch (AppworkException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
+                    respBuilder.info("errorMessage", e.getMessage());
+                    respBuilder.status(e.getCode());
+                }
+            });
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
@@ -236,6 +225,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Transactional
     @PutMapping("/unit/{unitId}/position/update/{id}")
     public ResponseEntity<AppResponse<JsonNode>> updatePosition(@RequestHeader("X-Auth-Token") String token,
                                                                 @PathVariable("unitId") Long unitId,
@@ -255,20 +245,16 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @DeleteMapping("/unit/{unitId}/position/delete/{id}")
+    @Transactional
+    @DeleteMapping("/unit/position/delete/{id}")
     public ResponseEntity<AppResponse<JsonNode>> deletePosition(@RequestHeader("X-Auth-Token") String token,
-                                                                @PathVariable("unitId") Long unitId,
                                                                 @PathVariable("id") Long id
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.deleteChild(unitId, "Position", id)));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            orgChartService.deletePosition(id);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
@@ -276,19 +262,19 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @GetMapping("/unit/position/read/list/{listName}")
-    public ResponseEntity<AppResponse<JsonNode>> readPositionList(@RequestHeader("X-Auth-Token") String token,
-                                                                  @PathVariable("listName") String listName
+    @Transactional
+    @GetMapping("/unit/position/read/list")
+    public ResponseEntity<AppResponse<JsonNode>> readPositionList(@RequestHeader("X-Auth-Token") String token
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.readChildList("Position", listName)));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllPositions().toString()));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
@@ -305,20 +291,11 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            unitRepository.findByName(code).ifPresentOrElse(
-                    (unit -> {
-                        try {
-                            respBuilder.data(SystemUtil.convertStringToJsonNode(unitRepository.findByParent(unit).toString()));
-                        } catch (JsonProcessingException e) {
-                            e.printStackTrace();
-                        }
-                    }), () -> {
-                        try {
-                            respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                        } catch (JsonProcessingException e) {
-                            e.printStackTrace();
-                        }
-                    });
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUnitChildren(code).toString()));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
@@ -335,19 +312,13 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            unitRepository.findByName(code).ifPresentOrElse((unit -> unitRepository.findByChild(unit).ifPresentOrElse((parentUnit -> {
+            orgChartService.getUnitParent(code).ifPresentOrElse((unit -> {
                 try {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(parentUnit.toString()));
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(unit.toString()));
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
             }), () -> {
-                try {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-            })), () -> {
                 try {
                     respBuilder.data(SystemUtil.convertStringToJsonNode("{}"));
                 } catch (JsonProcessingException e) {
@@ -361,7 +332,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-
+    @Transactional
     @PostMapping("/group/create")
     public ResponseEntity<AppResponse<JsonNode>> createGroup(@RequestHeader("X-Auth-Token") String token,
                                                              @RequestBody String props
@@ -382,7 +353,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-
+    @Transactional
     @GetMapping("/group/read/{id}")
     public ResponseEntity<AppResponse<JsonNode>> readGroup(@RequestHeader("X-Auth-Token") String token,
                                                            @PathVariable("id") Long id
@@ -412,7 +383,7 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            groupRepository.findByName(code).ifPresentOrElse((group -> {
+            groupRepository.findByNameAndGroupCodeNotNull(code).ifPresentOrElse((group -> {
                 try {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(group.toString()));
                 } catch (JsonProcessingException e) {
@@ -442,7 +413,7 @@ public class OrgChartController {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByNameIn(Arrays.asList(codes.trim().split("\\s*,\\s*"))).toString()));
+                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByNameInAndGroupCodeNotNull(Arrays.asList(codes.trim().split("\\s*,\\s*"))).toString()));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
@@ -462,7 +433,7 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            unitRepository.findByName(code).ifPresentOrElse((unit -> groupRepository.findByUnit(unit).ifPresentOrElse((groups -> {
+            unitRepository.findByNameAndUnitCodeNotNull(code).ifPresentOrElse((unit -> groupRepository.findByUnit(unit).ifPresentOrElse((groups -> {
                 try {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(groups.toString()));
                 } catch (JsonProcessingException e) {
@@ -498,7 +469,7 @@ public class OrgChartController {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByNameIn(Arrays.asList(codes.trim().split("\\s*,\\s*"))))).toString()));
+                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByNameInAndUnitCodeNotNull(Arrays.asList(codes.trim().split("\\s*,\\s*"))))).toString()));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
@@ -509,7 +480,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    //    @Transactional
+    @Transactional
     @GetMapping("/group/{code}/down")
     public ResponseEntity<AppResponse<JsonNode>> getGroupUnitChildrenByCode(@RequestHeader("X-Auth-Token") String token,
                                                                             @PathVariable("code") String code
@@ -518,7 +489,7 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            groupRepository.findByName(code).ifPresentOrElse(
+            groupRepository.findByNameAndGroupCodeNotNull(code).ifPresentOrElse(
                     group -> {
                         try {
                             respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByParent(group.getUnit()))).toString()));
@@ -539,28 +510,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    //    @Transactional
-    @GetMapping("/sp/group/{code}/down")
-    public ResponseEntity<AppResponse<JsonNode>> getGroupUnitChildrenByCodeSP(@RequestHeader("X-Auth-Token") String token,
-                                                                              @PathVariable("code") String code
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.getGroupByCodeAndDirection(code, "down", "").toString()));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-    //    @Transactional
+    @Transactional
     @GetMapping("/group/{code}/up")
     public ResponseEntity<AppResponse<JsonNode>> getGroupUnitParentsByCode(@RequestHeader("X-Auth-Token") String
                                                                                    token,
@@ -570,7 +520,7 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            groupRepository.findByName(code).ifPresentOrElse(
+            groupRepository.findByNameAndGroupCodeNotNull(code).ifPresentOrElse(
                     group -> unitRepository.findByGroup(group).ifPresentOrElse(
                             unit -> unitRepository.findByChild(unit).ifPresentOrElse(
                                     parentUnit -> groupRepository.findByUnit(parentUnit).ifPresentOrElse(parentGroup -> {
@@ -611,27 +561,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    //    @Transactional
-    @GetMapping("/sp/group/{code}/up")
-    public ResponseEntity<AppResponse<JsonNode>> getGroupUnitParentsByCodeSP(@RequestHeader("X-Auth-Token") String token,
-                                                                             @PathVariable("code") String code
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(groupRepository.getGroupByCodeAndDirection(code, "up", "").toString()));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
+    @Transactional
     @PutMapping("/group/update/{id}")
     public ResponseEntity<AppResponse<JsonNode>> updateGroup(@RequestHeader("X-Auth-Token") String token,
                                                              @PathVariable("id") Long id,
@@ -649,6 +579,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Transactional
     @DeleteMapping("/group/delete/{id}")
     public ResponseEntity<AppResponse<JsonNode>> deleteGroup(@RequestHeader("X-Auth-Token") String token,
                                                              @PathVariable("id") Long id
@@ -669,6 +600,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Transactional
     @PostMapping("/group/read/list/{listName}")
     public ResponseEntity<AppResponse<JsonNode>> readGroupList(@RequestHeader("X-Auth-Token") String token,
                                                                @PathVariable("listName") String listName
@@ -762,6 +694,8 @@ public class OrgChartController {
 //        return respBuilder.build().getResponseEntity();
 //    }
 //
+
+    @Transactional
     @PutMapping("/group/{groupId}/relation/unit/add")
     public ResponseEntity<AppResponse<JsonNode>> updateGroupUnitRelation(@RequestHeader("X-Auth-Token") String token,
                                                                          @PathVariable("groupId") Long groupId,
@@ -876,5 +810,36 @@ public class OrgChartController {
 //            e.printStackTrace();
 //        }
 //        return respBuilder.build().getResponseEntity();
+//    }
+
+
+
+    public Optional<Unit> createUnit(Account account, String props) throws AppworkException {
+        return unitRepository.findById(new Entity(account,
+                SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
+                "OrganizationalUnit").create(props));
+    }
+
+    public Optional<Unit> updateUnit(Account account, Long id, String props) {
+        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
+                "OrganizationalUnit").update(id, props);
+        return unitRepository.findById(id);
+    }
+
+    public Optional<Position> createPosition(Account account, Long unitId, String props) throws AppworkException {
+        return positionRepository.findById(new Entity(account,
+                SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
+                "OrganizationalUnit").createChild(unitId, "Position", props));
+    }
+
+    public Optional<Position> updatePosition(Account account, Long unitId, Long id, String props) {
+        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
+                "OrganizationalUnit").updateChild(unitId, "Position", id, props);
+        return positionRepository.findById(id);
+    }
+
+//    public Optional<Group> createGroup(Account account, String props) {
+//        Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
+//        otds.createGroup(props);
 //    }
 }
