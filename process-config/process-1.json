@@ -15,7 +15,7 @@
         "stepRG": {
             "hasAutocomplete": false,
             "roleFilter": "org/group/findByCodes/HGCS",
-            "page": "process-step-RG",
+            "page": "process-step-early",
             "condition": "condition",
             "nextStep": {
                 "approve": "stepRQ"
@@ -24,7 +24,7 @@
         "stepRQ": {
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HCAO",
-            "page": "process-step-RQ",
+            "page": "process-step-early",
             "condition": "condition",
             "nextStep": {
                 "approve": "stepRE"
@@ -52,7 +52,7 @@
         "stepMM": {
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
-            "page": "process-step-MM",
+            "page": "process-step-member",
             "condition": "condition",
             "nextStep": {
                 "approve": "stepApprovals"
@@ -61,7 +61,7 @@
         "stepApprovals": {
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
-            "page": "process-step-RE",
+            "page": "process-step-approvals",
             "condition": "condition",
             "nextStep": {
                 "HIROLE": "stepAD",
@@ -72,7 +72,7 @@
         "stepAD": {
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
-            "page": "process-step-RE",
+            "page": "process-step-late",
             "condition": "condition",
             "nextStep": {
                 "approve": "stepMM"

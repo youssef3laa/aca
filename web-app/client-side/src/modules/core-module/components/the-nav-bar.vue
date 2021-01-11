@@ -84,7 +84,7 @@ export default {
       drawer: false,
       items: [
         { title: 'Home', icon: 'dashboard', action: this.home },
-        { title: 'Demo', icon: 'dashboard', action: this.demo },
+        { title: 'Initiate Process', icon: 'dashboard', action: this.process },
         { title: 'About', icon: 'question_answer', action: this.about },
         { title: 'Logout', icon: 'question_answer', action: this.logout },
       ],
@@ -92,15 +92,23 @@ export default {
   },
   methods: {
     home() {
-      router.push('home')
+      // router.push('home')
+      router.push({name: 'HomePage' }).catch(function(){
+        router.go()
+      })
     },
-    demo() {
-      router.push('demo')
+    process() {
+      // router.push('demo')
+      router.push({name: 'initiation-step' }).catch(function(){
+        router.go()
+      })
     },
     about() {},
     logout() {
       localStorage.removeItem('user')
-      router.push({name: 'LoginView' })
+      router.push({name: 'LoginView' }).catch(function(){
+        router.go()
+      })
     },
   },
 }

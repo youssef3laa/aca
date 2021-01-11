@@ -4,18 +4,18 @@
     <span v-else>
 
       <span v-if="sec.forms">
-        <v-card v-for="formData in sec.forms" :key="formData.id" flat style="background: transparent">
+        <v-card  v-bind:style="{'background': sec.background}" style="margin-bottom: 10px" v-for="formData in sec.forms" :key="formData.id" flat>
           <!-- <v-card-text v-text="formData.form.name"></v-card-text> -->
 
       
-                    <span v-if="formData.resizable">
-            <splitpanes class="default-theme" dir="ltr">
-              <pane v-bind:style="{'background': form.background}" v-for="(form,index) in formData.resizable.forms" :key="index">
-                <span dir="rtl">
-                  <FormBuilder :forms="form" :model="form.model" />
-                </span>
-              </pane>
-            </splitpanes>
+          <span v-if="formData.resizable">
+          <splitpanes class="default-theme" dir="ltr">
+            <pane v-bind:style="{'background': form.background}" v-for="(form,index) in formData.resizable.forms" :key="index">
+              <span dir="rtl">
+                <FormBuilder :forms="form" :model="form.model" />
+              </span>
+            </pane>
+          </splitpanes>
           </span>
           
           <span v-if="sec.type != 'collapse'">
@@ -40,9 +40,9 @@
                     <v-col cols="8" class="text--secondary"> </v-col>
                   </v-row>
                   <template v-slot:actions>
-                    <v-icon color="error">
-                      mdi-arrow-collapse-down
-                    </v-icon>
+<!--                    <v-icon color="error">-->
+<!--                      mdi-arrow-collapse-down-->
+<!--                    </v-icon>-->
                   </template>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>

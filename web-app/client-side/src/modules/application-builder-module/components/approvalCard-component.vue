@@ -15,12 +15,15 @@
       <v-container>
         <v-textarea
           row
-          background-color="grey lighten-2"
-          color="primary"
-          :label="field.commentLabel"
+          color="outline"
           v-model="comment"
            @change="onValueChange"
-        ></v-textarea>
+          outlined
+        >
+          <template #label>
+            <span v-t="field.commentLabel"></span>
+          </template>
+        </v-textarea>
       </v-container>
     </v-card>
   </div>

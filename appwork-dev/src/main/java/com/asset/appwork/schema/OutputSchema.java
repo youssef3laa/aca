@@ -22,7 +22,7 @@ public class OutputSchema {
     String roleFilter;
 
     public String getAssignedType() {
-        if(assignedCN.contains("cn=organizational users")){
+        if(removeNull(this.assignedCN).contains("cn=organizational users")){
             return "user";
         }else{
             return "role";

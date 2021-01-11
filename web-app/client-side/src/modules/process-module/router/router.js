@@ -1,7 +1,7 @@
 import InitStep from '../views/process-init'
-import ProcessStep from '../views/process-step-RG'
-import ProcessStepRQ from '../views/process-step-RQ'
+import ProcessStepEarly from '../views/process-step-early'
 import ProcessStepRE from '../views/process-step-RE'
+import ProcessStepMember from '../views/process-step-member'
 
 const routes = [
     {
@@ -10,17 +10,17 @@ const routes = [
         component: InitStep
     },
     {
-        path: '/process-step-RG/:taskId/',
-        name: 'process-step-RG',
-        component: ProcessStep,
-    }, {
-        path: '/process-step-RQ/:taskId/',
-        name: 'process-step-RQ',
-        component: ProcessStepRQ
+        path: '/process-step-early/:taskId/',
+        name: 'process-step-early',
+        component: ProcessStepEarly,
     }, {
         path: '/process-step-RE/:taskId/',
         name: 'process-step-RE',
         component: ProcessStepRE
+    }, {
+        path: '/process-step-MM/:taskId/',
+        name: 'process-step-member',
+        component: ProcessStepMember
     },
 ]
 

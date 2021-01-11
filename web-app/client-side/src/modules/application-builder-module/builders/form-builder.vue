@@ -20,9 +20,9 @@
                   <v-col cols="8" class="text--secondary"> </v-col>
                 </v-row>
                 <template v-slot:actions>
-                  <v-icon color="error">
-                    mdi-arrow-collapse-down
-                  </v-icon>
+<!--                  <v-icon color="error">-->
+<!--                    mdi-arrow-collapse-down-->
+<!--                  </v-icon>-->
                 </template>
               </v-expansion-panel-header>
               <v-expansion-panel-content>

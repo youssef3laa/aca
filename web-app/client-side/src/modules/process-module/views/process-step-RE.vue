@@ -23,7 +23,7 @@ export default {
       this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
       //   let page = this.inputSchema.page;
 
-      this.loadForm("process-stepRE", this.fillForm);
+      this.loadForm("process-stepEarly", this.fillForm);
     },
     fillForm: async function () {
       this.$refs.appBuilder.disableSection("section1")
