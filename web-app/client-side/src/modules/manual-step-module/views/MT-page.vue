@@ -147,16 +147,15 @@ export default {
               {
                 key: 'tab1',
                 id: 1,
-                isActive : true,
-                name: 'البيانات تكملية',
+                isActive: true,
+                name: 'البيانات الأساسية',
                 icon: 'far fa-file-alt',
               },
               {
                 key: 'tab2',
                 id: 2,
-                
-                name: '2 البيانات تكملية',
-                icon: 'far fa-file-alt',
+                name: 'المرفقات',
+                icon: 'fas fa-paperclip',
               },
             ],
             sections: [
@@ -166,9 +165,9 @@ export default {
                 actions: ['cancel', 'save', 'complete'],
               },
               {
-                type: "tab",
+                type: 'tab',
                 display: 'none',
-                tabId : 2,
+                tabId: 2,
                 numOfResizable: 2,
                 key: 'section1',
                 tabs: [
@@ -353,8 +352,8 @@ export default {
               },
               {
                 type: 'tab',
-                display : 'block',
-                tabId : 1,
+                display: 'block',
+                tabId: 1,
                 name: 'الموافقة على الطلب',
                 forms: [
                   {
