@@ -12,6 +12,7 @@
         :error="errors"
         :val="val"
         :field="field"
+        @input="updateValue"
       ></richtextValidateComponent>
       <span class="red--text">{{ errors[0] }}</span>
 
@@ -33,6 +34,19 @@ import { ValidationProvider } from 'vee-validate'
 export default {
   name: 'richtextComponent',
   components: { richtextValidateComponent, ValidationProvider },
+  methods:{
+    updateValue(content){
+      this.content = content;
+      this.$emit('update', {
+        name: this.field.name,
+        value: this.content,
+        type: 'inputChange',
+      })
+     
+      // this.$observable.fire("richtextvalueUpdate", {value: content, fieldName:this.field.name});
+      // console.log(content);
+    }
+  },
   data() {
     return {
       content: this.val,
