@@ -2,10 +2,10 @@
   <span>
     <span
       v-if="page.tabs"
-      style="display: block; border-bottom: 1px solid #e1e1e1;height: 59px;"
+      style="display: block; border-bottom: 1px solid #e1e1e1;height: 72px;padding: 12px 0 12px 12px;width: 98%;margin-right: 12px;"
     >
       <button
-        style="    margin-bottom: 0px;"
+        style="margin-bottom: 0px;border-radius-top-righ:6px; border-radius-top-left:6px"
         v-for="tab in page.tabs"
         :key="tab.id"
         @click="selectedTab(tab)"
@@ -87,7 +87,7 @@ export default {
 }
 
 .active {
-  border-bottom: 3px solid #0278ae;
+  border-bottom: 3px solid #0278ae !important;
   background-color: rgba(2, 120, 174, 0.1);
 }
 .tab-btn {
