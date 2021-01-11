@@ -2,10 +2,24 @@
   <v-container style="padding-top: 0; padding-bottom:0">
     <TabBuilder v-if="sec.tabs" v-on:modelChange="dataChange" :section="sec" />
     <span v-else>
+
       <span v-if="sec.forms">
         <v-card v-for="formData in sec.forms" :key="formData.id" flat style="background: transparent">
           <!-- <v-card-text v-text="formData.form.name"></v-card-text> -->
-          <span style="margin-bottom: 10px; display: block" v-if="sec.type != 'collapse'">
+
+      
+                    <span v-if="formData.resizable">
+            <splitpanes class="default-theme" dir="ltr">
+              <pane v-bind:style="{'background': form.background}" v-for="(form,index) in formData.resizable.forms" :key="index">
+                <span dir="rtl">
+                  <FormBuilder :forms="form" :model="form.model" />
+                </span>
+              </pane>
+            </splitpanes>
+          </span>
+          
+          <span v-if="sec.type != 'collapse'">
+
             <FormBuilder :forms="formData" :model="formData.model" />
           </span>
           <span
@@ -104,12 +118,16 @@
 <script>
 import TabBuilder from './tab-builder'
 import FormBuilder from './form-builder'
+import { Splitpanes, Pane } from 'splitpanes'
+import 'splitpanes/dist/splitpanes.css'
 
 export default {
   name: 'SectionBuilder',
   components: {
     TabBuilder,
     FormBuilder,
+    Splitpanes,
+    Pane
   },
   methods: {
     dataChange: function(model) {

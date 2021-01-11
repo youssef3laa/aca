@@ -13,9 +13,9 @@ public interface UnitRepository extends GenericRepository<Unit, Long> {
 
     List<Unit> findAll();
 
-    Optional<Unit> findByName(String name);
+    Optional<Unit> findByNameAndUnitCodeNotNull(String name);
 
-    List<Unit> findByNameIn(List<String> names);
+    List<Unit> findByNameInAndUnitCodeNotNull(List<String> names);
 
     List<Unit> findByParent(Unit unit);
 

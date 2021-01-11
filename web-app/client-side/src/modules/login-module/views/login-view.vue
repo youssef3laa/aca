@@ -117,10 +117,6 @@ export default {
         }
     },
     mounted: function() {
-        if(Vue.prototype.$user.getSAMLart() && !(Vue.prototype.$user.getSAMLart() instanceof Object)){
-            router.push('home');
-            // console.log(Vue.prototype.$user.getSAMLart());
-        }
     }
 }
 </script>

@@ -32,16 +32,21 @@
   </v-menu> -->
   <v-menu v-model="menu" :close-on-content-click="false" max-width="290">
     <template v-slot:activator="{ on, val }">
+
       <v-text-field
         v-bind="val"
         v-on="on"
-        :label="field.label"
         :value="computedDateFormattedLuxonjs"
         clearable
         color="outline"
         outlined
         @click:clear="date = null"
-      ></v-text-field>
+      >
+        <template #label>
+          <span v-t="field.label"></span>
+        </template>
+
+      </v-text-field>
     </template>
     <v-date-picker
       v-model="date"

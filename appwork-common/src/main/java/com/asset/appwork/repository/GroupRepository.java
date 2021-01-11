@@ -12,16 +12,15 @@ import java.util.Set;
 
 @Repository
 public interface GroupRepository extends GenericRepository<Group, Long> {
-    Optional<Group> findByName(String name);
+    Optional<Group> findByNameAndGroupCodeNotNull(String name);
 
-    List<Group> findByNameIn(List<String> names);
+    List<Group> findByNameInAndGroupCodeNotNull(List<String> names);
 
     Optional<Group> findByUnit(Unit unit);
 
     List<Group> findByUnitIn(Set<Unit> units);
 
-    @Query(value = "{call ACA_ORG_SP_getGroupByCodeAndDirection(:groupCode, :direction, :unitTypeCode)}", nativeQuery = true)
-    List<Group> getGroupByCodeAndDirection(@Param("groupCode") String groupCode,
-                                           @Param("direction") String direction,
-                                           @Param("unitTypeCode") String unitTypeCode);
+    @Query(value = "{call ACA_ORG_SP_getGroupChildrenRecursivelyFilteredByUnitTypeCode(:groupCode, :unitTypeCode)}", nativeQuery = true)
+    List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(@Param("groupCode") String groupCode,
+                                                                  @Param("unitTypeCode") String unitTypeCode);
 }

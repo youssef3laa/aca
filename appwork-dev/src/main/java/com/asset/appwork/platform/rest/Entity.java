@@ -83,7 +83,7 @@ public class Entity {
         return http.getResponse();
     }
 
-    public <T> String createChild(Long parentId, String childName, T data) {
+    public <T> Long createChild(Long parentId, String childName, T data) throws AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
@@ -92,7 +92,12 @@ public class Entity {
                         data.toString() +
                         "}")
                 .post(this.apiBaseUrl + String.format(API.ADD_CHILD.getUrl(), this.entityName, parentId.toString(), childName));
-        return http.getResponse();
+        String response = http.getResponse();
+        try {
+            return Long.parseLong(SystemUtil.getJsonByPtrExpr(response, "/Identity/Id"));
+        } catch (NumberFormatException e) {
+            throw new AppworkException(SystemUtil.getJsonByPtrExpr(response, "/message"), ResponseCode.CREATE_ENTITY_FAILURE);
+        }
     }
 
     public String readChildById(Long parentId, String childName, Long childId) {

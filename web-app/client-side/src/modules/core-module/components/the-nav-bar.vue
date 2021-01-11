@@ -100,7 +100,7 @@ export default {
     about() {},
     logout() {
       localStorage.removeItem('user')
-      router.go('login')
+      router.push({name: 'LoginView' })
     },
   },
 }

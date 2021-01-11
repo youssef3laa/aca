@@ -1,6 +1,7 @@
 package com.asset.appwork.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -28,6 +29,10 @@ public class Unit extends BaseIdentity<Unit> {
     @ManyToMany(mappedBy = "child", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JsonIgnore
     private Collection<Unit> parent = new HashSet<>();
+    @OneToMany(mappedBy = "unit", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JsonProperty("positions")
+//    @JsonIgnore
+    Collection<Position> position;
 
     public String getUnitTypeCode() {
         return unitTypeCode;
@@ -67,6 +72,14 @@ public class Unit extends BaseIdentity<Unit> {
 
     public void setChild(Collection<Unit> children) {
         this.child = children;
+    }
+
+    public Collection<Position> getPosition() {
+        return position;
+    }
+
+    public void setPosition(Collection<Position> position) {
+        this.position = position;
     }
 }
 
