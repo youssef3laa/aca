@@ -50,6 +50,7 @@ import MemoComponent from '../components/memo-component'
 import AttachmentComponent from '../components/attachment-component'
 import IframeComponent from '../components/iframe-component'
 import SkeletonLoader from '../components/skeleton-loader-component'
+import chartsComponent from '../components/charts-component'
 
 export default {
   name: 'FormBuilder',
@@ -70,7 +71,8 @@ export default {
     MemoComponent,
     IframeComponent,
     SkeletonLoader,
-    AttachmentComponent
+    AttachmentComponent,
+    chartsComponent
   },
   data() {
     return {

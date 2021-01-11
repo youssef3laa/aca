@@ -3,9 +3,9 @@
     <TabBuilder v-if="sec.tabs" v-on:modelChange="dataChange" :section="sec" />
     <span v-else>
       <span v-if="sec.forms">
-        <v-card v-for="formData in sec.forms" :key="formData.id" flat>
+        <v-card v-for="formData in sec.forms" :key="formData.id" flat style="background: transparent">
           <!-- <v-card-text v-text="formData.form.name"></v-card-text> -->
-          <span v-if="sec.type != 'collapse'">
+          <span style="margin-bottom: 10px; display: block" v-if="sec.type != 'collapse'">
             <FormBuilder :forms="formData" :model="formData.model" />
           </span>
           <span
@@ -151,12 +151,6 @@ export default {
   margin: 0 20px 0 0;
   padding: 10px 15px;
 }
-<<<<<<< .mine
-.v-expansion-panel-header--active{
-  border-bottom: 1px solid #D1D1D1;
-}
-||||||| .r200
-=======
 .v-expansion-panel__header {
   border: none;
 }
@@ -170,5 +164,4 @@ export default {
   border-top: 1px solid black;
   z-index: -1;
 }
->>>>>>> .r228
 </style>
