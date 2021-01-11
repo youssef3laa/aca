@@ -62,7 +62,7 @@ export default {
                       {
                         type: 'MemoComponent',
                         name: 'نوع مذكرة العرض',
-                        subscribe: 'tasks',
+
                         col: 12,
                       },
                       

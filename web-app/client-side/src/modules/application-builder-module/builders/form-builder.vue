@@ -85,7 +85,9 @@ export default {
       if (this.forms.model)
         this.forms.model['_valid'] = !this.$refs['observer']['_data'].flags
             .invalid
-
+      // if (this.forms.key)
+      //   this.forms.model['_key'] = this.forms.key;
+        
       console.log(this.$refs['observer'].errors[data.name])
       console.log(this.$refs['observer']['_data'].flags)
       // this.$refs['observer'].validateWithInfo().then((val)=> console.log(val))

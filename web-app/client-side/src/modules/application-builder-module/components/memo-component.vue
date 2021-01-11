@@ -18,7 +18,7 @@
     <v-container>
       <AppBuilder ref="appBuilder" :app="app" />
     </v-container>
-    <v-btn @click="trigger">Submit</v-btn>
+    <v-btn @click="triggerSubmit">Submit</v-btn>
   </div>
 </template>
 
@@ -36,79 +36,194 @@ export default {
 
   data() {
     return {
+      selected: "",
+      // richText: [],
+      richText: {},
+      Memodata: [],
       app: {},
-      // app: {
-      //   pages: [
-      //     {
-      //       key: "memoPage",
-      //       sections: [
-      //         {
-      //           type: "collapse",
-      //           name: "نوع النص",
-      //           forms: [
-      //             {
-      //               key: "form1",
-      //               inputs: [
-      //                 {
-      //                   type: "richtextComponent",
-      //                   name: "richtext1",
-      //                   col: 12,
-      //                 },
-      //               ],
-      //               model: {
-      //                 richtext1: "",
-      //               },
-      //             },
-      //           ],
-      //         },
-      //       ],
-      //     },
-      //   ],
-      // },
+      app2: {
+        pages: [
+          {
+            key: "page1",
+            sections: [
+              {
+                numOfResizable: 2,
+                key: "section1",
+                tabs: [
+                  {
+                    key: "tab2",
+                    id: 2,
+                    name: "المرفقات",
+                    icon: "fas fa-paperclip",
+                  },
+                ],
+                forms: [
+                  {
+                    key: "form1",
+                    resizable: {
+                      forms: [
+                        {
+                          background: "white",
+                          inputs: [
+                            {
+                              type: "InputFileComponent",
+                              name: "inputFile",
+                              col: 12,
+                            },
+                          ],
+                          model: {
+                            inputFile: "",
+                          },
+                        },
+                        {
+                          key: "iframeObj",
+                          background: "white",
+                          inputs: [
+                            {
+                              type: "IframeComponent",
+                              name: "iframeObj",
+                              col: 12,
+                            },
+                          ],
+                          model: {
+                            iframeObj: {
+                              src: "",
+                            },
+                          },
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+
+      app3: {
+        pages: [
+          {
+            key: "memoPage",
+            sections: [
+              {
+                numOfResizable: 2,
+                type: "collapse",
+                name: "نوع النص",
+
+                tabs: [
+                  {
+                    key: "tab1",
+                    id: 1,
+                    name: "البيانات الأساسية",
+                    icon: "far fa-file-alt",
+                  },
+                  {
+                    key: "tab2",
+                    id: 2,
+                    name: "المرفقات",
+                    icon: "fas fa-paperclip",
+                  },
+                ],
+                forms: [
+                  {
+                    key: "form1",
+                    resizable: {
+                      forms: [
+                        {
+                          key: "form1",
+                          inputs: [
+                            {
+                              type: "richtextComponent",
+                              name: "richtext1",
+                              col: 12,
+                            },
+                          ],
+                          model: {
+                            richtext1: "",
+                          },
+                        },
+                        {
+                          key: "form1",
+                          inputs: [
+                            {
+                              type: "richtextComponent",
+                              name: "richtext1",
+                              col: 12,
+                            },
+                          ],
+                          model: {
+                            richtext1: "",
+                          },
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
     };
   },
   props: ["field"],
 
   methods: {
-    changeVal: function (event) {
-      var selected = event.value.value.text;
-      this.loadForm(selected, this.fillForm);
-      // setTimeout(() => {
-      //   let model = this.$refs.appBuilder.getModelData("form1");
-      //   console.log(model);
-      // }, 100);
-      // let model = this.$refs.appBuilder.getModelData("form1");
-
-      // var sectionsData = this.getMemoSections(event.value.value.text);
+    changeVal(event) {
+      // this.$observable.subscribe("richtextvalueUpdate", (richTextObj) => {
+      //   console.log(richTextObj);
+      //   this.richText[richTextObj.fieldName] =
+      //     "<![CDATA[" + richTextObj.value + "]]>";
+      //   console.log(this.richText);
+      // });
+      this.selected = event.value.value.text;
+      this.loadForm(this.selected, this.fillForm);
+      console.log(this.selected);
     },
 
     async fillForm() {
-      var model = await this.getMemoData();
-      this.$refs.appBuilder.setModelData("form1", model);
-      // this.$refs.appBuilder.setModelData("form2", model);
+      this.Memodata = await this.getMemoData(this.selected);
+      console.log(this.Memodata);
+      if (this.Memodata == undefined) return;
+      this.Memodata[this.Memodata.length - 1].memoValues.forEach((element) => {
+        var model = { [element.jsonKey]: element.value };
+        console.log(model);
+        console.log(element);
+        this.$refs.appBuilder.setModelData(element.jsonKey, model);
+      });
+      // this.$refs.appBuilder.setModelData("richtext1", { richtext1: "Snoopy" });
     },
-    trigger() {
-      let model = this.$refs.appBuilder.getModelData("form1");
-      console.log(model);
-      let data = {
-        requestId: "",
-        JSONId: "form1",
-        memo: [{ Key: "", value: "richtext1" }],
-      };
 
+    triggerSubmit() {
+      // let model = this.$refs.appBuilder.getModelData("richtext1");
+      // console.log(model);
+      // const richTextName = Object.keys(model)[0];
+      // console.log(richTextName);
+      //  this.richText[richTextObj.fieldName] =
+      //     "<![CDATA[" + richTextObj.value + "]]>";
+      
+      // this.Memodata[this.Memodata.length - 1].memoValues.forEach((element) => {
+      //   var data = this.$refs.appBuilder.getModelData(element.jsonKey);
+      //   this.richText[element.jsonKey] = "<![CDATA[" + data + "]]>";
+      //   console.log(data);
+      //   console.log(element.jsonKey);
+      // });
+
+     var test = this.$refs.appBuilder.getModelData('richtext1');
+      console.log(test);
+      let data;
+      data = {
+        requestId: "1",
+        jsonId: this.selected,
+        values: this.richText,
+      };
+      //[{ key: element.formName , value: element, },{ key: "form2", value: this.richText }],
+      console.log(JSON.stringify(data));
       this.setMemoData(data);
     },
   },
   computed: {
-    getFormData() {
-      var response = [
-        { component: "RichtextComponent", numberOfItems: 2, val: "" },
-        // { component: "AutocompleteComponent", numberOfItems: 1, val: "" },
-      ];
-      console.log(response);
-      console.log(this.response);
-      return response;
-    },
     getAutoCompeleteVal() {
       var val = {
         list: [
@@ -116,6 +231,7 @@ export default {
           { value: 2, text: "memo2" },
         ],
       };
+
       return val;
     },
   },
