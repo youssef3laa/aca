@@ -3,13 +3,14 @@
     "steps": {
         "init": {
             "hasAutocomplete": true,
-            "roleFilter": "org/group/findByCodes/HUNIT,HSEC,HOFC",
+            "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
             "page": "init-process",
             "condition": "condition",
             "nextStep": {
-                "HUNIT": "stepRG",
-                "HSEC": "stepRQ",
-                "HOFC": "stepRE"
+                "HGCS": "stepRG",
+                "HCCA": "stepRQ",
+                "HTCA": "stepRE",
+                "HTVA": "stepRE"
             }
         },
         "stepRG": {

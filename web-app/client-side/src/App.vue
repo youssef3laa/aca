@@ -50,7 +50,6 @@ h1 {
 </style>
 <script>
 import TheNavbar from './modules/core-module/components/the-nav-bar'
-import router from './router'
 import SystemUser from './config/user'
 import Vue from 'vue'
 // import dynamicView from './components/DynamicView'
@@ -63,7 +62,6 @@ export default {
       Vue.prototype.$user = new SystemUser()
 
       if (systemUser) Vue.prototype.$user.create(JSON.parse(systemUser))
-      else router.push('login')
     },
   },
   created: function() {

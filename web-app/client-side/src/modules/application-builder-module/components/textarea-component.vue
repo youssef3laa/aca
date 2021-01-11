@@ -3,12 +3,14 @@
   <v-textarea
     row
     color="outline"
-    :label="field.label"
     v-model="d"
     @input="addInput"
-    outlined 
-
-  ></v-textarea>
+    outlined
+  >
+      <template #label>
+          <span v-t="field.label"></span>
+      </template>
+  </v-textarea>
 </template>
 <script>
 export default {

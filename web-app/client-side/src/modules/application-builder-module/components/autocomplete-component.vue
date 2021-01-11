@@ -43,7 +43,7 @@ export default {
           const res = response.data.data.map((el) => {
             let obj = {
               name: el["name_ar"],
-              value: el["groupCode"],
+              value: el["cn"],
               text: el["name_ar"],
               code: el["groupCode"],
             };

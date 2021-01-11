@@ -59,7 +59,7 @@ export default {
     },
   },
   mounted() {
-      for (let i = 0; i < this.page.tabs.length; i++) {
+      for (let i = 0; i < this.page.tabs && this.page.tabs.length; i++) {
         if(this.page.tabs[i].isActive){
           this.selected = this.page.tabs[i]
           console.log("this.isActive")
