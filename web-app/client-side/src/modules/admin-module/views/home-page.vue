@@ -1,26 +1,26 @@
 <template>
   <div>
     <v-container>
-      <AppBuilder :app="app"/>
+      <AppBuilder :app="app" />
     </v-container>
   </div>
 </template>
 
 <script>
-import AppBuilder from '../../application-builder-module/builders/app-builder'
-import http from '../../core-module/services/http'
-import {extend} from 'vee-validate'
+import AppBuilder from "../../application-builder-module/builders/app-builder";
+import http from "../../core-module/services/http";
+import { extend } from "vee-validate";
 
-extend('password', {
-  params: ['target'],
-  validate(value, {target}) {
-    return value === target
+extend("password", {
+  params: ["target"],
+  validate(value, { target }) {
+    return value === target;
   },
-  message: 'Password confirmation does not match',
-})
+  message: "Password confirmation does not match",
+});
 
 export default {
-  name: 'HomePage',
+  name: "HomePage",
   components: {
     AppBuilder,
   },
@@ -84,19 +84,45 @@ export default {
               //   ],
               // },
               {
+                type: "card",
+                forms: [
+                  {
+                    key: "form3",
+                    inputs: [
+                      {
+                        type: "chartsComponent",
+                        chartType: "BarChart",
+                        col: 4,
+                      },
+                      {
+                        type: "chartsComponent",
+                        chartType: "PieChart",
+                        col: 4,
+                      },
+                      {
+                        type: "chartsComponent",
+                        chartType: "BubbleChart",
+                        col: 4,
+                      },
+                    ],
+                    model: {},
+                  },
+                ],
+              },
+              {
                 tabs: [
                   {
                     id: 1,
-                    name: 'المهام',
+                    name: "المهام",
                   },
                 ],
                 forms: [
                   {
                     inputs: [
                       {
-                        type: 'TableComponent',
-                        name: 'taskTable',
-                        subscribe: 'tasks',
+                        type: "TableComponent",
+                        name: "taskTable",
+                        subscribe: "tasks",
                         col: 12,
                       },
                     ],
@@ -104,35 +130,36 @@ export default {
                       taskTable: {
                         headers: [
                           {
-                            text: 'Task',
-                            align: 'start',
+                            text: "Task",
+                            align: "start",
                             filterable: false,
-                            value: 'Activity',
+                            value: "Activity",
                           },
                           {
-                            text: 'Sender Name',
-                            value: 'Sender.displayName',
+                            text: "Sender Name",
+                            value: "Sender.displayName",
                           },
                           {
-                            text: 'Process Name',
-                            value: 'TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process',
+                            text: "Process Name",
+                            value:
+                              "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process",
                           },
                           {
-                            text: 'Date',
-                            value: 'DeliveryDate',
+                            text: "Date",
+                            value: "DeliveryDate",
                           },
                           {
-                            text: 'Target Type',
-                            value: 'Target.type',
+                            text: "Target Type",
+                            value: "Target.type",
                           },
                           {
-                            text: 'Actions',
-                            value: 'actions',
+                            text: "Actions",
+                            value: "actions",
                             sortable: false,
                           },
                         ],
                         data: [],
-                        search: '',
+                        search: "",
                       },
                     },
                   },
@@ -142,41 +169,41 @@ export default {
           },
         ],
       },
-    }
+    };
   },
   methods: {
     getTasks: function () {
-      http.get('workflow/human/tasks').then((response) => {
-        console.log(response)
-        var data = JSON.parse(response.data.data)
-        console.log(data)
-        this.$observable.fire('tasks', {
-          type: 'modelUpdate',
+      http.get("workflow/human/tasks").then((response) => {
+        console.log(response);
+        var data = JSON.parse(response.data.data);
+        console.log(data);
+        this.$observable.fire("tasks", {
+          type: "modelUpdate",
           model: data,
-        })
-      })
+        });
+      });
     },
   },
 
   mounted: function () {
-    this.getTasks()
-    this.$observable.subscribe('submit', (model) => {
-      console.log(model)
-      this.getTasks()
+    this.getTasks();
+    this.$observable.subscribe("submit", (model) => {
+      console.log(model);
+      this.getTasks();
       if (model.valid) {
         http
-            .post('employee/initiate/', model.model)
-            .then((response) => {
-              console.log(response)
-              this.getTasks()
-            })
-            .catch((error) => {
-              console.error(error)
-            })
+          .post("employee/initiate/", model.model)
+          .then((response) => {
+            console.log(response);
+            this.getTasks();
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       }
-    })
+    });
   },
-}
+};
 
 // <component
 //         v-if="formBuilder != null"

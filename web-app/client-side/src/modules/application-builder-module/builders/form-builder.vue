@@ -49,6 +49,8 @@ import ApprovalComponent from '../components/approvalCard-component'
 import MemoComponent from '../components/memo-component'
 import AttachmentComponent from '../components/attachment-component'
 import IframeComponent from '../components/iframe-component'
+import SkeletonLoader from '../components/skeleton-loader-component'
+import chartsComponent from '../components/charts-component'
 
 export default {
   name: 'FormBuilder',
@@ -68,7 +70,9 @@ export default {
     ApprovalComponent,
     MemoComponent,
     IframeComponent,
-    AttachmentComponent
+    SkeletonLoader,
+    AttachmentComponent,
+    chartsComponent
   },
   data() {
     return {

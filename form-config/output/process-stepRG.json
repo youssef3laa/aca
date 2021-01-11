@@ -22,6 +22,11 @@
                             },
                             {
                                 "key": "tab2",
+                                "id": "3",
+                                "name": "الآراء السابقة"
+                            },
+                            {
+                                "key": "tab3",
                                 "id": "2",
                                 "name": "المرفقات"
                             }
@@ -71,19 +76,67 @@
 
                             ,
                             {
-                                "width": "50%",
-                                "resizable": "true",
-                                "key": "form2",
-                                "publish": "complete",
+                                "key": "historyTable",
                                 "inputs": [
                                     {
-                                        "type": "InputFileComponent",
-                                        "name": "inputFile",
-                                        "col": "12"
+                                        "type": "TableComponent",
+                                        "name": "taskTable",
+                                        "subscribe": "tasks",
+                                        "col": 12
                                     }
                                 ],
                                 "model": {
-                                    "Fname": ""
+                                    "taskTable": {
+                                        "headers": [
+                                            {
+                                                "text": "الاسم",
+                                                "align": "start",
+                                                "filterable": false,
+                                                "value": "userCN"
+                                            },
+                                            {
+                                                "text": "التاريخ",
+                                                "value": "approvalDate"
+                                            }
+                                        ],
+                                        "data": [],
+                                        "search": ""
+                                    }
+                                }
+                            },
+                            {
+                                "resizable": {
+                                    "forms": [
+                                        {
+                                            "background": "white",
+                                            "inputs": [
+                                                {
+                                                    "type": "InputFileComponent",
+                                                    "name": "inputFile",
+                                                    "col": 12
+                                                }
+                                            ],
+                                            "model": {
+                                                "inputFile": ""
+                                            }
+                                        },
+                                        {
+                                            "key": "iframeObj",
+                                            "background": "white",
+                                            "inputs": [
+                                                {
+                                                    "type": "IframeComponent",
+                                                    "name": "iframeObj",
+                                                    "col": 12
+                                                }
+                                            ],
+                                            "model": {
+                                                "iframeObj": {
+                                                    "src": ""
+                                                }
+                                            }
+                                        }
+                                    ]
                                 }
                             }
                         ]

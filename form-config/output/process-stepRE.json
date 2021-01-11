@@ -1,34 +1,39 @@
 {
-    "app": {
-        "pages": [
-            {
-                "key": "page1",
-                "sections": [
-                    {
-                        "type": "title",
-                        "name": "بيانات المكاتبة",
-                        "actions": [
-                            "cancel",
-                            "complete"
-                        ]
-                    },
-                    {
-                        "key": "section1",
-                        "tabs": [
-                            {
-                                "key": "tab1",
-                                "id": "1",
-                                "name": "البيانات الأساسية"
-                            },
-                            {
-                                "key": "tab2",
-                                "id": "2",
-                                "name": "المرفقات"
-                            }
-                        ],
-                        "forms": [
+  "app": {
+    "pages": [
+      {
+        "key": "page1",
+        "sections": [
+          {
+            "type": "title",
+            "name": "بيانات المكاتبة",
+            "actions": [
+              "cancel",
+              "complete"
+            ]
+          },
+          {
+            "key": "section1",
+            "tabs": [
+              {
+                "key": "tab1",
+                "id": "1",
+                "name": "البيانات الأساسية"
+              },
+              {
+                "key": "tab2",
+                "id": "3",
+                "name": "الآراء السابقة"
+              },
+              {
+                "key": "tab3",
+                "id": "2",
+                "name": "المرفقات"
+              }
+            ],
+            "forms": [
                             
-                                {
+                  {
   "key": "form1",
   "publish": "form1Change",
   "inputs": [
@@ -69,94 +74,112 @@
   }
 }
 
-                            ,
-                            {
-                                    "resizable": {
-                                      "forms": [
-                                        {
-                                          "background": "white",
-                                          "inputs": [
-                                            {
-                                              "type": "InputFileComponent",
-                                              "name": "inputFile",
-                                              "col": 12
-                                            }
-                                          ],
-                                          "model": {
-                                            "inputFile": ""
-                                          }
-                                        },
-                                        {
-                                          "background": "grey",
-                                          "inputs": [
-                                            {
-                                              "type": "InputFileComponent",
-                                              "name": "inputFile",
-                                              "col": 12
-                                            }
-                                          ],
-                                          "model": {
-                                            "inputFile": ""
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    "width": "50%",
-                                    "key": "form2",
-                                    "publish": "complete",
-                                    "inputs": [
-                                      {
-                                        "type": "InputFileComponent",
-                                        "name": "inputFile",
-                                        "col": 12
-                                      }
-                                    ],
-                                    "model": {
-                                      "Fname": ""
-                                    }
-                
-                            }
-                        ]
+                ,
+              {
+                "key": "historyTable",
+                "inputs": [
+                  {
+                    "type": "TableComponent",
+                    "name": "taskTable",
+                    "subscribe": "tasks",
+                    "col": 12
+                  }
+                ],
+                "model": {
+                  "taskTable": {
+                    "headers": [
+                      {
+                        "text": "الاسم",
+                        "align": "start",
+                        "filterable": false,
+                        "value": "userCN"
+                      },
+                      {
+                        "text": "التاريخ",
+                        "value": "approvalDate"
+                      }
+                    ],
+                    "data": [],
+                    "search": ""
+                  }
+                }
+              },
+              {
+                "resizable": {
+                  "forms": [
+                    {
+                      "background": "white",
+                      "inputs": [
+                        {
+                          "type": "InputFileComponent",
+                          "name": "inputFile",
+                          "col": 12
+                        }
+                      ],
+                      "model": {
+                        "inputFile": ""
+                      }
                     },
                     {
-                        "type": "card",
-                        "name": "الموافقة على الطلب",
-                        "forms": [
-                            {
-                                "key": "ApprovalForm",
-                                "inputs": [
-                                    {
-                                        "type": "ApprovalComponent",
-                                        "title": "الرجاء الموافقة على الطلب",
-                                        "commentLabel": "ملاحظات",
-                                        "name": "approval",
-                                        "actions": [
-                                            {
-                                                "value": "approve",
-                                                "label": "الموافقة على الطلب"
-                                            },
-                                            {
-                                                "value": "requestModification",
-                                                "label": "طلب تعديل"
-                                            },
-                                            {
-                                                "value": "reject",
-                                                "label": "رفض الطلب"
-                                            }
-                                        ]
-                                    }
-                                ],
-                                "model": {
-                                    "approval": {
-                                        "decision": "",
-                                        "comment": ""
-                                    }
-                                }
-                            }
-                        ]
+                      "key": "iframeObj",
+                      "background": "white",
+                      "inputs": [
+                        {
+                          "type": "IframeComponent",
+                          "name": "iframeObj",
+                          "col": 12
+                        }
+                      ],
+                      "model": {
+                        "iframeObj": {
+                          "src": ""
+                        }
+                      }
                     }
-                ]
-            }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "type": "card",
+            "name": "الموافقة على الطلب",
+            "forms": [
+              {
+                "key": "ApprovalForm",
+                "inputs": [
+                  {
+                    "type": "ApprovalComponent",
+                    "title": "الرجاء الموافقة على الطلب",
+                    "commentLabel": "ملاحظات",
+                    "name": "approval",
+                    "actions": [
+                      {
+                        "value": "approve",
+                        "label": "الموافقة على الطلب"
+                      },
+                      {
+                        "value": "requestModification",
+                        "label": "طلب تعديل"
+                      },
+                      {
+                        "value": "reject",
+                        "label": "رفض الطلب"
+                      }
+                    ]
+                  }
+                ],
+                "model": {
+                  "approval": {
+                    "decision": "",
+                    "comment": ""
+                  }
+                }
+              }
+            ]
+          }
         ]
-    }
+      }
+    ]
+  }
 }

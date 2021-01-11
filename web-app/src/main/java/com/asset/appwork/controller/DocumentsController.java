@@ -5,7 +5,9 @@ import com.asset.appwork.cs.AppworkCSOperations;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.model.AttachmentSort;
 import com.asset.appwork.response.AppResponse;
+import com.asset.appwork.service.AttachmentSortService;
 import com.asset.appwork.util.Http;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by omaradl on 11/16/2020.
@@ -32,6 +35,9 @@ import java.io.IOException;
 public class DocumentsController {
     @Autowired
     TokenService tokenService;
+
+    @Autowired
+    AttachmentSortService attachmentSortService;
 
     @PostMapping("/upload")
     public ResponseEntity<AppResponse<JsonNode>> uploadFile(@RequestHeader("X-Auth-Token") String token,
@@ -115,6 +121,159 @@ public class DocumentsController {
             obj.put("error", e.getMessage());
             obj.put("statusCode", ResponseCode.INTERNAL_SERVER_ERROR.getCode());
             respBuilder.data(obj);
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+
+    @GetMapping("sort")
+    public ResponseEntity<AppResponse<JsonNode>> getSort(@RequestHeader("X-Auth-Token") String token,
+                                                         @RequestParam("requestEntityId") String requestEntityId,
+                                                         @RequestParam("bwsId") String bwsId) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
+            List<AttachmentSort> attachmentSortList = attachmentSortService.getAttachmentSort(requestEntityId, bwsId);
+            ObjectMapper mapper = new ObjectMapper();
+            ArrayNode jsonNodes = mapper.valueToTree(attachmentSortList);
+            respBuilder.status(ResponseCode.SUCCESS);
+            respBuilder.data(jsonNodes);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @PostMapping(value = "sort", consumes = "application/json")
+    public ResponseEntity<AppResponse<JsonNode>> createSortAttachmentRecord(@RequestHeader("X-Auth-Token") String token,
+                                                                            @RequestBody AttachmentSort attachmentSort) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
+            AttachmentSort attachmentSortObj = attachmentSortService.createAttachmentSort(attachmentSort, account);
+            ObjectMapper mapper = new ObjectMapper();
+//            ObjectNode jsonNodes = mapper.value(attachmentSortList);
+            respBuilder.status(ResponseCode.SUCCESS);
+            respBuilder.data(mapper.valueToTree(attachmentSortObj));
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @PostMapping(value = "sort/bulk", consumes = "application/json")
+    public ResponseEntity<AppResponse<JsonNode>> createMultipleSortAttachmentRecord(@RequestHeader("X-Auth-Token") String token,
+                                                                                    @RequestBody List<AttachmentSort> attachmentSortList) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
+            ObjectMapper mapper = new ObjectMapper();
+
+            ArrayNode jsonNodes = mapper.createArrayNode();
+            for (AttachmentSort attachmentSort : attachmentSortList) {
+                AttachmentSort attachmentSortObj = attachmentSortService.createAttachmentSort(attachmentSort, account);
+                jsonNodes.add(mapper.valueToTree(attachmentSortObj));
+            }
+            respBuilder.status(ResponseCode.SUCCESS);
+            respBuilder.data(jsonNodes);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+
+    @DeleteMapping("sort/{id}")
+    public ResponseEntity<AppResponse<JsonNode>> deleteSortAttachmentRecord(@RequestHeader("X-Auth-Token") String token,
+                                                                            @PathVariable("id") Long id) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
+
+            String response = attachmentSortService.deleteAttachmentSort(id, account);
+            System.out.println("delete response");
+            System.out.println(response);
+            respBuilder.status(ResponseCode.SUCCESS);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+            ObjectMapper objectMapper = new ObjectMapper();
+            respBuilder.data(objectMapper.createObjectNode().put("errorMessage", e.getMessage()));
+        }
+        return respBuilder.build().getResponseEntity();
+
+
+    }
+
+    @DeleteMapping("sort/bulk/{ids}")
+    public ResponseEntity<AppResponse<JsonNode>> deleteMultipleSortAttachmentRecord(@RequestHeader("X-Auth-Token") String token,
+                                                                                    @PathVariable("ids") String ids) {
+        String[] stringList = ids.split(",");
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
+
+            for (String id : stringList) {
+                attachmentSortService.deleteAttachmentSort(Long.valueOf(id), account);
+            }
+            respBuilder.status(ResponseCode.SUCCESS);
+
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(e.getMessage()));
+            } catch (JsonProcessingException jsonProcessingException) {
+                jsonProcessingException.printStackTrace();
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+        return respBuilder.build().getResponseEntity();
+
+
+    }
+
+    @PostMapping("sort/update")
+    public ResponseEntity<AppResponse<JsonNode>> updateSortAttachmentRecord(@RequestHeader("X-Auth-Token") String token,
+                                                                            @RequestBody AttachmentSort attachmentSort) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        AttachmentSort resultantAttachmentSort;
+        try {
+            resultantAttachmentSort = attachmentSortService.updateAttachmentSort(attachmentSort);
+            respBuilder.status(ResponseCode.SUCCESS);
+            respBuilder.data(new ObjectMapper().valueToTree(resultantAttachmentSort));
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @PostMapping("sort/update/bulk")
+    public ResponseEntity<AppResponse<JsonNode>> updateMultipleSortAttachmentRecord(@RequestHeader("X-Auth-Token") String token,
+                                                                                    @RequestBody List<AttachmentSort> attachmentSortList) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        AttachmentSort resultantAttachmentSort;
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode jsonArray = mapper.createArrayNode();
+        try {
+            for (AttachmentSort attachmentSort : attachmentSortList) {
+                resultantAttachmentSort = attachmentSortService.updateAttachmentSort(attachmentSort);
+                jsonArray.add(mapper.valueToTree(resultantAttachmentSort));
+            }
+            respBuilder.status(ResponseCode.SUCCESS);
+            respBuilder.data(jsonArray);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
     }
