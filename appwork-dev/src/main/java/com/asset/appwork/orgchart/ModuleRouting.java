@@ -145,7 +145,7 @@ public class ModuleRouting {
                 });
                 if(assignedCN[0].isEmpty()){
                     Optional<Group> parent = calculateNextAssignee();
-                    ((OutputSchema)outputSchema).setAssignedCN(parent.get().getCN());
+                    ((OutputSchema)outputSchema).setAssignedCN(parent.get().getCn());
                     if(parent.isPresent() && routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.get().getGroupCode())){
                         nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.get().getGroupCode());
 

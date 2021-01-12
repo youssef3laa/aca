@@ -54,16 +54,25 @@ public class OrgChartController {
 
     @Transactional
     @PostMapping("/unit/create")
-    public ResponseEntity<AppResponse<Long>> createUnit(@RequestHeader("X-Auth-Token") String token,
-                                                        @RequestBody String props
+    public ResponseEntity<AppResponse<JsonNode>> createUnit(@RequestHeader("X-Auth-Token") String token,
+                                                            @RequestBody String props
     ) {
-        AppResponse.ResponseBuilder<Long> respBuilder = AppResponse.builder();
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             log.info("Create Unit by: " + account.getUsername());
-            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-            respBuilder.data(entity.create(props));
+            orgChartService.createUnit(account, props).ifPresentOrElse(unit -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(unit.toString()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }, () -> {
+                log.error(ResponseCode.READ_ENTITY_FAILURE.getMessage());
+                respBuilder.info("errorMessage", ResponseCode.READ_ENTITY_FAILURE.getMessage());
+                respBuilder.status(ResponseCode.READ_ENTITY_FAILURE);
+            });
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -110,22 +119,29 @@ public class OrgChartController {
     @Transactional
     @PutMapping("/unit/update/{id}")
     public ResponseEntity<AppResponse<JsonNode>> updateUnit(@RequestHeader("X-Auth-Token") String token,
-                             @PathVariable("id") Long id,
-                             @RequestBody String props
+                                                            @PathVariable("id") Long id,
+                                                            @RequestBody String props
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.update(id, props)));
+            orgChartService.updateUnit(account, id, props).ifPresentOrElse(unit -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(unit.toString()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }, () -> {
+                log.error(ResponseCode.READ_ENTITY_FAILURE.getMessage());
+                respBuilder.info("errorMessage", ResponseCode.READ_ENTITY_FAILURE.getMessage());
+                respBuilder.status(ResponseCode.READ_ENTITY_FAILURE);
+            });
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
             respBuilder.info("errorMessage", e.getMessage());
             respBuilder.status(e.getCode());
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
         }
         return respBuilder.build().getResponseEntity();
     }
@@ -139,7 +155,7 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            orgChartService.deleteUnit(id);
+            orgChartService.deleteUnit(id); // TODO: Transactional Roll back results in the error message not being displayed
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -173,17 +189,25 @@ public class OrgChartController {
 
     @Transactional
     @PostMapping("/unit/{unitId}/position/create")
-    public ResponseEntity<AppResponse<Long>> createPosition(@RequestHeader("X-Auth-Token") String token,
+    public ResponseEntity<AppResponse<JsonNode>> createPosition(@RequestHeader("X-Auth-Token") String token,
                                                                 @PathVariable("unitId") Long unitId,
                                                                 @RequestBody String props
     ) {
-        AppResponse.ResponseBuilder<Long> respBuilder = AppResponse.builder();
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-            respBuilder.data(entity.createChild(unitId, "Position", props));
-
+            orgChartService.createPosition(account, unitId, props).ifPresentOrElse(position -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(position.toString()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }, () -> {
+                log.error(ResponseCode.READ_ENTITY_FAILURE.getMessage());
+                respBuilder.info("errorMessage", ResponseCode.READ_ENTITY_FAILURE.getMessage());
+                respBuilder.status(ResponseCode.READ_ENTITY_FAILURE);
+            });
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -236,11 +260,22 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "OrganizationalUnit");
-            respBuilder.data(SystemUtil.convertStringToJsonNode(entity.updateChild(unitId, "Position", id, props)));
-
-        } catch (AppworkException | JsonProcessingException e) {
+            orgChartService.updatePosition(account, unitId, id, props).ifPresentOrElse(position -> {
+                try {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(position.toString()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }, () -> {
+                log.error(ResponseCode.READ_ENTITY_FAILURE.getMessage());
+                respBuilder.info("errorMessage", ResponseCode.READ_ENTITY_FAILURE.getMessage());
+                respBuilder.status(ResponseCode.READ_ENTITY_FAILURE);
+            });
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
     }
@@ -256,7 +291,9 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             orgChartService.deletePosition(id);
         } catch (AppworkException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
             respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
@@ -276,7 +313,9 @@ public class OrgChartController {
                 e.printStackTrace();
             }
         } catch (AppworkException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
             respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
@@ -297,7 +336,9 @@ public class OrgChartController {
                 e.printStackTrace();
             }
         } catch (AppworkException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
             respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
@@ -326,7 +367,9 @@ public class OrgChartController {
                 }
             });
         } catch (AppworkException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
             respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
@@ -554,6 +597,28 @@ public class OrgChartController {
                             e.printStackTrace();
                         }
                     });
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/group/{code}/down/all/unitTypeCode/{unitTypeCode}")
+    public ResponseEntity<AppResponse<JsonNode>> getGroupChildrenRecursivelyFilteredByUnitTypeCode(@RequestHeader("X-Auth-Token") String token,
+                                                                                                   @PathVariable("code") String code,
+                                                                                                   @PathVariable("unitTypeCode") String unitTypeCode
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode).toString()));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
@@ -811,32 +876,6 @@ public class OrgChartController {
 //        }
 //        return respBuilder.build().getResponseEntity();
 //    }
-
-
-
-    public Optional<Unit> createUnit(Account account, String props) throws AppworkException {
-        return unitRepository.findById(new Entity(account,
-                SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
-                "OrganizationalUnit").create(props));
-    }
-
-    public Optional<Unit> updateUnit(Account account, Long id, String props) {
-        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
-                "OrganizationalUnit").update(id, props);
-        return unitRepository.findById(id);
-    }
-
-    public Optional<Position> createPosition(Account account, Long unitId, String props) throws AppworkException {
-        return positionRepository.findById(new Entity(account,
-                SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
-                "OrganizationalUnit").createChild(unitId, "Position", props));
-    }
-
-    public Optional<Position> updatePosition(Account account, Long unitId, Long id, String props) {
-        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
-                "OrganizationalUnit").updateChild(unitId, "Position", id, props);
-        return positionRepository.findById(id);
-    }
 
 //    public Optional<Group> createGroup(Account account, String props) {
 //        Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));

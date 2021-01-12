@@ -2,6 +2,8 @@ package com.asset.appwork.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 
 import javax.persistence.*;
 
@@ -26,6 +28,11 @@ public class Position {
 //    @JsonProperty("unit")
     @JsonIgnore
     Unit unit;
+
+    @SneakyThrows
+    public String toString() {
+        return new ObjectMapper().writeValueAsString(this);
+    }
 
     public Long getId() {
         return id;
@@ -55,8 +62,8 @@ public class Position {
         return isLead;
     }
 
-    public void setLead(Boolean lead) {
-        isLead = lead;
+    public void setLead(Boolean isLead) {
+        this.isLead = isLead;
     }
 
     public Unit getUnit() {
