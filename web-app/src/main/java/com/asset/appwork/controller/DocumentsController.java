@@ -100,6 +100,7 @@ public class DocumentsController {
             obj.put("error", e.getMessage());
             obj.put("statusCode", ResponseCode.INTERNAL_SERVER_ERROR.getCode());
             respBuilder.data(obj);
+            respBuilder.status(e.getCode());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -119,8 +120,9 @@ public class DocumentsController {
             e.printStackTrace();
             ObjectNode obj = new ObjectNode(JsonNodeFactory.instance);
             obj.put("error", e.getMessage());
-            obj.put("statusCode", ResponseCode.INTERNAL_SERVER_ERROR.getCode());
+            obj.put("statusCode", e.getCode().getCode());
             respBuilder.data(obj);
+            respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
     }
@@ -206,6 +208,7 @@ public class DocumentsController {
             respBuilder.status(e.getCode());
             ObjectMapper objectMapper = new ObjectMapper();
             respBuilder.data(objectMapper.createObjectNode().put("errorMessage", e.getMessage()));
+
         }
         return respBuilder.build().getResponseEntity();
 

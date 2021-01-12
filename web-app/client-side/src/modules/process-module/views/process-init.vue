@@ -28,13 +28,13 @@ export default {
       console.log(fileId);
       let userToken;
       try {
-        userToken = await Http.post("http://appworks-dev:8080/otdsws/rest/authentication/credentials", {
+        userToken = await Http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
           "userName": "admin",
           "password": "Asset99a",
           "ticketType": "OTDSTICKET"
         });
         this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
-            'http://appworks-dev/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
+            'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
         console.log(userToken);
         // this.$observable.fire('file-component-skeleton', false)
 
