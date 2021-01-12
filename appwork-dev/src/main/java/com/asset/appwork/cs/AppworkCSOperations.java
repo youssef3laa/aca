@@ -19,7 +19,7 @@ import java.util.Optional;
 public class AppworkCSOperations {
 
     // content server host
-    private static final String CS_HOST = "http://cs/otcs/cs.exe/";
+    private static final String CS_HOST = "http://45.240.63.94/otcs/cs.exe/";
     private static final String API_VER = "api/v2/";
     private static final String API_ROOT = "nodes/";
     private final String userName;
@@ -27,6 +27,7 @@ public class AppworkCSOperations {
 
 
     public AppworkCSOperations(String userName, String password) {
+        //TODO use arguments
         this.userName = "admin";
         this.password = "Asset99a";
     }

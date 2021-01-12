@@ -5,22 +5,22 @@
 </template>
 
 <script>
-    import formPageMixin from "../../../mixins/formPageMixin";
-    import AppBuilder from "../../application-builder-module/builders/app-builder";
-    import historyMixin from "@/modules/history-module/mixin/historyMixin";
-    import Http from "@/modules/core-module/services/http";
+import formPageMixin from "../../../mixins/formPageMixin";
+import AppBuilder from "../../application-builder-module/builders/app-builder";
+import historyMixin from "@/modules/history-module/mixin/historyMixin";
+import Http from "@/modules/core-module/services/http";
 
-    export default {
-        name: "process-step-early",
-        mixins: [formPageMixin, historyMixin],
-        components: {
-            AppBuilder,
-        },
+export default {
+  name: "process-step-early",
+  mixins: [formPageMixin, historyMixin],
+  components: {
+    AppBuilder,
+  },
 
-        methods: {
-            readData: function () {
-                console.log("TaskData", this.taskData);
-                this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
+  methods: {
+    readData: function () {
+      console.log("TaskData", this.taskData);
+      this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
 
                 this.loadForm("process-stepEarly", this.fillForm);
             },
@@ -111,14 +111,14 @@
                 console.log(fileId);
                 let userToken;
                 try {
-                    userToken = await Http.post("http://appworks-dev:8080/otdsws/rest/authentication/credentials", {
-                        "userName": "admin",
-                        "password": "Asset99a",
-                        "ticketType": "OTDSTICKET"
-                    });
-                    this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
-                        'http://appworks-dev/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
-                    console.log(userToken);
+                  userToken = await Http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
+                    "userName": "admin",
+                    "password": "Asset99a",
+                    "ticketType": "OTDSTICKET"
+                  });
+                  this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
+                      'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
+                  console.log(userToken);
                     this.$observable.fire('file-component-skeleton', false)
 
                 } catch (e) {

@@ -1,5 +1,5 @@
 <script>
-import { Bar } from "vue-chartjs";
+import {Bar} from "vue-chartjs";
 
 export default {
   extends: Bar,
@@ -24,7 +24,7 @@ export default {
         datasets: [
           {
             label: "تقييم",
-            backgroundColor: "blue",
+            backgroundColor: "green",
             data: [40, 20, 18, 39, 17, 40, 39, 80, 40, 20, 12, 11],
           },
         ],
