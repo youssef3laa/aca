@@ -46,7 +46,7 @@
                 >
 
                   {{ file.name }} <br/>
-                  {{ file.size }}
+                  {{ file.size_formatted }}
                 </v-col>
                 <v-col :cols="2" style="cursor: pointer" @click="deleteFile(file)">
                   <v-icon color="#ea9cb3"> mdi-delete-circle-outline</v-icon>
