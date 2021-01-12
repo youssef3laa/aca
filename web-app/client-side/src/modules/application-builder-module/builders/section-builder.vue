@@ -1,5 +1,5 @@
 <template>
-  <v-container style="padding-top: 0; padding-bottom:0">
+  <span>
     <TabBuilder v-if="sec.tabs" v-on:modelChange="dataChange" :section="sec" />
     <span v-else>
 
@@ -112,7 +112,7 @@
         </v-col>
       </v-row>
     </span>
-  </v-container>
+  </span>
 </template>
 
 <script>

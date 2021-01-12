@@ -13,7 +13,7 @@
 @import url(https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400&display=swap);
 @import url(https://use.fontawesome.com/releases/v5.0.13/css/all.css);
 .container {
-  max-width: 100%;
+  max-width: 98%;
 }
 
 h1,span,label {
