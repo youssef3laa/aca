@@ -119,7 +119,7 @@
                     this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
                         'http://appworks-dev/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
                     console.log(userToken);
-                    this.$observable.fire('file-component-skeleton', false)
+                    // this.$observable.fire('file-component-skeleton', false)
 
                 } catch (e) {
                     console.log(e);
