@@ -18,7 +18,7 @@ const routes = [
         name: 'process-step-RE',
         component: ProcessStepRE
     }, {
-        path: '/process-step-MM/:taskId/',
+        path: '/process-step-member/:taskId/',
         name: 'process-step-member',
         component: ProcessStepMember
     },

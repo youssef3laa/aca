@@ -29,9 +29,9 @@
           >
             <!-- <p style="position:absolute; z-index:999;">{{ sec.name }}</p> -->
             <!-- <span class="line"></span> -->
-            <v-expansion-panels>
+            <v-expansion-panels v-model="panel" multiple>
               <v-expansion-panel>
-                <v-expansion-panel-header disable-icon-rotate>
+                <v-expansion-panel-header>
                   <v-row no-gutters>
                     <v-col cols="4">
                       <span>{{ sec.name }}</span>
@@ -150,6 +150,7 @@ export default {
   },
   data() {
     return {
+      panel : [0],
       sec: this.section,
     }
   },

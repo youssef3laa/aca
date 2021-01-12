@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class OrgChartService {
@@ -82,5 +84,15 @@ public class OrgChartService {
 
     public Optional<User> getUserDetails(String userId) {
         return userRepository.findByUserId(userId);
+    }
+
+    public Optional<Group> getGroupByCn(String cn) {
+        Pattern pattern = Pattern.compile("cn=(.*?),cn=organizational roles");
+        Matcher matcher = pattern.matcher(cn);
+        String name = "";
+        if (matcher.find()) {
+            name = matcher.group(1);
+        }
+        return groupRepository.findByNameAndGroupCodeNotNull(name);
     }
 }

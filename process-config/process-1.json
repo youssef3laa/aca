@@ -32,21 +32,21 @@
         },
         "stepRE": {
             "hasAutocomplete": true,
-            "roleFilter": "org/group/findByCodes/HCAG,HCOC",
+            "roleFilter": "org/group/findByCodes/HCAG,MCAG",
             "page": "process-step-RE",
             "condition": "condition",
             "nextStep": {
                 "HCAG": "stepRM",
-                "HCOC": "stepMM"
+                "MCAG": "stepMM"
             }
         },
         "stepRM": {
             "hasAutocomplete": true,
-            "roleFilter": "org/group/findByCodes/HCOC",
+            "roleFilter": "org/group/findByCodes/MCAG",
             "page": "process-step-RE",
             "condition": "condition",
             "nextStep": {
-                "HCOC": "stepMM"
+                "MCAG": "stepMM"
             }
         },
         "stepMM": {
