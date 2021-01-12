@@ -1,5 +1,5 @@
 <template>
-  <v-container style="padding-top: 0; padding-bottom:0">
+  <span>
     <TabBuilder v-if="sec.tabs" v-on:modelChange="dataChange" :section="sec" />
     <span v-else>
 
@@ -29,9 +29,9 @@
           >
             <!-- <p style="position:absolute; z-index:999;">{{ sec.name }}</p> -->
             <!-- <span class="line"></span> -->
-            <v-expansion-panels>
+            <v-expansion-panels v-model="panel" multiple>
               <v-expansion-panel>
-                <v-expansion-panel-header disable-icon-rotate>
+                <v-expansion-panel-header>
                   <v-row no-gutters>
                     <v-col cols="4">
                       <span>{{ sec.name }}</span>
@@ -112,7 +112,7 @@
         </v-col>
       </v-row>
     </span>
-  </v-container>
+  </span>
 </template>
 
 <script>
@@ -150,6 +150,7 @@ export default {
   },
   data() {
     return {
+      panel : [0],
       sec: this.section,
     }
   },

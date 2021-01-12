@@ -11,7 +11,7 @@
         >
           <v-expansion-panels v-if="forms.type=='collapse'">
             <v-expansion-panel>
-              <v-expansion-panel-header disable-icon-rotate>
+              <v-expansion-panel-header>
                 <v-row no-gutters>
                   <v-col cols="4">
                     <span>{{ forms.name }}</span>
