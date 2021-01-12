@@ -55,7 +55,6 @@ public class UserManagement {
                 .setData(samlartRequest(ticket))
                 .post(gatewayUrl);
         return SystemUtil.getJsonByPtrExpr(SystemUtil.convertXMLtoJSON(http.getResponse()), "/Body/Response/AssertionArtifact");
-
     }
 
     private String samlartRequest(String ticket){

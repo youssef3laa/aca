@@ -6,23 +6,21 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Repository
 public interface GroupRepository extends GenericRepository<Group, Long> {
-    Optional<Group> findByName(String name);
+    Optional<Group> findByNameAndGroupCodeNotNull(String name);
 
-    Optional<Collection<Group>> findByNameIn(Collection<String> names);
+    List<Group> findByNameInAndGroupCodeNotNull(List<String> names);
 
-    Optional<Collection<Group>> findByUnit(Unit unit);
+    Optional<Group> findByUnit(Unit unit);
 
-    //TODO: Need Fixing?
-    Optional<Collection<Group>> findByUnitIn(Set<Unit> units);
+    List<Group> findByUnitIn(Set<Unit> units);
 
-    @Query(value = "{call ACA_ORG_SP_getGroupByCodeAndDirection(:groupCode, :direction, :unitTypeCode)}", nativeQuery = true)
-    Optional<Collection<Group>> getGroupByCodeAndDirection(@Param("groupCode") String groupCode,
-                                                           @Param("direction") String direction,
-                                                           @Param("unitTypeCode") String unitTypeCode);
+    @Query(value = "{call ACA_ORG_SP_getGroupChildrenRecursivelyFilteredByUnitTypeCode(:groupCode, :unitTypeCode)}", nativeQuery = true)
+    List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(@Param("groupCode") String groupCode,
+                                                                  @Param("unitTypeCode") String unitTypeCode);
 }

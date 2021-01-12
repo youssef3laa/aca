@@ -143,6 +143,21 @@ export default {
         pages: [
           {
             key: 'page1',
+            tabs: [
+              {
+                key: 'tab1',
+                id: 1,
+                isActive: true,
+                name: 'البيانات الأساسية',
+                icon: 'far fa-file-alt',
+              },
+              {
+                key: 'tab2',
+                id: 2,
+                name: 'المرفقات',
+                icon: 'fas fa-paperclip',
+              },
+            ],
             sections: [
               {
                 type: 'title',
@@ -150,6 +165,9 @@ export default {
                 actions: ['cancel', 'save', 'complete'],
               },
               {
+                type: 'tab',
+                display: 'none',
+                tabId: 2,
                 numOfResizable: 2,
                 key: 'section1',
                 tabs: [
@@ -207,12 +225,9 @@ export default {
                     ],
                     model: {
                       receiverEntityName: {
-                        url:"/org/group/findByCodes/HADA,HADS",
-                        list: [
-
-                        ],
-                        value:
-                          '',
+                        url: '/org/group/findByCodes/HADA,HADS',
+                        list: [],
+                        value: '',
                       },
                       receiverMethod: {
                         list: [
@@ -336,7 +351,9 @@ export default {
                 ],
               },
               {
-                type: 'approval',
+                type: 'tab',
+                display: 'block',
+                tabId: 1,
                 name: 'الموافقة على الطلب',
                 forms: [
                   {
@@ -345,26 +362,26 @@ export default {
                       {
                         type: 'ApprovalComponent',
                         title: 'الرجاء الموافقة على الطلب',
-                        "commentLabel" : "ملاحظات",
-                        name : "approval",
-                        actions : [
+                        commentLabel: 'ملاحظات',
+                        name: 'approval',
+                        actions: [
                           {
-                            value : "approve",
-                            label : "الموافقة على الطلب"
+                            value: 'approve',
+                            label: 'الموافقة على الطلب',
                           },
                           {
-                            value : "reject",
-                            "label" : "رفض الطلب"
+                            value: 'reject',
+                            label: 'رفض الطلب',
                           },
-                        ]
+                        ],
                       },
                     ],
-                    model : {
-                      "approval" : {
-                        ApprovalCardDecision : "",
-                        comment : ""
+                    model: {
+                      approval: {
+                        ApprovalCardDecision: '',
+                        comment: '',
                       },
-                    }
+                    },
                   },
                 ],
               },

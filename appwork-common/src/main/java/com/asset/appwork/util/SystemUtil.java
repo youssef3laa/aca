@@ -230,8 +230,12 @@ public class SystemUtil {
         return objectWriter.writeValueAsString(new XmlMapper().registerModule(new SimpleModule().addDeserializer(Object.class, new SystemUtil.FixedUntypedObjectDeserializer())).readValue(xml, Object.class));
     }
 
-    public static String getJsonByPtrExpr(String json, String jsonPtrExpr) throws IOException {
-        return new ObjectMapper().readTree(json).at(jsonPtrExpr).asText();
+    public static String getJsonByPtrExpr(String json, String jsonPtrExpr) {
+        try {
+            return  new ObjectMapper().readTree(json).at(jsonPtrExpr).asText();
+        } catch (JsonProcessingException e) {
+            return "";
+        }
     }
 
     public static String generateOtdsAPIBaseUrl(Environment env) {

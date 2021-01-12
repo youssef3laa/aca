@@ -4,22 +4,28 @@ import com.asset.appwork.model.Group;
 import com.asset.appwork.model.Unit;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface UnitRepository extends GenericRepository<Unit, Long> {
-    Optional<Unit> findByName(String name);
+    Optional<Unit> findById(Long id);
 
-    Optional<Collection<Unit>> findByNameIn(Collection<String> names);
+    List<Unit> findAll();
 
-    Optional<Collection<Unit>> findByParent(Unit unit);
+    Optional<Unit> findByNameAndUnitCodeNotNull(String name);
 
-    Optional<Collection<Unit>> findByParentIn(Collection<Unit> unit);
+    List<Unit> findByNameInAndUnitCodeNotNull(List<String> names);
 
-    Optional<Collection<Unit>> findByChild(Unit unit);
+    List<Unit> findByParent(Unit unit);
 
-    Optional<Collection<Unit>> findByChildIn(Collection<Unit> unit);
+    List<Unit> findByParentIn(List<Unit> units);
 
-    Optional<Collection<Unit>> findByGroup(Group group);
+    Optional<Unit> findByChild(Unit unit);
+
+    List<Unit> findByChildIn(List<Unit> units);
+
+    Optional<Unit> findByGroup(Group group);
+
+    void deleteById(Long id);
 }

@@ -1,13 +1,11 @@
 package com.asset.appwork.platform.rest;
 
 import com.asset.appwork.dto.Account;
-import com.asset.appwork.platform.Platform;
+import com.asset.appwork.enums.ResponseCode;
+import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.util.Http;
 import com.asset.appwork.util.SystemUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class Entity {
@@ -22,18 +20,21 @@ public class Entity {
         this.entityName = entityName;
     }
 
-    public <T> Long create(T data) throws IOException {
+    public <T> Long create(T data) throws AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
                 .setData("{" +
                         "  \"Properties\": " +
-                                data.toString() +
+                        data.toString() +
                         "}")
                 .post(this.apiBaseUrl + String.format(API.ADD.getUrl(), this.entityName));
         String response = http.getResponse();
-        Long entityId =  Long.parseLong( SystemUtil.getJsonByPtrExpr(response, "/Identity/Id"));
-        return entityId;
+        try {
+            return Long.parseLong(SystemUtil.getJsonByPtrExpr(response, "/Identity/Id"));
+        } catch (NumberFormatException e) {
+            throw new AppworkException(SystemUtil.getJsonByPtrExpr(response, "/message"), ResponseCode.CREATE_ENTITY_FAILURE);
+        }
     }
 
     public String readById(Long id) {
@@ -62,13 +63,13 @@ public class Entity {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public <T> String update(Long id, T data){
+    public <T> String update(Long id, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
                 .setData("{" +
                         "  \"Properties\": " +
-                                data.toString() +
+                        data.toString() +
                         "}")
                 .put(this.apiBaseUrl + String.format(API.ITEM.getUrl(), this.entityName, id.toString()));
         return http.getResponse();
@@ -82,7 +83,7 @@ public class Entity {
         return http.getResponse();
     }
 
-    public <T> String createChild(Long parentId, String childName, T data){
+    public <T> Long createChild(Long parentId, String childName, T data) throws AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
@@ -91,7 +92,12 @@ public class Entity {
                         data.toString() +
                         "}")
                 .post(this.apiBaseUrl + String.format(API.ADD_CHILD.getUrl(), this.entityName, parentId.toString(), childName));
-        return http.getResponse();
+        String response = http.getResponse();
+        try {
+            return Long.parseLong(SystemUtil.getJsonByPtrExpr(response, "/Identity/Id"));
+        } catch (NumberFormatException e) {
+            throw new AppworkException(SystemUtil.getJsonByPtrExpr(response, "/message"), ResponseCode.CREATE_ENTITY_FAILURE);
+        }
     }
 
     public String readChildById(Long parentId, String childName, Long childId) {
@@ -102,7 +108,7 @@ public class Entity {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public <T> String updateChild(Long parentId, String childName, Long childId, T data){
+    public <T> String updateChild(Long parentId, String childName, Long childId, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())

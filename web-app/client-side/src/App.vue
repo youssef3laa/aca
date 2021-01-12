@@ -33,6 +33,9 @@ h1 {
   .red--text {
     color: #900 !important;
   }
+  .v-expansion-panel::before{
+    box-shadow: none;
+  }
 }
 .theme--light.v-label {
   color: rgba(0, 0, 0, 0.6);
@@ -40,13 +43,13 @@ h1 {
 .theme--light.v-application {
   background-color: #f2f2f2;
 }
+
 h1 {
   font-size: 26px;
 }
 </style>
 <script>
 import TheNavbar from './modules/core-module/components/the-nav-bar'
-import router from './router'
 import SystemUser from './config/user'
 import Vue from 'vue'
 // import dynamicView from './components/DynamicView'
@@ -59,7 +62,6 @@ export default {
       Vue.prototype.$user = new SystemUser()
 
       if (systemUser) Vue.prototype.$user.create(JSON.parse(systemUser))
-      else router.push('login')
     },
   },
   created: function() {

@@ -1,12 +1,8 @@
 package com.asset.appwork.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.HashSet;
 
 @Entity(name = "Group")
 @Table(name = "O9OpenTextEntityIdentityComponentsIdentity")
@@ -17,13 +13,15 @@ public class Group extends BaseIdentity<Group> {
     Boolean isHeadRole;
     @Column(name = "Vice")
     Boolean isViceRole;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JoinColumn(
+            name = "Unit_Id",
+            referencedColumnName = "Id"
+    )
+    @JsonProperty("unit")
+    Unit unit;
     @Transient
     String cn;
-    @ManyToMany(mappedBy = "group")
-//    @JsonManagedReference
-//    @JsonProperty("units")
-    @JsonIgnore
-    private Collection<Unit> unit = new HashSet<>();
 
     public String getGroupCode() {
         return groupCode;
@@ -49,13 +47,15 @@ public class Group extends BaseIdentity<Group> {
         isViceRole = viceRole;
     }
 
-    public Collection<Unit> getUnit() {
+    public Unit getUnit() {
         return unit;
     }
 
-    public void setUnit(Collection<Unit> units) {
-        this.unit = units;
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 
-    public String getCN() { return "cn="+this.name+",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local"; }
+    public String getCN() {
+        return "cn=" + this.name + ",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local";
+    }
 }
