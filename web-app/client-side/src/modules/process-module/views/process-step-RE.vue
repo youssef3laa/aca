@@ -23,9 +23,10 @@ export default {
       this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
       //   let page = this.inputSchema.page;
 
-      this.loadForm("process-stepRE", this.fillForm);
+      this.loadForm("process-stepEarly", this.fillForm);
     },
     fillForm: async function () {
+      this.$refs.appBuilder.disableSection("section1")
       let entityName = this.inputSchema.entityName;
       let entityId = this.inputSchema.entityId;
       this.readEntity(entityName, entityId)
@@ -36,13 +37,9 @@ export default {
               stepId: this.inputSchema.stepId,
               notes: response.notes,
               receiver: {
-                list: [
-                  {
-                    text: response.receiver,
-                    value: response.receiver,
-                  },
-                ],
-                value: response.receiver,
+                url: this.inputSchema.roleFilter,
+                list: [],
+                value: ""
               },
               requestDate: response.requestDate.split("Z")[0],
             });
@@ -102,8 +99,8 @@ export default {
         process: this.inputSchema.process,
         parentHistoryId: this.inputSchema.parentHistoryId,
 
-        code: approvalModel.approval.decision,
-        assignedCN: "cn=Aly@aw.aca,cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local",
+        code: model.receiver.value.code,
+        assignedCN: model.receiver.value.value,
         decision: approvalModel.approval.decision,
         comment: approvalModel.approval.comment,
       };
@@ -116,15 +113,15 @@ export default {
       console.log(fileId);
       let userToken;
       try {
-        userToken = await Http.post("http://appworks-dev:8080/otdsws/rest/authentication/credentials", {
+        userToken = await Http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
           "userName": "admin",
           "password": "Asset99a",
           "ticketType": "OTDSTICKET"
         });
         this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
-            'http://appworks-dev/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
+            'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
         console.log(userToken);
-        this.$observable.fire('file-component-skeleton', false)
+        // this.$observable.fire('file-component-skeleton', false)
 
       } catch (e) {
         console.log(e);

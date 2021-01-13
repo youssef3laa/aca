@@ -2,7 +2,7 @@
   <span>
     <span
       v-if="page.tabs"
-      style="display: block; border-bottom: 1px solid #e1e1e1;height: 72px;padding: 12px 0 12px 12px;width: 98%;margin-right: 12px;"
+      style="display: block; background-color: #fff; border-bottom:1px solid #e1e1e1;"
     >
       <button
         style="margin-bottom: 0px;border-radius-top-righ:6px; border-radius-top-left:6px"

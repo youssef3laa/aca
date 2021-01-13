@@ -2,6 +2,7 @@
 **/*.iml
 *.imL
 **/node_modules/
+form-config/output/
 web-app/client-side/node_modules/
 web-app/client-side/src/_drafts/
 **/.deploy*/

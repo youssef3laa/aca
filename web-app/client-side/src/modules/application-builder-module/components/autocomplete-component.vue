@@ -80,6 +80,7 @@ export default {
     val: function (newVal, oldVal) {
       console.log(oldVal);
       // this.val = newVal
+      if(newVal.url)  this.fetch(null, this.val.url)
       this.items = newVal;
       this.value = newVal.value;
       console.log("val", this.val);

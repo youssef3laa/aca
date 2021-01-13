@@ -1,21 +1,21 @@
 <template>
-  <v-container style="padding-top: 0; padding-bottom:0">
+  <span>
     <TabBuilder v-if="sec.tabs" v-on:modelChange="dataChange" :section="sec" />
     <span v-else>
 
       <span v-if="sec.forms">
-        <v-card v-for="formData in sec.forms" :key="formData.id" flat style="background: transparent">
+        <v-card  v-bind:style="{'background': sec.background}" style="margin-bottom: 10px" v-for="formData in sec.forms" :key="formData.id" flat>
           <!-- <v-card-text v-text="formData.form.name"></v-card-text> -->
 
       
-                    <span v-if="formData.resizable">
-            <splitpanes class="default-theme" dir="ltr">
-              <pane v-bind:style="{'background': form.background}" v-for="(form,index) in formData.resizable.forms" :key="index">
-                <span dir="rtl">
-                  <FormBuilder :forms="form" :model="form.model" />
-                </span>
-              </pane>
-            </splitpanes>
+          <span v-if="formData.resizable">
+          <splitpanes class="default-theme" dir="ltr">
+            <pane v-bind:style="{'background': form.background}" v-for="(form,index) in formData.resizable.forms" :key="index">
+              <span dir="rtl">
+                <FormBuilder :forms="form" :model="form.model" />
+              </span>
+            </pane>
+          </splitpanes>
           </span>
           
           <span v-if="sec.type != 'collapse'">
@@ -29,9 +29,9 @@
           >
             <!-- <p style="position:absolute; z-index:999;">{{ sec.name }}</p> -->
             <!-- <span class="line"></span> -->
-            <v-expansion-panels>
+            <v-expansion-panels v-model="panel" multiple>
               <v-expansion-panel>
-                <v-expansion-panel-header disable-icon-rotate>
+                <v-expansion-panel-header>
                   <v-row no-gutters>
                     <v-col cols="4">
                       <span>{{ sec.name }}</span>
@@ -40,9 +40,9 @@
                     <v-col cols="8" class="text--secondary"> </v-col>
                   </v-row>
                   <template v-slot:actions>
-                    <v-icon color="error">
-                      mdi-arrow-collapse-down
-                    </v-icon>
+<!--                    <v-icon color="error">-->
+<!--                      mdi-arrow-collapse-down-->
+<!--                    </v-icon>-->
                   </template>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
@@ -112,7 +112,7 @@
         </v-col>
       </v-row>
     </span>
-  </v-container>
+  </span>
 </template>
 
 <script>
@@ -150,6 +150,7 @@ export default {
   },
   data() {
     return {
+      panel : [0],
       sec: this.section,
     }
   },

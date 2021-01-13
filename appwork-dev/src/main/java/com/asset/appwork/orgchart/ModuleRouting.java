@@ -136,15 +136,23 @@ public class ModuleRouting {
 
             // Note: Case Approve
             if(codeSelected[0].contains(approveString)){
-                 // Note: If assignee code in next steps
-                 //      Else go to parent step
-                Optional<Group> parent = calculateNextAssignee();
+                 // Note: If assignee is not selected get parent
+                 //      Else go to selected step
 
-                if(parent.isPresent() && routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.get().getGroupCode())){
-                    ((OutputSchema)outputSchema).setAssignedCN(parent.get().getCN());
-                    nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.get().getGroupCode());
+                String[] assignedCN = {""};
+                ReflectionUtil.of(outputSchema).ifPresent("getAssignedCN", (s)->{
+                    assignedCN[0] = (String) s;
+                });
+                if(assignedCN[0].isEmpty()){
+                    Optional<Group> parent = calculateNextAssignee();
+                    ((OutputSchema)outputSchema).setAssignedCN(parent.get().getCn());
+                    if(parent.isPresent() && routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.get().getGroupCode())){
+                        nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.get().getGroupCode());
 
-                }else if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
+                    }else if(routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])){
+                        nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
+                    }
+                }else{
                     nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
                 }
 
@@ -178,6 +186,15 @@ public class ModuleRouting {
                 ((OutputSchema)outputSchema).setPage(nextPage);
             }
 
+            // Note: If next step is in the JSON
+            if(routingConfig.getSteps().containsKey(nextStep)) {
+
+                // Note: If next step contains roleFilter
+                ((OutputSchema)outputSchema).setRoleFilter(routingConfig.getSteps().get(nextStep).getRoleFilter());
+            }else{
+                nextStep = breakString;
+            }
+
             ((OutputSchema)outputSchema).setStepId(nextStep);
         }catch (Exception e){
             e.printStackTrace();
@@ -186,7 +203,7 @@ public class ModuleRouting {
     }
 
     private Optional<Group> calculateNextAssignee(){
-        Optional<User> user = orgChartService.getUserDetails(account.getUsername());
+        Optional<User> user = orgChartService.getUserDetails(account.getUsername()+"@aw.aca");
         System.out.println(user);
         if(user.isEmpty()) return Optional.empty();
         Optional<Group> userGroup = user.get().getGroup().stream().findFirst();

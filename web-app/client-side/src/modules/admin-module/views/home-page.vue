@@ -84,6 +84,7 @@ export default {
               //   ],
               // },
               {
+                "background": "transparent",
                 type: "card",
                 forms: [
                   {

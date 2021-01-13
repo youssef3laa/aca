@@ -55,7 +55,7 @@ public class Group extends BaseIdentity<Group> {
         this.unit = unit;
     }
 
-    public String getCN() {
+    public String getCn() {
         return "cn=" + this.name + ",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local";
     }
 }

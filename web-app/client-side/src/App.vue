@@ -12,13 +12,20 @@
 @import url(http://fonts.googleapis.com/earlyaccess/amiri.css);
 @import url(https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400&display=swap);
 @import url(https://use.fontawesome.com/releases/v5.0.13/css/all.css);
-.container {
-  max-width: 100%;
+
+
+.splitpanes--dragging {
+  pointer-events: none;
 }
 
-h1,span,label {
+.container {
+  max-width: 98%;
+}
+
+h1, span, label {
   font-family: 'Cairo', sans-serif;
 }
+
 h1 {
   font-weight: bold;
 }

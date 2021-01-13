@@ -20,6 +20,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -80,6 +81,7 @@ public class ProcessController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Transactional
     @PostMapping("/complete")
     public ResponseEntity<AppResponse<String>> complete(@RequestHeader("X-Auth-Token") String token, @RequestBody OutputSchema outputSchema) {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
