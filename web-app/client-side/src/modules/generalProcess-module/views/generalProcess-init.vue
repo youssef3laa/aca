@@ -15,7 +15,7 @@ export default {
   },
   mixins: [formPageMixin],
   async created() {
-    await this.loadForm("process-init");
+    await this.loadForm("generalProcess-init");
 
     this.$observable.subscribe("complete-step", () => {
       this.completeStep();
@@ -32,15 +32,14 @@ export default {
       }
 
       let obj = {
-        requestEntity: {
-          requestDate: model.requestDate,
-          receiver: model.receiver.value.text,
-          notes: model.notes,
+        generalProcessEntity: {
+          writingDate: model.writingDate,
+          summary: model.subjectSummary,
         },
         processModel: {
           process: "generalProcess",
           stepId: "init",
-          entityName: "ACA_Entity_request",
+          entityName: "ACA_Entity_generalProcess",
           code: model.receiver.value.code,
           assignedCN: model.receiver.value.value
         }

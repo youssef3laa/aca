@@ -1,5 +1,5 @@
 {
-    "processName": "process-1",
+    "processName": "generalProcess",
     "steps": {
         "init": {
             "hasAutocomplete": true,
@@ -64,17 +64,34 @@
             "page": "generalProcess-approvals",
             "condition": "condition",
             "nextStep": {
-                "HCOC": "stepAD",
-                "approve": "stepApprovals"
+                "approve": "stepApprovals2"
+            }
+        },
+        "stepApprovals2": {
+            "hasAutocomplete": true,
+            "roleFilter": "org/group/up",
+            "page": "generalProcess-approvals",
+            "condition": "condition",
+            "nextStep": {
+                "approve": "stepApprovals3"
+            }
+        },
+        "stepApprovals3": {
+            "hasAutocomplete": true,
+            "roleFilter": "org/group/findByCodes/HCOC",
+            "page": "generalProcess-approvals",
+            "condition": "condition",
+            "nextStep": {
+                "approve": "stepAD"
             }
         },
         "stepAD": {
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
-            "page": "generalProcess-late",
+            "page": "generalProcess-approvals",
             "condition": "condition",
             "nextStep": {
-                "approve": "stepMM"
+                "approve": "end"
             }
         }
     }

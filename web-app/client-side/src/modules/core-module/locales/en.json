@@ -3,11 +3,13 @@
   "username": "Username",
   "password": "Password",
   "currentLanguage": "English",
-  "login": "Login",
   "requestDate": "Request Date",
   "receiver": "Direction",
   "notes": "Notes",
-  "logged-in-success": "تم الدخول بنجاح",
+  "subjectSummary": "Subject Summary",
+  "writingDate": "Writing Date",
+  "login": "Login",
+  "logged-in-success": "Login Success",
   "CANNOT_CONNECT_TO_SERVER": "Cannot connect to the server",
   "INVALID_CREDENTIALS": "Username or Password is wrong"
 }

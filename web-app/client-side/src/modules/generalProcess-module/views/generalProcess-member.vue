@@ -34,13 +34,13 @@ export default {
 
                         this.$refs.appBuilder.setModelData("form1", {
                             stepId: this.inputSchema.stepId,
-                            notes: response.notes,
+                            subjectSummary: response.summary,
                             receiver: {
-                                url: "org/group/up",
+                                url: this.inputSchema.roleFilter,
                                 list: [],
                                 value: ""
                             },
-                            requestDate: response.requestDate.split("Z")[0],
+                            writingDate: response.writingDate.split("Z")[0],
                         });
                         this.approvalsHistoryResponse = await this.getHistoryByProcessNameAndEntityId(
                             this.inputSchema.process,
