@@ -176,7 +176,7 @@ public class OrgChartService {
                 );
     }
 
-    public List<Group> getGroupParentOfLoggedInUser(Account account) throws AppworkException {
+    public List<Group> getGroupParentsOfLoggedInUser(Account account) throws AppworkException {
         List<Group> groups = (List<Group>) getUserDetails(account.getUsername() + "@" + env.getProperty("otds.partition")).getGroup();
         List<Group> parentGroups = new ArrayList<>();
         groups.forEach(group -> {
