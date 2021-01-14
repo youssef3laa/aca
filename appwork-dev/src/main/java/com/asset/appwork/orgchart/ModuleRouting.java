@@ -117,7 +117,6 @@ public class ModuleRouting {
         //TODO: Create Setter function in reflection class
         try {
             String nextStep = "";
-            String nextPage = "";
 
             RoutingConfig routingConfig = generateRoutingConfig();
 
@@ -184,22 +183,23 @@ public class ModuleRouting {
 
             // Note: If there isn't assigned CN
             if (assignedCN[0].isEmpty()) {
-                Optional<Group> parent = calculateParent();
-                if (parent.isPresent()) {
-                    ((OutputSchema) outputSchema).setAssignedCN(parent.get().getCn());
+                try {
+                    Group parent = calculateParent();
+                    ((OutputSchema) outputSchema).setAssignedCN(parent.getCn());
 
                     // Note: if Parent GroupCode is in next steps
-                    if (routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.get().getGroupCode())) {
-                        nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.get().getGroupCode());
+                    if (routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.getGroupCode())) {
+                        nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.getGroupCode());
                     }
-
                     // Note: if parent UnitTypeCode is in next steps
-                    else if (routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.get().getUnit().getUnitTypeCode())) {
-                        nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.get().getUnit().getUnitTypeCode());
+                    else if (routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.getUnit().getUnitTypeCode())) {
+                        nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.getUnit().getUnitTypeCode());
                     }
+                    else nextStep = breakString;
                 }
-
-                else nextStep = breakString;
+                catch (AppworkException e){
+                    nextStep = breakString;
+                }
             }
 
             // Note: If next step calculated is in the JSON
@@ -215,29 +215,28 @@ public class ModuleRouting {
             }
 
             if (!nextStep.equals(breakString)) {
-                nextPage = routingConfig.getSteps().get(nextStep).getPage();
+                String nextPage = routingConfig.getSteps().get(nextStep).getPage();
                 ((OutputSchema) outputSchema).setPage(nextPage);
             }
 
             ((OutputSchema) outputSchema).setStepId(nextStep);
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
-            throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
+            throw new AppworkException(e.getMessage(),ResponseCode.MODULE_ROUTING_FAILURE);
         }
     }
 
-    private Optional<Group> calculateParent() {
-        Optional<User> user = orgChartService.getUserDetails(account.getUsername() + "@aw.aca");
-        System.out.println(user);
-        if (user.isEmpty()) return Optional.empty();
-        Optional<Group> userGroup = user.get().getGroup().stream().findFirst();
-        if (userGroup.isPresent()) {
-            return orgChartService.getGroupParent(userGroup.get().getGroupCode());
-        }
-        return Optional.empty();
+    private Group calculateParent() throws AppworkException {
+            User user = orgChartService.getUserDetails(account.getUsername() + "@aw.aca");
+            Optional<Group> userGroup = user.getGroup().stream().findFirst();
+            if (userGroup.isPresent()) {
+                return orgChartService.getGroupParent(userGroup.get().getGroupCode());
+            }else {
+                throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
+            }
     }
 
-    private <T> String calculateFromApprovalHistory(T outputSchema, String parentHistoryId) throws JsonProcessingException {
+    private <T> String calculateFromApprovalHistory(T outputSchema, String parentHistoryId) {
         Optional<ApprovalHistory> approvalHistory = this.approvalHistoryRepository.findById(Long.parseLong(parentHistoryId));
 
         if (approvalHistory.isPresent()) {

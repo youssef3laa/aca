@@ -193,6 +193,14 @@ public class SystemUtil {
         }
     }
 
+    public static String getJsonObjectByPtrExpr(String json, String jsonPtrExpr) {
+        try {
+            return  new ObjectMapper().readTree(json).at(jsonPtrExpr).toString();
+        } catch (JsonProcessingException e) {
+            return "{}";
+        }
+    }
+
     public static String generateOtdsAPIBaseUrl(Environment env) {
         return String.format("%s://%s:%s/otdsws/rest", env.getProperty("otds.request"), env.getProperty("otds.domain"),
                 env.getProperty("otds.port"));

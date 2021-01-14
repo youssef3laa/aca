@@ -14,19 +14,19 @@ import com.asset.appwork.repository.PositionRepository;
 import com.asset.appwork.repository.UnitRepository;
 import com.asset.appwork.repository.UserRepository;
 import com.asset.appwork.util.SystemUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionSystemException;
 
-import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@Slf4j
 public class OrgChartService {
     @Autowired
     UnitRepository unitRepository;
@@ -40,23 +40,26 @@ public class OrgChartService {
     @Autowired
     Environment env;
 
-    public Optional<Unit> createUnit(Account account, String props) throws AppworkException {
-        return unitRepository.findById(new Entity(account,
+    public Unit createUnit(Account account, String props) throws AppworkException {
+        return getUnit(new Entity(account,
                 SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
                 "OrganizationalUnit").create(props));
     }
 
-    public Optional<Unit> getUnit(Long id) {
-        return unitRepository.findById(id);
+    public Unit getUnit(Long id) throws AppworkException {
+        return unitRepository.findById(id).orElseThrow(
+                () -> new AppworkException("Could not get Unit Entity of id " + id, ResponseCode.READ_ENTITY_FAILURE)
+        );
     }
 
-    public Optional<Unit> updateUnit(Account account, Long id, String props) {
+    public Unit updateUnit(Account account, Long id, String props) throws AppworkException {
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
                 "OrganizationalUnit").update(id, props);
-        return unitRepository.findById(id);
+        return getUnit(id);
     }
 
     public void deleteUnit(Long id) throws AppworkException {
+        // TODO: Find solution to the Transaction Exception Roll back overriding AppworkException
         try {
             unitRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
@@ -68,23 +71,26 @@ public class OrgChartService {
         return unitRepository.findAll();
     }
 
-    public Optional<Position> createPosition(Account account, Long unitId, String props) throws AppworkException {
-        return positionRepository.findById(new Entity(account,
+    public Position createPosition(Account account, Long unitId, String props) throws AppworkException {
+        return getPosition(new Entity(account,
                 SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
                 "OrganizationalUnit").createChild(unitId, "Position", props));
     }
 
-    public Optional<Position> getPosition(Long id) {
-        return positionRepository.findById(id);
+    public Position getPosition(Long id) throws AppworkException {
+        return positionRepository.findById(id).orElseThrow(
+                () -> new AppworkException("Could not get Position Entity of id " + id, ResponseCode.READ_ENTITY_FAILURE)
+        );
     }
 
-    public Optional<Position> updatePosition(Account account, Long unitId, Long id, String props) {
+    public Position updatePosition(Account account, Long unitId, Long id, String props) throws AppworkException {
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
                 "OrganizationalUnit").updateChild(unitId, "Position", id, props);
-        return positionRepository.findById(id);
+        return getPosition(id);
     }
 
     public void deletePosition(Long id) throws AppworkException {
+        // TODO: Find solution to the Transaction Exception Roll back overriding AppworkException
         try {
             positionRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
@@ -96,51 +102,146 @@ public class OrgChartService {
         return positionRepository.findAll();
     }
 
+    public Unit getUnitParent(String code) throws AppworkException {
+        return unitRepository.findByNameAndUnitCodeNotNull(code)
+                .flatMap(unit -> unitRepository.findByChild(unit)).orElseThrow(
+                        () -> new AppworkException("Could not get the Parent of Unit " + code, ResponseCode.INTERNAL_SERVER_ERROR)
+                );
+    }
+
     public List<Unit> getUnitChildren(String code) {
         return unitRepository.findByNameAndUnitCodeNotNull(code)
                 .map(unit -> unitRepository.findByParent(unit)).orElse(Collections.emptyList());
     }
 
-    public Optional<Unit> getUnitParent(String code) {
-        return unitRepository.findByNameAndUnitCodeNotNull(code)
-                .flatMap(unit -> unitRepository.findByChild(unit));
+    public Group createGroup(Account account, String props) throws AppworkException {
+        String createdGroupName = SystemUtil.getJsonByPtrExpr(
+                new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
+                        .createGroup(SystemUtil.getJsonObjectByPtrExpr(props, "/otdsGroup")),
+                "/name");
+        int counter = 0;
+        do {
+            try {
+                TimeUnit.MILLISECONDS.sleep(500);
+            } catch (InterruptedException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+            }
+            counter++;
+        } while (counter > 5 || groupRepository.findByName(createdGroupName).isEmpty());
+
+        if (groupRepository.findByName(createdGroupName).isEmpty()) {
+            throw new AppworkException("Could not update group with name " + createdGroupName, ResponseCode.UPDATE_ENTITY_FAILURE);
+        }
+
+        Group platformGroupPostUpdate = groupRepository.findByName(createdGroupName).get();
+
+        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
+                "Group").update(platformGroupPostUpdate.getId(), SystemUtil.getJsonObjectByPtrExpr(props, "/platformGroup"));
+        return getGroup(platformGroupPostUpdate.getId());
     }
 
-    public Optional<Group> getGroup(Long id) {
-        return groupRepository.findById(id);
+    public Group getGroup(Long id) throws AppworkException {
+        return groupRepository.findById(id).orElseThrow(
+                () -> new AppworkException("Could not get Group Entity of id " + id, ResponseCode.READ_ENTITY_FAILURE)
+        );
     }
 
-    public Optional<Group> getGroupParent(String code) {
-        return groupRepository.findByNameAndGroupCodeNotNull(code)
-                .flatMap(group -> unitRepository.findByChild(group.getUnit()))
-                .flatMap(parentUnit -> groupRepository.findByUnit(parentUnit));
+    public Group getGroupByName(String name) throws AppworkException {
+        return groupRepository.findByNameAndGroupCodeNotNull(name).orElseThrow(
+                () -> new AppworkException("Could not get Group Entity of name " + name, ResponseCode.READ_ENTITY_FAILURE)
+        );
     }
 
-    public List<Group> getGroupChildren(String code) {
-        return groupRepository.findByNameAndGroupCodeNotNull(code)
-                .map(group -> unitRepository.findByParent(group.getUnit()))
-                .map(childUnits -> groupRepository.findByUnitIn(new HashSet<>(childUnits))).orElse(Collections.emptyList());
+    public List<Group> getGroupsByNames(String names) throws AppworkException {
+        return groupRepository.findByNameInAndGroupCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")));
+    }
+
+    public List<Group> getGroupsByUnitNames(String names) {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByNameInAndUnitCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")))));
+    }
+
+    public List<Group> getGroupsByUnitTypeCode(String code) {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCode(code)));
+    }
+
+    public List<Group> getGroupsByUnitTypeCodes(String codes) {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCodeIn(Arrays.asList(codes.trim().split("\\s*,\\s*")))));
+    }
+
+    public Group getGroupParent(String code) throws AppworkException {
+        return unitRepository.findByChild(getGroupByName(code).getUnit())
+                .flatMap(parentUnit -> groupRepository.findByUnit(parentUnit)).orElseThrow(
+                        () -> new AppworkException("Could not get the Parent of Group " + code, ResponseCode.INTERNAL_SERVER_ERROR)
+                );
+    }
+
+    public List<Group> getGroupParentOfLoggedInUser(Account account) throws AppworkException {
+        List<Group> groups = (List<Group>) getUserDetails(account.getUsername() + "@" + env.getProperty("otds.partition")).getGroup();
+        List<Group> parentGroups = new ArrayList<>();
+        groups.forEach(group -> {
+            try {
+                parentGroups.add(getGroupParent(group.getName()));
+            } catch (AppworkException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        return parentGroups;
+    }
+
+    public List<Group> getGroupChildren(String code) throws AppworkException {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByParent(getGroupByName(code).getUnit())));
+    }
+
+    public List<Group> getAllGroups() {
+        return groupRepository.findAll();
     }
 
     public List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode) {
         return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode);
     }
 
-    public Optional<Group> getGroup(String cn) {
+    public Group getGroupByCn(String cn) throws AppworkException {
         Pattern pattern = Pattern.compile("cn=(.*?),cn=organizational roles");
         Matcher matcher = pattern.matcher(cn);
         String name = "";
         if (matcher.find()) {
             name = matcher.group(1);
         }
-        return groupRepository.findByNameAndGroupCodeNotNull(name);
+        return getGroupByName(name);
     }
 
-    public Optional<User> getUserDetails(Long id) {
-        return userRepository.findById(id);
+    public Group updateGroup(Account account, Long id, String props) throws AppworkException {
+        Group group = getGroup(id);
+        new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
+                .updateGroupByGroupName(group.getName(), SystemUtil.getJsonObjectByPtrExpr(props, "/otdsGroup"));
+
+        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
+                "Group").update(group.getId(), SystemUtil.getJsonObjectByPtrExpr(props, "/platformGroup"));
+        return getGroup(group.getId());
     }
 
-    public Optional<User> getUserDetails(String userId) {
-        return userRepository.findByUserId(userId);
+    public Group updateGroupUnitRelation(Account account, Long id, String props) throws AppworkException {
+        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group")
+                .addRelation(id, "Unit", props);
+        return getGroup(id);
+    }
+
+    public void deleteGroup(Account account, Long id) throws AppworkException {
+        new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
+                .deleteGroupByGroupName(getGroup(id).getName());
+    }
+
+    public User getUserDetails(Long id) throws AppworkException {
+        return userRepository.findById(id).orElseThrow(
+                () -> new AppworkException("Could not get User of id " + id, ResponseCode.READ_ENTITY_FAILURE)
+        );
+    }
+
+    public User getUserDetails(String userId) throws AppworkException {
+        return userRepository.findByUserId(userId).orElseThrow(
+                () -> new AppworkException("Could not get User of UserId " + userId, ResponseCode.READ_ENTITY_FAILURE)
+        );
     }
 }
