@@ -50,6 +50,26 @@ export default {
             })
             .catch((error) => console.error(error));
         },
-
+        initiateBrava: function(){
+            this.$observable.subscribe('open-file-brava', async (fileId) => {
+                this.$observable.fire('file-component-skeleton', true)
+                console.log("openfilebrava");
+                console.log(fileId);
+                let userToken;
+                try {
+                    userToken = await http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
+                        "userName": "admin",
+                        "password": "Asset99a",
+                        "ticketType": "OTDSTICKET"
+                    });
+                    this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
+                        'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
+                    console.log(userToken);
+                    // this.$observable.fire('file-component-skeleton', false)
+                } catch (e) {
+                    console.log(e);
+                }
+            });
         }
     }
+}

@@ -33,7 +33,11 @@ public class Entity {
         try {
             return Long.parseLong(SystemUtil.getJsonByPtrExpr(response, "/Identity/Id"));
         } catch (NumberFormatException e) {
-            throw new AppworkException(SystemUtil.getJsonByPtrExpr(response, "/message"), ResponseCode.CREATE_ENTITY_FAILURE);
+            try {
+                throw new AppworkException(SystemUtil.getJsonByPtrExpr(response, "/message"), ResponseCode.CREATE_ENTITY_FAILURE);
+            } catch (AppworkException er) {
+                throw new AppworkException(er.getMessage(), ResponseCode.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
