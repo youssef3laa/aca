@@ -738,7 +738,7 @@ public class OrgChartController {
     @Transactional
     @GetMapping("/group/all/unitTypeCodes/{codes}")
     public ResponseEntity<AppResponse<JsonNode>> getGroupsByUnitTypeCodes(@RequestHeader("X-Auth-Token") String token,
-                                                                          @RequestParam("codes") String codes
+                                                                          @PathVariable("codes") String codes
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
