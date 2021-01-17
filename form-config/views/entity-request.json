@@ -14,27 +14,27 @@
       "name": "receiver",
       "rule": "required",
       "readonly": false,
-      "col": "6"
-    },
-    {
-      "type": "InputComponent",
-      "label": "requestDate",
-      "name": "requestDate",
-      "readonly": false,
-      "col": "6"
+      "col": "4"
     },
     {
       "type": "TextareaComponent",
-      "label": "notes",
-      "name": "notes",
+      "label": "subjectSummary",
+      "name": "subjectSummary",
       "readonly": false,
       "col": "12"
+    },
+    {
+      "type": "InputComponent",
+      "label": "writingDate",
+      "name": "writingDate",
+      "readonly": false,
+      "col": "4"
     }
   ],
   "model": {
     "stepId": "",
     "receiver": "",
-    "requestDate": "",
-    "notes": ""
+    "writingDate": "",
+    "subjectSummary": ""
   }
 }

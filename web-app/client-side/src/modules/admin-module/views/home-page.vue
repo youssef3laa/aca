@@ -30,6 +30,12 @@ export default {
       app: {
         pages: [
           {
+            tabs: [
+              {
+                id: 1,
+                name: "المهام",
+              },
+            ],
             sections: [
               // {
               //   tabs: [
@@ -85,7 +91,9 @@ export default {
               // },
               {
                 "background": "transparent",
-                type: "card",
+                "isTab": "false",
+                "type": "DefaultSection",
+                "isCard": "true",
                 forms: [
                   {
                     key: "form3",
@@ -111,12 +119,10 @@ export default {
                 ],
               },
               {
-                tabs: [
-                  {
-                    id: 1,
-                    name: "المهام",
-                  },
-                ],
+                "tabId": "1",
+                "isTab": "true",
+                "type": "DefaultSection",
+                "isCard": "true",
                 forms: [
                   {
                     inputs: [

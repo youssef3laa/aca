@@ -4,13 +4,12 @@ import com.asset.appwork.dto.Account;
 import com.asset.appwork.util.Http;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.springframework.core.env.Environment;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 public final class Otds {
     Account account;
@@ -52,14 +51,16 @@ public final class Otds {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public String deleteGroupByGroupName(String roleName) throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public String deleteGroupByGroupName(String roleName) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .delete(this.apiBaseUrl + String.format(API.GROUPS_DELETE.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
         return http.getResponse();
     }
 
-    public <T> String updateGroupByGroupName(String oldGroupName, T data) throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public <T> String updateGroupByGroupName(String oldGroupName, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
@@ -67,7 +68,8 @@ public final class Otds {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public String getAllGroups() throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public String getAllGroups() {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + String.format(API.GROUPS_GET_ALL.getUrl(), URLEncoder.encode(String.format("where_partition_name=%s", this.partition), StandardCharsets.UTF_8.name())));
@@ -75,14 +77,16 @@ public final class Otds {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public String getGroupByGroupName(String roleName) throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public String getGroupByGroupName(String roleName) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + String.format(API.GROUPS_GET.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public String getMembersAssignedToGroupByGroupName(String roleName) throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public String getMembersAssignedToGroupByGroupName(String roleName) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + String.format(API.GROUPS_GET_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
@@ -90,7 +94,8 @@ public final class Otds {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public <T> String assignMembersToGroup(String roleName, T data) throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public <T> String assignMembersToGroup(String roleName, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
@@ -99,7 +104,8 @@ public final class Otds {
         return http.getResponse();
     }
 
-    public <T> String unAssignMembersFromGroup(String roleName, T data) throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public <T> String unAssignMembersFromGroup(String roleName, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
@@ -108,7 +114,8 @@ public final class Otds {
         return http.getResponse();
     }
 
-    public <T> String assignGroupsToGroup(String roleName, T data) throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public <T> String assignGroupsToGroup(String roleName, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
@@ -117,7 +124,8 @@ public final class Otds {
         return http.getResponse();
     }
 
-    public <T> String unAssignGroupsFromGroup(String roleName, T data) throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public <T> String unAssignGroupsFromGroup(String roleName, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
@@ -126,7 +134,8 @@ public final class Otds {
         return http.getResponse();
     }
 
-    public String getUsersAssignedToGroupByGroupId(String roleName) throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public String getUsersAssignedToGroupByGroupId(String roleName) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + String.format(API.GROUPS_GET_USERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
@@ -134,11 +143,11 @@ public final class Otds {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public <T> String resetPassword(String username, T data) {
+    public <T> String resetPassword(String userId, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .put(this.apiBaseUrl + String.format(API.USERS_RESET_PASSWORD.getUrl(), username));
+                .put(this.apiBaseUrl + String.format(API.USERS_RESET_PASSWORD.getUrl(), userId));
         return http.getResponse();
     }
 
@@ -151,7 +160,8 @@ public final class Otds {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public String getAllUsers() throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public String getAllUsers() {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + API.USERS_GET_ALL.getUrl() + "?" + URLEncoder.encode(String.format("where_partition_name=%s", this.partition), StandardCharsets.UTF_8.name()));
@@ -159,29 +169,33 @@ public final class Otds {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public String getUserByUserName(String userName) throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public String getUserByUserName(String userName) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + String.format(API.USERS_GET.getUrl(), URLEncoder.encode(userName + "@" + this.partition, StandardCharsets.UTF_8.name())));
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public <T> String updateUserByUserName(String oldUsername, T data) throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public <T> String updateUserByUserId(String userId, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .put(this.apiBaseUrl + String.format(API.USERS_UPDATE.getUrl(), URLEncoder.encode(oldUsername + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .put(this.apiBaseUrl + String.format(API.USERS_UPDATE.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public String deleteUserByUserName(String username) throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public String deleteUserByUserId(String userId) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
-                .delete(this.apiBaseUrl + String.format(API.USERS_DELETE.getUrl(), URLEncoder.encode(username + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .delete(this.apiBaseUrl + String.format(API.USERS_DELETE.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
         return http.getResponse();
     }
 
-    public String getAllGroupsAssignedToUserByUserName(String username) throws UnsupportedEncodingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public String getAllGroupsAssignedToUserByUserName(String username) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + String.format(API.USERS_GET_GROUPS.getUrl(), URLEncoder.encode(username + "@" + this.partition, StandardCharsets.UTF_8.name())));
@@ -189,11 +203,12 @@ public final class Otds {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public <T> String assignUserToGroupByUserId(String username, T data) throws UnsupportedEncodingException, JsonProcessingException {
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public <T> String assignUserToGroupsByUserId(String userId, T data) throws JsonProcessingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .post(this.apiBaseUrl + String.format(API.USERS_ASSIGN_GROUP.getUrl(), URLEncoder.encode(username + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .post(this.apiBaseUrl + String.format(API.USERS_ASSIGN_GROUP.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
         return http.getResponse();
     }
 

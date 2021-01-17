@@ -30,7 +30,7 @@ public class OutputSchema {
     }
 
     public void setStepId(String stepId){
-        this.breakProcess = stepId.equals("break");
+        this.breakProcess = stepId.equals("end");
         this.stepId = stepId;
     }
 
