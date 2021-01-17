@@ -5,6 +5,7 @@ import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.ApprovalHistory;
+import com.asset.appwork.model.GeneralProcessModel;
 import com.asset.appwork.model.RequestEntity;
 import com.asset.appwork.orgchart.ModuleRouting;
 import com.asset.appwork.platform.rest.Entity;
@@ -44,7 +45,7 @@ public class ProcessController {
     // TODO: READ ON STATIC INNER CLASSES
     @Data
     private static class Request{
-        RequestEntity requestEntity;
+        GeneralProcessModel generalProcessEntity;
         OutputSchema processModel;
     }
 
@@ -55,20 +56,20 @@ public class ProcessController {
             Account account = tokenService.get(token);
             String cordysUrl = cordysService.getCordysUrl();
 
-            // Entity Creation
+            //Note: Entity Creation
             String restAPIBaseUrl = SystemUtil.generateRestAPIBaseUrl(environment,"AssetGeneralACA");
             Entity entity = new Entity(account,
                     restAPIBaseUrl
                     , requestJson.processModel.getEntityName());
-            Long entityId = entity.create(requestJson.requestEntity);
+            Long entityId = entity.create(requestJson.generalProcessEntity);
 
-            //Get Next Step
+            //Note: Get Next Step
             requestJson.processModel.setEntityId(entityId.toString());
 
             String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
             String config = SystemUtil.readFile(filePath);
 
-            ModuleRouting moduleRouting = new ModuleRouting( account, cordysUrl, config, approvalHistoryRepository, orgChartService);
+            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository, orgChartService);
             String response = moduleRouting.goToNext(requestJson.processModel);
             respBuilder.data(response);
         } catch (AppworkException e) {
@@ -76,6 +77,7 @@ public class ProcessController {
             respBuilder.status(e.getCode());
         }  catch (IOException e) {
             e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         return respBuilder.build().getResponseEntity();
@@ -98,7 +100,7 @@ public class ProcessController {
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
-        } catch (Exception e){
+        } catch (IOException e){
             e.printStackTrace();
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }

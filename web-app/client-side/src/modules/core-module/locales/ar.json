@@ -6,7 +6,10 @@
   "requestDate": "تاريخ الطلب",
   "receiver": "التوجيه",
   "notes": "الملاحظات",
+  "subjectSummary": "ملخص الموضوع",
+  "writingDate": "تاريخ المكاتبة",
   "login": "تسجيل دخول",
+  "logged-in-success": "تم الدخول بنجاح",
   "CANNOT_CONNECT_TO_SERVER": "خطأ في الإتصال بالسيرفر",
   "INVALID_CREDENTIALS": "برجاء التأكد من اسم المستخدم و كلمه المرور"
 }

@@ -23,7 +23,7 @@ import javax.swing.text.html.Option;
 import java.util.*;
 
 public class ModuleRouting {
-    private final String breakString = "break";
+    private final String breakString = "end";
     private final String approveString = "approve";
     private final String commentString = "comment";
     private final String requestModificationString = "requestModification";
