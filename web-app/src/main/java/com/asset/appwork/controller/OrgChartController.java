@@ -170,6 +170,28 @@ public class OrgChartController {
     }
 
     @Transactional
+    @PutMapping("/unit/{id}/subUnit/{subUnitId}")
+    public ResponseEntity<AppResponse<JsonNode>> addSubUnitToUnit(@RequestHeader("X-Auth-Token") String token,
+                                                                  @PathVariable("id") Long id,
+                                                                  @PathVariable("subUnitId") Long subUnitId
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            orgChartService.addSubUnitToUnit(account, id, subUnitId);
+            respBuilder.info("infoMessage", "Sub Unit added Successfully");
+            respBuilder.status(ResponseCode.SUCCESS);
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
     @PostMapping("/unit/{unitId}/position/create")
     public ResponseEntity<AppResponse<JsonNode>> createPosition(@RequestHeader("X-Auth-Token") String token,
                                                                 @PathVariable("unitId") Long unitId,
@@ -451,32 +473,6 @@ public class OrgChartController {
     }
 
     @Transactional
-    @GetMapping("/group/findByUnitCode/{code}")
-    public ResponseEntity<AppResponse<JsonNode>> findGroupByUnitCode(@RequestHeader("X-Auth-Token") String token,
-                                                                     @PathVariable("code") String code
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupByName(code).toString()));
-            } catch (JsonProcessingException e) {
-                log.error(e.getMessage());
-                e.printStackTrace();
-                respBuilder.info("errorMessage", e.getMessage());
-                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-            }
-        } catch (AppworkException e) {
-            log.error(e.getMessage());
-            e.printStackTrace();
-            respBuilder.info("errorMessage", e.getMessage());
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-    @Transactional
     @GetMapping("/group/findByUnitCodes/{codes}")
     public ResponseEntity<AppResponse<JsonNode>> findGroupByUnitCodes(@RequestHeader("X-Auth-Token") String token,
                                                                       @PathVariable("codes") String codes
@@ -583,6 +579,58 @@ public class OrgChartController {
     }
 
     @Transactional
+    @GetMapping("/group/up")
+    public ResponseEntity<AppResponse<JsonNode>> getGroupParentsOfLoggedInUser(@RequestHeader("X-Auth-Token") String
+                                                                                       token
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupParentsOfLoggedInUser(account).toString()));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/group/all/unitTypeCodes/{codes}")
+    public ResponseEntity<AppResponse<JsonNode>> getGroupsByUnitTypeCodes(@RequestHeader("X-Auth-Token") String token,
+                                                                          @PathVariable("codes") String codes
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitTypeCodes(codes).toString()));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
     @PutMapping("/group/update/{id}")
     public ResponseEntity<AppResponse<JsonNode>> updateGroup(@RequestHeader("X-Auth-Token") String token,
                                                              @PathVariable("id") Long id,
@@ -600,6 +648,50 @@ public class OrgChartController {
                 respBuilder.info("errorMessage", e.getMessage());
                 respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
             }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @PutMapping("/group/{groupId}/relation/unit/add")
+    public ResponseEntity<AppResponse<JsonNode>> updateGroupUnitRelation(@RequestHeader("X-Auth-Token") String token,
+                                                                         @PathVariable("groupId") Long groupId,
+                                                                         @RequestBody String props
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            orgChartService.updateGroupUnitRelation(account, groupId, props);
+            respBuilder.info("infoMessage", "Relation added Successfully");
+            respBuilder.status(ResponseCode.SUCCESS);
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @PutMapping("/group/{groupCode}/relation/unit/add/{unitCode}")
+    public ResponseEntity<AppResponse<JsonNode>> updateGroupUnitRelationByCodes(@RequestHeader("X-Auth-Token") String token,
+                                                                                @PathVariable("groupCode") String groupCode,
+                                                                                @PathVariable("unitCode") String unitCode
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            orgChartService.updateGroupUnitRelationByCodes(account, groupCode, unitCode);
+            respBuilder.info("infoMessage", "Relation added Successfully");
+            respBuilder.status(ResponseCode.SUCCESS);
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -656,6 +748,59 @@ public class OrgChartController {
     }
 
     @Transactional
+    @PostMapping("/user/create")
+    public ResponseEntity<AppResponse<JsonNode>> createUser(@RequestHeader("X-Auth-Token") String token,
+                                                            @RequestBody String props
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.createUser(account, props).toString()));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/user/{id}")
+    public ResponseEntity<AppResponse<JsonNode>> getUserById(@RequestHeader("X-Auth-Token") String
+                                                                     token,
+                                                             @PathVariable("id") Long id
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUser(id).toString()));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
     @GetMapping("/user/{userId}")
     public ResponseEntity<AppResponse<JsonNode>> getUserByUserId(@RequestHeader("X-Auth-Token") String
                                                                          token,
@@ -682,18 +827,18 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @Transactional
-    @PutMapping("/group/{groupId}/relation/unit/add")
-    public ResponseEntity<AppResponse<JsonNode>> updateGroupUnitRelation(@RequestHeader("X-Auth-Token") String token,
-                                                                         @PathVariable("groupId") Long groupId,
-                                                                         @RequestBody String props
+    @PutMapping("/user/update/{id}")
+    public ResponseEntity<AppResponse<JsonNode>> updateUser(@RequestHeader("X-Auth-Token") String
+                                                                    token,
+                                                            @PathVariable("id") Long id,
+                                                            @RequestBody String props
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.updateGroupUnitRelation(account, groupId, props).toString()));
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.updateUser(account, id, props).toString()));
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -710,22 +855,17 @@ public class OrgChartController {
     }
 
     @Transactional
-    @GetMapping("/group/up")
-    public ResponseEntity<AppResponse<JsonNode>> getGroupParentsOfLoggedInUser(@RequestHeader("X-Auth-Token") String
-                                                                         token
+    @DeleteMapping("/user/delete/{id}")
+    public ResponseEntity<AppResponse<JsonNode>> deleteUser(@RequestHeader("X-Auth-Token") String token,
+                                                            @PathVariable("id") Long id
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupParentsOfLoggedInUser(account).toString()));
-            } catch (JsonProcessingException e) {
-                log.error(e.getMessage());
-                e.printStackTrace();
-                respBuilder.info("errorMessage", e.getMessage());
-                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-            }
+            orgChartService.deleteUser(account, id);
+            respBuilder.info("infoMessage", "Deleted Successfully");
+            respBuilder.status(ResponseCode.SUCCESS);
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -735,17 +875,19 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @Transactional
-    @GetMapping("/group/all/unitTypeCodes/{codes}")
-    public ResponseEntity<AppResponse<JsonNode>> getGroupsByUnitTypeCodes(@RequestHeader("X-Auth-Token") String token,
-                                                                          @PathVariable("codes") String codes
+    @PutMapping("/user/{userId}/assign/group/{groupCode}")
+    public ResponseEntity<AppResponse<JsonNode>> assignUserToGroup(@RequestHeader("X-Auth-Token") String token,
+                                                                   @PathVariable("userId") String userId,
+                                                                   @PathVariable("groupCode") String groupCode
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitTypeCodes(codes).toString()));
+                orgChartService.assignUserToGroup(account, userId, groupCode);
+                respBuilder.info("infoMessage", "User added to group " + groupCode + " Successfully");
+                respBuilder.status(ResponseCode.SUCCESS);
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();

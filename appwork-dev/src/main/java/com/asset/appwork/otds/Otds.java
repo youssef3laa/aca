@@ -143,11 +143,11 @@ public final class Otds {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public <T> String resetPassword(String username, T data) {
+    public <T> String resetPassword(String userId, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .put(this.apiBaseUrl + String.format(API.USERS_RESET_PASSWORD.getUrl(), username));
+                .put(this.apiBaseUrl + String.format(API.USERS_RESET_PASSWORD.getUrl(), userId));
         return http.getResponse();
     }
 
@@ -178,19 +178,19 @@ public final class Otds {
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public <T> String updateUserByUserName(String oldUsername, T data) {
+    public <T> String updateUserByUserId(String userId, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .put(this.apiBaseUrl + String.format(API.USERS_UPDATE.getUrl(), URLEncoder.encode(oldUsername + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .put(this.apiBaseUrl + String.format(API.USERS_UPDATE.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public String deleteUserByUserName(String username) {
+    public String deleteUserByUserId(String userId) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
-                .delete(this.apiBaseUrl + String.format(API.USERS_DELETE.getUrl(), URLEncoder.encode(username + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .delete(this.apiBaseUrl + String.format(API.USERS_DELETE.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
         return http.getResponse();
     }
 
@@ -204,11 +204,11 @@ public final class Otds {
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public <T> String assignUserToGroupByUserId(String username, T data) throws JsonProcessingException {
+    public <T> String assignUserToGroupsByUserId(String userId, T data) throws JsonProcessingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .post(this.apiBaseUrl + String.format(API.USERS_ASSIGN_GROUP.getUrl(), URLEncoder.encode(username + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .post(this.apiBaseUrl + String.format(API.USERS_ASSIGN_GROUP.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
         return http.getResponse();
     }
 

@@ -31,19 +31,19 @@ public class Group extends BaseIdentity<Group> {
         this.groupCode = groupCode;
     }
 
-    public Boolean getHeadRole() {
+    public Boolean getIsHeadRole() {
         return isHeadRole;
     }
 
-    public void setHeadRole(Boolean headRole) {
+    public void setIsHeadRole(Boolean headRole) {
         isHeadRole = headRole;
     }
 
-    public Boolean getViceRole() {
+    public Boolean getIsViceRole() {
         return isViceRole;
     }
 
-    public void setViceRole(Boolean viceRole) {
+    public void setIsViceRole(Boolean viceRole) {
         isViceRole = viceRole;
     }
 
