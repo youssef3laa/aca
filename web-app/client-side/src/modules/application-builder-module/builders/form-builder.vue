@@ -78,6 +78,7 @@ import AttachmentComponent from '../components/attachment-component'
 import IframeComponent from '../components/iframe-component'
 import SkeletonLoader from '../components/skeleton-loader-component'
 import chartsComponent from '../components/charts-component'
+import ShowAttachmentComponent from "../components/show-attachment-component";
 
 export default {
   name: 'FormBuilder',
@@ -99,7 +100,9 @@ export default {
     IframeComponent,
     SkeletonLoader,
     AttachmentComponent,
-    chartsComponent
+    chartsComponent,
+    ShowAttachmentComponent,
+
   },
   data() {
     return {
