@@ -2,13 +2,13 @@
   <div>
     <splitpanes class="default-theme"  dir="ltr">
       <pane>
-        <ShowAttachmentComponent  :key="requestEntityId" :bwsId="bwsId" :requestEntityId="requestEntityId"> </ShowAttachmentComponent>
+        <ShowAttachmentComponent  :key="d.requestId" :bwsId="bwsId" :requestEntityId="d.requestId"> </ShowAttachmentComponent>
       </pane>
       <pane class="bg-white" dir="rtl">
         <v-container>
           <AutocompleteComponent
-            :field="field"
-            :val="getAutoCompeleteVal"
+            :field="{name: field.label}"
+            :val="{list: d.list}"
             @update="changeVal"
           >
           </AutocompleteComponent>
@@ -39,84 +39,85 @@ export default {
 
   data() {
     return {
+      d: this.val,
       selected: "",
       richText: {},
       Memodata: [],
-      bwsId : "",
-      requestEntityId : "",
-      app1: {
-        pages: [
-          {
-            key: "memoPage",
-            sections: [
-              {
-                forms: [
-                  {
-                    key: "form1",
-                    resizable: {
-                      forms: [
-                        {
-                          type: "collapse",
-                          name: "المرفقات",
-                          key: "attachments",
-                          inputs: [
-                            {
-                              type: "ShowAttachmentComponent",
-                              name: "showattachment",
-                              col: 12,
-                            },
-                          ],
-                          model: {},
-                        },
-                        {
-                          type: "collapse",
-                          name: "النص الثاني",
-                          key: "richtext2",
-                          inputs: [
-                            {
-                              type: "richtextComponent",
-                              name: "richtext1",
-                              col: 12,
-                            },
-                            {
-                              type: "richtextComponent",
-                              name: "richtext2",
-                              col: 12,
-                            },
-                          ],
-                          model: {
-                            richtext1: "<p></p>",
-                            richtext2: "<p></p>",
-                          },
-                        },
-                      ],
-                    },
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
+      bwsId : 680482,
+      // requestEntityId : "",
+      // app1: {
+      //   pages: [
+      //     {
+      //       key: "memoPage",
+      //       sections: [
+      //         {
+      //           forms: [
+      //             {
+      //               key: "form1",
+      //               resizable: {
+      //                 forms: [
+      //                   {
+      //                     type: "collapse",
+      //                     name: "المرفقات",
+      //                     key: "attachments",
+      //                     inputs: [
+      //                       {
+      //                         type: "ShowAttachmentComponent",
+      //                         name: "showattachment",
+      //                         col: 12,
+      //                       },
+      //                     ],
+      //                     model: {},
+      //                   },
+      //                   {
+      //                     type: "collapse",
+      //                     name: "النص الثاني",
+      //                     key: "richtext2",
+      //                     inputs: [
+      //                       {
+      //                         type: "richtextComponent",
+      //                         name: "richtext1",
+      //                         col: 12,
+      //                       },
+      //                       {
+      //                         type: "richtextComponent",
+      //                         name: "richtext2",
+      //                         col: 12,
+      //                       },
+      //                     ],
+      //                     model: {
+      //                       richtext1: "<p></p>",
+      //                       richtext2: "<p></p>",
+      //                     },
+      //                   },
+      //                 ],
+      //               },
+      //             },
+      //           ],
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // },
       app: {},
     };
   },
-  props: ["field", "val"],
+  props: ["val", "field"],
 
   methods: {
     changeVal(event) {
-      // this.$refs.appBuilder.setAppData({});
-      this.selected = event.value.value.text;
-      this.loadForm(this.selected, this.fillForm);
-      console.log(this.selected);
-      console.log(JSON.stringify(this.app1));
+      if(event.value.value){
+        this.selected = event.value.value.text;
+        this.loadForm(this.selected, this.fillForm);
+        console.log(this.selected);
+      }else{
+        this.$refs.appBuilder.setAppData({});
+      }
     },
 
     async fillForm() {
-      this.bwsId = 680482;
-      this.requestEntityId = 1;
-      this.Memodata = await this.getMemoData(this.selected);
-      console.log(this.Memodata);
+      this.Memodata = await this.getMemoData(this.selected,this.d.requestId);
+      console.log("MemoData",this.Memodata);
       if (this.Memodata == undefined) return;
       this.Memodata[this.Memodata.length - 1].memoValues.forEach((element) => {
         var model = { [element.jsonKey]: element.value };
@@ -137,22 +138,19 @@ export default {
       });
       let data;
       data = {
-        requestId: "1",
+        requestId: this.d.requestId,
         jsonId: this.selected,
         values: this.richText,
       };
       this.setMemoData(data);
     },
   },
-  computed: {
-    getAutoCompeleteVal() {
-      var val = {
-        list: [
-          { value: 1, text: "memo1" },
-          { value: 2, text: "memo2" },
-        ],
-      };
-      return val;
+  watch: {
+    val: function (newVal) {
+      for(var key in newVal){
+        this.d[key] = newVal[key];
+      }
+      // this.d = newVal
     },
   },
 };

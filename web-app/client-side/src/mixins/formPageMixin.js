@@ -50,6 +50,16 @@ export default {
             })
             .catch((error) => console.error(error));
         },
+        getLookupByCategoryAndKey: async function(category,key){
+            try {
+                var response = await http.get("lookup/get/category/" + category + "/key/" + key);
+                console.log("getLookupResponse",response.data);
+                return response.data.data;
+            }
+            catch (error) {
+                console.log(error);
+            }
+        },
         initiateBrava: function(){
             this.$observable.subscribe('open-file-brava', async (fileId) => {
                 this.$observable.fire('file-component-skeleton', true)

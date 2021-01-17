@@ -35,6 +35,8 @@ export default {
         generalProcessEntity: {
           writingDate: model.writingDate,
           summary: model.subjectSummary,
+          workType: model.workType.value.value,
+          incomingMeans: model.incomingMeans.value.value
         },
         processModel: {
           process: "generalProcess",

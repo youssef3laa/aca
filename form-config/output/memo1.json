@@ -5,7 +5,9 @@
             "key": "memoPage",
             "sections": [
                {
-                  
+                  "isTab": false,
+                  "type": "DefaultSection",
+                  "isCard": true,
                   "forms": [
                      {
                         "type": "collapse",

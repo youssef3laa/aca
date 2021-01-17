@@ -68,14 +68,16 @@ public class MemorandumController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @GetMapping("/get/{id}")
-    public ResponseEntity<AppResponse<List<Memorandum>>> getMemorandum(@RequestHeader("X-Auth-Token") String token, @PathVariable("id") String key){
+    @GetMapping("/get/{jsonId}/{requestId}")
+    public ResponseEntity<AppResponse<List<Memorandum>>> getMemorandum(@RequestHeader("X-Auth-Token") String token,
+                                                                       @PathVariable("jsonId") String jsonId,
+                                                                       @PathVariable("requestId") String requestId){
         AppResponse.ResponseBuilder<List<Memorandum>> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            List<Memorandum> s = memosRepository.findByJsonId(key);
+            List<Memorandum> s = memosRepository.findByJsonIdAndRequestId(jsonId, requestId);
             if(s.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
             respBuilder.data(s);
 

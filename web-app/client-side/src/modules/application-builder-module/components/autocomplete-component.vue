@@ -40,13 +40,23 @@ export default {
       http
         .get(url)
         .then((response) => {
-          const res = response.data.data.map((el) => {
-            let obj = {
-              name: el["name_ar"],
-              value: el["cn"],
-              text: el["name_ar"],
-              code: el["groupCode"],
-            };
+          const res = response.data.data.map((element) => {
+            let obj = {};
+            if(element["cn"]){
+              obj = {
+                name: element["name_ar"],
+                value: element["cn"],
+                text: element["name_ar"],
+                code: element["groupCode"],
+                object: element
+              }
+            }else{
+              obj = {
+                value: element["key"],
+                text: element["arValue"],
+                object: element
+              }
+            }
             return obj;
           });
           this.items.list = res.filter((e) => {
