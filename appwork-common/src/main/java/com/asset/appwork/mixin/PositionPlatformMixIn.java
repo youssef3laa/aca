@@ -23,28 +23,13 @@ public abstract class PositionPlatformMixIn {
         return name;
     }
 
-    @JsonProperty("positionName")
-    public void setName(String name) {
-        this.name = name;
-    }
-
     @JsonProperty("Description")
     public String getDescription() {
         return description;
     }
 
-    @JsonProperty("description")
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     @JsonProperty("Lead")
-    public Boolean getLead() {
+    public Boolean getIsLead() {
         return isLead;
-    }
-
-    @JsonProperty("isLead")
-    public void setLead(Boolean lead) {
-        isLead = lead;
     }
 }

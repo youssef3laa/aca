@@ -17,11 +17,9 @@ public class Assignment {
     @Id
     @Column(name = "Id")
     Long id;
-    //    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "Start_Date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     Date startDate;
-    //    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "End_Date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     Date endDate;
@@ -56,13 +54,6 @@ public class Assignment {
     Person person;
 
     @SneakyThrows
-    public static Assignment fromString(String json) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.addMixIn(Assignment.class, AssignmentPlatformMixIn.class);
-        return mapper.readValue(json, Assignment.class);
-    }
-
-    @SneakyThrows
     public String toString() {
         return new ObjectMapper().writeValueAsString(this);
     }
@@ -72,6 +63,13 @@ public class Assignment {
         ObjectMapper mapper = new ObjectMapper();
         mapper.addMixIn(this.getClass(), AssignmentPlatformMixIn.class);
         return mapper.writeValueAsString(this);
+    }
+
+    @SneakyThrows
+    public static Assignment fromString(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixIn(Assignment.class, AssignmentPlatformMixIn.class);
+        return mapper.readValue(json, Assignment.class);
     }
 
     public Long getId() {

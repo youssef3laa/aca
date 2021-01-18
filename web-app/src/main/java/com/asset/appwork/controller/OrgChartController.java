@@ -785,7 +785,7 @@ public class OrgChartController {
     }
 
     @Transactional
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/userId/{userId}")
     public ResponseEntity<AppResponse<JsonNode>> getUserByUserId(@RequestHeader("X-Auth-Token") String
                                                                          token,
                                                                  @PathVariable("userId") String userId
@@ -811,6 +811,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Transactional
     @PutMapping("/user/update/{id}")
     public ResponseEntity<AppResponse<JsonNode>> updateUser(@RequestHeader("X-Auth-Token") String
                                                                     token,
@@ -859,6 +860,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Transactional
     @PutMapping("/user/{userId}/assign/group/{groupCode}")
     public ResponseEntity<AppResponse<JsonNode>> assignUserToGroup(@RequestHeader("X-Auth-Token") String token,
                                                                    @PathVariable("userId") String userId,

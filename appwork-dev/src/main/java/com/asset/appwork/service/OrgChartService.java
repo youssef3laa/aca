@@ -384,7 +384,10 @@ public class OrgChartService {
         Position position = getPositionByName(groupCode);
         Assignment assignment = new Assignment();
         assignment.setPrincipal(position.getIsLead());
-        assignment = createAssignment(account, position.getUnit().getId(), position.getId(), assignment.toString());
+        System.out.println(assignment.toString());
+        System.out.println(position.toString());
+        System.out.println(position.toPlatformString());
+        assignment = createAssignment(account, position.getUnit().getId(), position.getId(), assignment.toPlatformString());
 
         addAssignmentToPersonRelation(account, assignment.getId(), new Member.TargetId(user.getPerson().getId()).toString());
     }

@@ -13,15 +13,12 @@ import java.util.Date;
 public abstract class AssignmentPlatformMixIn {
     @JsonIgnore
     Long id;
-    @JsonProperty("Start_Date")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     Date startDate;
-    @JsonProperty("End_Date")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     Date endDate;
-    @JsonProperty("Principal")
     Boolean principal;
     @JsonIgnore
     Unit unit;
@@ -29,4 +26,19 @@ public abstract class AssignmentPlatformMixIn {
     Position position;
     @JsonIgnore
     Person person;
+
+    @JsonProperty("Start_Date")
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    @JsonProperty("End_Date")
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    @JsonProperty("Principal")
+    public Boolean getPrincipal() {
+        return principal;
+    }
 }
