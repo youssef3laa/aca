@@ -1,6 +1,9 @@
 package com.asset.appwork.model;
 
+import com.asset.appwork.mixin.UserPlatformMixIn;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -34,6 +37,19 @@ public class User extends BaseIdentity<User> {
     @Transient
     String cn;
 
+    @SneakyThrows
+    public static User fromString(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixIn(User.class, UserPlatformMixIn.class);
+        return mapper.readValue(json, User.class);
+    }
+
+    @SneakyThrows
+    public String toPlatformString() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixIn(this.getClass(), UserPlatformMixIn.class);
+        return mapper.writeValueAsString(this);
+    }
 
     public String getUserId() {
         return userId;

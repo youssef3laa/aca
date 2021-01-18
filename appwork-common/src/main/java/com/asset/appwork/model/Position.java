@@ -2,6 +2,7 @@ package com.asset.appwork.model;
 
 import com.asset.appwork.mixin.PositionPlatformMixIn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -12,6 +13,7 @@ import java.util.Optional;
 
 @Entity(name = "Position")
 @Table(name = "O9OpenTextEntityIdentityComponentsPosition")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Position {
     @Id
     @Column(name = "Id1")
@@ -36,6 +38,13 @@ public class Position {
     @JsonProperty("assignments")
 //    @JsonIgnore
     Collection<Assignment> assignment;
+
+    @SneakyThrows
+    public static Position fromString(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixIn(Position.class, PositionPlatformMixIn.class);
+        return mapper.readValue(json, Position.class);
+    }
 
     @SneakyThrows
     public String toString() {

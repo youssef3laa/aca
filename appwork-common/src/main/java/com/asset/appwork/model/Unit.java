@@ -1,6 +1,9 @@
 package com.asset.appwork.model;
 
+import com.asset.appwork.mixin.UnitPlatformMixIn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -32,6 +35,20 @@ public class Unit extends BaseIdentity<Unit> {
     @ManyToMany(mappedBy = "child", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JsonIgnore
     private Collection<Unit> parent = new HashSet<>();
+
+    @SneakyThrows
+    public static Unit fromString(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixIn(Unit.class, UnitPlatformMixIn.class);
+        return mapper.readValue(json, Unit.class);
+    }
+
+    @SneakyThrows
+    public String toPlatformString() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixIn(this.getClass(), UnitPlatformMixIn.class);
+        return mapper.writeValueAsString(this);
+    }
 
     public String getUnitTypeCode() {
         return unitTypeCode;

@@ -3,6 +3,7 @@ package com.asset.appwork.model;
 import com.asset.appwork.mixin.AssignmentPlatformMixIn;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
@@ -11,6 +12,7 @@ import java.util.Date;
 
 @Entity(name = "Assignment")
 @Table(name = "O9OpenTextEntityIdentityComponentsAssignment")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Assignment {
     @Id
     @Column(name = "Id")
@@ -52,6 +54,13 @@ public class Assignment {
 //    @JsonProperty("person")
     @JsonIgnore
     Person person;
+
+    @SneakyThrows
+    public static Assignment fromString(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixIn(Assignment.class, AssignmentPlatformMixIn.class);
+        return mapper.readValue(json, Assignment.class);
+    }
 
     @SneakyThrows
     public String toString() {

@@ -246,6 +246,14 @@ public class SystemUtil {
         }
     }
 
+    public static Boolean isFieldInJson(String json, String fieldName) {
+        try {
+            return new ObjectMapper().readTree(json).has(fieldName);
+        } catch (JsonProcessingException e) {
+            return false;
+        }
+    }
+
     public static String generateOtdsAPIBaseUrl(Environment env) {
         return String.format("%s://%s:%s/otdsws/rest", env.getProperty("otds.request"), env.getProperty("otds.domain"),
                 env.getProperty("otds.port"));
