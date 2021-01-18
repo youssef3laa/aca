@@ -4,10 +4,6 @@ import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.repository.GroupRepository;
-import com.asset.appwork.repository.PositionRepository;
-import com.asset.appwork.repository.UnitRepository;
-import com.asset.appwork.repository.UserRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.util.SystemUtil;
@@ -15,7 +11,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -29,17 +24,6 @@ public class OrgChartController {
 
     @Autowired
     TokenService tokenService;
-    @Autowired
-    Environment env;
-
-    @Autowired
-    UnitRepository unitRepository;
-    @Autowired
-    GroupRepository groupRepository;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    PositionRepository positionRepository;
 
     @Autowired
     OrgChartService orgChartService;
@@ -811,7 +795,7 @@ public class OrgChartController {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUserDetails(userId).toString()));
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUserByUserId(userId).toString()));
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();

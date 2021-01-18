@@ -16,10 +16,7 @@ import com.asset.appwork.util.ReflectionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 
 public class ModuleRouting {
@@ -227,7 +224,7 @@ public class ModuleRouting {
     }
 
     private Group calculateParent() throws AppworkException {
-            User user = orgChartService.getUserDetails(account.getUsername() + "@aw.aca");
+            User user = orgChartService.getUserByUsername(account.getUsername());
             Optional<Group> userGroup = user.getGroup().stream().findFirst();
             if (userGroup.isPresent()) {
                 return orgChartService.getGroupParent(userGroup.get().getGroupCode());
