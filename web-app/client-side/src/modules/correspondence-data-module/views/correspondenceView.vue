@@ -17,7 +17,6 @@ export default {
 
   methods: {
     // fillForm() {
-
     //   this.$refs.appBuilder.setModelData("historyTable", {
     //     taskTable: {
     //       headers: [
@@ -41,41 +40,239 @@ export default {
   data() {
     return {
       response: [],
-     
-   
-             app: {
-        pages: [
-          {
-            sections: [
 
-              {
-                tabs: [
-                  {
-                    id: 1,
-                    name: 'مذكرة العرض',
-                  },
-                ],
-                forms: [
-                  {
-                    key:"correspondence",
-                    inputs: [
-                      {
-                        type: 'MemoComponent',
-                        name: 'نوع مذكرة العرض',
-
-                        col: 12,
+      
+        app: {
+          pages: [
+            {
+              key: "page1",
+              sections: [
+                {
+                  type: "title",
+                  name: "بيانات المكاتبة",
+                  actions: ["cancel", "complete"],
+                },
+              ],
+            },
+            {
+              key: "page2",
+              tabs: [
+                {
+                  key: "tab1",
+                  id: "1",
+                  isActive: true,
+                  name: "البيانات الأساسية",
+                  icon: "far fa-file-alt",
+                },
+                {
+                  key: "tab2",
+                  id: "2",
+                  name: "الآراء السابقة",
+                  icon: "fas fa-history",
+                },
+                {
+                  key: "tab3",
+                  id: "3",
+                  name: "مذكرة العرض",
+                  icon: "fas fa-print",
+                },
+                {
+                  key: "tab4",
+                  id: "4",
+                  name: "المرفقات",
+                  icon: "fas fa-paperclip",
+                },
+              ],
+              sections: [
+                {
+                  key: "section1",
+                  tabId: "1",
+                  type: "tab",
+                  display: "block",
+                  forms: [
+                    {
+                      key: "form1",
+                      publish: "form1Change",
+                      inputs: [
+                        {
+                          type: "InputComponent",
+                          label: "Step Name",
+                          name: "stepId",
+                          readonly: false,
+                          col: "12",
+                        },
+                        {
+                          type: "AutoCompleteComponent",
+                          name: "receiver",
+                          rule: "required",
+                          readonly: false,
+                          col: "6",
+                        },
+                        {
+                          type: "InputComponent",
+                          label: "requestDate",
+                          name: "requestDate",
+                          readonly: false,
+                          col: "6",
+                        },
+                        {
+                          type: "TextareaComponent",
+                          label: "notes",
+                          name: "notes",
+                          readonly: false,
+                          col: "12",
+                        },
+                      ],
+                      model: {
+                        stepId: "",
+                        receiver: "",
+                        requestDate: "",
+                        notes: "",
                       },
-                      
-                    ],
-                    model: {
-
                     },
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+                  ],
+                },
+                {
+                  key: "section2",
+                  type: "tab",
+                  tabId: "2",
+                  display: "none",
+                  forms: [
+                    {
+                      key: "historyTable",
+                      inputs: [
+                        {
+                          type: "TableComponent",
+                          name: "taskTable",
+                          subscribe: "tasks",
+                          col: 12,
+                        },
+                      ],
+                      model: {
+                        taskTable: {
+                          headers: [
+                            {
+                              text: "الاسم",
+                              align: "start",
+                              filterable: false,
+                              value: "userCN",
+                            },
+                            {
+                              text: "التاريخ",
+                              value: "approvalDate",
+                            },
+                          ],
+                          data: [],
+                          search: "",
+                        },
+                      },
+                    },
+                  ],
+                },
+                {
+                  key: "section3",
+                  type: "tab",
+                  tabId: "3",
+                  display: "none",
+                  forms: [
+                    {
+                      name: "القسم الأول",
+                      inputs: [
+                        {
+                          type: "MemoComponent",
+                          name: "نوع مذكرة العرض",
+                          col: 12,
+                        },
+                      ],
+                      model: {},
+                    },
+                  ],
+                },
+                {
+                  key: "section4",
+                  type: "tab",
+                  tabId: "4",
+                  display: "none",
+                  forms: [
+                    {
+                      resizable: {
+                        forms: [
+                          {
+                            key: "iframeObj",
+                            background: "white",
+                            inputs: [
+                              {
+                                type: "IframeComponent",
+                                name: "iframeObj",
+                                col: 12,
+                              },
+                            ],
+                            model: {
+                              iframeObj: {
+                                src: "",
+                              },
+                            },
+                          },
+                          {
+                            background: "white",
+                            inputs: [
+                              {
+                                type: "InputFileComponent",
+                                name: "inputFile",
+                                col: 12,
+                              },
+                            ],
+                            model: {
+                              inputFile: "",
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              key: "page3",
+              sections: [
+                {
+                  type: "card",
+                  name: "الموافقة على الطلب",
+                  forms: [
+                    {
+                      key: "ApprovalForm",
+                      inputs: [
+                        {
+                          type: "ApprovalComponent",
+                          title: "الرجاء الموافقة على الطلب",
+                          commentLabel: "notes",
+                          name: "approval",
+                          actions: [
+                            {
+                              value: "approve",
+                              label: "الموافقة على الطلب",
+                            },
+                            {
+                              value: "requestModification",
+                              label: "طلب تعديل",
+                            },
+                          ],
+                        },
+                      ],
+                      model: {
+                        approval: {
+                          decision: "",
+                          comment: "",
+                        },
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+
       },
     };
   },

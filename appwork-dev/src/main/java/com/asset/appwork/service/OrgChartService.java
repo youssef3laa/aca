@@ -226,7 +226,7 @@ public class OrgChartService {
     }
 
     public List<Group> getGroupParentsOfLoggedInUser(Account account) throws AppworkException {
-        List<Group> groups = (List<Group>) getUserDetails(account.getUsername() + "@" + env.getProperty("otds.partition")).getGroup();
+        List<Group> groups = (List<Group>) getUserByUserId(account.getUsername() + "@" + env.getProperty("otds.partition")).getGroup();
         List<Group> parentGroups = new ArrayList<>();
         groups.forEach(group -> {
             try {
@@ -330,9 +330,15 @@ public class OrgChartService {
         );
     }
 
-    public User getUserDetails(String userId) throws AppworkException {
+    public User getUserByUserId(String userId) throws AppworkException {
         return userRepository.findByUserId(userId).orElseThrow(
                 () -> new AppworkException("Could not get User of UserId " + userId, ResponseCode.READ_ENTITY_FAILURE)
+        );
+    }
+
+    public User getUserByUsername(String username) throws AppworkException {
+        return userRepository.findByUserId(username + "@" + env.getProperty("otds.partition")).orElseThrow(
+                () -> new AppworkException("Could not get User of username " + username, ResponseCode.READ_ENTITY_FAILURE)
         );
     }
 
@@ -347,7 +353,7 @@ public class OrgChartService {
 
         otds.resetPassword(userId, member.getPasswordResetJsonString(SystemUtil.getJsonByPtrExpr(props, "/password")));
 
-        return getUserDetails(userId);
+        return getUserByUserId(userId);
 
     }
 
@@ -362,7 +368,7 @@ public class OrgChartService {
                 Collections.singletonList(groupCode + "@" + env.getProperty("otds.partition"))
         ));
 
-        User user = getUserDetails(userId);
+        User user = getUserByUserId(userId);
         Position position = getPositionByName(groupCode);
         Assignment assignment = new Assignment();
         assignment.setPrincipal(position.getIsLead());

@@ -5,10 +5,13 @@
             "key": "memoPage",
             "sections": [
                {
-                  "type": "collapse",
-                  "name": "النص",
+                  "isTab": false,
+                  "type": "DefaultSection",
+                  "isCard": true,
                   "forms": [
                      {
+                        "type": "collapse",
+                        "name": "النص",
                         "key": "richtext",
                         "inputs": [
                            {

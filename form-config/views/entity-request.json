@@ -17,6 +17,20 @@
       "col": "4"
     },
     {
+      "type": "InputComponent",
+      "label": "incomingMeans",
+      "name": "incomingMeans",
+      "readonly": false,
+      "col": "4"
+    },
+    {
+      "type": "InputComponent",
+      "label": "workType",
+      "name": "workType",
+      "readonly": false,
+      "col": "4"
+    },
+    {
       "type": "TextareaComponent",
       "label": "subjectSummary",
       "name": "subjectSummary",

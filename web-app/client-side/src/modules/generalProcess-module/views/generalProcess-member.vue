@@ -32,9 +32,14 @@ export default {
                     .then(async (response) => {
                         response = JSON.parse(response.data.data);
 
+                        var workTypeObj = await this.getLookupByCategoryAndKey("workType",response.workType);
+                        var incomingMeansObj = await this.getLookupByCategoryAndKey("incomingMeans",response.incomingMeans);
+
                         this.$refs.appBuilder.setModelData("form1", {
                             stepId: this.inputSchema.stepId,
                             subjectSummary: response.summary,
+                            workType: workTypeObj.arValue,
+                            incomingMeans: incomingMeansObj.arValue,
                             receiver: {
                                 url: this.inputSchema.roleFilter,
                                 list: [],
@@ -47,6 +52,11 @@ export default {
                             this.inputSchema.entityId
                         );
 
+                        this.$refs.appBuilder.setModelData("memoPage", {
+                            memoComp: {
+                                requestId: this.inputSchema.requestId
+                            }
+                        })
                         this.$refs.appBuilder.setModelData("historyTable", {
                             taskTable: {
                                 headers: [
