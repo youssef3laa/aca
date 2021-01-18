@@ -92,7 +92,7 @@ export default {
       let fileId = this.filesUploaded.find(
         (element) => element.name === file.name
       ).id;
-      this.$observable.fire("open-file-brava", fileId);
+      this.$observable.fire("open-memo-file-brava", fileId);
     },
     deleteFile: async function (file) {
       if (file == undefined || file.id == undefined) return;

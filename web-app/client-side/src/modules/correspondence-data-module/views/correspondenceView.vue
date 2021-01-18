@@ -46,16 +46,6 @@ export default {
           pages: [
             {
               key: "page1",
-              sections: [
-                {
-                  type: "title",
-                  name: "بيانات المكاتبة",
-                  actions: ["cancel", "complete"],
-                },
-              ],
-            },
-            {
-              key: "page2",
               tabs: [
                 {
                   key: "tab1",
@@ -86,8 +76,16 @@ export default {
               sections: [
                 {
                   key: "section1",
+                  type: "TitleComponet",
+                  name: "بيانات المكاتبة",
+                  actions: ["cancel", "complete"],
+                },
+                {
+                  key: "section1",
                   tabId: "1",
-                  type: "tab",
+                  "isTab": true,
+                  type: "DefaultSection",
+                  "isCard": true,
                   display: "block",
                   forms: [
                     {
@@ -134,8 +132,10 @@ export default {
                 },
                 {
                   key: "section2",
-                  type: "tab",
                   tabId: "2",
+                  "isTab": true,
+                  type: "DefaultSection",
+                  "isCard": true,
                   display: "none",
                   forms: [
                     {
@@ -171,27 +171,47 @@ export default {
                 },
                 {
                   key: "section3",
-                  type: "tab",
                   tabId: "3",
+                  "isTab": true,
+                  type: "DefaultSection",
+                  "isCard": true,
                   display: "none",
                   forms: [
                     {
+                      key: "memoPage",
                       name: "القسم الأول",
                       inputs: [
                         {
                           type: "MemoComponent",
-                          name: "نوع مذكرة العرض",
+                          name: "memoComp",
+                          label: "memorandumType",
                           col: 12,
                         },
                       ],
-                      model: {},
+                      model: {
+                        memoComp: {
+                          "list": [
+                            {
+                              "value": "1",
+                              "text": "memo1"
+                            },
+                            {
+                              "value": "2",
+                              "text": "memo2"
+                            }
+                          ],
+                          "requestId": ""
+                        }
+                      },
                     },
                   ],
                 },
                 {
                   key: "section4",
-                  type: "tab",
                   tabId: "4",
+                  "isTab": true,
+                  type: "DefaultSection",
+                  "isCard": true,
                   display: "none",
                   forms: [
                     {
@@ -231,13 +251,10 @@ export default {
                     },
                   ],
                 },
-              ],
-            },
-            {
-              key: "page3",
-              sections: [
                 {
-                  type: "card",
+                  key: "section5",
+                  type: "DefaultSection",
+                  "isCard": true,
                   name: "الموافقة على الطلب",
                   forms: [
                     {
@@ -270,7 +287,7 @@ export default {
                   ],
                 },
               ],
-            },
+            }
           ],
 
       },

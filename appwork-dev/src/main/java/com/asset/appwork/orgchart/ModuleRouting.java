@@ -16,7 +16,10 @@ import com.asset.appwork.util.ReflectionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 
 public class ModuleRouting {
@@ -51,7 +54,7 @@ public class ModuleRouting {
         boolean hasAutocomplete;
         String roleFilter, unitFilter, userFilter;
         String page;
-        String condition;
+        String subBP;
         HashMap<String, String> nextStep;
     }
 
@@ -114,6 +117,7 @@ public class ModuleRouting {
         //TODO: Create Setter function in reflection class
         try {
             String nextStep = "";
+            String subBP = "";
 
             RoutingConfig routingConfig = generateRoutingConfig();
 
@@ -175,11 +179,16 @@ public class ModuleRouting {
                 nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(decision[0]);
             }
 
+            // Note: Else cas SubBP is in the Step
+            else if (!routingConfig.getSteps().get(currentStepId[0]).subBP.isEmpty()) {
+                subBP = routingConfig.getSteps().get(currentStepId[0]).subBP;
+            }
+
             else nextStep = breakString;
 
 
             // Note: If there isn't assigned CN
-            if (assignedCN[0].isEmpty()) {
+            if (assignedCN[0].isEmpty() && subBP.isEmpty()) {
                 try {
                     Group parent = calculateParent();
                     ((OutputSchema) outputSchema).setAssignedCN(parent.getCn());
@@ -205,17 +214,17 @@ public class ModuleRouting {
                 if (!routingConfig.getSteps().get(nextStep).getRoleFilter().isEmpty())
                     ((OutputSchema) outputSchema).setRoleFilter(routingConfig.getSteps().get(nextStep).getRoleFilter());
             }
-            else nextStep = breakString;
 
-            if (nextStep.isEmpty()) {
+            if (nextStep.isEmpty() && subBP.isEmpty()) {
                 nextStep = breakString;
             }
 
-            if (!nextStep.equals(breakString)) {
+            if (!nextStep.equals(breakString) && !nextStep.isEmpty()) {
                 String nextPage = routingConfig.getSteps().get(nextStep).getPage();
                 ((OutputSchema) outputSchema).setPage(nextPage);
             }
 
+            ((OutputSchema) outputSchema).setSubBP(subBP);
             ((OutputSchema) outputSchema).setStepId(nextStep);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -224,13 +233,13 @@ public class ModuleRouting {
     }
 
     private Group calculateParent() throws AppworkException {
-            User user = orgChartService.getUserByUsername(account.getUsername());
-            Optional<Group> userGroup = user.getGroup().stream().findFirst();
-            if (userGroup.isPresent()) {
-                return orgChartService.getGroupParent(userGroup.get().getGroupCode());
-            }else {
-                throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
-            }
+        User user = orgChartService.getUserByUsername(account.getUsername());
+        Optional<Group> userGroup = user.getGroup().stream().findFirst();
+        if (userGroup.isPresent()) {
+            return orgChartService.getGroupParent(userGroup.get().getGroupCode());
+        }else {
+            throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
+        }
     }
 
     private <T> String calculateFromApprovalHistory(T outputSchema, String parentHistoryId) {

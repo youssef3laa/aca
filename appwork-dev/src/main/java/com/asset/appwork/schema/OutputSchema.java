@@ -8,7 +8,6 @@ public class OutputSchema {
     String process;
     String stepId;
     String assignedCN;
-    String assignedType;
     Boolean breakProcess;
     String subBP;
     String decision;
@@ -21,14 +20,6 @@ public class OutputSchema {
     String parentHistoryId;
     String roleFilter;
 
-    public String getAssignedType() {
-        if(removeNull(this.assignedCN).contains("cn=organizational users")){
-            return "user";
-        }else{
-            return "role";
-        }
-    }
-
     public void setStepId(String stepId){
         this.breakProcess = stepId.equals("end");
         this.stepId = stepId;
@@ -36,7 +27,6 @@ public class OutputSchema {
 
     public String getXML(){
         return  "<assignedCN>"+removeNull(this.assignedCN)+"</assignedCN>\n"+
-                "<assignedType>"+this.getAssignedType()+"</assignedType>\n"+
                 "<stepId>"+removeNull(this.stepId)+"</stepId>\n"+
                 "<process>"+removeNull(this.process)+"</process>\n"+
                 "<subBP>"+removeNull(this.subBP)+"</subBP>"+
