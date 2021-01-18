@@ -182,6 +182,24 @@ public class Entity {
         return http.getResponse();
     }
 
+    public <T> Long createAddChildRelation(Long parentId, String childName, Long childId, String relationName, T data) throws AppworkException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("X-Requested-With", "XMLHttpRequest")
+                .setHeader("SAMLart", this.account.getSAMLart())
+                .setData("{" +
+                        "  \"Properties\": " +
+                        data.toString() +
+                        "}")
+                .post(this.apiBaseUrl + String.format(API.CHILD_ONE_RELATION.getUrl(),
+                        this.entityName, parentId.toString(), childName, childId.toString(), relationName));
+        String response = http.getResponse();
+        try {
+            return Long.parseLong(SystemUtil.getJsonByPtrExpr(response, "/Identity/Id"));
+        } catch (NumberFormatException e) {
+            throw new AppworkException(SystemUtil.getJsonByPtrExpr(response, "/message"), ResponseCode.CREATE_ENTITY_FAILURE);
+        }
+    }
+
     private enum API {
         ADD("/entities/%s"),
         ITEM("/entities/%s/items/%s"),
@@ -191,7 +209,8 @@ public class Entity {
         READ_CHILD_ITEMS("/entities/%s/items/%s/childEntities/%s"),
         LIST_CHILD("/entities/%s/childEntities/%s/lists/%s"),
         ONE_RELATION("/entities/%s/items/%s/relationships/%s"),
-        MANY_RELATION("/entities/%s/items/%s/relationships/%s/targets/%s");
+        MANY_RELATION("/entities/%s/items/%s/relationships/%s/targets/%s"),
+        CHILD_ONE_RELATION("/entities/%s/items/%s/childEntities/%s/items/%s/relationships/%s");
 
         private final String url;
 

@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface PositionRepository extends GenericRepository<Position, Long> {
     Optional<Position> findById(Long id);
 
-    List<Position>  findAll();
+    Optional<Position> findByName(String name);
+
+    List<Position> findAll();
 }

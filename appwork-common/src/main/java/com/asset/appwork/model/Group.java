@@ -1,6 +1,9 @@
 package com.asset.appwork.model;
 
+import com.asset.appwork.mixin.GroupPlatformMixIn;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 
 import javax.persistence.*;
 
@@ -23,6 +26,20 @@ public class Group extends BaseIdentity<Group> {
     @Transient
     String cn;
 
+    @SneakyThrows
+    public static Group fromString(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixIn(Group.class, GroupPlatformMixIn.class);
+        return mapper.readValue(json, Group.class);
+    }
+
+    @SneakyThrows
+    public String toPlatformString() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixIn(this.getClass(), GroupPlatformMixIn.class);
+        return mapper.writeValueAsString(this);
+    }
+
     public String getGroupCode() {
         return groupCode;
     }
@@ -31,19 +48,19 @@ public class Group extends BaseIdentity<Group> {
         this.groupCode = groupCode;
     }
 
-    public Boolean getHeadRole() {
+    public Boolean getIsHeadRole() {
         return isHeadRole;
     }
 
-    public void setHeadRole(Boolean headRole) {
+    public void setIsHeadRole(Boolean headRole) {
         isHeadRole = headRole;
     }
 
-    public Boolean getViceRole() {
+    public Boolean getIsViceRole() {
         return isViceRole;
     }
 
-    public void setViceRole(Boolean viceRole) {
+    public void setIsViceRole(Boolean viceRole) {
         isViceRole = viceRole;
     }
 

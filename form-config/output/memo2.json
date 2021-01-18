@@ -1,3 +1,6 @@
+
+
+
 {
    "app": {
       "pages": [
@@ -5,10 +8,12 @@
             "key": "memoPage",
             "sections": [
                {
-                  "type": "collapse",
-                  "name": "النص الأول",
+                  "isTab": false,
+                  "type": "DefaultSection",
+                  "isCard": true,
                   "forms": [
-                     {
+                     {  "type": "collapse",
+                        "name": "النص الأول",
                         "key": "richtext1",
                         "inputs": [
                            {
@@ -20,14 +25,10 @@
                         "model": {
                            "richtext1": "<p></p>"
                         }
-                     }
-                  ]
-               },
-               {
-                  "type": "collapse",
-                  "name": "النص الثاني",
-                  "forms": [
-                     {
+                     },
+                     {  
+                        "type": "collapse",
+                        "name": "النص الثاني",
                         "key": "richtext2",
                         "inputs": [
                            {
@@ -40,8 +41,10 @@
                            "richtext2": "<p></p>"
                         }
                      }
+                     
                   ]
                }
+
             ]
          }
       ]

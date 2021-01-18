@@ -1,14 +1,19 @@
 package com.asset.appwork.model;
 
+import com.asset.appwork.mixin.PositionPlatformMixIn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
 import javax.persistence.*;
+import java.util.Collection;
+import java.util.Optional;
 
 @Entity(name = "Position")
 @Table(name = "O9OpenTextEntityIdentityComponentsPosition")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Position {
     @Id
     @Column(name = "Id1")
@@ -29,9 +34,28 @@ public class Position {
     @JsonIgnore
     Unit unit;
 
+    @OneToMany(mappedBy = "position", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JsonProperty("assignments")
+//    @JsonIgnore
+    Collection<Assignment> assignment;
+
+    @SneakyThrows
+    public static Position fromString(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixIn(Position.class, PositionPlatformMixIn.class);
+        return mapper.readValue(json, Position.class);
+    }
+
     @SneakyThrows
     public String toString() {
         return new ObjectMapper().writeValueAsString(this);
+    }
+
+    @SneakyThrows
+    public String toPlatformString() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixIn(this.getClass(), PositionPlatformMixIn.class);
+        return mapper.writeValueAsString(this);
     }
 
     public Long getId() {
@@ -51,18 +75,18 @@ public class Position {
     }
 
     public String getDescription() {
-        return description;
+        return Optional.ofNullable(description).orElse("");
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public Boolean getLead() {
+    public Boolean getIsLead() {
         return isLead;
     }
 
-    public void setLead(Boolean isLead) {
+    public void setIsLead(Boolean isLead) {
         this.isLead = isLead;
     }
 

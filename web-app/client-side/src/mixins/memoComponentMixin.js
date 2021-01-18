@@ -32,11 +32,11 @@ export default {
                 console.log(error);
             }
         },
-        async getMemoData(memo) {
+        async getMemoData(jsonId,requestId) {
 
             try {
-                var response = await http.get("memorandum/get/" + memo);
-                console.log(response.data);
+                var response = await http.get("memorandum/get/" + jsonId + "/" + requestId);
+                console.log("getMemoResponse",response.data);
                 return response.data.data;
             }
             catch (error) {

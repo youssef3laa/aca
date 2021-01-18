@@ -1,11 +1,10 @@
 {
-    "processName": "process-1",
+    "processName": "generalProcess",
     "steps": {
         "init": {
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HGCS,HRCA,HCAO",
-            "page": "init-process",
-            "condition": "condition",
+            "page": "generalProcess-init",
             "nextStep": {
                 "HRCA": "stepRG",
                 "HGCS": "stepRQ",
@@ -15,8 +14,7 @@
         "stepRG": {
             "hasAutocomplete": false,
             "roleFilter": "org/group/findByCodes/HGCS",
-            "page": "process-step-early",
-            "condition": "condition",
+            "page": "generalProcess-early",
             "nextStep": {
                 "approve": "stepRQ"
             }
@@ -24,8 +22,7 @@
         "stepRQ": {
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HCAO",
-            "page": "process-step-early",
-            "condition": "condition",
+            "page": "generalProcess-early",
             "nextStep": {
                 "approve": "stepRE"
             }
@@ -33,8 +30,7 @@
         "stepRE": {
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HCAG,MCAG",
-            "page": "process-step-RE",
-            "condition": "condition",
+            "page": "generalProcess-early",
             "nextStep": {
                 "HCAG": "stepRM",
                 "MCAG": "stepMM"
@@ -43,39 +39,49 @@
         "stepRM": {
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/MCAG",
-            "page": "process-step-RE",
-            "condition": "condition",
+            "page": "generalProcess-early",
             "nextStep": {
                 "MCAG": "stepMM"
             }
         },
         "stepMM": {
             "hasAutocomplete": true,
-            "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
-            "page": "process-step-member",
-            "condition": "condition",
+            "roleFilter": "org/group/up",
+            "page": "generalProcess-member",
             "nextStep": {
                 "approve": "stepApprovals"
             }
         },
         "stepApprovals": {
             "hasAutocomplete": true,
-            "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
-            "page": "process-step-approvals",
-            "condition": "condition",
+            "roleFilter": "org/group/up",
+            "page": "generalProcess-approvals",
             "nextStep": {
-                "HIROLE": "stepAD",
-                "approve": "stepApprovals",
-                "LOROLE": "stepMM"
+                "approve": "stepApprovals2"
+            }
+        },
+        "stepApprovals2": {
+            "hasAutocomplete": true,
+            "roleFilter": "org/group/up",
+            "page": "generalProcess-approvals",
+            "nextStep": {
+                "approve": "stepApprovals3"
+            }
+        },
+        "stepApprovals3": {
+            "hasAutocomplete": true,
+            "roleFilter": "org/group/findByCodes/HCOC",
+            "page": "generalProcess-approvals",
+            "nextStep": {
+                "approve": "stepAD"
             }
         },
         "stepAD": {
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
-            "page": "process-step-late",
-            "condition": "condition",
+            "page": "generalProcess-approvals",
             "nextStep": {
-                "approve": "stepMM"
+                "approve": "end"
             }
         }
     }

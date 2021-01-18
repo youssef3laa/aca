@@ -85,7 +85,7 @@
                 drawer: false,
                 items: [
                     {title: 'Home', icon: 'dashboard', action: this.home},
-                    {title: 'Initiate Process', icon: 'dashboard', action: this.process},
+                    {title: 'Initiate General Process', icon: 'dashboard', action: this.process},
                     {title: 'About', icon: 'question_answer', action: this.about},
                     {title: 'Logout', icon: 'question_answer', action: this.logout},
                 ],
@@ -94,32 +94,23 @@
         methods: {
             home() {
                 // router.push('home')
-                router.replace({name: 'HomePage'}).catch(function () {
-                    router.go()
+                router.push({name: 'HomePage' }).catch(function(){
+                  router.go()
                 })
-                // router.push({name: 'HomePage' }).catch(function(){
-                //   router.go()
-                // })
             },
             process() {
                 // router.push('demo')
-                router.replace({name: 'initiation-step'}).catch(function () {
+                router.push({name: 'generalProcess-init'}).catch(function () {
                     router.go()
                 })
-                // router.push({name: 'initiation-step'}).catch(function () {
-                //     router.go()
-                // })
             },
             about() {
             },
             logout() {
                 localStorage.removeItem('user')
-                router.replace({name: 'LoginView'}).catch(function () {
+                router.push({name: 'LoginView'}).catch(function () {
                     router.go()
                 })
-                // router.push({name: 'LoginView'}).catch(function () {
-                //     router.go()
-                // })
             },
         },
     }

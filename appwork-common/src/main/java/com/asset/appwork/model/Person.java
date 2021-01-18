@@ -15,6 +15,8 @@ public class Person {
     @Id
     @Column(name = "Id")
     long id;
+    @Column(name = "User_ID")
+    String userId;
     @Column(name = "title")
     String title;
     @Column(name = "FirstName")
@@ -43,6 +45,14 @@ public class Person {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getTitle() {

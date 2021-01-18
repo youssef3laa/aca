@@ -8,10 +8,9 @@
 import formPageMixin from "../../../mixins/formPageMixin";
 import AppBuilder from "../../application-builder-module/builders/app-builder";
 import historyMixin from "@/modules/history-module/mixin/historyMixin";
-import Http from "@/modules/core-module/services/http";
 
 export default {
-  name: "process-step-MM",
+  name: "generalProcess-member",
   mixins: [formPageMixin, historyMixin],
   components: {
     AppBuilder,
@@ -23,7 +22,7 @@ export default {
       this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
                 //   let page = this.inputSchema.page;
 
-                this.loadForm("process-stepMember", this.fillForm);
+                this.loadForm("generalProcess-member", this.fillForm);
             },
             fillForm: async function () {
                 this.$refs.appBuilder.disableSection("section1")
@@ -33,21 +32,31 @@ export default {
                     .then(async (response) => {
                         response = JSON.parse(response.data.data);
 
+                        var workTypeObj = await this.getLookupByCategoryAndKey("workType",response.workType);
+                        var incomingMeansObj = await this.getLookupByCategoryAndKey("incomingMeans",response.incomingMeans);
+
                         this.$refs.appBuilder.setModelData("form1", {
                             stepId: this.inputSchema.stepId,
-                            notes: response.notes,
+                            subjectSummary: response.summary,
+                            workType: workTypeObj.arValue,
+                            incomingMeans: incomingMeansObj.arValue,
                             receiver: {
                                 url: this.inputSchema.roleFilter,
                                 list: [],
                                 value: ""
                             },
-                            requestDate: response.requestDate.split("Z")[0],
+                            writingDate: response.writingDate.split("Z")[0],
                         });
                         this.approvalsHistoryResponse = await this.getHistoryByProcessNameAndEntityId(
                             this.inputSchema.process,
                             this.inputSchema.entityId
                         );
 
+                        this.$refs.appBuilder.setModelData("memoPage", {
+                            memoComp: {
+                                requestId: this.inputSchema.requestId
+                            }
+                        })
                         this.$refs.appBuilder.setModelData("historyTable", {
                             taskTable: {
                                 headers: [
@@ -82,7 +91,7 @@ export default {
             this.taskId = this.$route.params.taskId;
             this.claimTask(this.taskId);
             this.getTaskData(this.taskId);
-
+            this.initiateBrava();
             this.$observable.subscribe("complete-step", () => {
                 console.log("complete-step-clicked");
                 console.log(this.$refs.appBuilder);
@@ -99,35 +108,13 @@ export default {
                     process: this.inputSchema.process,
                     parentHistoryId: this.inputSchema.parentHistoryId,
 
-                    code: approvalModel.approval.decision,
-                    // assignedCN: model.receiver.value.value,
+                    code: model.receiver.value.code,
+                    assignedCN: model.receiver.value.value,
                     decision: approvalModel.approval.decision,
                     comment: approvalModel.approval.comment,
                 };
                 this.completeStep(data);
                 // }
-            });
-            this.$observable.subscribe('open-file-brava', async (fileId) => {
-                this.$observable.fire('file-component-skeleton', true)
-
-                console.log(fileId);
-                let userToken;
-                try {
-                  userToken = await Http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
-                    "userName": "admin",
-                    "password": "Asset99a",
-                    "ticketType": "OTDSTICKET"
-                  });
-                  this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
-                      'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
-                  console.log(userToken);
-                   // this.$observable.fire('file-component-skeleton', false)
-
-                } catch (e) {
-                    console.log(e);
-                }
-
-
             });
 
         },
