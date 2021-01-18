@@ -42,7 +42,7 @@ public class DocumentsController {
     @PostMapping("/upload")
     public ResponseEntity<AppResponse<JsonNode>> uploadFile(@RequestHeader("X-Auth-Token") String token,
                                                             @RequestParam("file") MultipartFile[] files,
-                                                            @RequestParam("parentId") String parentId) {
+                                                            @RequestParam("parentId") Long parentId) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayNode jsonNodes = objectMapper.createArrayNode();
@@ -84,7 +84,7 @@ public class DocumentsController {
 
     @GetMapping("/list/{parentId}")
     public ResponseEntity<AppResponse<JsonNode>> listSubNodes(@RequestHeader("X-Auth-Token") String token,
-                                                              @PathVariable("parentId") String parentId,
+                                                              @PathVariable("parentId") Long parentId,
                                                               AppworkCSOperations.DocumentQuery documentQuery) {
 
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
@@ -98,18 +98,23 @@ public class DocumentsController {
             e.printStackTrace();
             ObjectNode obj = new ObjectNode(JsonNodeFactory.instance);
             obj.put("error", e.getMessage());
-            obj.put("statusCode", ResponseCode.INTERNAL_SERVER_ERROR.getCode());
+            obj.put("statusCode", e.getCode().getCode());
             respBuilder.data(obj);
             respBuilder.status(e.getCode());
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException | IllegalAccessException e) {
             e.printStackTrace();
+            ObjectNode obj = new ObjectNode(JsonNodeFactory.instance);
+            obj.put("error", e.getMessage());
+            obj.put("statusCode", ResponseCode.INTERNAL_SERVER_ERROR.getCode());
+            respBuilder.data(obj);
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
         return respBuilder.build().getResponseEntity();
     }
 
     @DeleteMapping("delete/{nodeId}")
     public ResponseEntity<AppResponse<JsonNode>> deleteNode(@RequestHeader("X-Auth-Token") String token,
-                                                            @PathVariable("nodeId") String nodeId) {
+                                                            @PathVariable("nodeId") Long nodeId) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
@@ -280,4 +285,58 @@ public class DocumentsController {
         }
         return respBuilder.build().getResponseEntity();
     }
+
+
+    //versions management
+
+    @SuppressWarnings("DuplicatedCode")
+    @GetMapping("/version/list/{nodeId}")
+    public ResponseEntity<AppResponse<JsonNode>> listNodeVersions(@RequestHeader("X-Auth-Token") String token,
+                                                                  @PathVariable("nodeId") Long nodeId,
+                                                                  AppworkCSOperations.DocumentQuery documentQuery) {
+
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
+            AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
+            Http http = appworkCSOperations.getNodeVersions(nodeId, documentQuery);
+            respBuilder.status(SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+            respBuilder.data(SystemUtil.convertStringToJsonNode(http.getResponse()));
+        } catch (AppworkException | IllegalAccessException | JsonProcessingException e) {
+            e.printStackTrace();
+            ObjectNode obj = new ObjectNode(JsonNodeFactory.instance);
+            obj.put("error", e.getMessage());
+            obj.put("statusCode", ResponseCode.INTERNAL_SERVER_ERROR.getCode());
+            respBuilder.data(obj);
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @GetMapping("/version/{nodeId}/{versionId}")
+    public ResponseEntity<AppResponse<JsonNode>> getSpecificNodeVersion(@RequestHeader("X-Auth-Token") String token,
+                                                                        @PathVariable("nodeId") Long nodeId,
+                                                                        @PathVariable("versionId") Integer versionId,
+                                                                        AppworkCSOperations.DocumentQuery documentQuery) {
+
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
+            AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
+            Http http = appworkCSOperations.getSpecifiedNodeVersion(nodeId, versionId, documentQuery);
+            respBuilder.status(SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+            respBuilder.data(SystemUtil.convertStringToJsonNode(http.getResponse()));
+        } catch (AppworkException | IllegalAccessException | JsonProcessingException e) {
+            e.printStackTrace();
+            ObjectNode obj = new ObjectNode(JsonNodeFactory.instance);
+            obj.put("error", e.getMessage());
+            obj.put("statusCode", ResponseCode.INTERNAL_SERVER_ERROR.getCode());
+            respBuilder.data(obj);
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
 }

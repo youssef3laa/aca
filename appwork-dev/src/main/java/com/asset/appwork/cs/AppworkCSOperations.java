@@ -12,6 +12,7 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -32,8 +33,8 @@ public class AppworkCSOperations {
         this.password = "Asset99a";
     }
 
-    //upload, versioning, search, download, brava, viewing, delete, rename, creation folder
-    public Http getNodeDetails(String nodeId) throws AppworkException {
+    //document management
+    public Http getNodeDetails(Long nodeId) throws AppworkException {
         String urlStr = CS_API.NODE_ACTION.getApiURL() + "/" +
                 nodeId;
         Http http = new Http().setDoAuthentication(true)
@@ -45,7 +46,7 @@ public class AppworkCSOperations {
         return http;
     }
 
-    public Http deleteNode(String nodeId) throws AppworkException {
+    public Http deleteNode(Long nodeId) throws AppworkException {
         String urlStr = CS_API.NODE_ACTION.getApiURL() + "/" +
                 nodeId;
         Http http = new Http().setDoAuthentication(true)
@@ -57,13 +58,13 @@ public class AppworkCSOperations {
         return http;
     }
 
-    public Http uploadDocument(byte[] file, String parentId, String fileName, String type) throws AppworkException {
+    public Http uploadDocument(byte[] file, Long parentId, String fileName, String type) throws AppworkException {
         String urlStr = CS_API.NODE_ACTION.getApiURL();
         Part[] parts =
                 {
                         new FilePart("file", new ByteArrayPartSource(fileName, file)),
                         new StringPart("name", fileName),
-                        new StringPart("parent_id", parentId),
+                        new StringPart("parent_id", String.valueOf(parentId)),
                         new StringPart("type", type)
                 };
 
@@ -78,15 +79,12 @@ public class AppworkCSOperations {
         return http;
     }
 
-
-    public Http getSubNodes(String parentId, DocumentQuery documentQuery) throws AppworkException {
+    public Http getSubNodes(Long parentId, DocumentQuery documentQuery) throws AppworkException, IllegalAccessException {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(CS_API.GET_SUB_NODES.getApiURL());
-        uriComponentsBuilder.queryParamIfPresent("where_type", Optional.ofNullable(documentQuery.getWhereType()));
-        uriComponentsBuilder.queryParamIfPresent("sort", Optional.ofNullable(documentQuery.getSort()));
-        uriComponentsBuilder.queryParamIfPresent("fields", Optional.ofNullable(documentQuery.getFields()));
+        fillURIComponentWithQuery(uriComponentsBuilder, documentQuery);
 
         Map<String, String> pathVariables = new HashMap<>();
-        pathVariables.put("id", parentId);
+        pathVariables.put("id", String.valueOf(parentId));
         Http http = new Http().setDoAuthentication(true)
                 .basicAuthentication(this.userName, this.password)
                 .setContentType(Http.ContentType.JSON_REQUEST)
@@ -97,9 +95,54 @@ public class AppworkCSOperations {
         return http;
     }
 
+    //versioning
+    public Http getNodeVersions(Long nodeId, DocumentQuery documentQuery) throws IllegalAccessException {
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(CS_API.GET_NODES_VERSIONS.getApiURL());
+        Class<DocumentQuery> cls = DocumentQuery.class;
+        Field[] fields = cls.getDeclaredFields();
+        String fieldName;
+        for (Field field : fields) {
+            fieldName = field.getName();
+            JsonProperty[] jsonProperties = field.getAnnotationsByType(JsonProperty.class);
+            if (jsonProperties.length > 0) fieldName = jsonProperties[0].value();
+
+            uriComponentsBuilder.queryParamIfPresent(fieldName, Optional.ofNullable(field.get(documentQuery)));
+        }
+        System.out.println(uriComponentsBuilder);
+        Map<String, Long> pathVariables = new HashMap<>();
+        pathVariables.put("id", nodeId);
+        return new Http().setDoAuthentication(true)
+                .basicAuthentication(this.userName, this.password)
+                .setContentType(Http.ContentType.JSON_REQUEST)
+                .get(uriComponentsBuilder.encode().buildAndExpand(pathVariables).toString());
+    }
+
+    public Http getSpecifiedNodeVersion(Long nodeId, Integer versionId, DocumentQuery documentQuery) throws IllegalAccessException {
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(CS_API.GET_SPECIFIED_NODE_VERSION.getApiURL());
+        fillURIComponentWithQuery(uriComponentsBuilder, documentQuery);
+        Map<String, Object> pathVariables = new HashMap<>();
+        pathVariables.put("id", nodeId);
+        pathVariables.put("version_number", versionId);
+        return new Http().setDoAuthentication(true)
+                .basicAuthentication(this.userName, this.password)
+                .setContentType(Http.ContentType.JSON_REQUEST)
+                .get(uriComponentsBuilder.encode().buildAndExpand(pathVariables).toString());
+    }
+
+    public void fillURIComponentWithQuery(UriComponentsBuilder uriComponentsBuilder, DocumentQuery documentQuery) throws IllegalAccessException {
+        Class<DocumentQuery> cls = DocumentQuery.class;
+        Field[] fields = cls.getDeclaredFields();
+        String fieldName;
+        for (Field field : fields) {
+            fieldName = field.getName();
+            JsonProperty[] jsonProperties = field.getAnnotationsByType(JsonProperty.class);
+            if (jsonProperties.length > 0) fieldName = jsonProperties[0].value();
+            uriComponentsBuilder.queryParamIfPresent(fieldName, Optional.ofNullable(field.get(documentQuery)));
+        }
+    }
 
     public enum CS_API {
-        //APIs URL
+        //APIs source URL
         //https://appworksdeveloper.opentext.com/webaccess/#url=%2Fawd%2Fresources%2Fapis%2Fcs-rest-api-for-cs-16-s%23!%2Fnodes&tab=501
 
         //api/v2/nodes/{id}
@@ -109,7 +152,12 @@ public class AppworkCSOperations {
          * */
         NODE_ACTION(),
         //{{baseUrl}}/v2/nodes/:id/nodes
-        GET_SUB_NODES("{id}/nodes");
+        GET_SUB_NODES("{id}/nodes"),
+        //{{baseUrl}}/v2/nodes/:id/versions
+        GET_NODES_VERSIONS("{id}/versions"),
+        //{{baseUrl}}/v2/nodes/:id/versions
+        GET_SPECIFIED_NODE_VERSION("{id}/versions/{version_number}");
+
 
         private final String apiURL;
 
@@ -134,6 +182,10 @@ public class AppworkCSOperations {
 
         String sort;
         String fields;
+        String page;
+        String limit;
+        String order;
+        String expand;
 
     }
 
