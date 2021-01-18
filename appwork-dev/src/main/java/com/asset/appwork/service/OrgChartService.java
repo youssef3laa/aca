@@ -72,7 +72,7 @@ public class OrgChartService {
     }
 
     public List<Unit> getAllUnits() {
-        return unitRepository.findAll();
+        return unitRepository.findAllByUnitCodeNotNull();
     }
 
     public void addSubUnitToUnit(Account account, Long id, Long subUnitId) {
@@ -253,7 +253,7 @@ public class OrgChartService {
     }
 
     public List<Group> getAllGroups() {
-        return groupRepository.findAll();
+        return groupRepository.findAllByGroupCodeNotNull();
     }
 
     public List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode) {

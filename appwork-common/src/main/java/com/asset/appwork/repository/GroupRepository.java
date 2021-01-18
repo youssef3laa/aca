@@ -24,7 +24,7 @@ public interface GroupRepository extends GenericRepository<Group, Long> {
 
     List<Group> findByUnitIn(Set<Unit> units);
 
-    List<Group> findAll();
+    List<Group> findAllByGroupCodeNotNull();
 
     @Query(value = "{call ACA_ORG_SP_getGroupChildrenRecursivelyFilteredByUnitTypeCode(:groupCode, :unitTypeCode)}", nativeQuery = true)
     List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(@Param("groupCode") String groupCode,

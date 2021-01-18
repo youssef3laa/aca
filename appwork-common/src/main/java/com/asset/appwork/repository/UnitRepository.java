@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface UnitRepository extends GenericRepository<Unit, Long> {
     Optional<Unit> findById(Long id);
 
-    List<Unit> findAll();
+    List<Unit> findAllByUnitCodeNotNull();
 
     Optional<Unit> findByNameAndUnitCodeNotNull(String name);
 
