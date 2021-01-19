@@ -3,16 +3,23 @@
     <v-container>
       <v-row>
         <v-col :cols="12">
+          <v-icon @click="scroll(-300)" class="left-arrow">
+            mdi-arrow-left</v-icon
+          >
+          <v-icon @click="scroll(300)" class="right-arrow">
+            mdi-arrow-right</v-icon
+          >
           <draggable
+            ref="content"
+            id="content"
             :animation="150"
             :list="filesUploaded"
             :swapThreshold="0.5"
-            class="row vertical-scroll"
+            class="row horizontal-scroll"
             tag="div"
             @change="onChange"
             @end="onEnd($event)"
           >
-          
             <div
               v-for="(file, index) in filesUploaded"
               :key="index"
@@ -58,7 +65,7 @@ export default {
   components: { draggable },
 
   name: "file-input-component",
-  props: ["val", "field","bwsId","requestEntityId"],
+  props: ["val", "field", "bwsId", "requestEntityId"],
   data() {
     return {
       // bwsId: "",
@@ -74,6 +81,31 @@ export default {
     console.log(this.bwsId);
   },
   methods: {
+    scroll(scrollPixels) {
+      const content = this.$refs.content.clientWidth;
+      // content.scrollLeft -=300;
+      console.log(content);
+      const element = document.getElementById("content");
+
+      // element.animate({scrollLeft: '=-300'},1000);
+       var scroll = scrollPixels/10; 
+       var scrolled = 0;
+     const interval=  setInterval(() => {
+        element.scrollLeft += scroll;
+        scrolled += scroll;
+       if(scrolled ==scrollPixels){
+         clearInterval(interval);
+
+       }
+      }, 20);
+    },
+    scrollRight() {
+      const content = this.$refs.content;
+      // content.scrollLeft -=300;
+      console.log(content);
+      const element = document.getElementById("content");
+      element.scrollLeft += 300;
+    },
     onChange: function (evt) {
       console.log("onChange", evt);
     },
@@ -252,9 +284,30 @@ $font-12: 12px;
   font-size: 35px !important;
   padding-top: 8px;
 }
-.vertical-scroll{
-  flex-wrap: unset !important;
+.horizontal-scroll {
+  flex-wrap: nowrap !important;
   overflow-y: hidden;
-  overflow-x: scroll ;
+  overflow-x: hidden;
+}
+// .left-arrow {
+//   position: absolute;
+//   vertical-align: middle;
+//   left: 0;
+// }
+.right-arrow {
+  position: absolute !important;
+  right: 0;
+  top: 50%;
+  margin-left: auto;
+  margin-right: 1%;
+  text-align: center;
+}
+.left-arrow {
+  position: absolute !important;
+  left: 0;
+  top: 50%;
+  margin-left: 1%;
+  margin-right: auto;
+  text-align: center;
 }
 </style>

@@ -33,7 +33,7 @@ import IframeComponent from "./iframe-component.vue";
 import { Splitpanes, Pane } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 // import InputFileComponent from "./input-file-component"
-import AttachmentComponent from "./attachment-component";
+import AttachmentComponent from "./attachment-horizontal-component";
 import http from "../../core-module/services/http";
 export default {
   props: ["bwsId", "requestEntityId"],
