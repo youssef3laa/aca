@@ -47,10 +47,6 @@ export default {
                             },
                             writingDate: response.writingDate.split("Z")[0],
                         });
-                        this.approvalsHistoryResponse = await this.getHistoryByProcessNameAndEntityId(
-                            this.inputSchema.process,
-                            this.inputSchema.entityId
-                        );
 
                         this.$refs.appBuilder.setModelData("memoPage", {
                             memoComp: {
@@ -58,26 +54,7 @@ export default {
                             }
                         })
                         this.$refs.appBuilder.setModelData("historyTable", {
-                            taskTable: {
-                                headers: [
-                                    {
-                                        text: "القرار",
-                                        align: "start",
-                                        value: "decision",
-                                    },
-                                    {
-                                        text: "الاسم",
-                                        align: "start",
-                                        value: "userCN",
-                                    },
-                                    {
-                                        text: "التاريخ",
-                                        value: "approvalDate",
-                                    },
-                                ],
-                                data: this.approvalsHistoryResponse,
-                                search: "",
-                            },
+                            taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
                         });
 
                         console.log("response", response);
@@ -93,6 +70,7 @@ export default {
             this.getTaskData(this.taskId);
             this.initiateBrava();
             this.$observable.subscribe("complete-step", () => {
+                if(!this.$refs.appBuilder) return;
                 console.log("complete-step-clicked");
                 console.log(this.$refs.appBuilder);
                 // var model =

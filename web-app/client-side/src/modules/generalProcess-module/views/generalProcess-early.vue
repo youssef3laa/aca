@@ -46,32 +46,9 @@ export default {
               },
               writingDate: response.writingDate.split("Z")[0],
             });
-            this.approvalsHistoryResponse = await this.getHistoryByProcessNameAndEntityId(
-                this.inputSchema.process,
-                this.inputSchema.entityId
-            );
-            console.log(this.approvalsHistoryResponse);
+
             this.$refs.appBuilder.setModelData("historyTable", {
-              taskTable: {
-                headers: [
-                  {
-                    text: "القرار",
-                    align: "start",
-                    value: "decision",
-                  },
-                  {
-                    text: "الاسم",
-                    align: "start",
-                    value: "userCN",
-                  },
-                  {
-                    text: "التاريخ",
-                    value: "approvalDate",
-                  },
-                ],
-                data: this.approvalsHistoryResponse,
-                search: "",
-              },
+              taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
             });
 
             console.log("response", response);
@@ -88,6 +65,7 @@ export default {
     this.initiateBrava();
 
     this.$observable.subscribe("complete-step", () => {
+      if(!this.$refs.appBuilder) return;
       let model = this.$refs.appBuilder.getModelData("form1");
       // if (!model._valid){
       //   //@TODO show warning
