@@ -1,18 +1,23 @@
 <template>
   <div>
-    <splitpanes class="default-theme"  dir="ltr">
+    <splitpanes class="default-theme" dir="ltr">
       <pane>
-        <ShowAttachmentComponent  :key="d.requestId" :bwsId="bwsId" :requestEntityId="d.requestId"> </ShowAttachmentComponent>
+        <ShowAttachmentComponent
+          :key="d.requestId"
+          :bwsId="bwsId"
+          :requestEntityId="d.requestId"
+        >
+        </ShowAttachmentComponent>
       </pane>
       <pane class="bg-white" dir="rtl">
         <v-container>
           <AutocompleteComponent
-            :field="{name: field.label}"
-            :val="{list: d.list}"
+            :field="{ name: field.label }"
+            :val="{  list :{},url: url }"
             @update="changeVal"
           >
           </AutocompleteComponent>
-          <AppBuilder ref="appBuilder" :app="app" />
+          <AppBuilder style="overflow: hidden" ref="appBuilder" :app="app" />
         </v-container>
       </pane>
     </splitpanes>
@@ -40,65 +45,11 @@ export default {
   data() {
     return {
       d: this.val,
+      url:'lookup/get/category/memoType',
       selected: "",
       richText: {},
       Memodata: [],
-      bwsId : 680482,
-      // requestEntityId : "",
-      // app1: {
-      //   pages: [
-      //     {
-      //       key: "memoPage",
-      //       sections: [
-      //         {
-      //           forms: [
-      //             {
-      //               key: "form1",
-      //               resizable: {
-      //                 forms: [
-      //                   {
-      //                     type: "collapse",
-      //                     name: "المرفقات",
-      //                     key: "attachments",
-      //                     inputs: [
-      //                       {
-      //                         type: "ShowAttachmentComponent",
-      //                         name: "showattachment",
-      //                         col: 12,
-      //                       },
-      //                     ],
-      //                     model: {},
-      //                   },
-      //                   {
-      //                     type: "collapse",
-      //                     name: "النص الثاني",
-      //                     key: "richtext2",
-      //                     inputs: [
-      //                       {
-      //                         type: "richtextComponent",
-      //                         name: "richtext1",
-      //                         col: 12,
-      //                       },
-      //                       {
-      //                         type: "richtextComponent",
-      //                         name: "richtext2",
-      //                         col: 12,
-      //                       },
-      //                     ],
-      //                     model: {
-      //                       richtext1: "<p></p>",
-      //                       richtext2: "<p></p>",
-      //                     },
-      //                   },
-      //                 ],
-      //               },
-      //             },
-      //           ],
-      //         },
-      //       ],
-      //     },
-      //   ],
-      // },
+      bwsId: 680482,
       app: {},
     };
   },
@@ -106,18 +57,20 @@ export default {
 
   methods: {
     changeVal(event) {
-      if(event.value.value){
-        this.selected = event.value.value.text;
+      if (event.value.value) {
+        this.$refs.appBuilder.setAppData({pages:[{sections:[{forms:[]}]}]});
+        console.log( this.$refs.appBuilder);
+        this.selected = event.value.value.value;
         this.loadForm(this.selected, this.fillForm);
         console.log(this.selected);
-      }else{
-        this.$refs.appBuilder.setAppData({});
+      } else {
+        this.$refs.appBuilder.setAppData({pages:[{sections:[{forms:[]}]}]});
       }
     },
 
     async fillForm() {
-      this.Memodata = await this.getMemoData(this.selected,this.d.requestId);
-      console.log("MemoData",this.Memodata);
+      this.Memodata = await this.getMemoData(this.selected, this.d.requestId);
+      console.log("MemoData", this.d);
       if (this.Memodata == undefined) return;
       this.Memodata[this.Memodata.length - 1].memoValues.forEach((element) => {
         var model = { [element.jsonKey]: element.value };
@@ -147,7 +100,7 @@ export default {
   },
   watch: {
     val: function (newVal) {
-      for(var key in newVal){
+      for (var key in newVal) {
         this.d[key] = newVal[key];
       }
       // this.d = newVal
@@ -157,7 +110,7 @@ export default {
 </script>
 
 <style>
-.bg-white{
+.bg-white {
   background-color: white !important;
 }
 </style>

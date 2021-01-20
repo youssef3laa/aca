@@ -63,6 +63,8 @@ export default {
             console.log(e);
             return (e.name || "").indexOf(v || "") > -1;
           });
+            console.log(this.items.list);
+
           this.loading = false;
         })
         .catch((err) => console.log(err));
