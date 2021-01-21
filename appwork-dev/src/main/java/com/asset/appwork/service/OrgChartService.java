@@ -123,7 +123,7 @@ public class OrgChartService {
     }
 
     public List<Position> getAllPositions() {
-        return positionRepository.findAll();
+        return positionRepository.findAllByNameNotNull();
     }
 
     public Assignment createAssignment(Account account, Long unitId, Long positionId, String props) throws AppworkException {
@@ -352,6 +352,10 @@ public class OrgChartService {
         return userRepository.findByUserId(username + "@" + env.getProperty("otds.partition")).orElseThrow(
                 () -> new AppworkException("Could not get User of username " + username, ResponseCode.READ_ENTITY_FAILURE)
         );
+    }
+
+    public List<User> getAllUsers() throws AppworkException {
+        return userRepository.findAllByUserIdNotNull();
     }
 
     public User updateUser(Account account, Long id, String props) throws AppworkException, JsonProcessingException {

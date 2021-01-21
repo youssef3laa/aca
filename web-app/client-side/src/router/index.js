@@ -8,6 +8,8 @@ import ManualStep from '../modules/manual-step-module/router/router'
 import generalProcessRoutes from '../modules/generalProcess-module/router/router'
 import HistoryRoutes from '../modules/history-module/router/router'
 import correspondenceRoutes from '../modules/correspondence-data-module/router/router'
+import OrgChartRoutes from '../modules/orgChart-module/router/router'
+
 Vue.use(VueRouter)
 
 // const routess = [
@@ -27,12 +29,21 @@ Vue.use(VueRouter)
 // ]
 
 let allRoutes = [];
-allRoutes = allRoutes.concat(LoginRoutes, AdminRoutes, DemoRoutes,
-    ManualStep, generalProcessRoutes, HistoryRoutes,correspondenceRoutes,{
+allRoutes = allRoutes.concat(
+    LoginRoutes,
+    AdminRoutes,
+    DemoRoutes,
+    ManualStep,
+    generalProcessRoutes,
+    HistoryRoutes,
+    correspondenceRoutes,
+    OrgChartRoutes,
+    {
         path: '/',
         name: 'Home',
         component: Home,
-    })
+    }
+)
 
 const routes = allRoutes
 
