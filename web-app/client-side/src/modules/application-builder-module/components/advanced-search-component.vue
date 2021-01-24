@@ -18,10 +18,7 @@ export default {
 </script>
 
 <style>
-.task-list-heading {
-  display: flex;
-  margin: 20px;
-}
+
 .search-icon-wrapper {
   display: flex;
   width: 28px;
