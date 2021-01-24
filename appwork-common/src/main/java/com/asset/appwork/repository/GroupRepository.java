@@ -2,6 +2,7 @@ package com.asset.appwork.repository;
 
 import com.asset.appwork.model.Group;
 import com.asset.appwork.model.Unit;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,21 +21,21 @@ public interface GroupRepository extends GenericRepository<Group, Long> {
     Optional<Group> findByNameAndGroupCodeNotNull(String name);
 
     List<Group> findByNameInAndGroupCodeNotNull(List<String> names);
-    List<Group> findByNameInAndGroupCodeNotNull(List<String> names, Pageable pageable);
+    Page<Group> findByNameInAndGroupCodeNotNull(List<String> names, Pageable pageable);
 
     Optional<Group> findByUnit(Unit unit);
 
     List<Group> findByUnitIn(Set<Unit> units);
-    List<Group> findByUnitIn(Set<Unit> units, Pageable pageable);
+    Page<Group> findByUnitIn(Set<Unit> units, Pageable pageable);
 
     List<Group> findAllByGroupCodeNotNull();
-    List<Group> findAllByGroupCodeNotNull(Pageable pageable);
+    Page<Group> findAllByGroupCodeNotNull(Pageable pageable);
 
     @Query(value = "{call ACA_ORG_SP_getGroupChildrenRecursivelyFilteredByUnitTypeCode(:groupCode, :unitTypeCode)}", nativeQuery = true)
     List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(@Param("groupCode") String groupCode,
                                                                   @Param("unitTypeCode") String unitTypeCode);
     @Query(value = "{call ACA_ORG_SP_getGroupChildrenRecursivelyFilteredByUnitTypeCode(:groupCode, :unitTypeCode)}", nativeQuery = true)
-    List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(@Param("groupCode") String groupCode,
+    Page<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(@Param("groupCode") String groupCode,
                                                                   @Param("unitTypeCode") String unitTypeCode,
                                                                   Pageable pageable);
 }

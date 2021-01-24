@@ -2,6 +2,7 @@ package com.asset.appwork.repository;
 
 import com.asset.appwork.model.Group;
 import com.asset.appwork.model.Unit;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -13,29 +14,29 @@ public interface UnitRepository extends GenericRepository<Unit, Long> {
     Optional<Unit> findById(Long id);
 
     List<Unit> findAllByUnitCodeNotNull();
-    List<Unit> findAllByUnitCodeNotNull(Pageable pageable);
+    Page<Unit> findAllByUnitCodeNotNull(Pageable pageable);
 
     Optional<Unit> findByNameAndUnitCodeNotNull(String name);
 
     List<Unit> findByNameInAndUnitCodeNotNull(List<String> names);
-    List<Unit> findByNameInAndUnitCodeNotNull(List<String> names, Pageable pageable);
+    Page<Unit> findByNameInAndUnitCodeNotNull(List<String> names, Pageable pageable);
 
     List<Unit> findByUnitTypeCode(String code);
-    List<Unit> findByUnitTypeCode(String code, Pageable pageable);
+    Page<Unit> findByUnitTypeCode(String code, Pageable pageable);
 
     List<Unit> findByUnitTypeCodeIn(List<String> codes);
-    List<Unit> findByUnitTypeCodeIn(List<String> codes, Pageable pageable);
+    Page<Unit> findByUnitTypeCodeIn(List<String> codes, Pageable pageable);
 
     List<Unit> findByParent(Unit unit);
-    List<Unit> findByParent(Unit unit, Pageable pageable);
+    Page<Unit> findByParent(Unit unit, Pageable pageable);
 
     List<Unit> findByParentIn(List<Unit> units);
-    List<Unit> findByParentIn(List<Unit> units, Pageable pageable);
+    Page<Unit> findByParentIn(List<Unit> units, Pageable pageable);
 
     Optional<Unit> findByChild(Unit unit);
 
     List<Unit> findByChildIn(List<Unit> units);
-    List<Unit> findByChildIn(List<Unit> units, Pageable pageable);
+    Page<Unit> findByChildIn(List<Unit> units, Pageable pageable);
 
     Optional<Unit> findByGroup(Group group);
 

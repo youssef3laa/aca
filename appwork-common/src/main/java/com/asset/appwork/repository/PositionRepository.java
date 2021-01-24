@@ -1,6 +1,7 @@
 package com.asset.appwork.repository;
 
 import com.asset.appwork.model.Position;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -14,5 +15,5 @@ public interface PositionRepository extends GenericRepository<Position, Long> {
     Optional<Position> findByName(String name);
 
     List<Position> findAllByNameNotNull();
-    List<Position> findAllByNameNotNull(Pageable pageable);
+    Page<Position> findAllByNameNotNull(Pageable pageable);
 }
