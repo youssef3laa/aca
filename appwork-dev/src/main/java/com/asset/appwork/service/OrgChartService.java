@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -75,6 +76,10 @@ public class OrgChartService {
         return unitRepository.findAllByUnitCodeNotNull();
     }
 
+    public List<Unit> getAllUnits(int page, int size) {
+        return unitRepository.findAllByUnitCodeNotNull(PageRequest.of(page, size));
+    }
+
     public void addSubUnitToUnit(Account account, Long id, Long subUnitId) {
         Member.TargetId targetId = new Member.TargetId(subUnitId);
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
@@ -126,6 +131,10 @@ public class OrgChartService {
         return positionRepository.findAllByNameNotNull();
     }
 
+    public List<Position> getAllPositions(int page, int size) {
+        return positionRepository.findAllByNameNotNull(PageRequest.of(page, size));
+    }
+
     public Assignment createAssignment(Account account, Long unitId, Long positionId, String props) throws AppworkException {
         return getAssignment(new Entity(account,
                 SystemUtil.generateRestAPIBaseUrl(env, "OpenTextEntityIdentityComponents"),
@@ -169,6 +178,12 @@ public class OrgChartService {
     public List<Unit> getUnitChildren(String code) {
         return unitRepository.findByNameAndUnitCodeNotNull(code)
                 .map(unit -> unitRepository.findByParent(unit)).orElse(Collections.emptyList());
+    }
+
+    // TODO: Double Check Result
+    public List<Unit> getUnitChildren(String code, int page, int size) {
+        return unitRepository.findByNameAndUnitCodeNotNull(code)
+                .map(unit -> unitRepository.findByParent(unit, PageRequest.of(page, size))).orElse(Collections.emptyList());
     }
 
     public Group createGroup(Account account, String props) throws AppworkException, JsonProcessingException {
@@ -215,16 +230,32 @@ public class OrgChartService {
         return groupRepository.findByNameInAndGroupCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")));
     }
 
+    public List<Group> getGroupsByNames(String names, int page, int size) throws AppworkException {
+        return groupRepository.findByNameInAndGroupCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")), PageRequest.of(page, size));
+    }
+
     public List<Group> getGroupsByUnitNames(String names) {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByNameInAndUnitCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")))));
+    }
+
+    public List<Group> getGroupsByUnitNames(String names, int page, int size) {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByNameInAndUnitCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")))), PageRequest.of(page, size));
     }
 
     public List<Group> getGroupsByUnitTypeCode(String code) {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCode(code)));
     }
 
+    public List<Group> getGroupsByUnitTypeCode(String code, int page, int size) {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCode(code)), PageRequest.of(page, size));
+    }
+
     public List<Group> getGroupsByUnitTypeCodes(String codes) {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCodeIn(Arrays.asList(codes.trim().split("\\s*,\\s*")))));
+    }
+
+    public List<Group> getGroupsByUnitTypeCodes(String codes, int page, int size) {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCodeIn(Arrays.asList(codes.trim().split("\\s*,\\s*")))), PageRequest.of(page, size));
     }
 
     public Group getGroupParent(String code) throws AppworkException {
@@ -252,12 +283,24 @@ public class OrgChartService {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByParent(getGroupByName(code).getUnit())));
     }
 
+    public List<Group> getGroupChildren(String code, int page, int size) throws AppworkException {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByParent(getGroupByName(code).getUnit())), PageRequest.of(page, size));
+    }
+
     public List<Group> getAllGroups() {
         return groupRepository.findAllByGroupCodeNotNull();
     }
 
+    public List<Group> getAllGroups(int page, int size) {
+        return groupRepository.findAllByGroupCodeNotNull(PageRequest.of(page, size));
+    }
+
     public List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode) {
         return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode);
+    }
+
+    public List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode, int page, int size) {
+        return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, PageRequest.of(page, size));
     }
 
     public Group getGroupByCn(String cn) throws AppworkException {
@@ -356,6 +399,10 @@ public class OrgChartService {
 
     public List<User> getAllUsers() throws AppworkException {
         return userRepository.findAllByUserIdNotNull();
+    }
+
+    public List<User> getAllUsers(int page, int size) throws AppworkException {
+        return userRepository.findAllByUserIdNotNull(PageRequest.of(page, size));
     }
 
     public User updateUser(Account account, Long id, String props) throws AppworkException, JsonProcessingException {

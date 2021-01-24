@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/org")
@@ -130,14 +132,20 @@ public class OrgChartController {
 
     @Transactional
     @PostMapping("/unit/read/list")
-    public ResponseEntity<AppResponse<JsonNode>> readUnitList(@RequestHeader("X-Auth-Token") String token
+    public ResponseEntity<AppResponse<JsonNode>> readUnitList(@RequestHeader("X-Auth-Token") String token,
+                                                              @RequestParam(value = "page") Optional<Integer> page,
+                                                              @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUnits().toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUnits(page.get(), size.get()).toString()));
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUnits().toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -279,14 +287,20 @@ public class OrgChartController {
 
     @Transactional
     @GetMapping("/unit/position/read/list")
-    public ResponseEntity<AppResponse<JsonNode>> readPositionList(@RequestHeader("X-Auth-Token") String token
+    public ResponseEntity<AppResponse<JsonNode>> readPositionList(@RequestHeader("X-Auth-Token") String token,
+                                                                  @RequestParam(value = "page") Optional<Integer> page,
+                                                                  @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllPositions().toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllPositions(page.get(), size.get()).toString()));
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllPositions().toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -305,14 +319,20 @@ public class OrgChartController {
     @Transactional
     @GetMapping("/unit/{code}/down")
     public ResponseEntity<AppResponse<JsonNode>> getUnitChildrenByCode(@RequestHeader("X-Auth-Token") String token,
-                                                                       @PathVariable("code") String code
+                                                                       @PathVariable("code") String code,
+                                                                       @RequestParam(value = "page") Optional<Integer> page,
+                                                                       @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUnitChildren(code).toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUnitChildren(code, page.get(), size.get()).toString()));
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUnitChildren(code).toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -433,14 +453,20 @@ public class OrgChartController {
     @Transactional
     @GetMapping("/group/findByCodes/{codes}")
     public ResponseEntity<AppResponse<JsonNode>> findGroupByCodes(@RequestHeader("X-Auth-Token") String token,
-                                                                  @PathVariable("codes") String codes
+                                                                  @PathVariable("codes") String codes,
+                                                                  @RequestParam(value = "page") Optional<Integer> page,
+                                                                  @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByNames(codes).toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByNames(codes, page.get(), size.get()).toString()));
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByNames(codes).toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -459,14 +485,20 @@ public class OrgChartController {
     @Transactional
     @GetMapping("/group/findByUnitCodes/{codes}")
     public ResponseEntity<AppResponse<JsonNode>> findGroupByUnitCodes(@RequestHeader("X-Auth-Token") String token,
-                                                                      @PathVariable("codes") String codes
+                                                                      @PathVariable("codes") String codes,
+                                                                      @RequestParam(value = "page") Optional<Integer> page,
+                                                                      @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitNames(codes).toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitNames(codes, page.get(), size.get()).toString()));
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitNames(codes).toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -485,14 +517,20 @@ public class OrgChartController {
     @Transactional
     @GetMapping("/group/{code}/down")
     public ResponseEntity<AppResponse<JsonNode>> getGroupUnitChildrenByCode(@RequestHeader("X-Auth-Token") String token,
-                                                                            @PathVariable("code") String code
+                                                                            @PathVariable("code") String code,
+                                                                            @RequestParam(value = "page") Optional<Integer> page,
+                                                                            @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildren(code).toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildren(code, page.get(), size.get()).toString()));
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildren(code).toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -539,14 +577,20 @@ public class OrgChartController {
     @GetMapping("/group/{code}/down/all/unitTypeCode/{unitTypeCode}")
     public ResponseEntity<AppResponse<JsonNode>> getGroupChildrenRecursivelyFilteredByUnitTypeCode(@RequestHeader("X-Auth-Token") String token,
                                                                                                    @PathVariable("code") String code,
-                                                                                                   @PathVariable("unitTypeCode") String unitTypeCode
+                                                                                                   @PathVariable("unitTypeCode") String unitTypeCode,
+                                                                                                   @RequestParam(value = "page") Optional<Integer> page,
+                                                                                                   @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode).toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, page.get(), size.get()).toString()));
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode).toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -591,14 +635,20 @@ public class OrgChartController {
     @Transactional
     @GetMapping("/group/all/unitTypeCodes/{codes}")
     public ResponseEntity<AppResponse<JsonNode>> getGroupsByUnitTypeCodes(@RequestHeader("X-Auth-Token") String token,
-                                                                          @PathVariable("codes") String codes
+                                                                          @PathVariable("codes") String codes,
+                                                                          @RequestParam(value = "page") Optional<Integer> page,
+                                                                          @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitTypeCodes(codes).toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitTypeCodes(codes, page.get(), size.get()).toString()));
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitTypeCodes(codes).toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -708,14 +758,20 @@ public class OrgChartController {
 
     @Transactional
     @PostMapping("/group/read/list")
-    public ResponseEntity<AppResponse<JsonNode>> readGroupList(@RequestHeader("X-Auth-Token") String token
+    public ResponseEntity<AppResponse<JsonNode>> readGroupList(@RequestHeader("X-Auth-Token") String token,
+                                                               @RequestParam(value = "page") Optional<Integer> page,
+                                                               @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllGroups().toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllGroups(page.get(), size.get()).toString()));
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllGroups().toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -862,14 +918,20 @@ public class OrgChartController {
 
     @Transactional
     @PostMapping("/user/read/list")
-    public ResponseEntity<AppResponse<JsonNode>> getAllUsers(@RequestHeader("X-Auth-Token") String token
+    public ResponseEntity<AppResponse<JsonNode>> getAllUsers(@RequestHeader("X-Auth-Token") String token,
+                                                             @RequestParam(value = "page") Optional<Integer> page,
+                                                             @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUsers().toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUsers(page.get(), size.get()).toString()));
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUsers().toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
