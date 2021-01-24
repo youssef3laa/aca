@@ -148,34 +148,11 @@ export default {
                 key: 'tab1',
                 id: '1',
                 isActive: true,
-                name: 'البيانات الأساسية',
-                icon: 'far fa-file-alt',
-              },
-              {
-                key: 'tab2',
-                id: '2',
                 name: 'المرفقات',
-                icon: 'fas fa-paperclip',
-              },
-              {
-                key: 'tab3',
-                id: '3',
-                name: 'collapse',
-                icon: 'fas fa-paperclip',
+                icon: 'far fa-file-alt',
               },
             ],
             sections: [
-              {
-                key: 'title',
-                type: 'TitleComponet',
-                name: 'بيانات المكاتبة',
-                actions: ['cancel', 'save', 'complete'],
-                // sections: [
-                //   {
-                //     type: 'title',
-                //   },
-                // ],
-              },
               {
                 key: 'section1',
                 tabId: '1',
@@ -186,116 +163,276 @@ export default {
                 forms: [
                   {
                     key: 'form1',
-                    publish: 'form1Change',
                     inputs: [
                       {
-                        type: 'AutoCompleteComponent',
-                        name: 'receiver',
-                        rule: 'required',
-                        // url: '',
-                        // list: '',
-                        // isAutoComplete: true,
-                        col: '6',
+                        type: 'ButtonComponent',
+                        action: 'openModal',
+                        publish: 'openModal',
+                        label: 'إضافة',
+                        modalId: 1,
                       },
                       {
-                        type: 'DatePickerComponent',
-                        label: 'requestDate',
-                        name: 'requestDate',
-                        rule: 'required',
-                        col: '6',
+                        type: 'ButtonComponent',
+                        action: 'openModal',
+                        publish: 'openModal',
+                        label: 'إضافة',
+                        // modalId: 2,
                       },
                       {
-                        type: 'TextareaComponent',
-                        label: 'notes',
-                        name: 'notes',
-                        col: '12',
+                        type: 'ModalComponent',
+                        name: 'test1',
+                        col: 4,
+                        modalId: 1,
+                        forms: [
+                          {
+                            key: 'subForm',
+                            inputs: [
+                              {
+                                type: 'InputComponent',
+                                name: 'test2',
+                                col: 4,
+                                label: 'test2',
+                              },
+                              {
+                                type: 'InputComponent',
+                                name: 'test3',
+                                col: 4,
+                                label: 'test3',
+                              },
+                              {
+                                type: 'ButtonComponent',
+                                action: 'openModal',
+                                publish: 'openModal',
+                                label: 'إضافة',
+                              },
+                            ],
+                            model: {},
+                          },
+                        ],
+                        // label: 'test',
+                      },
+                      {
+                        type: 'ModalComponent',
+                        name: 'test1',
+                        col: 4,
+                        modalId: 2,
+                        forms: [
+                          {
+                            key: 'subForm',
+                            inputs: [
+                              {
+                                type: 'InputComponent',
+                                name: 'test2',
+                                col: 4,
+                                label: 'test2',
+                              },
+                            ],
+                            model: {},
+                          },
+                        ],
+                        // label: 'test',
+                      },
+                      {
+                        type: 'InputComponent',
+                        name: 'test2',
+                        col: 4,
+                        label: 'test2',
                       },
                     ],
                     model: {
-                      receiver: {
-                        url: 'org/group/findByCodes/HGCS,HRCA,HCAO',
-                        list: [],
-                        value: '',
-                      },
-                      requestDate: '',
-                      notes: '',
+                      test1: {},
                     },
                   },
                 ],
+                // forms: [
+                //   {
+                //     key: 'form1',
+                //     inputs: [
+                //       {
+                //         type: 'ModalComponent',
+                //         name: 'addUnit',
+                //         col: 4,
+                //         forms: [
+                //           {
+                //             key: 'subForm',
+                //             inputs: [
+                //               { type: 'InputComponent', name: 'test', col: 4 },
+                //             ],
+                //             model: {
+                //               test: {},
+                //             },
+                //           },
+                //         ],
+                //       },
+                //     ],
+                //     model: {
+                //       addUnit: {},
+                //     },
+                //   },
+                // ],
               },
-              {
-                key: 'section2',
-                type: 'Resizable',
-                tabId: '2',
-                isTab: true,
-                isCard: true,
-                display: 'none',
-                forms: [
-                  {
-                    resizable: {
-                      forms: [
-                        {
-                          key: 'iframeObj',
-                          background: 'white',
-                          inputs: [
-                            {
-                              type: 'IframeComponent',
-                              name: 'iframeObj',
-                              col: 12,
-                            },
-                          ],
-                          model: {
-                            iframeObj: {
-                              src: '',
-                            },
-                          },
-                        },
-                        {
-                          background: 'white',
-                          inputs: [
-                            {
-                              type: 'InputFileComponent',
-                              name: 'inputFile',
-                              col: 12,
-                            },
-                          ],
-                          model: {
-                            inputFile: '',
-                          },
-                        },
-                      ],
-                    },
-                  },
-                ],
-              },
-              {
-                key: 'section3',
-                tabId: '3',
-                isTab: true,
-                isCard: true,
-                display: 'none',
-                type: 'CollapseSection',
-                name: 'النص',
-                forms: [
-                  {
-                    key: 'richtext',
-                    inputs: [
-                      {
-                        type: 'richtextComponent',
-                        name: 'richtext',
-                        col: 12,
-                      },
-                    ],
-                    model: {
-                      richtext: '<p></p>',
-                    },
-                  },
-                ],
-              },
+              {},
             ],
           },
         ],
       },
+      // app: {
+      //   pages: [
+      //     {
+      //       key: 'page1',
+      //       tabs: [
+      //         {
+      //           key: 'tab1',
+      //           id: '1',
+      //           isActive: true,
+      //           name: 'البيانات الأساسية',
+      //           icon: 'far fa-file-alt',
+      //         },
+      //         {
+      //           key: 'tab2',
+      //           id: '2',
+      //           name: 'المرفقات',
+      //           icon: 'fas fa-paperclip',
+      //         },
+      //         {
+      //           key: 'tab3',
+      //           id: '3',
+      //           name: 'collapse',
+      //           icon: 'fas fa-paperclip',
+      //         },
+      //       ],
+      //       sections: [
+      //         {
+      //           key: 'title',
+      //           type: 'TitleComponet',
+      //           name: 'بيانات المكاتبة',
+      //           actions: ['cancel', 'save', 'complete'],
+      //           // sections: [
+      //           //   {
+      //           //     type: 'title',
+      //           //   },
+      //           // ],
+      //         },
+      //         {
+      //           key: 'section1',
+      //           tabId: '1',
+      //           isTab: true,
+      //           type: 'DefaultSection',
+      //           isCard: true,
+      //           display: 'block',
+      //           forms: [
+      //             {
+      //               key: 'form1',
+      //               publish: 'form1Change',
+      //               inputs: [
+      //                 {
+      //                   type: 'AutoCompleteComponent',
+      //                   name: 'receiver',
+      //                   rule: 'required',
+      //                   // url: '',
+      //                   // list: '',
+      //                   // isAutoComplete: true,
+      //                   col: '6',
+      //                 },
+      //                 {
+      //                   type: 'DatePickerComponent',
+      //                   label: 'requestDate',
+      //                   name: 'requestDate',
+      //                   rule: 'required',
+      //                   col: '6',
+      //                 },
+      //                 {
+      //                   type: 'TextareaComponent',
+      //                   label: 'notes',
+      //                   name: 'notes',
+      //                   col: '12',
+      //                 },
+      //               ],
+      //               model: {
+      //                 receiver: {
+      //                   url: 'org/group/findByCodes/HGCS,HRCA,HCAO',
+      //                   list: [],
+      //                   value: '',
+      //                 },
+      //                 requestDate: '',
+      //                 notes: '',
+      //               },
+      //             },
+      //           ],
+      //         },
+      //         {
+      //           key: 'section2',
+      //           type: 'Resizable',
+      //           tabId: '2',
+      //           isTab: true,
+      //           isCard: true,
+      //           display: 'none',
+      //           forms: [
+      //             {
+      //               resizable: {
+      //                 forms: [
+      //                   {
+      //                     key: 'iframeObj',
+      //                     background: 'white',
+      //                     inputs: [
+      //                       {
+      //                         type: 'IframeComponent',
+      //                         name: 'iframeObj',
+      //                         col: 12,
+      //                       },
+      //                     ],
+      //                     model: {
+      //                       iframeObj: {
+      //                         src: '',
+      //                       },
+      //                     },
+      //                   },
+      //                   {
+      //                     background: 'white',
+      //                     inputs: [
+      //                       {
+      //                         type: 'InputFileComponent',
+      //                         name: 'inputFile',
+      //                         col: 12,
+      //                       },
+      //                     ],
+      //                     model: {
+      //                       inputFile: '',
+      //                     },
+      //                   },
+      //                 ],
+      //               },
+      //             },
+      //           ],
+      //         },
+      //         {
+      //           key: 'section3',
+      //           tabId: '3',
+      //           isTab: true,
+      //           isCard: true,
+      //           display: 'none',
+      //           type: 'CollapseSection',
+      //           name: 'النص',
+      //           forms: [
+      //             {
+      //               key: 'richtext',
+      //               inputs: [
+      //                 {
+      //                   type: 'richtextComponent',
+      //                   name: 'richtext',
+      //                   col: 12,
+      //                 },
+      //               ],
+      //               model: {
+      //                 richtext: '<p></p>',
+      //               },
+      //             },
+      //           ],
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // },
     }
   },
 }
