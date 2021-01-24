@@ -17,14 +17,11 @@ export default {
   async created() {
     await this.loadForm("generalProcess-init");
 
-    this.$observable.subscribe("complete-step", () => {
-      this.completeStep();
-    });
-
     this.initiateBrava();
   },
   methods: {
     completeStep: function () {
+      // if(!this.$refs.appBuilder) return;
       let model = this.$refs.appBuilder.getModelData("form1");
       if (!model._valid) {
         //@TODO show warining
@@ -50,6 +47,9 @@ export default {
     },
   },
   mounted() {
+    this.$observable.subscribe("complete-step", () => {
+      this.completeStep();
+    });
   },
   data() {
     return {

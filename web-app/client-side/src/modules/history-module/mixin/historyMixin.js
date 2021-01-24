@@ -19,6 +19,28 @@ export default {
             } catch (err) {
                 console.error(err);
             }
+        },
+        createHistoryTableModel(processName, entityId) {
+            return {
+                url: "history/"+ processName + "/" + entityId,
+                headers: [
+                    {
+                        text: "القرار",
+                        align: "start",
+                        value: "decision",
+                    },
+                    {
+                        text: "الاسم",
+                        align: "start",
+                        value: "userCN",
+                    },
+                    {
+                        text: "التاريخ",
+                        value: "approvalDate",
+                    },
+                ],
+                data: []
+            }
         }
     }
 }

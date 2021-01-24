@@ -10,8 +10,15 @@ import com.asset.appwork.repository.ApprovalHistoryRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,18 +64,21 @@ public class ApprovalHistoryController {
 
     @GetMapping("/{processName}/{entityId}")
     public ResponseEntity<AppResponse<List<ApprovalHistory>>> readHistory(@RequestHeader("X-Auth-Token") String token,
-                                                                          @PathVariable("entityId") String entityId,
-                                                                          @PathVariable("processName") String processName) {
+                                                             @PathVariable("entityId") String entityId,
+                                                             @PathVariable("processName") String processName,
+                                                             @RequestParam(value = "page", required = false, defaultValue = "0") Integer pageNumber,
+                                                             @RequestParam(value = "size", required = false, defaultValue = ""+1+"" ) Integer pageSize) {
         AppResponse.ResponseBuilder<List<ApprovalHistory>> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
 
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            List<ApprovalHistory> histories = historyRepository.findByProcessNameAndEntityId(processName, entityId);
+            Page<ApprovalHistory> histories = historyRepository.findByProcessNameAndEntityId(processName, entityId, PageRequest.of(pageNumber, pageSize));
             if(histories.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
-            respBuilder.data(histories);
 
+            respBuilder.info("totalCount", histories.getTotalElements());
+            respBuilder.data(histories.getContent());
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();

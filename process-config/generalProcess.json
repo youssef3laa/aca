@@ -41,7 +41,7 @@
             "roleFilter": "org/group/findByCodes/MCAG",
             "page": "generalProcess-early",
             "nextStep": {
-                "MCAG": "stepMM"
+                "approve": "stepMM"
             }
         },
         "stepMM": {

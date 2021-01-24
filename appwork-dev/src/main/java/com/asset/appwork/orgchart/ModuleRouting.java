@@ -4,8 +4,6 @@ import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.ApprovalHistory;
-import com.asset.appwork.model.Group;
-import com.asset.appwork.model.User;
 import com.asset.appwork.platform.soap.Process;
 import com.asset.appwork.platform.soap.Workflow;
 import com.asset.appwork.platform.util.CordysUtil;
@@ -16,18 +14,17 @@ import com.asset.appwork.util.ReflectionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 
+@Slf4j
 public class ModuleRouting {
     private final String breakString = "end";
+    private final String rejectString = "reject";
     private final String approveString = "approve";
     private final String commentString = "comment";
     private final String requestModificationString = "requestModification";
-    private final String rejectString = "reject";
 
     String config;
     Account account;
@@ -46,15 +43,15 @@ public class ModuleRouting {
     @Data
     static class RoutingConfig {
         Map<String, StepConfig> steps;
-        String processName;
+        String processName = "";
     }
 
     @Data
     static class StepConfig {
-        boolean hasAutocomplete;
-        String roleFilter, unitFilter, userFilter;
-        String page;
-        String subBP;
+        boolean hasAutocomplete = false;
+        String roleFilter = "", unitFilter = "", userFilter = "";
+        String page = "";
+        String subBP = "";
         HashMap<String, String> nextStep;
     }
 
@@ -88,6 +85,7 @@ public class ModuleRouting {
             response = cordysUtil.sendRequest(account, processInitiateMessage);
         } catch (Exception e) {
             e.printStackTrace();
+            log.error("ModuleRouting: "+ e.getMessage());
             throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
         }
         return response;
@@ -108,6 +106,7 @@ public class ModuleRouting {
             response = cordysUtil.sendRequest(account, completeWorkflowMessage);
         } catch (Exception e) {
             e.printStackTrace();
+            log.error("ModuleRouting: "+ e.getMessage());
             throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
         }
         return response;
@@ -116,8 +115,10 @@ public class ModuleRouting {
     private <T> void calculateNextStep(T outputSchema) throws AppworkException {
         //TODO: Create Setter function in reflection class
         try {
-            String nextStep = "";
-            String subBP = "";
+            String nextStep;
+            String nextPage = "";
+            String nextSubBP = "";
+            String nextRoleFilter = "";
 
             RoutingConfig routingConfig = generateRoutingConfig();
 
@@ -125,7 +126,6 @@ public class ModuleRouting {
             String[] codeSelected = {""};
             String[] decision = {""};
             String[] parentHistoryId = {""};
-            String[] assignedCN = {""};
 
             ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s) -> {
                 currentStepId[0] = (String) s;
@@ -135,111 +135,120 @@ public class ModuleRouting {
                 decision[0] = (String) s;
             }).ifPresent("getParentHistoryId", (s) -> {
                 parentHistoryId[0] = (String) s;
-            }).ifPresent("getAssignedCN", (s) -> {
-                assignedCN[0] = (String) s;
             });
 
             ((OutputSchema) outputSchema).setParentHistoryId(null);
 
-            // Note: Else case Code is in Next Steps
-            if (routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(codeSelected[0])) {
-                nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(codeSelected[0]);
+            if(codeSelected[0].isEmpty() && decision[0].isEmpty()){
+                throw new AppworkException(ResponseCode.MODULE_ROUTING_INPUTS_ERROR);
             }
 
-            // Note: Case Request Modification
-            else if (decision[0].contains(requestModificationString)) {
-                // NOTE:  If code selected and is in nextSteps
-                if (routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(requestModificationString)) {
-                    ((OutputSchema) outputSchema).setParentHistoryId(parentHistoryId[0]);
-                    nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(requestModificationString);
-                }
+            decision[0] = getDecisionString(decision[0]);
 
-                // Note: get previous step from approval history
-                else {
-                    nextStep = calculateFromApprovalHistory(outputSchema, parentHistoryId[0]);
-                }
+            switch (decision[0]){
+                case approveString:
+                    nextStep = handleApprovalCase(routingConfig, currentStepId[0], codeSelected[0]);
+                    break;
+                case requestModificationString:
+                    nextStep = handleRequestModificationCase(outputSchema, routingConfig, currentStepId[0], parentHistoryId[0]);
+                    break;
+                case commentString:
+                    nextStep = getIdFromNextSteps(routingConfig, currentStepId[0], commentString);
+                    break;
+                case rejectString:
+                    nextStep = breakString;
+                    break;
+                default:
+                    nextStep = handleDefaultCase(routingConfig, currentStepId[0], codeSelected[0], decision[0]);
+                    break;
             }
 
-            // Note: Else case Approve
-            else if (decision[0].contains(approveString)) {
-                if (routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(approveString)) {
-                    nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(approveString);
-                }
-            }
-
-            // Note: Else case Comment
-            else if (decision[0].contains(commentString)) {
-                if (routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(commentString)) {
-                    nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(commentString);
-                }
-            }
-
-            // Note: Else case decision is in Next Steps
-            else if (routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(decision[0])) {
-                nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(decision[0]);
-            }
-
-            // Note: Else cas SubBP is in the Step
-            else if (!routingConfig.getSteps().get(currentStepId[0]).subBP.isEmpty()) {
-                subBP = routingConfig.getSteps().get(currentStepId[0]).subBP;
-            }
-
-            else nextStep = breakString;
-
-
-            // Note: If there isn't assigned CN
-            if (assignedCN[0].isEmpty() && subBP.isEmpty()) {
-                try {
-                    Group parent = calculateParent();
-                    ((OutputSchema) outputSchema).setAssignedCN(parent.getCn());
-
-                    // Note: if Parent GroupCode is in next steps
-                    if (routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.getGroupCode())) {
-                        nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.getGroupCode());
-                    }
-                    // Note: if parent UnitTypeCode is in next steps
-                    else if (routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.getUnit().getUnitTypeCode())) {
-                        nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.getUnit().getUnitTypeCode());
-                    }
-                    else nextStep = breakString;
-                }
-                catch (AppworkException e){
+            if(nextStep.isEmpty()){
+                if (!routingConfig.getSteps().get(currentStepId[0]).subBP.isEmpty()){
+                    nextSubBP = routingConfig.getSteps().get(currentStepId[0]).subBP;
+                }else {
                     nextStep = breakString;
                 }
+            }else {
+                if(!nextStep.equals(breakString)){
+                    if (routingConfig.getSteps().containsKey(nextStep)) {
+                        nextRoleFilter = routingConfig.getSteps().get(nextStep).getRoleFilter();
+                        nextPage = routingConfig.getSteps().get(nextStep).getPage();
+                    }else{
+                        throw new AppworkException(ResponseCode.MODULE_ROUTING_INPUTS_ERROR);
+                    }
+
+                    String[] assignedCN = {""};
+                    ReflectionUtil.of(outputSchema).ifPresent("getAssignedCN", (s) -> {
+                        assignedCN[0] = (String) s;
+                    });
+                    if(assignedCN[0].isEmpty()){
+                        throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
+                    }
+                }
             }
 
-            // Note: If next step calculated is in the JSON
-            if (routingConfig.getSteps().containsKey(nextStep)) {
-                // Note: If next step contains roleFilter
-                if (!routingConfig.getSteps().get(nextStep).getRoleFilter().isEmpty())
-                    ((OutputSchema) outputSchema).setRoleFilter(routingConfig.getSteps().get(nextStep).getRoleFilter());
-            }
-
-            if (nextStep.isEmpty() && subBP.isEmpty()) {
-                nextStep = breakString;
-            }
-
-            if (!nextStep.equals(breakString) && !nextStep.isEmpty()) {
-                String nextPage = routingConfig.getSteps().get(nextStep).getPage();
-                ((OutputSchema) outputSchema).setPage(nextPage);
-            }
-
-            ((OutputSchema) outputSchema).setSubBP(subBP);
-            ((OutputSchema) outputSchema).setStepId(nextStep);
+            updateOutputSchema(outputSchema, nextStep, nextPage, nextSubBP, nextRoleFilter);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+            log.error("ModuleRouting: "+ e.getMessage());
             throw new AppworkException(e.getMessage(),ResponseCode.MODULE_ROUTING_FAILURE);
         }
     }
 
-    private Group calculateParent() throws AppworkException {
-        User user = orgChartService.getUserByUsername(account.getUsername());
-        Optional<Group> userGroup = user.getGroup().stream().findFirst();
-        if (userGroup.isPresent()) {
-            return orgChartService.getGroupParent(userGroup.get().getGroupCode());
+    private String getDecisionString(String decision){
+        if(decision.contains(requestModificationString)){
+            return requestModificationString;
+        }else if(decision.contains(approveString)){
+            return approveString;
+        }else if(decision.contains(commentString)){
+            return commentString;
+        }else if(decision.contains(rejectString)){
+            return rejectString;
         }else {
-            throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
+            return decision;
         }
+    }
+
+    private String handleApprovalCase(RoutingConfig routingConfig, String currentStepId, String codeSelected){
+        String step = getIdFromNextSteps(routingConfig, currentStepId, codeSelected);
+        if (step.isEmpty()) {
+            return getIdFromNextSteps(routingConfig, currentStepId, approveString);
+        }
+        return step;
+    }
+
+    private <T> String handleRequestModificationCase(T outputSchema, RoutingConfig routingConfig, String currentStepId, String parentHistoryId){
+        String step = getIdFromNextSteps(routingConfig, currentStepId, requestModificationString);
+        if(!step.isEmpty()){
+            ((OutputSchema) outputSchema).setParentHistoryId(parentHistoryId);
+            return step;
+        }
+        else {
+            return calculateFromApprovalHistory(outputSchema, parentHistoryId);
+        }
+    }
+
+    private String handleDefaultCase(RoutingConfig routingConfig, String currentStepId, String codeSelected, String decision){
+        String step = getIdFromNextSteps(routingConfig, currentStepId, codeSelected);
+        if(step.isEmpty()){
+            return getIdFromNextSteps(routingConfig, currentStepId, decision);
+        }
+        return step;
+    }
+
+    private String getIdFromNextSteps(RoutingConfig routingConfig, String currentStepId, String inputCase){
+        if (routingConfig.getSteps().get(currentStepId).getNextStep().containsKey(inputCase) ) {
+            return routingConfig.getSteps().get(currentStepId).getNextStep().get(inputCase);
+        }
+        return "";
+    }
+
+    private <T> void updateOutputSchema(T outputSchema, String nextStep, String nextPage, String nextSubBP, String nextRoleFilter) {
+        ((OutputSchema) outputSchema).setStepId(nextStep);
+        ((OutputSchema) outputSchema).setPage(nextPage);
+        ((OutputSchema) outputSchema).setSubBP(nextSubBP);
+        ((OutputSchema) outputSchema).setRoleFilter(nextRoleFilter);
     }
 
     private <T> String calculateFromApprovalHistory(T outputSchema, String parentHistoryId) {
@@ -251,6 +260,38 @@ public class ModuleRouting {
             return approvalHistory.get().getStepId();
         }
 
-        return breakString;
+        return "";
     }
 }
+
+
+//           // Note: If there isn't assigned CN
+//            if (assignedCN[0].isEmpty() && subBP.isEmpty()) {
+//                try {
+//                    Group parent = calculateParent();
+//                    ((OutputSchema) outputSchema).setAssignedCN(parent.getCn());
+//
+//                    // Note: if Parent GroupCode is in next steps
+//                    if (routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.getGroupCode())) {
+//                        nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.getGroupCode());
+//                    }
+//                    // Note: if parent UnitTypeCode is in next steps
+//                    else if (routingConfig.getSteps().get(currentStepId[0]).getNextStep().containsKey(parent.getUnit().getUnitTypeCode())) {
+//                        nextStep = routingConfig.getSteps().get(currentStepId[0]).getNextStep().get(parent.getUnit().getUnitTypeCode());
+//                    }
+//                    else nextStep = breakString;
+//                }
+//                catch (AppworkException e){
+//                    nextStep = breakString;
+//                }
+//            }
+//===============================================================
+//            private Group calculateParent() throws AppworkException {
+//                User user = orgChartService.getUserByUsername(account.getUsername());
+//                Optional<Group> userGroup = user.getGroup().stream().findFirst();
+//                if (userGroup.isPresent()) {
+//                    return orgChartService.getGroupParent(userGroup.get().getGroupCode());
+//                }else {
+//                    throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
+//                }
+//            }

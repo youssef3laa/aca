@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -75,6 +77,10 @@ public class OrgChartService {
         return unitRepository.findAllByUnitCodeNotNull();
     }
 
+    public Page<Unit> getAllUnits(int page, int size) {
+        return unitRepository.findAllByUnitCodeNotNull(PageRequest.of(page, size));
+    }
+
     public void addSubUnitToUnit(Account account, Long id, Long subUnitId) {
         Member.TargetId targetId = new Member.TargetId(subUnitId);
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
@@ -123,7 +129,11 @@ public class OrgChartService {
     }
 
     public List<Position> getAllPositions() {
-        return positionRepository.findAll();
+        return positionRepository.findAllByNameNotNull();
+    }
+
+    public Page<Position> getAllPositions(int page, int size) {
+        return positionRepository.findAllByNameNotNull(PageRequest.of(page, size));
     }
 
     public Assignment createAssignment(Account account, Long unitId, Long positionId, String props) throws AppworkException {
@@ -171,6 +181,12 @@ public class OrgChartService {
                 .map(unit -> unitRepository.findByParent(unit)).orElse(Collections.emptyList());
     }
 
+    // TODO: Double Check Result
+    public Page<Unit> getUnitChildren(String code, int page, int size) {
+        return unitRepository.findByNameAndUnitCodeNotNull(code)
+                .map(unit -> unitRepository.findByParent(unit, PageRequest.of(page, size))).orElse(Page.empty());
+    }
+
     public Group createGroup(Account account, String props) throws AppworkException, JsonProcessingException {
         Member member = new Member(env.getProperty("otds.partition"), SystemUtil.getJsonByPtrExpr(props, "/name"), Collections.emptyList());
         String createdGroupName = SystemUtil.getJsonByPtrExpr(
@@ -215,16 +231,32 @@ public class OrgChartService {
         return groupRepository.findByNameInAndGroupCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")));
     }
 
+    public Page<Group> getGroupsByNames(String names, int page, int size) throws AppworkException {
+        return groupRepository.findByNameInAndGroupCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")), PageRequest.of(page, size));
+    }
+
     public List<Group> getGroupsByUnitNames(String names) {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByNameInAndUnitCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")))));
+    }
+
+    public Page<Group> getGroupsByUnitNames(String names, int page, int size) {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByNameInAndUnitCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")))), PageRequest.of(page, size));
     }
 
     public List<Group> getGroupsByUnitTypeCode(String code) {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCode(code)));
     }
 
+    public Page<Group> getGroupsByUnitTypeCode(String code, int page, int size) {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCode(code)), PageRequest.of(page, size));
+    }
+
     public List<Group> getGroupsByUnitTypeCodes(String codes) {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCodeIn(Arrays.asList(codes.trim().split("\\s*,\\s*")))));
+    }
+
+    public Page<Group> getGroupsByUnitTypeCodes(String codes, int page, int size) {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCodeIn(Arrays.asList(codes.trim().split("\\s*,\\s*")))), PageRequest.of(page, size));
     }
 
     public Group getGroupParent(String code) throws AppworkException {
@@ -252,12 +284,24 @@ public class OrgChartService {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByParent(getGroupByName(code).getUnit())));
     }
 
+    public Page<Group> getGroupChildren(String code, int page, int size) throws AppworkException {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByParent(getGroupByName(code).getUnit())), PageRequest.of(page, size));
+    }
+
     public List<Group> getAllGroups() {
         return groupRepository.findAllByGroupCodeNotNull();
     }
 
+    public Page<Group> getAllGroups(int page, int size) {
+        return groupRepository.findAllByGroupCodeNotNull(PageRequest.of(page, size));
+    }
+
     public List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode) {
         return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode);
+    }
+
+    public Page<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode, int page, int size) {
+        return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, PageRequest.of(page, size));
     }
 
     public Group getGroupByCn(String cn) throws AppworkException {
@@ -352,6 +396,14 @@ public class OrgChartService {
         return userRepository.findByUserId(username + "@" + env.getProperty("otds.partition")).orElseThrow(
                 () -> new AppworkException("Could not get User of username " + username, ResponseCode.READ_ENTITY_FAILURE)
         );
+    }
+
+    public List<User> getAllUsers() throws AppworkException {
+        return userRepository.findAll();
+    }
+
+    public Page<User> getAllUsers(int page, int size) throws AppworkException {
+        return userRepository.findAll(PageRequest.of(page, size));
     }
 
     public User updateUser(Account account, Long id, String props) throws AppworkException, JsonProcessingException {
