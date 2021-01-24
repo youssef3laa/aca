@@ -9,6 +9,7 @@ import generalProcessRoutes from '../modules/generalProcess-module/router/router
 import HistoryRoutes from '../modules/history-module/router/router'
 import correspondenceRoutes from '../modules/correspondence-data-module/router/router'
 import OrgChartRoutes from '../modules/orgChart-module/router/router'
+import observable from "../modules/core-module/lib/vue-sub-lib";
 
 Vue.use(VueRouter)
 
@@ -51,6 +52,10 @@ const router = new VueRouter({
     mode: 'history',
     base: process.env.BASE_URL,
     routes,
+})
+
+router.afterEach(() => {
+    observable.observers = {}
 })
 
 export default router

@@ -13,7 +13,7 @@
         <v-container>
           <AutocompleteComponent
             :field="{ name: field.label }"
-            :val="{  list :{},url: url }"
+            :val="{ list :[], url: url }"
             @update="changeVal"
           >
           </AutocompleteComponent>

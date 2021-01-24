@@ -65,7 +65,7 @@ export default {
     this.initiateBrava();
 
     this.$observable.subscribe("complete-step", () => {
-      if(!this.$refs.appBuilder) return;
+      // if(!this.$refs.appBuilder) return;
       let model = this.$refs.appBuilder.getModelData("form1");
       // if (!model._valid){
       //   //@TODO show warning
