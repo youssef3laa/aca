@@ -7,7 +7,7 @@
 <script>
 import AppBuilder from "../../application-builder-module/builders/app-builder";
 // import Http from "http";
-import Http from "../../core-module/services/http"
+import http from "../../core-module/services/http";
 
 export default {
   name: "attachment",
@@ -20,57 +20,68 @@ export default {
         pages: [
           {
             key: "page1",
+            tabs: [
+              {
+                "key": "tab1",
+                "id": "1",
+                "isActive": true,
+                "name": "المرفقات",
+                "icon": "far fa-file-alt"
+              },
+            ],
             sections: [
               {
-                numOfResizable: 2,
-                key: 'section1',
-                tabs: [
-
+                "key": "title",
+                "type": "TitleComponet",
+                "name": "بيانات المكاتبة",
+                "actions": [
+                  "cancel",
+                  "complete"
+                ]
+              },
+              {
+                "key": "section1",
+                "tabId": "1",
+                "isTab": true,
+                "isCard": true,
+                "type": "Resizable",
+                "display": "block",
+                "forms": [
                   {
-                    key: 'tab2',
-                    id: 2,
-                    name: 'المرفقات',
-                    icon: 'fas fa-paperclip',
-                  },
-                ],
-                forms: [
-                  {
-                    key: "form1",
-                    resizable: {
-                      forms: [
+                    "resizable": {
+                      "forms": [
                         {
-                          background: 'white',
-                          inputs: [
+                          "key": "iframeObj",
+                          "background": "white",
+                          "inputs": [
                             {
-                              type: 'InputFileComponent',
-                              name: 'inputFile',
-                              col: 12,
-                            },
+                              "type": "IframeComponent",
+                              "name": "iframeObj",
+                              "col": 12
+                            }
                           ],
-                          model: {
-                            inputFile: '',
-                          },
+                          "model": {
+                            "iframeObj": {
+                              "src": ""
+                            }
+                          }
                         },
                         {
-                          key: 'iframeObj',
-                          background: 'white',
-                          inputs: [
+                          "background": "white",
+                          "inputs": [
                             {
-                              type: 'IframeComponent',
-                              name: 'iframeObj',
-                              col: 12,
-                            },
+                              "type": "InputFileComponent",
+                              "name": "inputFile",
+                              "col": 12
+                            }
                           ],
-                          model: {
-                            iframeObj: {
-                              src: "",
-                            },
-                          },
-                        },
-
-                      ],
-                    },
-                  },
+                          "model": {
+                            "inputFile": ""
+                          }
+                        }
+                      ]
+                    }
+                  }
                 ],
               },
             ],
@@ -83,11 +94,11 @@ export default {
   created() {
     this.$observable.subscribe('open-file-brava', async (fileId) => {
       this.$observable.fire('file-component-skeleton', true)
-
+      console.log("openfilebrava");
       console.log(fileId);
       let userToken;
       try {
-        userToken = await Http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
+        userToken = await http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
           "userName": "admin",
           "password": "Asset99a",
           "ticketType": "OTDSTICKET"
@@ -95,13 +106,10 @@ export default {
         this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
             'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
         console.log(userToken);
-        this.$observable.fire('file-component-skeleton', false)
-
+        // this.$observable.fire('file-component-skeleton', false)
       } catch (e) {
         console.log(e);
       }
-
-
     });
   }, mounted() {
     //load list of files

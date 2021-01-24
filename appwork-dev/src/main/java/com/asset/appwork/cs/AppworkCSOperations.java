@@ -117,18 +117,49 @@ public class AppworkCSOperations {
                 .get(uriComponentsBuilder.encode().buildAndExpand(pathVariables).toString());
     }
 
-    public Http getSpecifiedNodeVersion(Long nodeId, Integer versionId, DocumentQuery documentQuery) throws IllegalAccessException {
+    public Http getSpecifiedNodeVersion(Long nodeId, Integer versionId, DocumentQuery documentQuery) throws IllegalAccessException, AppworkException {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(CS_API.GET_SPECIFIED_NODE_VERSION.getApiURL());
         fillURIComponentWithQuery(uriComponentsBuilder, documentQuery);
         Map<String, Object> pathVariables = new HashMap<>();
         pathVariables.put("id", nodeId);
         pathVariables.put("version_number", versionId);
-        return new Http().setDoAuthentication(true)
+        Http http = new Http().setDoAuthentication(true)
                 .basicAuthentication(this.userName, this.password)
                 .setContentType(Http.ContentType.JSON_REQUEST)
                 .get(uriComponentsBuilder.encode().buildAndExpand(pathVariables).toString());
+        if (!http.isSuccess())
+            throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return http;
     }
 
+
+    //categories
+    public Http updateCategoryOnNode(Long nodeId, Long categoryId, Map<String, String> categoryValues) throws AppworkException {
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(CS_API.UPDATE_CATEGORY_ON_NODE.getApiURL());
+        Map<String, Object> pathVariables = new HashMap<>();
+        pathVariables.put("id", nodeId);
+        pathVariables.put("category_id", categoryId);
+        Part[] parts = new Part[categoryValues.size()];
+        int index = 0;
+        for (Map.Entry<String, String> entry : categoryValues.entrySet()) {
+            System.out.println("Key = " + entry.getKey() +
+                    ", Value = " + entry.getValue());
+            parts[index] = new StringPart(entry.getKey(), entry.getValue());
+            ++index;
+        }
+        Http http = new Http().setDoAuthentication(true)
+                .basicAuthentication(this.userName, this.password)
+                .setData(parts)
+                .setContentType(Http.ContentType.FORM_REQUEST)
+                .put(uriComponentsBuilder.encode().buildAndExpand(pathVariables).toString());
+
+        if (!http.isSuccess())
+            throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+
+        return http;
+    }
+
+    //general
     public void fillURIComponentWithQuery(UriComponentsBuilder uriComponentsBuilder, DocumentQuery documentQuery) throws IllegalAccessException {
         Class<DocumentQuery> cls = DocumentQuery.class;
         Field[] fields = cls.getDeclaredFields();
@@ -153,11 +184,15 @@ public class AppworkCSOperations {
         NODE_ACTION(),
         //{{baseUrl}}/v2/nodes/:id/nodes
         GET_SUB_NODES("{id}/nodes"),
+
+        //versions
         //{{baseUrl}}/v2/nodes/:id/versions
         GET_NODES_VERSIONS("{id}/versions"),
         //{{baseUrl}}/v2/nodes/:id/versions
-        GET_SPECIFIED_NODE_VERSION("{id}/versions/{version_number}");
+        GET_SPECIFIED_NODE_VERSION("{id}/versions/{version_number}"),
 
+        //categories
+        UPDATE_CATEGORY_ON_NODE("{id}/categories/{category_id}");
 
         private final String apiURL;
 

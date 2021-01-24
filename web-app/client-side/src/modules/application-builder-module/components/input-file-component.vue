@@ -19,13 +19,72 @@
       </v-row>
     </v-container>
     <br/>
-    <span>الملفات</span>
+    <span v-if="files.length">
+        <span>الملفات المعلقة</span>
+        <v-container>
+          <v-alert
+              border="left"
+              color="outline"
+              colored-border
+              dense
+              icon="mdi-information-outline"
+              text
+          >
+            {{ $t('pleaseChooseFileTypeToCompleteFileUpload') }}
+          </v-alert>
+
+
+          <v-row v-for="(file, index) in files" :key="index">
+            <v-col cols="5">
+
+              <v-text-field
+                  v-model="file.file.name"
+                  color="outline"
+                  hide-details
+                  outlined readonly v-bind:label="$t('nameOfTheFile')"
+              >
+                <v-icon slot="append" color="red"
+                        @click="file.removeFile({file,index})">mdi-close-circle-outline</v-icon>
+              </v-text-field>
+
+
+            </v-col>
+
+            <v-col cols="5">
+              <v-autocomplete
+                  v-model="file.fileTypeSelected"
+                  :items="fileTypes"
+                  clearable
+                  color="outline"
+                  hide-details
+                  hide-no-data
+                  open-on-clear
+                  outlined
+                  small-chips
+                  v-bind:label="$t('typeOfTheFile')">
+
+              </v-autocomplete>
+
+
+            </v-col>
+
+            <v-col cols="2">
+              <v-btn style="height: 100%" @click="uploadFile(file)">
+                <v-icon>mdi-plus</v-icon>
+                test3
+              </v-btn>
+            </v-col>
+          </v-row>
+
+        </v-container>
+        <span>الملفات</span>
+    </span>
     <v-container>
       <v-row>
         <v-col :cols="12">
 
           <draggable :animation="150" :list="filesUploaded" :swapThreshold="0.5" class="row" tag="div"
-                     @change="onChange"
+
                      @end="onEnd($event)">
             <div
                 v-for="(file, index) in filesUploaded"
@@ -102,10 +161,11 @@ $font-12: 12px;
 <script>
 import draggable from 'vuedraggable'
 import Http from '../../core-module/services/http'
+import formPageMixin from "../../../mixins/formPageMixin";
 
 export default {
   components: {draggable},
-
+  mixins: [formPageMixin],
   name: 'file-input-component',
   props: ["val", "field"],
   data() {
@@ -114,7 +174,9 @@ export default {
       files: [],
       requestEntityId: '',
       filesUploaded: [],
-      attachmentSortList: []
+      filesBeforeUpload: [],
+      attachmentSortList: [],
+      fileTypes: []
 
     }
   },
@@ -123,9 +185,6 @@ export default {
     this.requestEntityId = 1;
   },
   methods: {
-    onChange: function (evt) {
-      console.log("onChange", evt);
-    },
     onEnd: function () {
       let tempArr = [];
       for (let i = 0; i < this.filesUploaded.length; ++i) {
@@ -174,47 +233,47 @@ export default {
       evt.dataTransfer.effectAllowed = 'move'
       evt.dataTransfer.setData('itemID', file.id)
     },
-    uploadFiles: function () {
-      const formData = new FormData()
-      this.files.forEach((file) => {
-        if (!this.filesUploaded.find(element => element.name === file.name))
-          formData.append('file', file)
-      })
-      // formData.append('file', this.files);
-      formData.append('parentId', this.bwsId)
-      Http.addHeader('Content-Type', 'multipart/form-data')
-      Http.post('/document/upload', formData)
-          .then((response) => {
-            let data = response.data.data;
-            let tempFilesArr = [];
-            for (let i = 0; i < data.length; ++i) {
-              const element = data[i];
-              for (let key in element) {
-                // eslint-disable-next-line no-prototype-builtins
-                if (element.hasOwnProperty(key)) {
-                  const fileObj = element[key].results.data.properties;
-
-                  tempFilesArr.push({
-                    "fileId": fileObj.id,
-                    "bwsId": this.bwsId,
-                    "requestEntityId": this.requestEntityId,
-                    "position": this.filesUploaded.length
-                  });
-
-                  this.filesUploaded.push(fileObj);
-                  this.files = this.files.filter(fileElement => fileElement.name !== fileObj.name)
-                }
-              }
-
-            }
-            this.createAttachmentSortRecord(tempFilesArr);
-
-          })
-          .catch((reason) => {
-            console.log(reason)
-            this.files = [];
-          })
-    },
+    // uploadFiles: function () {
+    //   const formData = new FormData()
+    //   this.files.forEach((file) => {
+    //     if (!this.filesUploaded.find(element => element.name === file.name))
+    //       formData.append('file', file)
+    //   })
+    //   // formData.append('file', this.files);
+    //   formData.append('parentId', this.bwsId)
+    //   Http.addHeader('Content-Type', 'multipart/form-data')
+    //   Http.post('/document/upload', formData)
+    //       .then((response) => {
+    //         let data = response.data.data;
+    //         let tempFilesArr = [];
+    //         for (let i = 0; i < data.length; ++i) {
+    //           const element = data[i];
+    //           for (let key in element) {
+    //             // eslint-disable-next-line no-prototype-builtins
+    //             if (element.hasOwnProperty(key)) {
+    //               const fileObj = element[key].results.data.properties;
+    //
+    //               tempFilesArr.push({
+    //                 "fileId": fileObj.id,
+    //                 "bwsId": this.bwsId,
+    //                 "requestEntityId": this.requestEntityId,
+    //                 "position": this.filesUploaded.length
+    //               });
+    //
+    //               this.filesUploaded.push(fileObj);
+    //               this.files = this.files.filter(fileElement => fileElement.name !== fileObj.name)
+    //             }
+    //           }
+    //
+    //         }
+    //         this.createAttachmentSortRecord(tempFilesArr);
+    //
+    //       })
+    //       .catch((reason) => {
+    //         console.log(reason)
+    //         this.files = [];
+    //       })
+    // },
     listFiles: async function () {
       let nodesResponse
           , attachmentSortResponse;
@@ -307,9 +366,40 @@ export default {
       Http.post('/document/sort/update/bulk', arr)
           .then(() => console.log("finished updating position in backend"))
           .catch(reason => console.error(reason))
+    },
+    uploadFile: function (file) {
+      console.log(file);
+    },
+    fillFilesArray: function (filesSource) {
+      if (!filesSource) return;
+      filesSource.forEach(element => {
+        this.files.push({
+          file: element,
+          removeFile: (obj) => {
+            console.log(obj)
+            this.files.splice(obj.index, 1);
+          },
+          fileTypeSelected: null
+        })
+      })
+      // this.files.forEach(element => {
+      //   // fileName
+      //   // removeFile
+      //   // fileTypeSelected
+      //   this.filesBeforeUpload.push({
+      //     fileName: element.name,
+      //     removeFile: (obj) => {
+      //       console.log(obj)
+      //       this.filesBeforeUpload.splice(obj.index, 1);
+      //       this.files.splice(obj.index, 1);
+      //     },
+      //     fileTypeSelected: null
+      //   })
+      //   console.log(element);
+      // })
     }
   },
-  mounted() {
+  async mounted() {
     const dropzone = this.$el.firstElementChild
     const fileUpload = dropzone.firstElementChild
     if (dropzone) {
@@ -329,10 +419,12 @@ export default {
         e.preventDefault()
         const dragevent = e
         if (dragevent.dataTransfer) {
-          for (let i = 0; i < dragevent.dataTransfer.files.length; i++) {
-            this.files.push(dragevent.dataTransfer.files[i])
-          }
-          this.uploadFiles()
+          this.fillFilesArray(dragevent.dataTransfer.files);
+          // for (let i = 0; i < dragevent.dataTransfer.files.length; i++) {
+          //   this.files.push(this.prepareFileObject(dragevent.dataTransfer.files[i]))
+          // }
+          // this.uploadFiles()
+          // this.updateFilesBeforeUpload();
 
         }
       })
@@ -344,22 +436,36 @@ export default {
         fileUpload.addEventListener('change', (e) => {
           const target = e.target
           if (target.files && target.files.length > 0) {
-            for (let i = 0; i < target.files.length; i++) {
-              this.files.push(target.files[i])
-            }
+            this.fillFilesArray(target.files);
+
+            // for (let i = 0; i < target.files.length; i++) {
+            //   this.files.push(this.prepareFileObject(target.files[i]))
+            // }
           }
-          this.uploadFiles()
+          // this.uploadFiles()
+          //this.updateFilesBeforeUpload();
+
         })
       }
     }
-    this.listFiles();
+    await this.listFiles();
 
+    let lookups = await this.getLookupByCategory("attachmentFileType");
+    console.log(lookups, this.$i18n.locale);
+
+    let langKey = this.$i18n.locale == 'ar' ? 'arValue' : 'enValue';
+    this.fileTypes = Array.from(lookups).map((element) => {
+      return {
+        text: element[langKey],
+        value: element['key']
+      }
+    })
   }
-  ,
 }
 </script>
 
 <style>
+
 .card {
   border: 2px solid #d6d6d6;
   border-radius: 6px;
@@ -371,6 +477,7 @@ export default {
   border: 2px solid #0278ae;
 }
 </style>
+
 <!-- <v-data-table
       :headers="tableHeaders"
       :items="files"

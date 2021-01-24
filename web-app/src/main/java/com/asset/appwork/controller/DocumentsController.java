@@ -18,11 +18,13 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -38,6 +40,9 @@ public class DocumentsController {
 
     @Autowired
     AttachmentSortService attachmentSortService;
+
+    @Autowired
+    Environment environment;
 
     @PostMapping("/upload")
     public ResponseEntity<AppResponse<JsonNode>> uploadFile(@RequestHeader("X-Auth-Token") String token,
@@ -338,5 +343,33 @@ public class DocumentsController {
         }
         return respBuilder.build().getResponseEntity();
     }
+
+
+    //categories
+    @PutMapping("{id}/categories/{categoryId}")
+    public ResponseEntity<AppResponse<JsonNode>> updateNodeOnDocument(@RequestHeader("X-Auth-Token") String token,
+                                                                      @RequestBody HashMap<String, String> categoryValues,
+                                                                      @PathVariable("id") Long nodeId,
+                                                                      @PathVariable("categoryId") Long categoryId) {
+
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
+            Http http = appworkCSOperations.updateCategoryOnNode(nodeId, categoryId, categoryValues);
+            respBuilder.status(SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+            respBuilder.data(SystemUtil.convertStringToJsonNode(http.getResponse()));
+            log.info("updatedNodeOnDocument: " + http.getResponse());
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            respBuilder.status(e.getCode());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+//    uploadThenUpdateCategory
+
 
 }
