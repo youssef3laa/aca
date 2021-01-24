@@ -3,25 +3,6 @@ import http from "../modules/core-module/services/http";
 export default {
     methods: {
 
-        async getMemoAutoCompeleteList() {
-            try {
-                var response = await http.get("/memo");
-                return response.data.data;
-            }
-            catch (error) {
-                console.log(error);
-            }
-        },
-        async setHistory(data) {
-            console.log(data);
-            try {
-                var response = await http.post("/history/create", data);
-                console.log(response.data);
-            }
-            catch (err) {
-                console.error(err);
-            }
-        },
         async setMemoData(data) {
             try {
                 var response = await http.post("/memorandum/create", data);

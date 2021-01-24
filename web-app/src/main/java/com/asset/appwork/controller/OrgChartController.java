@@ -861,6 +861,31 @@ public class OrgChartController {
     }
 
     @Transactional
+    @PostMapping("/user/read/list")
+    public ResponseEntity<AppResponse<JsonNode>> getAllUsers(@RequestHeader("X-Auth-Token") String token
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUsers().toString()));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
     @PutMapping("/user/{userId}/assign/group/{groupCode}")
     public ResponseEntity<AppResponse<JsonNode>> assignUserToGroup(@RequestHeader("X-Auth-Token") String token,
                                                                    @PathVariable("userId") String userId,
