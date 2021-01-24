@@ -1,9 +1,10 @@
 <template>
   <span>
     <div v-for="(section, key) in page.sections" :key="key">
-      <span v-if="page.tabs && key == 0">
+        <span v-if=" page.tabs && key ==0 && section.type!='TitleComponet'" >
         <TabBuilder :page="page" />
       </span>
+     
       <SectionBuilder
         v-bind:style="[
           section.isTab && section.display == 'none'
@@ -13,7 +14,11 @@
         v-on:modelChange="dataChange"
         :section="section"
       />
+       <span v-if=" page.tabs && key ==0 && section.type=='TitleComponet'" >
+        <TabBuilder :page="page" />
+      </span>
     </div>
+    
   </span>
 </template>
 

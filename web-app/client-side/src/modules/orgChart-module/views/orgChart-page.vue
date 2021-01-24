@@ -64,7 +64,12 @@ export default {
                   {
                     inputs: [
                       {
-                        type: "TableComponent",
+                        key: 'tableUser_delete',
+                        search: true, 
+                        filter: true,
+                        add: true,
+                        actions: [],
+                        type: "DataTableComponent",
                         name: "unitsTable",
                         subscribe: "units",
                         col: 12,
@@ -72,6 +77,7 @@ export default {
                     ],
                     model: {
                       unitsTable: {
+                        url : 'org/unit/read/list',
                         headers: [
                           {
                             text: "Internal code",
