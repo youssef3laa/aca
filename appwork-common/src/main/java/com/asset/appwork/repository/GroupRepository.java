@@ -33,4 +33,8 @@ public interface GroupRepository extends GenericRepository<Group, Long> {
     @Query(value = "{call ACA_ORG_SP_getGroupChildrenRecursivelyFilteredByUnitTypeCode(:groupCode, :unitTypeCode)}", nativeQuery = true)
     List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(@Param("groupCode") String groupCode,
                                                                   @Param("unitTypeCode") String unitTypeCode);
+    @Query(value = "{call ACA_ORG_SP_getGroupChildrenRecursivelyFilteredByUnitTypeCode(:groupCode, :unitTypeCode)}", nativeQuery = true)
+    List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(@Param("groupCode") String groupCode,
+                                                                  @Param("unitTypeCode") String unitTypeCode,
+                                                                  Pageable pageable);
 }
