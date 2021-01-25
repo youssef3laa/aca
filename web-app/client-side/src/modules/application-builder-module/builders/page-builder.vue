@@ -4,6 +4,7 @@
         <span v-if=" page.tabs && key ==0 && section.type!='TitleComponet'" >
         <TabBuilder :page="page" />
       </span>
+     
       <SectionBuilder
         v-bind:style="[
           section.isTab && section.display == 'none'
@@ -17,6 +18,7 @@
         <TabBuilder :page="page" />
       </span>
     </div>
+    
   </span>
 </template>
 <script>

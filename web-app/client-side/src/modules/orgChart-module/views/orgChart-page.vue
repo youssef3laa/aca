@@ -8,7 +8,7 @@
 
 <script>
 import AppBuilder from "../../application-builder-module/builders/app-builder";
-import http from "../../core-module/services/http";
+// import http from "../../core-module/services/http";
 
 export default {
   name: "OrgChart",
@@ -64,14 +64,19 @@ export default {
                   {
                     inputs: [
                       {
-                        type: "TableComponent",
+                        type: "DataTableComponent",
                         name: "unitsTable",
                         subscribe: "units",
                         col: 12,
+                        search: true,
+                        filter: true,
+                        add: true,
+                        actions: ['edit', 'delete', 'view'],
                       },
                     ],
                     model: {
                       unitsTable: {
+                        url : 'org/unit/read/list',
                         headers: [
                           {
                             text: "Internal code",
@@ -93,11 +98,6 @@ export default {
                             text: "Unit code",
                             value: "unitCode",
                           },
-                          // {
-                          //   text: "Actions",
-                          //   value: "actions",
-                          //   sortable: false,
-                          // },
                         ],
                         data: [],
                         search: "",
@@ -116,14 +116,19 @@ export default {
                   {
                     inputs: [
                       {
-                        type: "TableComponent",
+                        type: "DataTableComponent",
                         name: "rolesTable",
                         subscribe: "roles",
                         col: 12,
+                        search: true,
+                        filter: true,
+                        add: true,
+                        actions: ['edit', 'delete', 'view'],
                       },
                     ],
                     model: {
                       rolesTable: {
+                        url : 'org/group/read/list',
                         headers: [
                           {
                             text: "Internal code",
@@ -141,11 +146,6 @@ export default {
                             text: "Role code",
                             value: "groupCode",
                           },
-                          // {
-                          //   text: "Actions",
-                          //   value: "actions",
-                          //   sortable: false,
-                          // },
                         ],
                         data: [],
                         search: "",
@@ -164,14 +164,19 @@ export default {
                   {
                     inputs: [
                       {
-                        type: "TableComponent",
+                        type: "DataTableComponent",
                         name: "usersTable",
                         subscribe: "users",
                         col: 12,
+                        search: true,
+                        filter: true,
+                        add: true,
+                        actions: ['edit', 'delete', 'view'],
                       },
                     ],
                     model: {
                       usersTable: {
+                        url : 'org/user/read/list',
                         headers: [
                           {
                             text: "Username",
@@ -189,11 +194,6 @@ export default {
                             text: "Phone",
                             value: "details.phone",
                           },
-                          // {
-                          //   text: "Actions",
-                          //   value: "actions",
-                          //   sortable: false,
-                          // },
                         ],
                         data: [],
                         search: "",
@@ -216,36 +216,9 @@ export default {
     };
   },
   methods: {
-    getUnits: function () {
-      http.post("org/unit/read/list").then((response) => {
-        this.$observable.fire("units", {
-          type: "modelUpdate",
-          model: response.data,
-        });
-      });
-    },
-    getRoles: function () {
-      http.post("org/group/read/list").then((response) => {
-        this.$observable.fire("roles", {
-          type: "modelUpdate",
-          model: response.data,
-        });
-      });
-    },
-    getUsers: function () {
-      http.post("org/user/read/list").then((response) => {
-        this.$observable.fire("users", {
-          type: "modelUpdate",
-          model: response.data,
-        });
-      });
-    },
   },
 
   mounted: function () {
-    this.getUnits();
-    this.getRoles();
-    this.getUsers();
   },
 };
 </script>

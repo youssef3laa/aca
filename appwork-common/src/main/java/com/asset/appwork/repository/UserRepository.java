@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface UserRepository extends GenericRepository<User, Long> {
     Optional<User> findById(Long id);
 
-    List<User> findAll();
-    Page<User> findAll(Pageable pageable);
+    List<User> findAllByUserIdNotNull();
+    Page<User> findAllByUserIdNotNull(Pageable pageable);
 
     Optional<User> findByUserId(String userId);
 }
