@@ -2,60 +2,50 @@ import http from "../modules/core-module/services/http";
 
 export default {
     methods: {
-        loadForm: function (formName, callBack) {
-            http.get("/user/form/" + formName)
+        loadForm: function (formName,callBack) {
+            http.get("/user/form/"+formName)
                 .then((response) => {
                     this.$refs.appBuilder.setAppData(response.data.data.app);
-                    if (callBack) {
+                    if(callBack){
                         callBack();
                     }
                 })
                 .catch((error) => console.error(error));
         },
-        initiateProcess: function (data) {
-            http.post("/process/initiate", data)
-                .then((response) => {
-                    console.log(response);
-                    alert("Initiate Complete!");
-                })
-                .catch((error) => console.error(error));
-        },
-        getTaskData: function (taskId) {
-            http.get('/workflow/task/data?taskId=' + taskId)
-                .then((response) => {
-                    this.taskData = response.data.data.Body.GetTaskResponse.tuple.old.Task;
-                    this.readData();
-                })
-                .catch((error) => {
-                    console.error(error)
-                })
-        },
         claimTask: function (taskId) {
             http.post('/workflow/task/claim', taskId)
                 .then((response) => {
-                    console.log(response);
+                    console.log("ClaimTask Response:", response);
                 })
                 .catch((error) => {
                     console.error(error)
                 })
         },
-        readEntity: function (entityName, entityId) {
-            return http.get('/entity/read?entityName=' + entityName + '&entityId=' + entityId)
+        getTaskData: async function (taskId) {
+            try{
+                let response = await http.get('/workflow/task/data?taskId=' + taskId);
+                console.log("TaskData Response: ", response);
+                return response.data.data.Body.GetTaskResponse.tuple.old.Task;
+            } catch (error) {
+                console.error(error);
+            }
         },
-        completeStep: function (data) {
-            http.post("/process/complete", data)
-                .then((response) => {
-                    console.log(response);
-                    alert("Step Complete!");
-                })
-                .catch((error) => console.error(error));
-        },
-        getLookupByCategoryAndKey: async function (category, key) {
-            try {
-                var response = await http.get("lookup/get/category/" + category + "/key/" + key);
-                console.log("getLookupResponse", response.data);
+        readEntity: async function(entityName, entityId) {
+            try{
+                let response = await http.get('/entity/read?entityName='+ entityName +'&entityId='+entityId);
+                console.log("EntityData Response: ", response);
                 return response.data.data;
             } catch (error) {
+                console.error(error);
+            }
+        },
+        getLookupByCategoryAndKey: async function(category,key){
+            try {
+                var response = await http.get("lookup/get/category/" + category + "/key/" + key);
+                console.log("getLookupResponse",response.data);
+                return response.data.data;
+            }
+            catch (error) {
                 console.log(error);
             }
         },
@@ -68,7 +58,23 @@ export default {
                 console.log(error);
             }
         },
-        initiateBrava: function () {
+        initiateProcess: function (data){
+            http.post("/process/initiate", data)
+                .then((response) => {
+                    console.log(response);
+                    alert("Initiate Complete!");
+                })
+                .catch((error) => console.error(error));
+        },
+        completeStep: function(data){
+            http.post("/process/complete", data)
+                .then((response) => {
+                    console.log(response);
+                    alert("Step Complete!");
+                })
+                .catch((error) => console.error(error));
+        },
+        initiateBrava: function(){
             this.$observable.subscribe('open-file-brava', async (fileId) => {
                 this.$observable.fire('file-component-skeleton', true)
                 console.log("openfilebrava");

@@ -47,12 +47,16 @@ public class ModuleRouting {
     }
 
     @Data
-    static class StepConfig {
-        boolean hasAutocomplete = false;
-        String roleFilter = "", unitFilter = "", userFilter = "";
-        String page = "";
+    static class StepConfig<T> {
+        Boolean hasAutocomplete = false;
+        Boolean addApproval = true;
+        String roleFilter = "";
+        String unitFilter = "";
+        String userFilter = "";
+        String page = "" ;
         String subBP = "";
-        HashMap<String, String> nextStep;
+        HashMap<String, String> nextStep = new HashMap<>();
+        HashMap<String, T> extraData = new HashMap<>();
     }
 
     private RoutingConfig generateRoutingConfig() throws JsonProcessingException {
@@ -115,17 +119,11 @@ public class ModuleRouting {
     private <T> void calculateNextStep(T outputSchema) throws AppworkException {
         //TODO: Create Setter function in reflection class
         try {
-            String nextStep;
-            String nextPage = "";
-            String nextSubBP = "";
-            String nextRoleFilter = "";
+            String nextStep, nextPage = "", nextSubBP = "", nextRoleFilter = "";
 
             RoutingConfig routingConfig = generateRoutingConfig();
 
-            String[] currentStepId = {""};
-            String[] codeSelected = {""};
-            String[] decision = {""};
-            String[] parentHistoryId = {""};
+            String[] currentStepId = {""}, codeSelected = {""}, decision = {""}, parentHistoryId = {""};
 
             ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s) -> {
                 currentStepId[0] = (String) s;
@@ -188,6 +186,7 @@ public class ModuleRouting {
                 }
             }
 
+            updateOutputSchemaExtraData(outputSchema, routingConfig, currentStepId[0]);
             updateOutputSchema(outputSchema, nextStep, nextPage, nextSubBP, nextRoleFilter);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -239,7 +238,7 @@ public class ModuleRouting {
 
     private String getIdFromNextSteps(RoutingConfig routingConfig, String currentStepId, String inputCase){
         if (routingConfig.getSteps().get(currentStepId).getNextStep().containsKey(inputCase) ) {
-            return routingConfig.getSteps().get(currentStepId).getNextStep().get(inputCase);
+            return routingConfig.getSteps().get(currentStepId).getNextStep().get(inputCase).toString();
         }
         return "";
     }
@@ -249,6 +248,18 @@ public class ModuleRouting {
         ((OutputSchema) outputSchema).setPage(nextPage);
         ((OutputSchema) outputSchema).setSubBP(nextSubBP);
         ((OutputSchema) outputSchema).setRoleFilter(nextRoleFilter);
+    }
+
+    private <T> void updateOutputSchemaExtraData(T outputSchema, RoutingConfig routingConfig, String currentStep){
+        HashMap<String,T> extraData = new HashMap<>();
+        ReflectionUtil.of(outputSchema).ifPresent("getExtraData", (s) -> {
+            extraData.putAll((HashMap<String,T>) s);
+        });
+        extraData.putAll(routingConfig.getSteps().get(currentStep).getExtraData());
+
+        ((OutputSchema) outputSchema).setExtraData(extraData);
+
+        ((OutputSchema) outputSchema).setAddApproval(routingConfig.getSteps().get(currentStep).getAddApproval());
     }
 
     private <T> String calculateFromApprovalHistory(T outputSchema, String parentHistoryId) {
