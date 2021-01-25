@@ -136,7 +136,7 @@ public class OrgChartController {
     }
 
     @Transactional
-    @PostMapping("/unit/read/list")
+    @GetMapping("/unit/read/list")
     public ResponseEntity<AppResponse<JsonNode>> readUnitList(@RequestHeader("X-Auth-Token") String token,
                                                               @RequestParam(value = "page") Optional<Integer> page,
                                                               @RequestParam(value = "size") Optional<Integer> size
@@ -778,7 +778,7 @@ public class OrgChartController {
     }
 
     @Transactional
-    @PostMapping("/group/read/list")
+    @GetMapping("/group/read/list")
     public ResponseEntity<AppResponse<JsonNode>> readGroupList(@RequestHeader("X-Auth-Token") String token,
                                                                @RequestParam(value = "page") Optional<Integer> page,
                                                                @RequestParam(value = "size") Optional<Integer> size
@@ -940,7 +940,7 @@ public class OrgChartController {
     }
 
     @Transactional
-    @PostMapping("/user/read/list")
+    @GetMapping("/user/read/list")
     public ResponseEntity<AppResponse<JsonNode>> getAllUsers(@RequestHeader("X-Auth-Token") String token,
                                                              @RequestParam(value = "page") Optional<Integer> page,
                                                              @RequestParam(value = "size") Optional<Integer> size
