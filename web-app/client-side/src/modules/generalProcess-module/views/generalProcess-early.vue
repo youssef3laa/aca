@@ -61,6 +61,12 @@
                 this.$refs.appBuilder.setModelData("historyTable", {
                     taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
                 });
+
+                this.$refs.appBuilder.setModelData("signaturePage", {
+                    signature: {
+                        requestId: this.inputSchema.requestId   
+                    }
+                });
             },
             submit: function () {
                 let model = this.$refs.appBuilder.getModelData("form1");

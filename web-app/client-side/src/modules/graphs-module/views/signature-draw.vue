@@ -103,7 +103,8 @@ export default {
       console.log(isEmpty);
       // console.log(data);
 
-      this.uploadToCS(data, this.folderId);
+      await this.uploadToCS(data, this.folderId);
+      await this.reload();
     },
     change() {
       this.options = {
@@ -118,38 +119,47 @@ export default {
     clear() {
       this.$refs.signaturePad.clearSignature();
     },
+    reload: async function(){
+      if(!this.folderId) return;
+      const {
+        data: { data },
+      } = await this.getSubNodes(this.folderId);
+      const signatureList = data.results.map((image) => {
+        return {
+          id: image["data"]["properties"]["id"],
+          date: image["data"]["properties"]["create_date"],
+        };
+      });
+
+      // Download signatures
+      this.signatures = [];
+      signatureList.forEach(async (image) => {
+        const result = await this.downloadFromCS(image["id"]);
+        image["base64"] = `data:image/png;base64,${result}`;
+        this.signatures.push(image);
+      });
+    },
+    initialize: async function(){
+      if(!this.requestId) return;
+      let folder = await this.createFolder(
+              this.signaturesContainer,
+              this.requestId
+      );
+      this.folderId = folder.id
+
+      // List all signatures attached to request id
+      await this.reload();
+    }
   },
   async created() {
     // Return folder id
-    let folder = await this.createFolder(
-      this.signaturesContainer,
-      this.requestId
-    );
-    this.folderId = folder.id
-
-    // List all signatures attached to request id
-    const {
-      data: { data },
-    } = await this.getSubNodes(folder.id);
-    const signatureList = data.results.map((image) => {
-      return {
-        id: image["data"]["properties"]["id"],
-        date: image["data"]["properties"]["create_date"],
-      };
-    });
-
-    // Download signatures
-    signatureList.forEach(async (image) => {
-      const result = await this.downloadFromCS(image["id"]);
-      image["base64"] = `data:image/png;base64,${result}`;
-      this.signatures.push(image);
-    });
+    await this.initialize();
   },
-  // watch: {
-  //   requestId: function(newVal) {
-  //     this.requestId = newVal
-  //   }
-  // }
+  watch: {
+    requestId: function() {
+      this.initialize()
+    }
+  }
 };
 </script>
 
