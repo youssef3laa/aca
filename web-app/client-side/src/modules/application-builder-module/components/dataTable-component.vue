@@ -30,8 +30,43 @@
       :server-items-length="totalItems"
       :loading="loading"
       :footer-props="footerProps"
+      :search="search"
+      item-key="id"
       class="elevation-1"
-    ></v-data-table>
+    >
+      <template v-slot:item.action="{ item }">
+        <!-- <v-btn
+          color="primary"
+          dark
+        >
+          {{item.name_ar}}
+        </v-btn> -->
+
+        <v-menu top>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn color="primary" dark v-bind="attrs" v-on="on">
+              <v-icon> fas fa-ellipsis-h </v-icon>
+            </v-btn>
+          </template>
+
+          <v-list>
+            <v-list-item v-for="(i, index) in field.actions" :key="index">
+              <v-list-item-title v-on:click="handleAction(item, i)"
+                ><span v-if="i == 'Edit'"
+                  ><v-icon> far fa-edit </v-icon> {{ i }}</span
+                >
+                <span v-else-if="i == 'Delete'">
+                  <v-icon> far fa-trash-alt </v-icon> {{ i }}</span
+                >
+                <span v-else-if="i == 'View'">
+                  <v-icon> fas fa-expand-arrows-alt </v-icon> {{ i }}</span
+                >
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </template>
+    </v-data-table>
   </div>
 </template>
 <script>
@@ -41,7 +76,7 @@ export default {
   data() {
     return {
       search: null,
-      totalItems: 0,
+      totalItems: 61,
       d: this.val,
       loading: true,
       footerProps: {
@@ -67,8 +102,18 @@ export default {
     },
   },
   methods: {
+    handleAction(item, actionName) {
+      console.log(this.field.key + '_' + actionName)
+      //   console.log(item)
+      //   console.log(actionName)
+
+       this.$observable.fire(this.field.key + '_' + actionName, {item})
+    },
     getDataFromApi(event) {
-      if (!this.d.url) return
+      if (!this.d.url) {
+        this.loading = false
+        return
+      }
 
       this.loading = true
       const page = event.page - 1
@@ -77,15 +122,15 @@ export default {
         limit = this.totalItems
       }
       this.d.params = this.d.params ? this.d.params : {}
-        let params = this.d.params
-        params.page = page
-        params.size = limit
-        const URL = this.d.url + '?' + new URLSearchParams(params).toString()
+      let params = this.d.params
+      params.page = page
+      params.size = limit
+      const URL = this.d.url + '?' + new URLSearchParams(params).toString()
       http
-        .get(URL)
+        .post(URL)
         .then((response) => {
-          this.totalItems = response.data.data.count
-          this.d.data = response.data.data.list
+          //   this.totalItems = response.data.metaInfo.totalCount
+          this.d.data = response.data.data
           this.loading = false
         })
         .catch((error) => {
@@ -109,7 +154,7 @@ export default {
     }
   },
   mounted() {
-    console.log(this.d.data)
+    console.log(this.d)
   },
   props: ['val', 'field'],
 }
