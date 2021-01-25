@@ -1,6 +1,7 @@
 package com.asset.appwork.cs;
 
 
+import com.asset.appwork.dto.CreateNode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.util.Http;
 import com.asset.appwork.util.SystemUtil;
@@ -10,12 +11,13 @@ import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class AppworkCSOperations {
 
@@ -58,20 +60,42 @@ public class AppworkCSOperations {
         return http;
     }
 
-    public Http uploadDocument(byte[] file, Long parentId, String fileName, String type) throws AppworkException {
-        String urlStr = CS_API.NODE_ACTION.getApiURL();
-        Part[] parts =
-                {
-                        new FilePart("file", new ByteArrayPartSource(fileName, file)),
-                        new StringPart("name", fileName),
-                        new StringPart("parent_id", String.valueOf(parentId)),
-                        new StringPart("type", type)
-                };
+    public Http uploadDocument(CreateNode createNode) throws AppworkException, IllegalAccessException, NoSuchFieldException, IOException {
 
+        Class<CreateNode> createNodeClass = CreateNode.class;
+        Field[] fields = createNodeClass.getDeclaredFields();
+        List<Part> parts = new ArrayList<>();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            Object o = field.get(createNode);
+            if (o == null) continue;
+
+            if (o instanceof MultipartFile) {
+                Field fileName = createNodeClass.getDeclaredField("name");
+                fileName.setAccessible(true);
+                byte[] bytes = ((MultipartFile) o).getBytes();
+                parts.add(new FilePart(field.getName(),
+                        new ByteArrayPartSource((String) fileName.get(createNode),
+                                bytes)));
+            } else {
+                parts.add(new StringPart(field.getName(), String.valueOf(o), StandardCharsets.UTF_8.name()));
+            }
+        }
+        String urlStr = CS_API.NODE_ACTION.getApiURL();
+//        Part[] parts =
+//                {
+//                        new FilePart("file", new ByteArrayPartSource(createNode.getName(), createNode.getFile().getBytes())),
+//                        new StringPart("name", createNode.getName()),
+//                        new StringPart("parent_id", String.valueOf(createNode.getParent_id())),
+//                        new StringPart("type", String.valueOf(createNode.getType()))
+//                };
+
+        Part[] partsArray = new Part[parts.size()];
+        partsArray = parts.toArray(partsArray);
         Http http = new Http().setDoAuthentication(true)
                 .basicAuthentication(this.userName, this.password)
                 .setContentType(Http.ContentType.FORM_REQUEST)
-                .setData(parts)
+                .setData(partsArray)
                 .post(urlStr);
         if (!http.isSuccess())
             throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));

@@ -3,6 +3,7 @@ package com.asset.appwork.controller;
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.cs.AppworkCSOperations;
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.dto.CreateNode;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.AttachmentSort;
@@ -21,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -44,25 +44,74 @@ public class DocumentsController {
     @Autowired
     Environment environment;
 
+    //    @PostMapping("/upload")
+//    public ResponseEntity<AppResponse<JsonNode>> uploadFile(@RequestHeader("X-Auth-Token") String token,
+//                                                            @RequestParam("file") MultipartFile file,
+//                                                            @RequestParam("parentId") Long parentId,
+//                                                            @RequestParam("name") String name) {
     @PostMapping("/upload")
     public ResponseEntity<AppResponse<JsonNode>> uploadFile(@RequestHeader("X-Auth-Token") String token,
-                                                            @RequestParam("file") MultipartFile file,
-                                                            @RequestParam("parentId") Long parentId,
-                                                            @RequestParam("name") String name) {
+                                                            CreateNode createNode) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
             try {
+//                CreateNode createNode = new CreateNode();
+//                createNode.setFile(file.getBytes());
+//                createNode.setName(name);
+//                createNode.setParentId(parentId);
+                createNode.setType(144);
                 Http http = appworkCSOperations.
-                        uploadDocument(file.getBytes(), parentId, name, String.valueOf(144));
+                        uploadDocument(createNode);
                 System.out.println(http.getResponse());
                 System.out.println(http.getStatusCode());
-                respBuilder.status(ResponseCode.SUCCESS);
-            } catch (IOException e) {
+                respBuilder.status(ResponseCode.CREATED);
+            } catch (IllegalAccessException | NoSuchFieldException e) {
+                e.printStackTrace();
                 log.error(e.getMessage());
-                respBuilder.status(ResponseCode.UNSUPPORTED_FILE_TYPE);
+                respBuilder.status(ResponseCode.BAD_REQUEST);
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @PostMapping("/create/folder")
+    public ResponseEntity<AppResponse<JsonNode>> createFolder(@RequestHeader("X-Auth-Token") String token,
+                                                              CreateNode createNode) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
+            AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
+            try {
+//                CreateNode createNode = new CreateNode();
+//                createNode.setFile(file.getBytes());
+//                createNode.setName(name);
+//                createNode.setParentId(parentId);
+                createNode.setType(0);
+                Http http = appworkCSOperations.
+                        uploadDocument(createNode);
+                System.out.println(http.getResponse());
+                System.out.println(http.getStatusCode());
+                respBuilder.status(ResponseCode.CREATED);
+            } catch (IllegalAccessException | NoSuchFieldException e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+                respBuilder.status(ResponseCode.BAD_REQUEST);
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
             }
         } catch (AppworkException e) {
             log.error(e.getMessage());
