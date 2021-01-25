@@ -9,6 +9,7 @@ import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.util.SystemUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +26,11 @@ public class EntityController {
     @Autowired
     CordysService cordysService;
 
-    @SuppressWarnings("DuplicatedCode")
     @GetMapping("/read")
-    public ResponseEntity<AppResponse<String>> readEntity(@RequestHeader("X-Auth-Token") String token
+    public ResponseEntity<AppResponse<JsonNode>> readEntity(@RequestHeader("X-Auth-Token") String token
             , @RequestParam("entityName") String entityName
             , @RequestParam("entityId") Long entityId) {
-        AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account != null) {
@@ -38,7 +38,7 @@ public class EntityController {
                 Entity entity = new Entity(account, apiBaseUrl,entityName);
                 String response = entity.readById(entityId);
                 response = SystemUtil.readJSONObject(response, "Properties");
-                respBuilder.data(response);
+                respBuilder.data(SystemUtil.convertStringToJsonNode(response));
             }
         } catch (AppworkException e) {
             e.printStackTrace();

@@ -79,9 +79,30 @@
         "stepAD": {
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
-            "page": "generalProcess-approvals",
+            "page": "generalProcess-stepAD",
             "nextStep": {
-                "approve": "end"
+                "approve": ""
+            },
+            "subBP": "ACA_SubBP_parallelTasks",
+            "extraData": {
+                "assignees": { 
+                    "assignee": [
+                        "cn=HCAO,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local", 
+                        "cn=HCAG,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local" , 
+                        "cn=MCAG,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local"
+                    ] 
+                },
+                "stepIdSBP": "parallel",
+                "roleFilterSBP": "org/group/findByCodes/HRCA",
+                "pageSBP": "generalProcess-parallel"
+            }
+        },
+        "parallel": {
+            "hasAutocomplete": true,
+            "roleFilter": "org/group/findByCodes/HRCA",
+            "page": "generalProcess-parallel",
+            "nextStep": {
+                "comment": "stepRG"
             }
         }
     }

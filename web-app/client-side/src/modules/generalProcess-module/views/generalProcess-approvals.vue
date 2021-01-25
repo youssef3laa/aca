@@ -15,65 +15,67 @@
         components: {
             AppBuilder,
         },
+        data() {
+            return {
+                taskId: "",
+                taskData: {},
+                inputSchema: {},
+                app: {},
+                model: {},
+            };
+        },
+        async created() {
+            this.taskId = this.$route.params.taskId;
+            this.initiateBrava();
+            this.claimTask(this.taskId);
 
+            this.taskData = await this.getTaskData(this.taskId);
+            this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
+            this.loadForm("generalProcess-member", this.fillForm);
+
+            this.$observable.subscribe("complete-step", this.submit);
+        },
         methods: {
-            readData: function () {
-                console.log("TaskData", this.taskData);
-                this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
-                //   let page = this.inputSchema.page;
-
-                this.loadForm("generalProcess-member", this.fillForm);
-            },
             fillForm: async function () {
                 this.$refs.appBuilder.disableSection("section1")
                 let entityName = this.inputSchema.entityName;
                 let entityId = this.inputSchema.entityId;
-                this.readEntity(entityName, entityId)
-                    .then(async (response) => {
-                        response = JSON.parse(response.data.data);
 
-                        var workTypeObj = await this.getLookupByCategoryAndKey("workType",response.workType);
-                        var incomingMeansObj = await this.getLookupByCategoryAndKey("incomingMeans",response.incomingMeans);
+                let entityData = await this.readEntity(entityName, entityId);
+                let workTypeObj = await this.getLookupByCategoryAndKey("workType", entityData.workType);
+                let incomingMeansObj = await this.getLookupByCategoryAndKey("incomingMeans", entityData.incomingMeans);
 
-                        this.$refs.appBuilder.setModelData("form1", {
-                            stepId: this.inputSchema.stepId,
-                            subjectSummary: response.summary,
-                            workType: workTypeObj.arValue,
-                            incomingMeans: incomingMeansObj.arValue,
-                            receiver: {
-                                url: this.inputSchema.roleFilter,
-                                list: [],
-                                value: ""
-                            },
-                            writingDate: response.writingDate.split("Z")[0],
-                        });
+                this.$refs.appBuilder.setModelData("form1", {
+                    stepId: this.inputSchema.stepId,
+                    subjectSummary: entityData.summary,
+                    workType: workTypeObj.arValue,
+                    incomingMeans: incomingMeansObj.arValue,
+                    receiver: {
+                        url: this.inputSchema.roleFilter,
+                        list: [],
+                        value: ""
+                    },
+                    writingDate: entityData.writingDate.split("Z")[0],
+                });
 
-                        this.$refs.appBuilder.setModelData("historyTable", {
-                            taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
-                        });
+                this.$refs.appBuilder.setModelData("memoPage", {
+                    memoComp: {
+                        requestId: this.inputSchema.requestId
+                    }
+                })
 
-                        console.log("response", response);
-                    })
-                    .catch((error) => {
-                        console.error(error);
-                    });
+                this.$refs.appBuilder.setModelData("historyTable", {
+                    taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
+                });
             },
-        },
-        async created() {
-            this.taskId = this.$route.params.taskId;
-            this.claimTask(this.taskId);
-            this.getTaskData(this.taskId);
-            this.initiateBrava();
-            this.$observable.subscribe("complete-step", () => {
-                // if(!this.$refs.appBuilder) return;
-                console.log("complete-step-clicked");
-                console.log(this.$refs.appBuilder);
-                // var model =
+            submit: function () {
                 let model = this.$refs.appBuilder.getModelData("form1");
                 let approvalModel = this.$refs.appBuilder.getModelData("ApprovalForm");
-                console.log("MODEL:", model);
-                console.log("APPROVAL MODEL", approvalModel);
-                // if (model._valid) {
+                // if (!model._valid){
+                //   //@TODO show warning
+                //   return;
+                // }
+
                 var data = {
                     taskId: this.taskId,
                     entityId: this.inputSchema.entityId,
@@ -87,19 +89,7 @@
                     comment: approvalModel.approval.comment,
                 };
                 this.completeStep(data);
-                // }
-            });
-
-        },
-
-        data() {
-            return {
-                taskId: "",
-                taskData: {},
-                inputSchema: {},
-                app: {},
-                model: {},
-            };
-        },
+            }
+        }
     };
 </script>

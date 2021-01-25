@@ -10,7 +10,7 @@
     import historyMixin from "../../history-module/mixin/historyMixin";
 
     export default {
-        name: "generalProcess-member",
+        name: "generalProcess-parallel",
         mixins: [formPageMixin, historyMixin],
         components: {
             AppBuilder,
@@ -21,7 +21,7 @@
                 taskData: {},
                 inputSchema: {},
                 app: {},
-                model: {},
+                model: {}
             };
         },
         async created() {
@@ -31,13 +31,13 @@
 
             this.taskData = await this.getTaskData(this.taskId);
             this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
-            this.loadForm("generalProcess-member", this.fillForm);
+            this.loadForm("generalProcess-parallel", this.fillForm);
 
             this.$observable.subscribe("complete-step", this.submit);
         },
         methods: {
             fillForm: async function () {
-                this.$refs.appBuilder.disableSection("section1")
+                this.$refs.appBuilder.disableSection("section1");
                 let entityName = this.inputSchema.entityName;
                 let entityId = this.inputSchema.entityId;
 
@@ -57,12 +57,6 @@
                     },
                     writingDate: entityData.writingDate.split("Z")[0],
                 });
-
-                this.$refs.appBuilder.setModelData("memoPage", {
-                    memoComp: {
-                        requestId: this.inputSchema.requestId
-                    }
-                })
 
                 this.$refs.appBuilder.setModelData("historyTable", {
                     taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
@@ -86,7 +80,7 @@
                     code: model.receiver.value.code,
                     assignedCN: model.receiver.value.value,
                     decision: approvalModel.approval.decision,
-                    comment: approvalModel.approval.comment
+                    comment: approvalModel.approval.comment,
                 };
                 this.completeStep(data);
             }
