@@ -1,0 +1,157 @@
+<template>
+  <div id="app">
+    <v-card>
+      <div class="container">
+        <v-alert outlined type="info" prominent icon="mdi-draw">
+          <p style="font-size: 16px; color: black">
+            <span style="font-size: 20px; color: #609ec1"> التأشيرة </span
+            ><br />
+            تستخدم هذه المساحة لكتابة تأشيرة السيد مدير الهيئة
+          </p>
+        </v-alert>
+        <!-- <h3>التأشيرة</h3> -->
+        <div class="col-12 mt-2">
+          <VueSignaturePad
+            id="signature"
+            width="100%"
+            height="500px"
+            ref="signaturePad"
+            :options="options"
+          />
+        </div>
+        <v-row align="center" justify="space-around" style="padding: 10px">
+          <v-btn @click="clear">مسح</v-btn>
+          <v-btn @click="undo">الغاء</v-btn>
+          <v-btn @click="save">حفظ</v-btn>
+        </v-row>
+      </div>
+    </v-card>
+    <v-card style="top: 30px">
+      <div class="container">
+        <!-- <h3>التأشيرات السابقة</h3> -->
+        <v-alert outlined type="info" prominent icon="mdi-draw">
+          <p style="font-size: 16px; color: black">
+            <span style="font-size: 20px; color: #609ec1">
+              التأشيرات السابقة
+            </span>
+          </p>
+        </v-alert>
+        <v-img
+          :src="selected"
+          width="100%"
+          height="500px"
+          id="signature"
+        ></v-img>
+        <v-sheet class="mx-auto" elevation="8" max-width="100%">
+          <v-slide-group v-model="selected" class="pa-4" mandatory show-arrows>
+            <v-slide-item
+              v-for="signature in signatures"
+              v-bind:value="signature.base64"
+              :key="signature.id"
+              v-slot="{ active, toggle }"
+            >
+              <v-card
+                :style="active ? 'border: 2px solid #aaaaaa;' : ''"
+                class="ma-4"
+                height="200"
+                width="155px"
+                @click="toggle"
+              >
+                <v-img
+                  :src="signature.base64"
+                  style="border: 2px solid #e9e9e9; height: 100px"
+                ></v-img>
+                <v-card-text>{{ signature.date.split("T")[0] }}</v-card-text>
+              </v-card>
+            </v-slide-item>
+          </v-slide-group>
+        </v-sheet>
+      </div>
+    </v-card>
+  </div>
+</template>
+
+<script>
+import signatureMixin from "../mixin/signatureMixin";
+
+export default {
+  data() {
+    return {
+      options: {
+        penColor: "black",
+        // backgroundColor: 'rgb(255, 255, 255)'
+      },
+      requestId: 665146,
+      signatures: [],
+      selected: null,
+    };
+  },
+  mixins: [signatureMixin],
+  methods: {
+    undo() {
+      this.$refs.signaturePad.undoSignature();
+    },
+    async save() {
+      const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
+
+      alert("Open DevTools see the save data.");
+      console.log(isEmpty);
+      // console.log(data);
+
+      this.uploadToCS(data, this.requestId);
+    },
+    change() {
+      this.options = {
+        penColor: "#00f",
+      };
+    },
+    resume() {
+      this.options = {
+        penColor: "#c0f",
+      };
+    },
+    clear() {
+      this.$refs.signaturePad.clearSignature();
+    },
+  },
+  async created() {
+    // List all signatures attached to request id
+    const {
+      data: { data },
+    } = await this.getSubNodes(this.requestId);
+    const signatureList = data.results.map((image) => {
+      return {
+        id: image["data"]["properties"]["id"],
+        date: image["data"]["properties"]["create_date"],
+      };
+    });
+
+    // Download signatures
+    signatureList.forEach(async (image) => {
+      const result = await this.downloadFromCS(image["id"]);
+      image["base64"] = `data:image/png;base64,${result}`;
+      this.signatures.push(image);
+    });
+  },
+};
+</script>
+
+<style>
+#signature {
+  /* border: double 3px transparent;
+border-radius: 5px;
+background-image: linear-gradient(white, white),
+    radial-gradient(circle at top left, #4bc5e8, #9f6274);
+background-origin: border-box;
+  background-clip: content-box, border-box; */
+  background: var(--unnamed-color-ffffff) 0% 0% no-repeat padding-box;
+  background: #ffffff 0% 0% no-repeat padding-box;
+  box-shadow: 0px 3px 6px #00000014;
+  border: 2px solid #aaaaaa;
+  border-radius: 5px;
+  opacity: 1;
+}
+.v-alert--outlined {
+  border: none !important ;
+}
+</style>

@@ -1,5 +1,6 @@
 package com.asset.appwork.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -19,10 +20,12 @@ public class ApprovalHistory {
 
     String decision;
     String comment;
-    Date approvalDate;
     String userCN;
     String entityId;
     String processName;
     String stepId;
     String parent;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd , hh:mm:ss a")
+    Date approvalDate;
 }

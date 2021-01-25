@@ -27,6 +27,7 @@ public class Http {
     ContentType contentType;
     Integer statusCode;
     String response;
+    byte[] responseFile;
     boolean doAuthentication;
     boolean isSuccess = true;
 
@@ -50,6 +51,10 @@ public class Http {
 
     public String getResponse() {
         return this.response;
+    }
+
+    public byte[] getResponseFile() {
+        return this.responseFile;
     }
 
     public Http setHeader(String key, String value) {
@@ -78,6 +83,25 @@ public class Http {
         try {
             statusCode = this.client.executeMethod(method);
             response = method.getResponseBodyAsString();
+            if (method.getStatusCode() > 299) isSuccess = false;
+
+        } catch (IOException e) {
+            // @TODO log file
+            isSuccess = false;
+            log.error(e.getMessage());
+        }
+        return this;
+    }
+
+    public Http download(String url) {
+        GetMethod method = new GetMethod(url);
+        if (!headers.isEmpty()) headers.forEach(headerVar -> {
+            method.addRequestHeader(headerVar);
+        });
+
+        try {
+            statusCode = this.client.executeMethod(method);
+            responseFile = method.getResponseBody();
             if (method.getStatusCode() > 299) isSuccess = false;
 
         } catch (IOException e) {

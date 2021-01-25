@@ -10,14 +10,26 @@ import java.util.Collection;
 public abstract class PositionPlatformMixIn {
     @JsonIgnore
     Long id;
-    @JsonProperty("PositionName")
     String name;
-    @JsonProperty("Description")
     String description;
-    @JsonProperty("Lead")
     Boolean isLead;
     @JsonIgnore
     Unit unit;
     @JsonIgnore
     Collection<Assignment> assignment;
+
+    @JsonProperty("PositionName")
+    public String getName() {
+        return name;
+    }
+
+    @JsonProperty("Description")
+    public String getDescription() {
+        return description;
+    }
+
+    @JsonProperty("Lead")
+    public Boolean getIsLead() {
+        return isLead;
+    }
 }

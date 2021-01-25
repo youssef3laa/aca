@@ -8,6 +8,9 @@ import ManualStep from '../modules/manual-step-module/router/router'
 import generalProcessRoutes from '../modules/generalProcess-module/router/router'
 import HistoryRoutes from '../modules/history-module/router/router'
 import correspondenceRoutes from '../modules/correspondence-data-module/router/router'
+import OrgChartRoutes from '../modules/orgChart-module/router/router'
+import observable from "../modules/core-module/lib/vue-sub-lib";
+
 Vue.use(VueRouter)
 
 // const routess = [
@@ -27,12 +30,21 @@ Vue.use(VueRouter)
 // ]
 
 let allRoutes = [];
-allRoutes = allRoutes.concat(LoginRoutes, AdminRoutes, DemoRoutes,
-    ManualStep, generalProcessRoutes, HistoryRoutes,correspondenceRoutes,{
+allRoutes = allRoutes.concat(
+    LoginRoutes,
+    AdminRoutes,
+    DemoRoutes,
+    ManualStep,
+    generalProcessRoutes,
+    HistoryRoutes,
+    correspondenceRoutes,
+    OrgChartRoutes,
+    {
         path: '/',
         name: 'Home',
         component: Home,
-    })
+    }
+)
 
 const routes = allRoutes
 
@@ -40,6 +52,10 @@ const router = new VueRouter({
     mode: 'history',
     base: process.env.BASE_URL,
     routes,
+})
+
+router.afterEach(() => {
+    observable.observers = {}
 })
 
 export default router

@@ -46,44 +46,29 @@ public class DocumentsController {
 
     @PostMapping("/upload")
     public ResponseEntity<AppResponse<JsonNode>> uploadFile(@RequestHeader("X-Auth-Token") String token,
-                                                            @RequestParam("file") MultipartFile[] files,
-                                                            @RequestParam("parentId") Long parentId) {
+                                                            @RequestParam("file") MultipartFile file,
+                                                            @RequestParam("parentId") Long parentId,
+                                                            @RequestParam("name") String name) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        ObjectMapper objectMapper = new ObjectMapper();
-        ArrayNode jsonNodes = objectMapper.createArrayNode();
-        String currentFileName = "";
         try {
             Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
             try {
-                for (MultipartFile mf : files) {
-                    currentFileName = mf.getOriginalFilename();
-                    Http http = appworkCSOperations.
-                            uploadDocument(mf.getBytes(), parentId, mf.getOriginalFilename(), String.valueOf(144));
-                    System.out.println(http.getResponse());
-                    System.out.println(http.getStatusCode());
-                    ObjectNode fileNode = objectMapper.createObjectNode();
-                    fileNode.set(mf.getOriginalFilename(), objectMapper.readTree(http.getResponse()));
-                    jsonNodes.add(fileNode);
-
-                }
+                Http http = appworkCSOperations.
+                        uploadDocument(file.getBytes(), parentId, name, String.valueOf(144));
+                System.out.println(http.getResponse());
+                System.out.println(http.getStatusCode());
+                respBuilder.status(ResponseCode.SUCCESS);
             } catch (IOException e) {
                 log.error(e.getMessage());
                 respBuilder.status(ResponseCode.UNSUPPORTED_FILE_TYPE);
-                ObjectNode errorNode = objectMapper.createObjectNode();
-                errorNode.set(currentFileName, objectMapper.readTree(e.getMessage()));
-                jsonNodes.add(errorNode);
             }
-        } catch (AppworkException | JsonProcessingException e) {
+        } catch (AppworkException e) {
             log.error(e.getMessage());
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-            ObjectNode errorNode = objectMapper.createObjectNode();
-            errorNode.put(currentFileName, e.getMessage());
-            jsonNodes.add(errorNode);
-
         }
 
-        respBuilder.data(jsonNodes);
         return respBuilder.build().getResponseEntity();
     }
 
@@ -341,6 +326,28 @@ public class DocumentsController {
             respBuilder.data(obj);
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @GetMapping("/download/{documentId}")
+    public ResponseEntity<AppResponse<byte[]>> uploadFile(@RequestHeader("X-Auth-Token") String token,
+                                                          @PathVariable("documentId") Long documentId) {
+        AppResponse.ResponseBuilder<byte[]> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
+
+            Http http = appworkCSOperations.downloadDocument(documentId);
+
+            byte[] file = http.getResponseFile();
+
+            respBuilder.status(ResponseCode.SUCCESS);
+            respBuilder.data(file);
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+
         return respBuilder.build().getResponseEntity();
     }
 

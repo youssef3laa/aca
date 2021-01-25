@@ -172,6 +172,17 @@ public class AppworkCSOperations {
         }
     }
 
+    public Http downloadDocument(Long documentId) throws AppworkException {
+        String urlStr = CS_API.NODE_ACTION.getApiURL() + documentId + "/content";
+        Http http = new Http().setDoAuthentication(true)
+                .basicAuthentication(this.userName, this.password)
+                .download(urlStr);
+        if (!http.isSuccess())
+            throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+
+        return http;
+    }
+
     public enum CS_API {
         //APIs source URL
         //https://appworksdeveloper.opentext.com/webaccess/#url=%2Fawd%2Fresources%2Fapis%2Fcs-rest-api-for-cs-16-s%23!%2Fnodes&tab=501

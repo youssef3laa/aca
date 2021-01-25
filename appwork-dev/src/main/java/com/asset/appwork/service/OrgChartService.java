@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -41,7 +43,7 @@ public class OrgChartService {
     public Unit createUnit(Account account, String props) throws AppworkException {
         return getUnit(new Entity(account,
                 SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
-                "OrganizationalUnit").create(props));
+                "OrganizationalUnit").create(Unit.fromString(props).toPlatformString()));
     }
 
     public Unit getUnit(Long id) throws AppworkException {
@@ -58,7 +60,7 @@ public class OrgChartService {
 
     public Unit updateUnit(Account account, Long id, String props) throws AppworkException {
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
-                "OrganizationalUnit").update(id, props);
+                "OrganizationalUnit").update(id, Unit.fromString(props).toPlatformString());
         return getUnit(id);
     }
 
@@ -72,7 +74,11 @@ public class OrgChartService {
     }
 
     public List<Unit> getAllUnits() {
-        return unitRepository.findAll();
+        return unitRepository.findAllByUnitCodeNotNull();
+    }
+
+    public Page<Unit> getAllUnits(int page, int size) {
+        return unitRepository.findAllByUnitCodeNotNull(PageRequest.of(page, size));
     }
 
     public void addSubUnitToUnit(Account account, Long id, Long subUnitId) {
@@ -81,10 +87,17 @@ public class OrgChartService {
                 "OrganizationalUnit").addRelation(id, "SubUnits", Collections.singletonList(targetId).toString());
     }
 
+    public void addSubUnitToUnit(Account account, String parentUnitCode, String subUnitCode) throws AppworkException {
+        Long id = getUnitByName(parentUnitCode).getId();
+        Long subUnitId = getUnitByName(subUnitCode).getId();
+
+        addSubUnitToUnit(account, id, subUnitId);
+    }
+
     public Position createPosition(Account account, Long unitId, String props) throws AppworkException {
         return getPosition(new Entity(account,
                 SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
-                "OrganizationalUnit").createChild(unitId, "Position", props));
+                "OrganizationalUnit").createChild(unitId, "Position", Position.fromString(props).toPlatformString()));
     }
 
     public Position getPosition(Long id) throws AppworkException {
@@ -101,7 +114,8 @@ public class OrgChartService {
 
     public Position updatePosition(Account account, Long unitId, Long id, String props) throws AppworkException {
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
-                "OrganizationalUnit").updateChild(unitId, "Position", id, props);
+                "OrganizationalUnit").updateChild(unitId, "Position", id,
+                Position.fromString(props).toPlatformString());
         return getPosition(id);
     }
 
@@ -115,14 +129,18 @@ public class OrgChartService {
     }
 
     public List<Position> getAllPositions() {
-        return positionRepository.findAll();
+        return positionRepository.findAllByNameNotNull();
+    }
+
+    public Page<Position> getAllPositions(int page, int size) {
+        return positionRepository.findAllByNameNotNull(PageRequest.of(page, size));
     }
 
     public Assignment createAssignment(Account account, Long unitId, Long positionId, String props) throws AppworkException {
         return getAssignment(new Entity(account,
                 SystemUtil.generateRestAPIBaseUrl(env, "OpenTextEntityIdentityComponents"),
                 "OrganizationalUnit").createAddChildRelation(unitId, "Position", positionId,
-                "ToAssignment", props));
+                "ToAssignment", Assignment.fromString(props).toPlatformString()));
     }
 
     public Assignment getAssignment(Long id) throws AppworkException {
@@ -133,7 +151,7 @@ public class OrgChartService {
 
     public Assignment updateAssignment(Account account, Long id, String props) throws AppworkException {
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "OpenTextEntityIdentityComponents"),
-                "Assignment").update(id, props);
+                "Assignment").update(id, Assignment.fromString(props).toPlatformString());
         return getAssignment(id);
     }
 
@@ -163,10 +181,17 @@ public class OrgChartService {
                 .map(unit -> unitRepository.findByParent(unit)).orElse(Collections.emptyList());
     }
 
-    public Group createGroup(Account account, String props) throws AppworkException {
+    // TODO: Double Check Result
+    public Page<Unit> getUnitChildren(String code, int page, int size) {
+        return unitRepository.findByNameAndUnitCodeNotNull(code)
+                .map(unit -> unitRepository.findByParent(unit, PageRequest.of(page, size))).orElse(Page.empty());
+    }
+
+    public Group createGroup(Account account, String props) throws AppworkException, JsonProcessingException {
+        Member member = new Member(env.getProperty("otds.partition"), SystemUtil.getJsonByPtrExpr(props, "/name"), Collections.emptyList());
         String createdGroupName = SystemUtil.getJsonByPtrExpr(
                 new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
-                        .createGroup(SystemUtil.getJsonObjectByPtrExpr(props, "/otdsGroup")),
+                        .createGroup(member.toString()),
                 "/name");
         int counter = 0;
         do {
@@ -186,7 +211,7 @@ public class OrgChartService {
         Group platformGroupPostUpdate = groupRepository.findByName(createdGroupName).get();
 
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
-                "Group").update(platformGroupPostUpdate.getId(), SystemUtil.getJsonObjectByPtrExpr(props, "/platformGroup"));
+                "Group").update(platformGroupPostUpdate.getId(), Group.fromString(props).toPlatformString());
         return getGroup(platformGroupPostUpdate.getId());
     }
 
@@ -206,16 +231,32 @@ public class OrgChartService {
         return groupRepository.findByNameInAndGroupCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")));
     }
 
+    public Page<Group> getGroupsByNames(String names, int page, int size) throws AppworkException {
+        return groupRepository.findByNameInAndGroupCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")), PageRequest.of(page, size));
+    }
+
     public List<Group> getGroupsByUnitNames(String names) {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByNameInAndUnitCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")))));
+    }
+
+    public Page<Group> getGroupsByUnitNames(String names, int page, int size) {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByNameInAndUnitCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")))), PageRequest.of(page, size));
     }
 
     public List<Group> getGroupsByUnitTypeCode(String code) {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCode(code)));
     }
 
+    public Page<Group> getGroupsByUnitTypeCode(String code, int page, int size) {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCode(code)), PageRequest.of(page, size));
+    }
+
     public List<Group> getGroupsByUnitTypeCodes(String codes) {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCodeIn(Arrays.asList(codes.trim().split("\\s*,\\s*")))));
+    }
+
+    public Page<Group> getGroupsByUnitTypeCodes(String codes, int page, int size) {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCodeIn(Arrays.asList(codes.trim().split("\\s*,\\s*")))), PageRequest.of(page, size));
     }
 
     public Group getGroupParent(String code) throws AppworkException {
@@ -243,12 +284,24 @@ public class OrgChartService {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByParent(getGroupByName(code).getUnit())));
     }
 
+    public Page<Group> getGroupChildren(String code, int page, int size) throws AppworkException {
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByParent(getGroupByName(code).getUnit())), PageRequest.of(page, size));
+    }
+
     public List<Group> getAllGroups() {
-        return groupRepository.findAll();
+        return groupRepository.findAllByGroupCodeNotNull();
+    }
+
+    public Page<Group> getAllGroups(int page, int size) {
+        return groupRepository.findAllByGroupCodeNotNull(PageRequest.of(page, size));
     }
 
     public List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode) {
         return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode);
+    }
+
+    public Page<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode, int page, int size) {
+        return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, PageRequest.of(page, size));
     }
 
     public Group getGroupByCn(String cn) throws AppworkException {
@@ -263,11 +316,14 @@ public class OrgChartService {
 
     public Group updateGroup(Account account, Long id, String props) throws AppworkException {
         Group group = getGroup(id);
-        new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
-                .updateGroupByGroupName(group.getName(), SystemUtil.getJsonObjectByPtrExpr(props, "/otdsGroup"));
 
+        if (SystemUtil.isFieldInJson(props, "name")) {
+            Member member = new Member(env.getProperty("otds.partition"), SystemUtil.getJsonByPtrExpr(props, "/name"), Collections.emptyList());
+            new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
+                    .updateGroupByGroupName(group.getName(), member.toString());
+        }
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
-                "Group").update(group.getId(), SystemUtil.getJsonObjectByPtrExpr(props, "/platformGroup"));
+                "Group").update(group.getId(), Group.fromString(props).toPlatformString());
         return getGroup(group.getId());
     }
 
@@ -342,6 +398,14 @@ public class OrgChartService {
         );
     }
 
+    public List<User> getAllUsers() throws AppworkException {
+        return userRepository.findAll();
+    }
+
+    public Page<User> getAllUsers(int page, int size) throws AppworkException {
+        return userRepository.findAll(PageRequest.of(page, size));
+    }
+
     public User updateUser(Account account, Long id, String props) throws AppworkException, JsonProcessingException {
         UserMember userMember = new ObjectMapper().readValue(props, UserMember.class);
         Member member = userMember.getMember(env.getProperty("otds.partition"));
@@ -372,6 +436,9 @@ public class OrgChartService {
         Position position = getPositionByName(groupCode);
         Assignment assignment = new Assignment();
         assignment.setPrincipal(position.getIsLead());
+        System.out.println(assignment.toString());
+        System.out.println(position.toString());
+        System.out.println(position.toPlatformString());
         assignment = createAssignment(account, position.getUnit().getId(), position.getId(), assignment.toPlatformString());
 
         addAssignmentToPersonRelation(account, assignment.getId(), new Member.TargetId(user.getPerson().getId()).toString());

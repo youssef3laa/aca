@@ -1,17 +1,17 @@
 <template>
   <v-autocomplete
-      v-model="value"
-      :items="items.list"
-      :loading="loading"
-      :search-input.sync="search"
-      chips
-      clearable
-      color="outline"
-      deletable-chips
-      dense
-      outlined
-      small-chips
-      v-on:change="autocompleteChange"
+    v-model="value"
+    :items="items.list"
+    chips
+    clearable
+    color="outline"
+    deletable-chips
+    dense
+    outlined
+    small-chips
+    v-on:change="autocompleteChange"
+    :search-input.sync="search"
+    :loading="loading"
   >
     <template #label>
       <span v-t="field.name"></span>
@@ -22,11 +22,8 @@
 
 <script>
 import http from "../../core-module/services/http";
-import {ValidationProvider} from "vee-validate";
-
 export default {
   name: "autoCompleteComponent",
-  components: [ValidationProvider],
   data() {
     return {
       //   items: ['foo', 'bar', 'fizz', 'buzz'],
@@ -41,34 +38,36 @@ export default {
   methods: {
     fetch(v, url) {
       http
-          .get(url)
-          .then((response) => {
-            const res = response.data.data.map((element) => {
-              let obj = {};
-              if (element["cn"]) {
-                obj = {
-                  name: element["name_ar"],
-                  value: element["cn"],
-                  text: element["name_ar"],
-                  code: element["groupCode"],
-                  object: element
-                }
-              } else {
-                obj = {
-                  value: element["key"],
-                  text: element["arValue"],
-                  object: element
-                }
+        .get(url)
+        .then((response) => {
+          const res = response.data.data.map((element) => {
+            let obj = {};
+            if(element["cn"]){
+              obj = {
+                name: element["name_ar"],
+                value: element["cn"],
+                text: element["name_ar"],
+                code: element["groupCode"],
+                object: element
               }
-              return obj;
-            });
-            this.items.list = res.filter((e) => {
-              console.log(e);
-              return (e.name || "").indexOf(v || "") > -1;
-            });
-            this.loading = false;
-          })
-          .catch((err) => console.log(err));
+            }else{
+              obj = {
+                value: element["key"],
+                text: element["arValue"],
+                object: element
+              }
+            }
+            return obj;
+          });
+          this.items.list = res.filter((e) => {
+            console.log(e);
+            return (e.name || "").indexOf(v || "") > -1;
+          });
+            console.log(this.items.list);
+
+          this.loading = false;
+        })
+        .catch((err) => console.log(err));
     },
     querySelections(v, url) {
       this.loading = true;
@@ -93,7 +92,7 @@ export default {
     val: function (newVal, oldVal) {
       console.log(oldVal);
       // this.val = newVal
-      if (newVal.url) this.fetch(null, this.val.url)
+      if(newVal.url)  this.fetch(null, this.val.url)
       this.items = newVal;
       this.value = newVal.value;
       console.log("val", this.val);

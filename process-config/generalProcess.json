@@ -5,7 +5,6 @@
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HGCS,HRCA,HCAO",
             "page": "generalProcess-init",
-            "condition": "condition",
             "nextStep": {
                 "HRCA": "stepRG",
                 "HGCS": "stepRQ",
@@ -16,7 +15,6 @@
             "hasAutocomplete": false,
             "roleFilter": "org/group/findByCodes/HGCS",
             "page": "generalProcess-early",
-            "condition": "condition",
             "nextStep": {
                 "approve": "stepRQ"
             }
@@ -25,7 +23,6 @@
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HCAO",
             "page": "generalProcess-early",
-            "condition": "condition",
             "nextStep": {
                 "approve": "stepRE"
             }
@@ -34,7 +31,6 @@
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HCAG,MCAG",
             "page": "generalProcess-early",
-            "condition": "condition",
             "nextStep": {
                 "HCAG": "stepRM",
                 "MCAG": "stepMM"
@@ -44,16 +40,14 @@
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/MCAG",
             "page": "generalProcess-early",
-            "condition": "condition",
             "nextStep": {
-                "MCAG": "stepMM"
+                "approve": "stepMM"
             }
         },
         "stepMM": {
             "hasAutocomplete": true,
             "roleFilter": "org/group/up",
             "page": "generalProcess-member",
-            "condition": "condition",
             "nextStep": {
                 "approve": "stepApprovals"
             }
@@ -62,7 +56,6 @@
             "hasAutocomplete": true,
             "roleFilter": "org/group/up",
             "page": "generalProcess-approvals",
-            "condition": "condition",
             "nextStep": {
                 "approve": "stepApprovals2"
             }
@@ -71,7 +64,6 @@
             "hasAutocomplete": true,
             "roleFilter": "org/group/up",
             "page": "generalProcess-approvals",
-            "condition": "condition",
             "nextStep": {
                 "approve": "stepApprovals3"
             }
@@ -80,7 +72,6 @@
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HCOC",
             "page": "generalProcess-approvals",
-            "condition": "condition",
             "nextStep": {
                 "approve": "stepAD"
             }
@@ -89,7 +80,6 @@
             "hasAutocomplete": true,
             "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
             "page": "generalProcess-approvals",
-            "condition": "condition",
             "nextStep": {
                 "approve": "end"
             }

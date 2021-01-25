@@ -3,6 +3,7 @@ package com.asset.appwork.model;
 import com.asset.appwork.mixin.AssignmentPlatformMixIn;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
@@ -11,15 +12,14 @@ import java.util.Date;
 
 @Entity(name = "Assignment")
 @Table(name = "O9OpenTextEntityIdentityComponentsAssignment")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Assignment {
     @Id
     @Column(name = "Id")
     Long id;
-    //    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "Start_Date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     Date startDate;
-    //    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "End_Date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     Date endDate;
@@ -63,6 +63,13 @@ public class Assignment {
         ObjectMapper mapper = new ObjectMapper();
         mapper.addMixIn(this.getClass(), AssignmentPlatformMixIn.class);
         return mapper.writeValueAsString(this);
+    }
+
+    @SneakyThrows
+    public static Assignment fromString(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixIn(Assignment.class, AssignmentPlatformMixIn.class);
+        return mapper.readValue(json, Assignment.class);
     }
 
     public Long getId() {

@@ -4,6 +4,10 @@ import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.model.Group;
+import com.asset.appwork.model.Position;
+import com.asset.appwork.model.Unit;
+import com.asset.appwork.model.User;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.util.SystemUtil;
@@ -11,9 +15,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -130,14 +137,22 @@ public class OrgChartController {
 
     @Transactional
     @PostMapping("/unit/read/list")
-    public ResponseEntity<AppResponse<JsonNode>> readUnitList(@RequestHeader("X-Auth-Token") String token
+    public ResponseEntity<AppResponse<JsonNode>> readUnitList(@RequestHeader("X-Auth-Token") String token,
+                                                              @RequestParam(value = "page") Optional<Integer> page,
+                                                              @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUnits().toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    Page<Unit> unitPage = orgChartService.getAllUnits(page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(unitPage.getContent().toString()));
+                    respBuilder.info("totalCount", unitPage.getTotalElements());
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUnits().toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -279,14 +294,22 @@ public class OrgChartController {
 
     @Transactional
     @GetMapping("/unit/position/read/list")
-    public ResponseEntity<AppResponse<JsonNode>> readPositionList(@RequestHeader("X-Auth-Token") String token
+    public ResponseEntity<AppResponse<JsonNode>> readPositionList(@RequestHeader("X-Auth-Token") String token,
+                                                                  @RequestParam(value = "page") Optional<Integer> page,
+                                                                  @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllPositions().toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    Page<Position> positionPage = orgChartService.getAllPositions(page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(positionPage.getContent().toString()));
+                    respBuilder.info("totalCount", positionPage.getTotalElements());
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllPositions().toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -305,14 +328,22 @@ public class OrgChartController {
     @Transactional
     @GetMapping("/unit/{code}/down")
     public ResponseEntity<AppResponse<JsonNode>> getUnitChildrenByCode(@RequestHeader("X-Auth-Token") String token,
-                                                                       @PathVariable("code") String code
+                                                                       @PathVariable("code") String code,
+                                                                       @RequestParam(value = "page") Optional<Integer> page,
+                                                                       @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUnitChildren(code).toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    Page<Unit> unitPage = orgChartService.getUnitChildren(code, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(unitPage.getContent().toString()));
+                    respBuilder.info("totalCount", unitPage.getTotalElements());
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUnitChildren(code).toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -433,14 +464,22 @@ public class OrgChartController {
     @Transactional
     @GetMapping("/group/findByCodes/{codes}")
     public ResponseEntity<AppResponse<JsonNode>> findGroupByCodes(@RequestHeader("X-Auth-Token") String token,
-                                                                  @PathVariable("codes") String codes
+                                                                  @PathVariable("codes") String codes,
+                                                                  @RequestParam(value = "page") Optional<Integer> page,
+                                                                  @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByNames(codes).toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    Page<Group> groupPage = orgChartService.getGroupsByNames(codes, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+                    respBuilder.info("totalCount", groupPage.getTotalElements());
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByNames(codes).toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -459,14 +498,22 @@ public class OrgChartController {
     @Transactional
     @GetMapping("/group/findByUnitCodes/{codes}")
     public ResponseEntity<AppResponse<JsonNode>> findGroupByUnitCodes(@RequestHeader("X-Auth-Token") String token,
-                                                                      @PathVariable("codes") String codes
+                                                                      @PathVariable("codes") String codes,
+                                                                      @RequestParam(value = "page") Optional<Integer> page,
+                                                                      @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitNames(codes).toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    Page<Group> groupPage = orgChartService.getGroupsByUnitNames(codes, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+                    respBuilder.info("totalCount", groupPage.getTotalElements());
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitNames(codes).toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -485,14 +532,22 @@ public class OrgChartController {
     @Transactional
     @GetMapping("/group/{code}/down")
     public ResponseEntity<AppResponse<JsonNode>> getGroupUnitChildrenByCode(@RequestHeader("X-Auth-Token") String token,
-                                                                            @PathVariable("code") String code
+                                                                            @PathVariable("code") String code,
+                                                                            @RequestParam(value = "page") Optional<Integer> page,
+                                                                            @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildren(code).toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    Page<Group> groupPage = orgChartService.getGroupChildren(code, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+                    respBuilder.info("totalCount", groupPage.getTotalElements());
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildren(code).toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -539,14 +594,22 @@ public class OrgChartController {
     @GetMapping("/group/{code}/down/all/unitTypeCode/{unitTypeCode}")
     public ResponseEntity<AppResponse<JsonNode>> getGroupChildrenRecursivelyFilteredByUnitTypeCode(@RequestHeader("X-Auth-Token") String token,
                                                                                                    @PathVariable("code") String code,
-                                                                                                   @PathVariable("unitTypeCode") String unitTypeCode
+                                                                                                   @PathVariable("unitTypeCode") String unitTypeCode,
+                                                                                                   @RequestParam(value = "page") Optional<Integer> page,
+                                                                                                   @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode).toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    Page<Group> groupPage = orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+                    respBuilder.info("totalCount", groupPage.getTotalElements());
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode).toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -591,14 +654,22 @@ public class OrgChartController {
     @Transactional
     @GetMapping("/group/all/unitTypeCodes/{codes}")
     public ResponseEntity<AppResponse<JsonNode>> getGroupsByUnitTypeCodes(@RequestHeader("X-Auth-Token") String token,
-                                                                          @PathVariable("codes") String codes
+                                                                          @PathVariable("codes") String codes,
+                                                                          @RequestParam(value = "page") Optional<Integer> page,
+                                                                          @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitTypeCodes(codes).toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    Page<Group> groupPage = orgChartService.getGroupsByUnitTypeCodes(codes, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+                    respBuilder.info("totalCount", groupPage.getTotalElements());
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitTypeCodes(codes).toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -708,14 +779,22 @@ public class OrgChartController {
 
     @Transactional
     @PostMapping("/group/read/list")
-    public ResponseEntity<AppResponse<JsonNode>> readGroupList(@RequestHeader("X-Auth-Token") String token
+    public ResponseEntity<AppResponse<JsonNode>> readGroupList(@RequestHeader("X-Auth-Token") String token,
+                                                               @RequestParam(value = "page") Optional<Integer> page,
+                                                               @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllGroups().toString()));
+                if(page.isPresent() && size.isPresent()) {
+                    Page<Group> groupPage = orgChartService.getAllGroups(page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+                    respBuilder.info("totalCount", groupPage.getTotalElements());
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllGroups().toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -785,7 +864,7 @@ public class OrgChartController {
     }
 
     @Transactional
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/userId/{userId}")
     public ResponseEntity<AppResponse<JsonNode>> getUserByUserId(@RequestHeader("X-Auth-Token") String
                                                                          token,
                                                                  @PathVariable("userId") String userId
@@ -811,6 +890,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Transactional
     @PutMapping("/user/update/{id}")
     public ResponseEntity<AppResponse<JsonNode>> updateUser(@RequestHeader("X-Auth-Token") String
                                                                     token,
@@ -859,6 +939,40 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Transactional
+    @PostMapping("/user/read/list")
+    public ResponseEntity<AppResponse<JsonNode>> getAllUsers(@RequestHeader("X-Auth-Token") String token,
+                                                             @RequestParam(value = "page") Optional<Integer> page,
+                                                             @RequestParam(value = "size") Optional<Integer> size
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                if(page.isPresent() && size.isPresent()) {
+                    Page<User> userPage = orgChartService.getAllUsers(page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(userPage.getContent().toString()));
+                    respBuilder.info("totalCount", userPage.getTotalElements());
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUsers().toString()));
+                }
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
     @PutMapping("/user/{userId}/assign/group/{groupCode}")
     public ResponseEntity<AppResponse<JsonNode>> assignUserToGroup(@RequestHeader("X-Auth-Token") String token,
                                                                    @PathVariable("userId") String userId,
