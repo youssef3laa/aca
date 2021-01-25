@@ -1,6 +1,6 @@
 <template>
   <v-container>
-      <signatureDraw></signatureDraw>
+      <signatureDraw :requestId="d.requestId"></signatureDraw>
   </v-container>
 </template>
 
@@ -8,13 +8,20 @@
 import signatureDraw from "../../graphs-module/views/signature-draw.vue";
 
 export default {
-  name: 'signatureComponent',
+  name: 'SignatureComponent',
+  props: ['val', 'field'],
   data() {
     return {
+      d: this.val
     };
   },
   components: {
     signatureDraw,
+  },
+  watch: {
+    val: function(newVal) {
+      this.d = newVal
+    }
   },
 };
 </script>

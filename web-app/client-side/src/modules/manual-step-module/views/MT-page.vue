@@ -311,7 +311,7 @@ export default {
                     key: "richtext",
                     inputs: [
                       {
-                        type: "signatureComponent",
+                        type: "SignatureComponent",
                         name: "richtext",
                         col: 12,
                       },

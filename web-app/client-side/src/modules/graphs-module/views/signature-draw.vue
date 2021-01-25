@@ -83,12 +83,15 @@ export default {
         penColor: "black",
         // backgroundColor: 'rgb(255, 255, 255)'
       },
-      requestId: 665146,
+      // requestId: 665146,
+      signaturesContainer: 705435,
       signatures: [],
       selected: null,
+      folderId: null
     };
   },
   mixins: [signatureMixin],
+  props: ['requestId'],
   methods: {
     undo() {
       this.$refs.signaturePad.undoSignature();
@@ -100,7 +103,7 @@ export default {
       console.log(isEmpty);
       // console.log(data);
 
-      this.uploadToCS(data, this.requestId);
+      this.uploadToCS(data, this.folderId);
     },
     change() {
       this.options = {
@@ -117,10 +120,17 @@ export default {
     },
   },
   async created() {
+    // Return folder id
+    let folder = await this.createFolder(
+      this.signaturesContainer,
+      this.requestId
+    );
+    this.folderId = folder.id
+
     // List all signatures attached to request id
     const {
       data: { data },
-    } = await this.getSubNodes(this.requestId);
+    } = await this.getSubNodes(folder.id);
     const signatureList = data.results.map((image) => {
       return {
         id: image["data"]["properties"]["id"],
@@ -135,6 +145,11 @@ export default {
       this.signatures.push(image);
     });
   },
+  // watch: {
+  //   requestId: function(newVal) {
+  //     this.requestId = newVal
+  //   }
+  // }
 };
 </script>
 
