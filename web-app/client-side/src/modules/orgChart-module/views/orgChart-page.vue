@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-container>
-      <AppBuilder :app="app" />
+      <AppBuilder :app="app" ref="appBuilder" />
     </v-container>
   </div>
 </template>
@@ -73,10 +73,29 @@ export default {
                         add: true,
                         actions: ['edit', 'delete', 'view'],
                       },
+                      {
+                        modalId: "unitModal",
+                        type: "ModalComponent",
+                        name: "unitModal",
+                        forms: [
+                          {
+                            key: "unitModal",
+                            inputs: [
+                              {
+                                type: "InputComponent",
+                                label: "Id",
+                                name: "id",
+                                col: "4",
+                              },
+                            ],
+                            model: {},
+                          }
+                        ],
+                      }
                     ],
                     model: {
                       unitsTable: {
-                        url : 'org/unit/read/list',
+                        url: 'org/unit/read/list',
                         headers: [
                           {
                             text: "Internal code",
@@ -98,6 +117,10 @@ export default {
                             text: "Unit code",
                             value: "unitCode",
                           },
+                          {
+                            text: '',
+                            value: 'action'
+                          }
                         ],
                         data: [],
                         search: "",
@@ -128,7 +151,7 @@ export default {
                     ],
                     model: {
                       rolesTable: {
-                        url : 'org/group/read/list',
+                        url: 'org/group/read/list',
                         headers: [
                           {
                             text: "Internal code",
@@ -176,7 +199,7 @@ export default {
                     ],
                     model: {
                       usersTable: {
-                        url : 'org/user/read/list',
+                        url: 'org/user/read/list',
                         headers: [
                           {
                             text: "Username",
@@ -208,6 +231,24 @@ export default {
                 type: "DefaultSection",
                 isCard: true,
                 display: "none",
+                // background: "transparent",
+                forms: [
+                  {
+                    inputs: [
+                      {
+                        type: "D3GraphComponent",
+                        name: "chart",
+                        subscribe: "chart",
+                        col: 12
+                      },
+                    ],
+                    model: {
+                      chart: {
+                        url: "https://gist.githubusercontent.com/bumbeishvili/dc0d47bc95ef359fdc75b63cd65edaf2/raw/c33a3a1ef4ba927e3e92b81600c8c6ada345c64b/orgChart.json",
+                      },
+                    },
+                  },
+                ],
               },
             ],
           },
@@ -215,10 +256,19 @@ export default {
       },
     };
   },
-  methods: {
-  },
+  methods: {},
 
   mounted: function () {
+    this.$observable.subscribe('unitsTable_view', (data) => {
+      console.log(data);
+      this.$refs.appBuilder.setModelData("unitModal", {
+        id: data.id,
+      });
+      this.$observable.fire("openModal", {
+        modalId: "unitModal",
+        obj: data,
+      });
+    });
   },
 };
 </script>
