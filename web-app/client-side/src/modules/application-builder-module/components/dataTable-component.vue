@@ -76,7 +76,6 @@ export default {
   data() {
     return {
       search: null,
-      totalItems: 61,
       d: this.val,
       loading: true,
       footerProps: {
@@ -127,10 +126,11 @@ export default {
       params.size = limit
       const URL = this.d.url + '?' + new URLSearchParams(params).toString()
       http
-        .post(URL)
+        .get(URL)
         .then((response) => {
           //   this.totalItems = response.data.metaInfo.totalCount
           this.d.data = response.data.data
+          this.totalItems = response.data.metaInfo.totalCount;
           this.loading = false
         })
         .catch((error) => {

@@ -399,11 +399,11 @@ public class OrgChartService {
     }
 
     public List<User> getAllUsers() throws AppworkException {
-        return userRepository.findAll();
+        return userRepository.findAllByUserIdNotNull();
     }
 
     public Page<User> getAllUsers(int page, int size) throws AppworkException {
-        return userRepository.findAll(PageRequest.of(page, size));
+        return userRepository.findAllByUserIdNotNull(PageRequest.of(page, size));
     }
 
     public User updateUser(Account account, Long id, String props) throws AppworkException, JsonProcessingException {
