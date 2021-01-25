@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <v-card>
+    <v-card style="margin: 20px 0; border-radius: 6px">
       <div class="container">
         <v-alert outlined type="info" prominent icon="mdi-draw">
           <p style="font-size: 16px; color: black">
@@ -26,7 +26,7 @@
         </v-row>
       </div>
     </v-card>
-    <v-card style="top: 30px">
+    <v-card style="margin: 50px 0; border-radius: 6px">
       <div class="container">
         <!-- <h3>التأشيرات السابقة</h3> -->
         <v-alert outlined type="info" prominent icon="mdi-draw">
@@ -59,9 +59,11 @@
               >
                 <v-img
                   :src="signature.base64"
-                  style="border: 2px solid #e9e9e9; height: 100px"
+                  style="border: 2px solid #e9e9e9; height: 150px"
                 ></v-img>
-                <v-card-text>{{ signature.date.split("T")[0] }}</v-card-text>
+                <v-card-text style="border-top: 2px solid #e9e9e9">{{
+                  signature.date.split("T")[0]
+                }}</v-card-text>
               </v-card>
             </v-slide-item>
           </v-slide-group>
@@ -153,5 +155,8 @@ background-origin: border-box;
 }
 .v-alert--outlined {
   border: none !important ;
+}
+.v-slide-item--active {
+  border: 2px solid #2d7fae !important;
 }
 </style>
