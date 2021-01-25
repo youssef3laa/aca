@@ -5,15 +5,7 @@
       <AdvancedSearch></AdvancedSearch>
       <OrgChartBtn></OrgChartBtn>
     </div>
-    <splitpanes class="default-theme" dir="ltr">
-      <pane>
-    
-        <AppBuilder ref="appBuilder" :app="app" />
-      </pane>
-      <pane size="21">
-        <Sidebar></Sidebar>
-      </pane>
-    </splitpanes>
+      <Inbox></Inbox>
     <!-- <v-container>
       <AppBuilder ref="appBuilder" :app="app1" />
     </v-container> -->
@@ -21,16 +13,14 @@
 </template>
 
 <script>
-import AppBuilder from "../../application-builder-module/builders/app-builder";
 import correspondenceMixin from "../mixin/correspondenceMixin";
 import formPageMixin from "../../../mixins/formPageMixin";
 import TasksLists from "../../application-builder-module/components/tasks-list-component";
 import AdvancedSearch from "../../application-builder-module/components/advanced-search-component";
 import OrgChartBtn from "../../application-builder-module/components/org-chart-btn-component";
-import Sidebar from "../../application-builder-module/components/sidebar-component";
-// import TableComponent from "../../application-builder-module/components/table-component"
-import { Splitpanes, Pane } from "splitpanes";
-import "splitpanes/dist/splitpanes.css";
+
+import Inbox from "../../application-builder-module/components/inbox-component"
+
 import http from "../../core-module/services/http";
 
 export default {
@@ -39,10 +29,7 @@ export default {
     TasksLists,
     AdvancedSearch,
     OrgChartBtn,
-    Sidebar,
-    Splitpanes,
-    Pane,
-    AppBuilder
+    Inbox
   },
   mixins: [correspondenceMixin, formPageMixin],
 
@@ -93,33 +80,34 @@ export default {
                       taskTable: {
                         headers: [
                           {
-                            text: "Task",
-                            align: "start",
-                            filterable: false,
-                            value: "Activity",
-                          },
-                          {
-                            text: "Sender Name",
-                            value: "Sender.displayName",
-                          },
-                          {
-                            text: "Process Name",
-                            value:
-                              "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process",
-                          },
-                          {
-                            text: "Date",
-                            value: "DeliveryDate",
-                          },
-                          {
-                            text: "Target Type",
-                            value: "Target.type",
-                          },
-                          {
-                            text: "Actions",
+                            text: "",
                             value: "actions",
                             sortable: false,
                           },
+                          {
+                            text: "التاريخ",
+                            align: "start",
+                            filterable: false,
+                            value: "",
+                          },
+                          {
+                            text: "رقم الوارد",
+                            value: "",
+                          },
+                          {
+                            text: "الجهة",
+                            value:
+                              "",
+                          },
+                          {
+                            text: "المرسل",
+                            value: "",
+                          },
+                          {
+                            text: "عنوان الموضوع",
+                            value: "",
+                          },
+                  
                         ],
                         data: [],
                         search: "",

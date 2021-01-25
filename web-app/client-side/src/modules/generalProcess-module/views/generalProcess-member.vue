@@ -5,23 +5,39 @@
 </template>
 
 <script>
-import formPageMixin from "../../../mixins/formPageMixin";
-import AppBuilder from "../../application-builder-module/builders/app-builder";
-import historyMixin from "@/modules/history-module/mixin/historyMixin";
+    import formPageMixin from "../../../mixins/formPageMixin";
+    import AppBuilder from "../../application-builder-module/builders/app-builder";
+    import historyMixin from "@/modules/history-module/mixin/historyMixin";
 
-export default {
-  name: "generalProcess-member",
-  mixins: [formPageMixin, historyMixin],
-  components: {
-    AppBuilder,
-  },
-
-  methods: {
-    readData: function () {
-      console.log("TaskData", this.taskData);
-      this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
-                //   let page = this.inputSchema.page;
-
+    export default {
+        name: "generalProcess-member",
+        mixins: [formPageMixin, historyMixin],
+        components: {
+            AppBuilder,
+        },
+        $refs: {
+            appBuilder: AppBuilder
+        },
+        async created() {
+            this.taskId = this.$route.params.taskId;
+            this.claimTask(this.taskId);
+            this.getTaskData(this.taskId);
+            this.initiateBrava();
+            this.$observable.subscribe("complete-step", this.complete);
+        },
+        data() {
+            return {
+                taskId: "",
+                taskData: {},
+                inputSchema: {},
+                app: {},
+                model: {},
+            };
+        },
+        methods: {
+            readData: function () {
+                console.log("TaskData", this.taskData);
+                this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
                 this.loadForm("generalProcess-member", this.fillForm);
             },
             fillForm: async function () {
@@ -32,8 +48,8 @@ export default {
                     .then(async (response) => {
                         response = JSON.parse(response.data.data);
 
-                        var workTypeObj = await this.getLookupByCategoryAndKey("workType",response.workType);
-                        var incomingMeansObj = await this.getLookupByCategoryAndKey("incomingMeans",response.incomingMeans);
+                        var workTypeObj = await this.getLookupByCategoryAndKey("workType", response.workType);
+                        var incomingMeansObj = await this.getLookupByCategoryAndKey("incomingMeans", response.incomingMeans);
 
                         this.$refs.appBuilder.setModelData("form1", {
                             stepId: this.inputSchema.stepId,
@@ -63,17 +79,9 @@ export default {
                         console.error(error);
                     });
             },
-        },
-        async created() {
-            this.taskId = this.$route.params.taskId;
-            this.claimTask(this.taskId);
-            this.getTaskData(this.taskId);
-            this.initiateBrava();
-            this.$observable.subscribe("complete-step", () => {
-                if(!this.$refs.appBuilder) return;
+            complete: function () {
                 console.log("complete-step-clicked");
                 console.log(this.$refs.appBuilder);
-                // var model =
                 let model = this.$refs.appBuilder.getModelData("form1");
                 let approvalModel = this.$refs.appBuilder.getModelData("ApprovalForm");
                 console.log("MODEL:", model);
@@ -92,19 +100,7 @@ export default {
                     comment: approvalModel.approval.comment,
                 };
                 this.completeStep(data);
-                // }
-            });
-
-        },
-
-        data() {
-            return {
-                taskId: "",
-                taskData: {},
-                inputSchema: {},
-                app: {},
-                model: {},
-            };
-        },
+            }
+        }
     };
 </script>

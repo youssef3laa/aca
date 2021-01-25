@@ -14,9 +14,11 @@ import com.asset.appwork.util.ReflectionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
+@Slf4j
 public class ModuleRouting {
     private final String breakString = "end";
     private final String rejectString = "reject";
@@ -83,6 +85,7 @@ public class ModuleRouting {
             response = cordysUtil.sendRequest(account, processInitiateMessage);
         } catch (Exception e) {
             e.printStackTrace();
+            log.error("ModuleRouting: "+ e.getMessage());
             throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
         }
         return response;
@@ -103,6 +106,7 @@ public class ModuleRouting {
             response = cordysUtil.sendRequest(account, completeWorkflowMessage);
         } catch (Exception e) {
             e.printStackTrace();
+            log.error("ModuleRouting: "+ e.getMessage());
             throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
         }
         return response;
@@ -187,6 +191,7 @@ public class ModuleRouting {
             updateOutputSchema(outputSchema, nextStep, nextPage, nextSubBP, nextRoleFilter);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+            log.error("ModuleRouting: "+ e.getMessage());
             throw new AppworkException(e.getMessage(),ResponseCode.MODULE_ROUTING_FAILURE);
         }
     }

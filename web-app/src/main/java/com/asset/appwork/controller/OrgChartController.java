@@ -4,6 +4,10 @@ import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.model.Group;
+import com.asset.appwork.model.Position;
+import com.asset.appwork.model.Unit;
+import com.asset.appwork.model.User;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.util.SystemUtil;
@@ -11,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -142,7 +147,9 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if(page.isPresent() && size.isPresent()) {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUnits(page.get(), size.get()).toString()));
+                    Page<Unit> unitPage = orgChartService.getAllUnits(page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(unitPage.getContent().toString()));
+                    respBuilder.info("totalCount", unitPage.getTotalElements());
                 } else {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUnits().toString()));
                 }
@@ -297,7 +304,9 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if(page.isPresent() && size.isPresent()) {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllPositions(page.get(), size.get()).toString()));
+                    Page<Position> positionPage = orgChartService.getAllPositions(page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(positionPage.getContent().toString()));
+                    respBuilder.info("totalCount", positionPage.getTotalElements());
                 } else {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllPositions().toString()));
                 }
@@ -329,7 +338,9 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if(page.isPresent() && size.isPresent()) {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUnitChildren(code, page.get(), size.get()).toString()));
+                    Page<Unit> unitPage = orgChartService.getUnitChildren(code, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(unitPage.getContent().toString()));
+                    respBuilder.info("totalCount", unitPage.getTotalElements());
                 } else {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUnitChildren(code).toString()));
                 }
@@ -463,7 +474,9 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if(page.isPresent() && size.isPresent()) {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByNames(codes, page.get(), size.get()).toString()));
+                    Page<Group> groupPage = orgChartService.getGroupsByNames(codes, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+                    respBuilder.info("totalCount", groupPage.getTotalElements());
                 } else {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByNames(codes).toString()));
                 }
@@ -495,7 +508,9 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if(page.isPresent() && size.isPresent()) {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitNames(codes, page.get(), size.get()).toString()));
+                    Page<Group> groupPage = orgChartService.getGroupsByUnitNames(codes, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+                    respBuilder.info("totalCount", groupPage.getTotalElements());
                 } else {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitNames(codes).toString()));
                 }
@@ -527,7 +542,9 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if(page.isPresent() && size.isPresent()) {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildren(code, page.get(), size.get()).toString()));
+                    Page<Group> groupPage = orgChartService.getGroupChildren(code, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+                    respBuilder.info("totalCount", groupPage.getTotalElements());
                 } else {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildren(code).toString()));
                 }
@@ -587,7 +604,9 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if(page.isPresent() && size.isPresent()) {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, page.get(), size.get()).toString()));
+                    Page<Group> groupPage = orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+                    respBuilder.info("totalCount", groupPage.getTotalElements());
                 } else {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode).toString()));
                 }
@@ -645,7 +664,9 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if(page.isPresent() && size.isPresent()) {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitTypeCodes(codes, page.get(), size.get()).toString()));
+                    Page<Group> groupPage = orgChartService.getGroupsByUnitTypeCodes(codes, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+                    respBuilder.info("totalCount", groupPage.getTotalElements());
                 } else {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsByUnitTypeCodes(codes).toString()));
                 }
@@ -768,7 +789,9 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if(page.isPresent() && size.isPresent()) {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllGroups(page.get(), size.get()).toString()));
+                    Page<Group> groupPage = orgChartService.getAllGroups(page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+                    respBuilder.info("totalCount", groupPage.getTotalElements());
                 } else {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllGroups().toString()));
                 }
@@ -928,7 +951,9 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if(page.isPresent() && size.isPresent()) {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUsers(page.get(), size.get()).toString()));
+                    Page<User> userPage = orgChartService.getAllUsers(page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(userPage.getContent().toString()));
+                    respBuilder.info("totalCount", userPage.getTotalElements());
                 } else {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUsers().toString()));
                 }

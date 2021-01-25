@@ -1,20 +1,26 @@
 <template>
   <div class="sidebar-wrapper">
-    <div class="sidebar-item">
-      <span> <span> الصادر</span> 34</span>
-      <i class="far fa-edit"></i>
-
-    </div>
-    <div class="sidebar-item">
-      <span> <span> الوارد</span> 34</span>
-      <i class="far fa-edit"></i>
+    <div v-for="(d,key) in data" :key="key" class="sidebar-item">
+      <span> <span> {{d.name}}</span> {{d.number}}</span>
+      <div class="icon-wrapper">
+     <i :class=d.icon></i>
+      </div>
 
     </div>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  props:["val","field"],
+  data(){
+    return{
+        data:[{name:"الوارد",number:21, icon:"fas fa-download"},{name:"الصادر",number:34, icon:"far fa-paper-plane"},
+        ]
+    };
+  },
+  
+};
 </script>
 
 <style>
@@ -22,10 +28,9 @@ export default {};
   display: flex;
   flex-direction: column;
   background: white;
-height: 100%;
-
-  align-items: center !important;
-  justify-content: center;
+  padding-top: 10%;
+  height: 100%;
+  align-items: flex-end !important;
 }
 .sidebar-item {
   display: flex;
@@ -33,14 +38,25 @@ height: 100%;
   background-color: rgba(7, 104, 159, 0.05);
   margin: 10px;
   height: 40px;
-  width: 80%;
+  width: 85%;
   padding: 10px;
   justify-content: center;
   border-radius: 5px;
+  margin-right:4px ;
   color: #0278ae;
 }
 
-.sidebar-item i {
+
+.icon-wrapper {
+  display: flex;
+  color:white;
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  justify-content: center;
+  align-items: center;
+  background: #0278ae;
+  border-radius: 5px;
   margin-left: 10px;
 }
 </style>

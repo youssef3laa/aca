@@ -65,7 +65,7 @@
             this.getTaskData(this.taskId);
             this.initiateBrava();
             this.$observable.subscribe("complete-step", () => {
-                if(!this.$refs.appBuilder) return;
+                // if(!this.$refs.appBuilder) return;
                 console.log("complete-step-clicked");
                 console.log(this.$refs.appBuilder);
                 // var model =
