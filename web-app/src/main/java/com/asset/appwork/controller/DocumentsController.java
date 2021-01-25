@@ -4,6 +4,7 @@ import com.asset.appwork.config.TokenService;
 import com.asset.appwork.cs.AppworkCSOperations;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.dto.CreateNode;
+import com.asset.appwork.dto.Document;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.AttachmentSort;
@@ -50,9 +51,9 @@ public class DocumentsController {
 //                                                            @RequestParam("parentId") Long parentId,
 //                                                            @RequestParam("name") String name) {
     @PostMapping("/upload")
-    public ResponseEntity<AppResponse<JsonNode>> uploadFile(@RequestHeader("X-Auth-Token") String token,
+    public ResponseEntity<AppResponse<Document>> uploadFile(@RequestHeader("X-Auth-Token") String token,
                                                             CreateNode createNode) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        AppResponse.ResponseBuilder<Document> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
@@ -63,11 +64,26 @@ public class DocumentsController {
 //                createNode.setName(name);
 //                createNode.setParentId(parentId);
                 createNode.setType(144);
+
+                //TODO move below code to service
+                Long nodeId = appworkCSOperations.checkIfDocumentAlreadyExists(createNode.getParent_id(),
+                        createNode.getName(),
+                        144);
+                Document document = new Document();
+                if (nodeId != -1) {
+                    document.setId(nodeId);
+                    respBuilder.status(ResponseCode.SUCCESS);
+                    respBuilder.data(document);
+                    return respBuilder.build().getResponseEntity();
+                }
+
                 Http http = appworkCSOperations.
                         uploadDocument(createNode);
                 System.out.println(http.getResponse());
                 System.out.println(http.getStatusCode());
-                respBuilder.status(ResponseCode.CREATED);
+                respBuilder.status(ResponseCode.SUCCESS);
+                document.setId(new ObjectMapper().readTree(http.getResponse()).get("results").get("data").get("properties").get("id").longValue());
+                respBuilder.data(document);
             } catch (IllegalAccessException | NoSuchFieldException e) {
                 e.printStackTrace();
                 log.error(e.getMessage());
@@ -81,16 +97,15 @@ public class DocumentsController {
         } catch (AppworkException e) {
             log.error(e.getMessage());
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-            respBuilder.data(new ObjectMapper().valueToTree(e.getMessage()));
         }
 
         return respBuilder.build().getResponseEntity();
     }
 
     @PostMapping("/create/folder")
-    public ResponseEntity<AppResponse<JsonNode>> createFolder(@RequestHeader("X-Auth-Token") String token,
+    public ResponseEntity<AppResponse<Document>> createFolder(@RequestHeader("X-Auth-Token") String token,
                                                               CreateNode createNode) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        AppResponse.ResponseBuilder<Document> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
@@ -101,11 +116,26 @@ public class DocumentsController {
 //                createNode.setName(name);
 //                createNode.setParentId(parentId);
                 createNode.setType(0);
+
+
+                //TODO move below code to service
+                Long nodeId = appworkCSOperations.checkIfDocumentAlreadyExists(createNode.getParent_id(),
+                        createNode.getName(),
+                        0);
+                Document document = new Document();
+                if (nodeId != -1) {
+                    document.setId(nodeId);
+                    respBuilder.status(ResponseCode.SUCCESS);
+                    respBuilder.data(document);
+                    return respBuilder.build().getResponseEntity();
+                }
                 Http http = appworkCSOperations.
                         uploadDocument(createNode);
                 System.out.println(http.getResponse());
                 System.out.println(http.getStatusCode());
                 respBuilder.status(ResponseCode.SUCCESS);
+                document.setId(new ObjectMapper().readTree(http.getResponse()).get("results").get("data").get("properties").get("id").longValue());
+                respBuilder.data(document);
             } catch (IllegalAccessException | NoSuchFieldException e) {
                 e.printStackTrace();
                 log.error(e.getMessage());

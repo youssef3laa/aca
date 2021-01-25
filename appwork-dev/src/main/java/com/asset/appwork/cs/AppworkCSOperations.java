@@ -2,10 +2,15 @@ package com.asset.appwork.cs;
 
 
 import com.asset.appwork.dto.CreateNode;
+import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.util.Http;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Data;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
@@ -63,6 +68,8 @@ public class AppworkCSOperations {
     public Http uploadDocument(CreateNode createNode) throws AppworkException, IllegalAccessException, NoSuchFieldException, IOException {
 
         Class<CreateNode> createNodeClass = CreateNode.class;
+
+
         Field[] fields = createNodeClass.getDeclaredFields();
         List<Part> parts = new ArrayList<>();
         for (Field field : fields) {
@@ -116,6 +123,17 @@ public class AppworkCSOperations {
 
         if (!http.isSuccess())
             throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return http;
+    }
+
+    public Http downloadDocument(Long documentId) throws AppworkException {
+        String urlStr = CS_API.NODE_ACTION.getApiURL() + documentId + "/content";
+        Http http = new Http().setDoAuthentication(true)
+                .basicAuthentication(this.userName, this.password)
+                .download(urlStr);
+        if (!http.isSuccess())
+            throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+
         return http;
     }
 
@@ -196,15 +214,30 @@ public class AppworkCSOperations {
         }
     }
 
-    public Http downloadDocument(Long documentId) throws AppworkException {
-        String urlStr = CS_API.NODE_ACTION.getApiURL() + documentId + "/content";
+    public Long checkIfDocumentAlreadyExists(Long ParentId, String name, Integer type) throws IllegalAccessException, AppworkException, JsonProcessingException {
+
+//        {{baseUrl}}/v2/nodes/:id/nodes?where_type=0&where_name=testrefaii21&fields=properties{id,name,name_multilingual}
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(CS_API.GET_SUB_NODES.getApiURL());
+        DocumentQuery documentQuery = new DocumentQuery();
+        documentQuery.setWhere_type(String.valueOf(type));
+        documentQuery.setWhere_name(name);
+        documentQuery.setFields("properties{id}");
+        fillURIComponentWithQuery(uriComponentsBuilder, documentQuery);
+        Map<String, Object> pathVariables = new HashMap<>();
+        pathVariables.put("id", ParentId);
         Http http = new Http().setDoAuthentication(true)
                 .basicAuthentication(this.userName, this.password)
-                .download(urlStr);
-        if (!http.isSuccess())
-            throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+                .setContentType(Http.ContentType.JSON_REQUEST)
+                .get(uriComponentsBuilder.encode().buildAndExpand(pathVariables).toString());
 
-        return http;
+        if (!http.isSuccess()) throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(http.getResponse());
+        ArrayNode jsonArray = jsonNode.withArray("results");
+        if (jsonArray.size() == 0) return -1L;
+        if (jsonArray.size() == 1) return jsonArray.get(0).get("data").get("properties").get("id").longValue();
+        else
+            throw new AppworkException("there are more than on file with the same name", ResponseCode.DUPLICATION_CONFLICT);
     }
 
     public enum CS_API {
@@ -247,8 +280,8 @@ public class AppworkCSOperations {
 
     @Data
     public static class DocumentQuery {
-        @JsonProperty("where_type")
-        String whereType;
+        String where_type;
+        String where_name;
 
         String sort;
         String fields;

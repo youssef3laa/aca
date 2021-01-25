@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CreateNode {
 
-    private String parent_id;
+    private Long parent_id;
     private Integer type;
     private String name;
     private Long original_id;
