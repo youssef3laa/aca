@@ -52,13 +52,13 @@
           <v-list>
             <v-list-item v-for="(i, index) in field.actions" :key="index">
               <v-list-item-title v-on:click="handleAction(item, i)"
-                ><span v-if="i == 'Edit'"
+                ><span v-if="i == 'edit'"
                   ><v-icon> far fa-edit </v-icon> {{ i }}</span
                 >
-                <span v-else-if="i == 'Delete'">
+                <span v-else-if="i == 'delete'">
                   <v-icon> far fa-trash-alt </v-icon> {{ i }}</span
                 >
-                <span v-else-if="i == 'View'">
+                <span v-else-if="i == 'view'">
                   <v-icon> fas fa-expand-arrows-alt </v-icon> {{ i }}</span
                 >
               </v-list-item-title>
@@ -77,6 +77,7 @@ export default {
     return {
       search: null,
       d: this.val,
+      totalItems: this.val.data.length,
       loading: true,
       footerProps: {
         'items-per-page-options': [5, 10, 25, -1],
@@ -102,11 +103,11 @@ export default {
   },
   methods: {
     handleAction(item, actionName) {
-      console.log(this.field.key + '_' + actionName)
+      console.log(this.field.name + '_' + actionName)
       //   console.log(item)
       //   console.log(actionName)
 
-       this.$observable.fire(this.field.key + '_' + actionName, {item})
+       this.$observable.fire(this.field.name + '_' + actionName, {item})
     },
     getDataFromApi(event) {
       if (!this.d.url) {
@@ -128,7 +129,6 @@ export default {
       http
         .get(URL)
         .then((response) => {
-          //   this.totalItems = response.data.metaInfo.totalCount
           this.d.data = response.data.data
           this.totalItems = response.data.metaInfo.totalCount;
           this.loading = false
