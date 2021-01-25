@@ -72,6 +72,7 @@ public class DocumentsController {
                 e.printStackTrace();
                 log.error(e.getMessage());
                 respBuilder.status(ResponseCode.BAD_REQUEST);
+
             } catch (IOException e) {
                 e.printStackTrace();
                 log.error(e.getMessage());
@@ -80,6 +81,7 @@ public class DocumentsController {
         } catch (AppworkException e) {
             log.error(e.getMessage());
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            respBuilder.data(new ObjectMapper().valueToTree(e.getMessage()));
         }
 
         return respBuilder.build().getResponseEntity();
@@ -103,7 +105,7 @@ public class DocumentsController {
                         uploadDocument(createNode);
                 System.out.println(http.getResponse());
                 System.out.println(http.getStatusCode());
-                respBuilder.status(ResponseCode.CREATED);
+                respBuilder.status(ResponseCode.SUCCESS);
             } catch (IllegalAccessException | NoSuchFieldException e) {
                 e.printStackTrace();
                 log.error(e.getMessage());
@@ -116,6 +118,12 @@ public class DocumentsController {
         } catch (AppworkException e) {
             log.error(e.getMessage());
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+//            try {
+//                respBuilder.data(new ObjectMapper().readTree(e.getMessage()));
+//            } catch (JsonProcessingException jsonProcessingException) {
+//                jsonProcessingException.printStackTrace();
+//            }
+
         }
 
         return respBuilder.build().getResponseEntity();
