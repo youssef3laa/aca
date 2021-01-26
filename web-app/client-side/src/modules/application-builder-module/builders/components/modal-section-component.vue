@@ -3,12 +3,14 @@
     <v-card>
       <v-row>
         <v-col :cols="10">
-          <v-card-title class="headline">{{formData.modalTitle}}</v-card-title>
+          <v-card-title class="headline">{{
+            formData.modalTitle
+          }}</v-card-title>
         </v-col>
         <v-col :cols="2">
           <span
             @click="dialog = false"
-            style="text-align: left; padding: 25px 30px;"
+            style="text-align: left; padding: 25px 30px; float: left;"
             ><v-icon> fas fa-times</v-icon></span
           >
         </v-col>

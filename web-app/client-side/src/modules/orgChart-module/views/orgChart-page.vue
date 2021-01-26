@@ -60,19 +60,42 @@ export default {
                 isCard: true,
                 forms: [
                   {
+                    modalTitle: 'تعديل وحدة',
                     key: 'editUnitModal',
                     modalId: 'unitModal',
-                    modalTitle: 'تعديل وحدة',
                     inputs: [
                       {
                         type: 'InputComponent',
-                        label: 'Id',
-                        name: 'id',
+                        label: 'Arabic name',
+                        name: 'name_ar',
+                        col: '4',
+                      },
+                      {
+                        type: 'InputComponent',
+                        label: 'English name',
+                        name: 'name_en',
+                        col: '4',
+                      },
+                      {
+                        type: 'InputComponent',
+                        label: 'Unit type code',
+                        name: 'unitTypeCode',
+                        col: '4',
+                      },
+                      {
+                        type: 'InputComponent',
+                        label: 'Unit code',
+                        name: 'unitCode',
                         col: '4',
                       },
                     ],
                     model: {
                       id: '',
+                      name: '',
+                      name_ar: '',
+                      name_en: '',
+                      unitTypeCode: '',
+                      unitCode: '',
                     },
                   },
                   {
