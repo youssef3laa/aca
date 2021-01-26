@@ -120,15 +120,16 @@ export default {
         {
           title: "المهام",
           icon: "fas fa-bolt",
+          action:this.about,
           options: [
             {
               title: "إنشاء وارد جديد",
               icon: "far fa-edit",
               action: this.process,
             },
-            { title: "تسجيل موضوع", icon: "far fa-edit" },
-            { title: "إنشاء تكليف", icon: "far fa-edit" },
-            { title: "شاشة التوجيهات", icon: "far fa-edit" },
+            { title: "تسجيل موضوع", icon: "far fa-edit",action: this.about },
+            { title: "إنشاء تكليف", icon: "far fa-edit",action: this.about },
+            { title: "شاشة التوجيهات", icon: "far fa-edit",action: this.about },
 
           ],
         },
