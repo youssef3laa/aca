@@ -3,7 +3,7 @@
     <pane>
       <AppBuilder dir="rtl" ref="appBuilder" :app="app" />
     </pane>
-    <pane size="14">
+    <pane max-size="20" size="14">
       <Sidebar></Sidebar>
     </pane>
   </splitpanes>
