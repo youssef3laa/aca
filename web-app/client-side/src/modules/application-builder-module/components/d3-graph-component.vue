@@ -15,6 +15,7 @@ import TreeView from "d3-org-chart";
 export default {
   name: "D3GraphComponent",
   data() {
+    return {};
   },
   methods: {
     drawGraph(data) {
