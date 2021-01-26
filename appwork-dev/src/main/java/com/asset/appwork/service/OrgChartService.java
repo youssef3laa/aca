@@ -81,6 +81,10 @@ public class OrgChartService {
         return unitRepository.findAllByUnitCodeNotNull(PageRequest.of(page, size));
     }
 
+    public List<Unit> getUnitChildrenRecursively(String parentUnitCode) {
+        return unitRepository.getUnitChildrenRecursively(parentUnitCode);
+    }
+
     public void addSubUnitToUnit(Account account, Long id, Long subUnitId) {
         Member.TargetId targetId = new Member.TargetId(subUnitId);
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),

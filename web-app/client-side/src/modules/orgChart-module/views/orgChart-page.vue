@@ -1,14 +1,14 @@
 <template>
   <div>
     <v-container>
-      <AppBuilder :app="app" ref="appBuilder" />
+      <AppBuilder :app="app" ref="appBuilder"/>
     </v-container>
   </div>
 </template>
 
 <script>
 import AppBuilder from '../../application-builder-module/builders/app-builder'
-// import http from "../../core-module/services/http";
+import http from "@/modules/core-module/services/http";
 
 export default {
   name: 'OrgChart',
@@ -71,7 +71,7 @@ export default {
                       },
                     ],
                     model: {
-                      id : ''
+                      id: ''
                     },
                   },
                 ],
@@ -238,6 +238,7 @@ export default {
                 // background: "transparent",
                 forms: [
                   {
+                    key: 'chart',
                     inputs: [
                       {
                         type: 'D3GraphComponent',
@@ -246,12 +247,6 @@ export default {
                         col: 12,
                       },
                     ],
-                    model: {
-                      chart: {
-                        url:
-                          'https://gist.githubusercontent.com/bumbeishvili/dc0d47bc95ef359fdc75b63cd65edaf2/raw/c33a3a1ef4ba927e3e92b81600c8c6ada345c64b/orgChart.json',
-                      },
-                    },
                   },
                 ],
               },
@@ -261,19 +256,99 @@ export default {
       },
     }
   },
-  methods: {},
+  methods: {
+    generateD3OrgChartJson: function() {
+      http.get("/org/unit/read/list").then(response => {
+        let data = response.data.data.map(item => {
+          const width = Math.round(Math.random() * 50 + 300);
+          const height = Math.round(Math.random() * 20 + 130);
+          const cornerShape = ['ORIGINAL', 'ROUNDED', 'CIRCLE'][Math.round(Math.random() * 2)];
+          const nodeImageWidth = 100;
+          const nodeImageHeight = 100;
+          const centerTopDistance = 0;
+          const centerLeftDistance = 0;
+          const expanded = false;
 
-  mounted: function() {
+          // const titleMarginLeft = nodeImageWidth / 2 + 20 + centerLeftDistance;
+          // const contentMarginLeft = width / 2 + 25;
+          return {
+            nodeId: item.id,
+            parentNodeId: (!Array.isArray(item.parentId)) ? item.parentId : null,
+            width: width,
+            height: height,
+            borderWidth: 1,
+            borderRadius: 15,
+            borderColor: {
+              red: 15,
+              green: 140,
+              blue: 121,
+              alpha: 1,
+            },
+            backgroundColor: {
+              red: 0,
+              green: 81,
+              blue: 90,
+              alpha: 1,
+            },
+            nodeImage: {
+              url: "",
+              width: nodeImageWidth,
+              height: nodeImageHeight,
+              centerTopDistance: centerTopDistance,
+              centerLeftDistance: centerLeftDistance,
+              cornerShape: cornerShape,
+              shadow: false,
+              borderWidth: 0,
+              borderColor: {
+                red: 19,
+                green: 123,
+                blue: 128,
+                alpha: 1,
+              },
+            },
+            template: `<div>
+                  <div style="margin-top:10px;
+                              font-size:20px;
+                              font-weight:bold;
+                              text-align: center;
+                         ">${item.name_ar} </div>
+                 <div style="margin-top:3px;
+                              font-size:16px;
+                              text-align: center;
+                         ">${item.name_en} </div>
+
+                 <div style="margin-top:3px;
+                              font-size:14px;
+                              text-align: center;
+                         ">${item.name}</div>
+              </div>`,
+            connectorLineColor: {
+              red: 11,
+              green: 123,
+              blue: 108,
+              alpha: 1
+            },
+            connectorLineWidth: 5,
+            dashArray: '',
+            expanded: expanded
+          }
+        });
+        this.$observable.fire('drawD3Graph', data);
+      });
+    },
+  },
+
+  mounted: function () {
     this.$observable.subscribe('unitsTable_view', (data) => {
-      console.log(data)
       this.$refs.appBuilder.setModelData("editUnitModal", {
         id: data.item.id,
       });
       this.$observable.fire('openModal', {
         modalId: 'unitModal',
         obj: data,
-      })
-    })
+      });
+    });
+    this.generateD3OrgChartJson();
   },
 }
 </script>

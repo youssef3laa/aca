@@ -2,7 +2,7 @@
   <v-app>
     <v-container>
       <v-row>
-        <v-col id="tree" style="background: white"/>
+        <v-col id="graph" style="background: white"/>
       </v-row>
     </v-container>
   </v-app>
@@ -10,7 +10,6 @@
 
 
 <script>
-import * as d3 from "d3";
 import TreeView from "d3-org-chart";
 
 export default {
@@ -18,20 +17,18 @@ export default {
   data() {
   },
   methods: {
-    drawGraph() {
-      d3.json(this.val.url)
-          .then(data=>{
-            new TreeView()
-                .container('#tree')
-                .data(data)
-                .initialZoom(0.6)
-                .onNodeClick(d=> console.log(d+' node clicked'))
-                .render()
-          })
+    drawGraph(data) {
+      new TreeView()
+          .container('#graph')
+          .data(data)
+          .svgWidth(1200) // Change Size Dynamically
+          .initialZoom(0.5).render();
     }
   },
   mounted() {
-    this.drawGraph();
+    this.$observable.subscribe('drawD3Graph', (data) => {
+      this.drawGraph(data);
+    });
   },
   props: ['val', 'field'],
 };
