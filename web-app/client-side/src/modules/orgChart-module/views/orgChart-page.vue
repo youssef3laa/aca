@@ -7,11 +7,11 @@
 </template>
 
 <script>
-import AppBuilder from "../../application-builder-module/builders/app-builder";
-import http from "../../core-module/services/http";
+import AppBuilder from '../../application-builder-module/builders/app-builder'
+import http from '../../core-module/services/http'
 
 export default {
-  name: "OrgChart",
+  name: 'OrgChart',
   components: {
     AppBuilder,
   },
@@ -54,50 +54,54 @@ export default {
                 name: 'Organizational Chart',
               },
               {
-                tabId: "1",
+                tabId: '1',
                 isTab: true,
-                type: "DefaultSection",
+                type: 'DefaultSection',
                 isCard: true,
-                display: "block",
+                display: 'block',
                 isActive: true,
                 forms: [
                   {
                     inputs: [
                       {
-                        key: 'tableUser_delete',
-                        search: true, 
+                        key: 'tableUser',
+                        search: true,
                         filter: true,
                         add: true,
-                        actions: [],
-                        type: "DataTableComponent",
-                        name: "unitsTable",
-                        subscribe: "units",
+                        actions: ['edit', 'delete', 'view'],
+                        type: 'DataTableComponent',
+                        name: 'unitsTable',
+                        subscribe: 'units',
                         col: 12,
                       },
                     ],
                     model: {
                       unitsTable: {
-                        url : 'org/unit/read/list',
+                        url: 'org/unit/read/list',
                         headers: [
                           {
-                            text: "Internal code",
-                            value: "name",
+                            text: 'Internal code',
+                            value: 'name',
                           },
                           {
-                            text: "Name ar",
-                            value: "name_ar",
+                            text: 'Name ar',
+                            value: 'name_ar',
                           },
                           {
-                            text: "Name en",
-                            value: "name_en",
+                            text: 'Name en',
+                            value: 'name_en',
                           },
                           {
-                            text: "Unit type code",
-                            value: "unitTypeCode",
+                            text: 'Unit type code',
+                            value: 'unitTypeCode',
                           },
                           {
-                            text: "Unit code",
-                            value: "unitCode",
+                            text: 'Unit code',
+                            value: 'unitCode',
+                          },
+                          {
+                            text: '',
+                            value: 'action',
                           },
                           // {
                           //   text: "Actions",
@@ -106,25 +110,25 @@ export default {
                           // },
                         ],
                         data: [],
-                        search: "",
+                        search: '',
                       },
                     },
                   },
                 ],
               },
               {
-                tabId: "2",
+                tabId: '2',
                 isTab: true,
-                type: "DefaultSection",
+                type: 'DefaultSection',
                 isCard: true,
-                display: "none",
+                display: 'none',
                 forms: [
                   {
                     inputs: [
                       {
-                        type: "TableComponent",
-                        name: "rolesTable",
-                        subscribe: "roles",
+                        type: 'TableComponent',
+                        name: 'rolesTable',
+                        subscribe: 'roles',
                         col: 12,
                       },
                     ],
@@ -132,20 +136,20 @@ export default {
                       rolesTable: {
                         headers: [
                           {
-                            text: "Internal code",
-                            value: "name",
+                            text: 'Internal code',
+                            value: 'name',
                           },
                           {
-                            text: "Name ar",
-                            value: "name_ar",
+                            text: 'Name ar',
+                            value: 'name_ar',
                           },
                           {
-                            text: "Name en",
-                            value: "name_en",
+                            text: 'Name en',
+                            value: 'name_en',
                           },
                           {
-                            text: "Role code",
-                            value: "groupCode",
+                            text: 'Role code',
+                            value: 'groupCode',
                           },
                           // {
                           //   text: "Actions",
@@ -154,25 +158,25 @@ export default {
                           // },
                         ],
                         data: [],
-                        search: "",
+                        search: '',
                       },
                     },
                   },
                 ],
               },
               {
-                tabId: "3",
+                tabId: '3',
                 isTab: true,
-                type: "DefaultSection",
+                type: 'DefaultSection',
                 isCard: true,
-                display: "none",
+                display: 'none',
                 forms: [
                   {
                     inputs: [
                       {
-                        type: "TableComponent",
-                        name: "usersTable",
-                        subscribe: "users",
+                        type: 'TableComponent',
+                        name: 'usersTable',
+                        subscribe: 'users',
                         col: 12,
                       },
                     ],
@@ -180,20 +184,20 @@ export default {
                       usersTable: {
                         headers: [
                           {
-                            text: "Username",
-                            value: "name",
+                            text: 'Username',
+                            value: 'name',
                           },
                           {
-                            text: "Display name",
-                            value: "displayName",
+                            text: 'Display name',
+                            value: 'displayName',
                           },
                           {
-                            text: "Email",
-                            value: "details.email",
+                            text: 'Email',
+                            value: 'details.email',
                           },
                           {
-                            text: "Phone",
-                            value: "details.phone",
+                            text: 'Phone',
+                            value: 'details.phone',
                           },
                           // {
                           //   text: "Actions",
@@ -202,56 +206,59 @@ export default {
                           // },
                         ],
                         data: [],
-                        search: "",
+                        search: '',
                       },
                     },
                   },
                 ],
               },
               {
-                tabId: "4",
+                tabId: '4',
                 isTab: true,
-                type: "DefaultSection",
+                type: 'DefaultSection',
                 isCard: true,
-                display: "none",
+                display: 'none',
               },
             ],
           },
         ],
       },
-    };
+    }
   },
   methods: {
-    getUnits: function () {
-      http.post("org/unit/read/list").then((response) => {
-        this.$observable.fire("units", {
-          type: "modelUpdate",
+    // getUnits: function () {
+    //   http.post("org/unit/read/list").then((response) => {
+    //     this.$observable.fire("units", {
+    //       type: "modelUpdate",
+    //       model: response.data,
+    //     });
+    //   });
+    // },
+    getRoles: function() {
+      http.post('org/group/read/list').then((response) => {
+        this.$observable.fire('roles', {
+          type: 'modelUpdate',
           model: response.data,
-        });
-      });
+        })
+      })
     },
-    getRoles: function () {
-      http.post("org/group/read/list").then((response) => {
-        this.$observable.fire("roles", {
-          type: "modelUpdate",
+    getUsers: function() {
+      http.post('org/user/read/list').then((response) => {
+        this.$observable.fire('users', {
+          type: 'modelUpdate',
           model: response.data,
-        });
-      });
-    },
-    getUsers: function () {
-      http.post("org/user/read/list").then((response) => {
-        this.$observable.fire("users", {
-          type: "modelUpdate",
-          model: response.data,
-        });
-      });
+        })
+      })
     },
   },
 
-  mounted: function () {
-    this.getUnits();
-    this.getRoles();
-    this.getUsers();
+  mounted: function() {
+    this.$observable.subscribe('tableUser_View', (data) => {
+      console.log(data)
+    })
+    // this.getUnits();
+    this.getRoles()
+    this.getUsers()
   },
-};
+}
 </script>
