@@ -62,6 +62,7 @@ export default {
                   {
                     key: 'editUnitModal',
                     modalId: 'unitModal',
+                    modalTitle: 'إضافة وحدة',
                     inputs: [
                       {
                         type: 'InputComponent',
@@ -71,7 +72,23 @@ export default {
                       },
                     ],
                     model: {
-                      id : ''
+                      id: '',
+                    },
+                  },
+                  {
+                    key: 'editUnitModal',
+                    modalId: 'addUnitModal',
+                    modalTitle: 'إضافة وحدة',
+                    inputs: [
+                      {
+                        type: 'InputComponent',
+                        label: 'Name',
+                        name: 'id',
+                        col: '6',
+                      },
+                    ],
+                    model: {
+                      id: '',
                     },
                   },
                 ],
@@ -95,6 +112,7 @@ export default {
                         filter: true,
                         add: true,
                         actions: ['edit', 'delete', 'view'],
+                        modalId: 'addUnitModal',
                       },
                     ],
                     model: {
@@ -266,12 +284,20 @@ export default {
   mounted: function() {
     this.$observable.subscribe('unitsTable_view', (data) => {
       console.log(data)
-      this.$refs.appBuilder.setModelData("editUnitModal", {
+      this.$refs.appBuilder.setModelData('editUnitModal', {
         id: data.item.id,
-      });
+      })
       this.$observable.fire('openModal', {
         modalId: 'unitModal',
         obj: data,
+      })
+    })
+    this.$observable.subscribe('updateModal', (obj) => {
+      console.log(obj.obj.id)
+    })
+    this.$observable.subscribe('unitsTable_add', () => {
+      this.$observable.fire('openModal', {
+        modalId: 'addUnitModal',
       })
     })
   },

@@ -2,7 +2,7 @@
   <div>
     <v-row>
       <v-col :cols="7">
-        <button style="padding: 5px; margin: 20px;">
+        <button style="padding: 5px; margin: 20px;" @click="handlAddButton()">
           <v-icon color="info">fas fa-plus</v-icon>
           <span> إضافة </span>
         </button>
@@ -75,7 +75,7 @@ export default {
   name: 'DataTableComponent',
   data() {
     return {
-      search: null,
+      search: '',
       totalItems: this.val.data.length,
       d: this.val,
       loading: true,
@@ -102,12 +102,16 @@ export default {
     },
   },
   methods: {
+    handlAddButton() {
+      console.log(this.field)
+      this.$observable.fire(this.field.name + '_add')
+    },
     handleAction(item, actionName) {
       console.log(this.field.name + '_' + actionName)
       //   console.log(item)
       //   console.log(actionName)
 
-       this.$observable.fire(this.field.name + '_' + actionName, {item})
+      this.$observable.fire(this.field.name + '_' + actionName, { item })
     },
     getDataFromApi(event) {
       if (!this.d.url) {
@@ -159,7 +163,7 @@ export default {
   props: ['val', 'field'],
 }
 </script>
-<style>
+<style scoped>
 .v-btn {
   color: black;
   background: #eaeaea;
@@ -171,5 +175,4 @@ export default {
 /* .dropDown-menu {
   background: #96969f !important;
 } */
-
 </style>
