@@ -1,9 +1,10 @@
 <template>
   <span>
     <div v-for="(section, key) in page.sections" :key="key">
-      <span v-if="page.tabs && key == 0">
+        <span v-if=" page.tabs && key ==0 && section.type!='TitleComponet'" >
         <TabBuilder :page="page" />
       </span>
+     
       <SectionBuilder
         v-bind:style="[
           section.isTab && section.display == 'none'
@@ -13,10 +14,13 @@
         v-on:modelChange="dataChange"
         :section="section"
       />
+       <span v-if=" page.tabs && key ==0 && section.type=='TitleComponet'" >
+        <TabBuilder :page="page" />
+      </span>
     </div>
+    
   </span>
 </template>
-
 <script>
 import SectionBuilder from './section-builder'
 import TabBuilder from './tab-builder'
@@ -53,10 +57,8 @@ export default {
     //   }
     // },
     // selectTabById: function(tabid){
-
     // }
   },
-
   // mounted() {
   //   for (let i = 0; this.page.tabs && i < this.page.tabs.length; i++) {
   //     if (this.page.tabs[i].isActive) {
@@ -67,19 +69,17 @@ export default {
   // },
 }
 </script>
-
 <style>
 /* .tab-btn {
   padding: 6px 10px;
-  background: #ffffff;
+  background: #FFFFFF;
   cursor: pointer;
   margin-bottom: 1rem;
-  border: 2px solid #cccccc;
+  border: 2px solid #CCCCCC;
   outline: none;
 }
-
 .active {
-  border-bottom: 3px solid #0278ae !important;
+  border-bottom: 3px solid #0278AE !important;
   background-color: rgba(2, 120, 174, 0.1);
 }
 .tab-btn {

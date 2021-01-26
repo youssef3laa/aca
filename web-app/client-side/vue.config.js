@@ -5,7 +5,10 @@ module.exports = {
     },
     transpileDependencies: [
         "vuetify",
-        "vue-sub"
+        "vue-sub",
+        "signature_pad",
+        "vue-signature-pad",
+        "VueSignaturePad"
     ],
 
     pluginOptions: {
