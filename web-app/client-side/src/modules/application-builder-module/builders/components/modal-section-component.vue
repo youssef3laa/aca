@@ -1,15 +1,7 @@
 <template>
   <v-dialog v-model="dialog" persistent width="600">
-    <template v-slot:activator="{ on, attrs }">
-      <v-btn color="primary" dark v-bind="attrs" v-on="on">
-        Open Dialog
-      </v-btn>
-    </template>
-
     <v-card>
-      <v-card-title class="headline">
-        Use Google's location service?
-      </v-card-title>
+      <v-card-title class="headline">Title</v-card-title>
       <span>
         <FormBuilder :forms="formData" :model="formData.model" />
       </span>
@@ -27,6 +19,7 @@
 </template>
 
 <script>
+// import FormBuilder from '../builders/form-builder'
 import FormBuilder from '../form-builder'
 export default {
   components: {
@@ -38,7 +31,21 @@ export default {
     }
   },
   mounted() {
-      console.log(this.formData)
+    console.log(this.formData)
+    console.log(this.formData.modalId)
+    let modelId = this.formData.modalId
+    this.$observable.context = this
+    this.$observable.subscribe('openModal', (modalObj) => {
+      console.log(this.dialog)
+      // console.log(modalObj.valid)
+      // this.dialog = modalObj.valid
+      if (modelId == modalObj.modalId) {
+        this.dialog = true
+        console.log(this.dialog)
+      }
+    })
+    // console.log(this.formData.forms[0])
+    // console.log(this.val)
   },
   props: ['formData'],
 }

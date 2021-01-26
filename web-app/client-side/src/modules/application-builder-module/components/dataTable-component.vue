@@ -44,7 +44,7 @@
 
         <v-menu top>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn color="primary" dark v-bind="attrs" v-on="on">
+            <v-btn v-bind="attrs" v-on="on">
               <v-icon> fas fa-ellipsis-h </v-icon>
             </v-btn>
           </template>
@@ -52,13 +52,13 @@
           <v-list>
             <v-list-item v-for="(i, index) in field.actions" :key="index">
               <v-list-item-title v-on:click="handleAction(item, i)"
-                ><span v-if="i == 'Edit'"
+                ><span class="dropDown-menu" v-if="i == 'edit'"
                   ><v-icon> far fa-edit </v-icon> {{ i }}</span
                 >
-                <span v-else-if="i == 'Delete'">
+                <span class="dropDown-menu" v-else-if="i == 'delete'">
                   <v-icon> far fa-trash-alt </v-icon> {{ i }}</span
                 >
-                <span v-else-if="i == 'View'">
+                <span class="dropDown-menu" v-else-if="i == 'view'">
                   <v-icon> fas fa-expand-arrows-alt </v-icon> {{ i }}</span
                 >
               </v-list-item-title>
@@ -129,7 +129,7 @@ export default {
       http
         .get(URL)
         .then((response) => {
-          //   this.totalItems = response.data.metaInfo.totalCount
+          this.totalItems = response.data.metaInfo.totalCount
           this.d.data = response.data.data
           this.loading = false
         })
@@ -165,6 +165,11 @@ export default {
   background: #eaeaea;
   padding: 0 5px !important;
   margin: 0 5px !important;
+  height: 20px !important;
+  min-width: 0 !important;
 }
+/* .dropDown-menu {
+  background: #96969f !important;
+} */
 
 </style>
