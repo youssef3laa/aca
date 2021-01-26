@@ -3,7 +3,8 @@
     <v-expansion-panels
       style="position:relative;    width: 100%;
     display: block;"
-    >
+      v-model="panel"
+      multiple>
       <v-expansion-panel>
         <v-expansion-panel-header>
           <v-row no-gutters>
@@ -35,7 +36,9 @@ export default {
     FormBuilder,
   },
   data() {
-    return {}
+    return {
+      panel: [0]
+    }
   },
   mounted() {
       console.log(this.formData);

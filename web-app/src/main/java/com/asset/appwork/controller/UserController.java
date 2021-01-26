@@ -7,12 +7,16 @@ import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.orgchart.UserManagement;
 import com.asset.appwork.response.AppResponse;
+import com.asset.appwork.service.OrgChartService;
+import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
@@ -22,6 +26,7 @@ import java.io.IOException;
 /**
  * Created by karim on 10/28/20.
  */
+@Slf4j
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/user")
 @RestController
@@ -33,7 +38,8 @@ public class UserController {
     UserManagement userManagement;
     @Autowired
     Environment environment;
-
+    @Autowired
+    OrgChartService orgChartService;
 
     @GetMapping("/form/{key}")
     public ResponseEntity<AppResponse<JsonNode>> getForm(@PathVariable("key") String key) {
@@ -71,6 +77,31 @@ public class UserController {
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/details")
+    public ResponseEntity<AppResponse<JsonNode>> getLoggedInUserDetails(@RequestHeader("X-Auth-Token") String token)
+    {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUserByUsername(account.getUsername()).toString()));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
         return respBuilder.build().getResponseEntity();
     }
 }
