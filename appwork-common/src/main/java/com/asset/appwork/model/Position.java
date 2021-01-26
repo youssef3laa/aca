@@ -40,15 +40,15 @@ public class Position {
     Collection<Assignment> assignment;
 
     @SneakyThrows
+    public String toString() {
+        return new ObjectMapper().writeValueAsString(this);
+    }
+
+    @SneakyThrows
     public static Position fromString(String json) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.addMixIn(Position.class, PositionPlatformMixIn.class);
         return mapper.readValue(json, Position.class);
-    }
-
-    @SneakyThrows
-    public String toString() {
-        return new ObjectMapper().writeValueAsString(this);
     }
 
     @SneakyThrows

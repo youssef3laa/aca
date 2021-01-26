@@ -1,7 +1,7 @@
 package com.asset.appwork.model;
 
 import com.asset.appwork.mixin.UnitPlatformMixIn;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
@@ -33,8 +33,11 @@ public class Unit extends BaseIdentity<Unit> {
     @JsonIgnore
     Collection<Position> position;
     @ManyToMany(mappedBy = "child", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private Collection<Unit> parent = new HashSet<>();
+//    @JsonIgnore
+//    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+//    @JsonIdentityReference(alwaysAsId=true)
+//    @JsonFormat(with = JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)
+    Collection<Unit> parent = new HashSet<>();
 
     @SneakyThrows
     public static Unit fromString(String json) {
@@ -74,14 +77,6 @@ public class Unit extends BaseIdentity<Unit> {
         this.group = groups;
     }
 
-    public Collection<Unit> getParent() {
-        return parent;
-    }
-
-    public void setParent(Collection<Unit> parents) {
-        this.parent = parents;
-    }
-
     public Collection<Unit> getChild() {
         return child;
     }
@@ -97,7 +92,14 @@ public class Unit extends BaseIdentity<Unit> {
     public void setPosition(Collection<Position> position) {
         this.position = position;
     }
-}
+
+    public Collection<Unit> getParent() {
+        return parent;
+    }
+
+    public void setParent(Collection<Unit> parent) {
+        this.parent = parent;
+    }}
 
 //    @JsonProperty(value = "", access = JsonProperty.Access.WRITE_ONLY)
 //    @JsonIgnore

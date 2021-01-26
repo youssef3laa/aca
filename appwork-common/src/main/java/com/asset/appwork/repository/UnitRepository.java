@@ -4,6 +4,8 @@ import com.asset.appwork.model.Group;
 import com.asset.appwork.model.Unit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -41,4 +43,10 @@ public interface UnitRepository extends GenericRepository<Unit, Long> {
     Optional<Unit> findByGroup(Group group);
 
     void deleteById(Long id);
+
+    @Query(value = "{call ACA_ORG_SP_getUnitChildrenRecursively(:unitCode)}", nativeQuery = true)
+    List<Unit> getUnitChildrenRecursively(@Param("unitCode") String unitCode);
+    @Query(value = "{call ACA_ORG_SP_getUnitChildrenRecursively(:unitCode)}", nativeQuery = true)
+    Page<Unit> getUnitChildrenRecursively(@Param("unitCode") String unitCode,
+                                                                  Pageable pageable);
 }
