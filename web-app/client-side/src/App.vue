@@ -1,9 +1,11 @@
 <template>
   <div id="app">
-    <TheNavbar />
     <v-app id="inspire">
       <!-- <dynamicView /> -->
+    <TheNavbar />
+    <v-content>
       <router-view />
+      </v-content>
     </v-app>
   </div>
 </template>
@@ -56,7 +58,7 @@ h1 {
 }
 </style>
 <script>
-import TheNavbar from './modules/core-module/components/the-nav-bar'
+import TheNavbar from './modules/core-module/components/the-new-nav-bar'
 import SystemUser from './config/user'
 import Vue from 'vue'
 // import dynamicView from './components/DynamicView'

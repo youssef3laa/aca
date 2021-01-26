@@ -9,7 +9,7 @@
     <div id="task-list">
       <div v-for="(task, key) in taskList" :key="key" class="task">
         <i class="far fa-edit"></i>
-        <span class="task-name">{{ task.name }}</span>
+        <span class="task-name">{{ task.title }}</span>
       </div>
     </div>
     <div class="scroller-wrapper">
@@ -26,12 +26,12 @@ export default {
   data() {
     return {
       taskList: [
-        { name: "إنشاء وارد جديد" },
-        { name: "تسجيل موضوع" },
-        { name: "إنشاء تكليف" },
-        { name: "شاشة التوجيهات" },
-        { name: "شاشة التوجيهات" },
-        { name: "شاشة التوجيهات" },
+        { title: "إنشاء وارد جديد" },
+        { title: "تسجيل موضوع" },
+        { title: "إنشاء تكليف" },
+        { title: "شاشة التوجيهات" },
+        { title: "شاشة التوجيهات" },
+        { title: "شاشة التوجيهات" },
       ],
     };
   },
