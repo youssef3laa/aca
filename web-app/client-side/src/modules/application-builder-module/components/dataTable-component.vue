@@ -44,7 +44,7 @@
 
         <v-menu top>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn v-bind="attrs" v-on="on">
+            <v-btn color="primary" dark v-bind="attrs" v-on="on">
               <v-icon> fas fa-ellipsis-h </v-icon>
             </v-btn>
           </template>
@@ -52,13 +52,13 @@
           <v-list>
             <v-list-item v-for="(i, index) in field.actions" :key="index">
               <v-list-item-title v-on:click="handleAction(item, i)"
-                ><span class="drop-menu" v-if="i == 'edit'"
+                ><span v-if="i == 'Edit'"
                   ><v-icon> far fa-edit </v-icon> {{ i }}</span
                 >
-                <span class="drop-menu" v-else-if="i == 'delete'">
+                <span v-else-if="i == 'Delete'">
                   <v-icon> far fa-trash-alt </v-icon> {{ i }}</span
                 >
-                <span class="drop-menu" v-else-if="i == 'view'">
+                <span v-else-if="i == 'View'">
                   <v-icon> fas fa-expand-arrows-alt </v-icon> {{ i }}</span
                 >
               </v-list-item-title>
@@ -103,11 +103,11 @@ export default {
   },
   methods: {
     handleAction(item, actionName) {
-      console.log(this.field.key + '_' + actionName)
+      console.log(this.field.name + '_' + actionName)
       //   console.log(item)
       //   console.log(actionName)
 
-      this.$observable.fire(this.field.key + '_' + actionName, { item })
+       this.$observable.fire(this.field.name + '_' + actionName, {item})
     },
     getDataFromApi(event) {
       if (!this.d.url) {
@@ -127,9 +127,9 @@ export default {
       params.size = limit
       const URL = this.d.url + '?' + new URLSearchParams(params).toString()
       http
-        .post(URL)
+        .get(URL)
         .then((response) => {
-          this.totalItems = response.data.metaInfo.totalCount
+          //   this.totalItems = response.data.metaInfo.totalCount
           this.d.data = response.data.data
           this.loading = false
         })

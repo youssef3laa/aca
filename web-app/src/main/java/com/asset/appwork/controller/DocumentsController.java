@@ -3,6 +3,8 @@ package com.asset.appwork.controller;
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.cs.AppworkCSOperations;
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.dto.CreateNode;
+import com.asset.appwork.dto.Document;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.AttachmentSort;
@@ -18,11 +20,12 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -39,29 +42,118 @@ public class DocumentsController {
     @Autowired
     AttachmentSortService attachmentSortService;
 
+    @Autowired
+    Environment environment;
+
+    //    @PostMapping("/upload")
+//    public ResponseEntity<AppResponse<JsonNode>> uploadFile(@RequestHeader("X-Auth-Token") String token,
+//                                                            @RequestParam("file") MultipartFile file,
+//                                                            @RequestParam("parentId") Long parentId,
+//                                                            @RequestParam("name") String name) {
     @PostMapping("/upload")
-    public ResponseEntity<AppResponse<JsonNode>> uploadFile(@RequestHeader("X-Auth-Token") String token,
-                                                            @RequestParam("file") MultipartFile file,
-                                                            @RequestParam("parentId") Long parentId,
-                                                            @RequestParam("name") String name) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+    public ResponseEntity<AppResponse<Document>> uploadFile(@RequestHeader("X-Auth-Token") String token,
+                                                            CreateNode createNode) {
+        AppResponse.ResponseBuilder<Document> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
             try {
+//                CreateNode createNode = new CreateNode();
+//                createNode.setFile(file.getBytes());
+//                createNode.setName(name);
+//                createNode.setParentId(parentId);
+                createNode.setType(144);
+
+                //TODO move below code to service
+                Long nodeId = appworkCSOperations.checkIfDocumentAlreadyExists(createNode.getParent_id(),
+                        createNode.getName(),
+                        144);
+                Document document = new Document();
+                if (nodeId != -1) {
+                    document.setId(nodeId);
+                    respBuilder.status(ResponseCode.SUCCESS);
+                    respBuilder.data(document);
+                    return respBuilder.build().getResponseEntity();
+                }
+
                 Http http = appworkCSOperations.
-                        uploadDocument(file.getBytes(), parentId, name, String.valueOf(144));
+                        uploadDocument(createNode);
                 System.out.println(http.getResponse());
                 System.out.println(http.getStatusCode());
                 respBuilder.status(ResponseCode.SUCCESS);
-            } catch (IOException e) {
+                document.setId(new ObjectMapper().readTree(http.getResponse()).get("results").get("data").get("properties").get("id").longValue());
+                respBuilder.data(document);
+            } catch (IllegalAccessException | NoSuchFieldException e) {
+                e.printStackTrace();
                 log.error(e.getMessage());
-                respBuilder.status(ResponseCode.UNSUPPORTED_FILE_TYPE);
+                respBuilder.status(ResponseCode.BAD_REQUEST);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
             }
         } catch (AppworkException e) {
             log.error(e.getMessage());
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @PostMapping("/create/folder")
+    public ResponseEntity<AppResponse<Document>> createFolder(@RequestHeader("X-Auth-Token") String token,
+                                                              CreateNode createNode) {
+        AppResponse.ResponseBuilder<Document> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
+            AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
+            try {
+//                CreateNode createNode = new CreateNode();
+//                createNode.setFile(file.getBytes());
+//                createNode.setName(name);
+//                createNode.setParentId(parentId);
+                createNode.setType(0);
+
+
+                //TODO move below code to service
+                Long nodeId = appworkCSOperations.checkIfDocumentAlreadyExists(createNode.getParent_id(),
+                        createNode.getName(),
+                        0);
+                Document document = new Document();
+                if (nodeId != -1) {
+                    document.setId(nodeId);
+                    respBuilder.status(ResponseCode.SUCCESS);
+                    respBuilder.data(document);
+                    return respBuilder.build().getResponseEntity();
+                }
+                Http http = appworkCSOperations.
+                        uploadDocument(createNode);
+                System.out.println(http.getResponse());
+                System.out.println(http.getStatusCode());
+                respBuilder.status(ResponseCode.SUCCESS);
+                document.setId(new ObjectMapper().readTree(http.getResponse()).get("results").get("data").get("properties").get("id").longValue());
+                respBuilder.data(document);
+            } catch (IllegalAccessException | NoSuchFieldException e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+                respBuilder.status(ResponseCode.BAD_REQUEST);
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+//            try {
+//                respBuilder.data(new ObjectMapper().readTree(e.getMessage()));
+//            } catch (JsonProcessingException jsonProcessingException) {
+//                jsonProcessingException.printStackTrace();
+//            }
+
         }
 
         return respBuilder.build().getResponseEntity();
@@ -345,5 +437,33 @@ public class DocumentsController {
 
         return respBuilder.build().getResponseEntity();
     }
+
+
+    //categories
+    @PutMapping("{id}/categories/{categoryId}")
+    public ResponseEntity<AppResponse<JsonNode>> updateNodeOnDocument(@RequestHeader("X-Auth-Token") String token,
+                                                                      @RequestBody HashMap<String, String> categoryValues,
+                                                                      @PathVariable("id") Long nodeId,
+                                                                      @PathVariable("categoryId") Long categoryId) {
+
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
+            Http http = appworkCSOperations.updateCategoryOnNode(nodeId, categoryId, categoryValues);
+            respBuilder.status(SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+            respBuilder.data(SystemUtil.convertStringToJsonNode(http.getResponse()));
+            log.info("updatedNodeOnDocument: " + http.getResponse());
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            respBuilder.status(e.getCode());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+//    uploadThenUpdateCategory
+
 
 }

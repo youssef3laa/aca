@@ -7,10 +7,10 @@
 <script>
     import formPageMixin from "../../../mixins/formPageMixin";
     import AppBuilder from "../../application-builder-module/builders/app-builder";
-    import historyMixin from "../../history-module/mixin/historyMixin";
+    import historyMixin from "@/modules/history-module/mixin/historyMixin";
 
     export default {
-        name: "generalProcess-member",
+        name: "generalProcess-stepAD",
         mixins: [formPageMixin, historyMixin],
         components: {
             AppBuilder,
@@ -31,7 +31,7 @@
 
             this.taskData = await this.getTaskData(this.taskId);
             this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
-            this.loadForm("generalProcess-member", this.fillForm);
+            this.loadForm("generalProcess-stepAD", this.fillForm);
 
             this.$observable.subscribe("complete-step", this.submit);
         },
@@ -86,7 +86,7 @@
                     code: model.receiver.value.code,
                     assignedCN: model.receiver.value.value,
                     decision: approvalModel.approval.decision,
-                    comment: approvalModel.approval.comment
+                    comment: approvalModel.approval.comment,
                 };
                 this.completeStep(data);
             }

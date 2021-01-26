@@ -1,17 +1,17 @@
 <template>
   <div>
     <v-container>
-      <AppBuilder :app="app" />
+      <AppBuilder :app="app" ref="appBuilder" />
     </v-container>
   </div>
 </template>
 
 <script>
-import AppBuilder from '../../application-builder-module/builders/app-builder'
-import http from '../../core-module/services/http'
+import AppBuilder from "../../application-builder-module/builders/app-builder";
+// import http from "../../core-module/services/http";
 
 export default {
-  name: 'OrgChart',
+  name: "OrgChart",
   components: {
     AppBuilder,
   },
@@ -54,211 +54,221 @@ export default {
                 name: 'Organizational Chart',
               },
               {
-                tabId: '1',
+                tabId: "1",
                 isTab: true,
-                type: 'DefaultSection',
+                type: "DefaultSection",
                 isCard: true,
-                display: 'block',
+                display: "block",
                 isActive: true,
                 forms: [
                   {
                     inputs: [
                       {
-                        key: 'tableUser',
+                        type: "DataTableComponent",
+                        name: "unitsTable",
+                        subscribe: "units",
+                        col: 12,
                         search: true,
                         filter: true,
                         add: true,
                         actions: ['edit', 'delete', 'view'],
-                        type: 'DataTableComponent',
-                        name: 'unitsTable',
-                        subscribe: 'units',
-                        col: 12,
                       },
+                      {
+                        modalId: "unitModal",
+                        type: "ModalComponent",
+                        name: "unitModal",
+                        forms: [
+                          {
+                            key: "unitModal",
+                            inputs: [
+                              {
+                                type: "InputComponent",
+                                label: "Id",
+                                name: "id",
+                                col: "4",
+                              },
+                            ],
+                            model: {},
+                          }
+                        ],
+                      }
                     ],
                     model: {
                       unitsTable: {
                         url: 'org/unit/read/list',
                         headers: [
                           {
-                            text: 'Internal code',
-                            value: 'name',
+                            text: "Internal code",
+                            value: "name",
                           },
                           {
-                            text: 'Name ar',
-                            value: 'name_ar',
+                            text: "Name ar",
+                            value: "name_ar",
                           },
                           {
-                            text: 'Name en',
-                            value: 'name_en',
+                            text: "Name en",
+                            value: "name_en",
                           },
                           {
-                            text: 'Unit type code',
-                            value: 'unitTypeCode',
+                            text: "Unit type code",
+                            value: "unitTypeCode",
                           },
                           {
-                            text: 'Unit code',
-                            value: 'unitCode',
+                            text: "Unit code",
+                            value: "unitCode",
                           },
                           {
                             text: '',
-                            value: 'action',
-                          },
-                          // {
-                          //   text: "Actions",
-                          //   value: "actions",
-                          //   sortable: false,
-                          // },
+                            value: 'action'
+                          }
                         ],
                         data: [],
-                        search: '',
+                        search: "",
                       },
                     },
                   },
                 ],
               },
               {
-                tabId: '2',
+                tabId: "2",
                 isTab: true,
-                type: 'DefaultSection',
+                type: "DefaultSection",
                 isCard: true,
-                display: 'none',
+                display: "none",
                 forms: [
                   {
                     inputs: [
                       {
-                        type: 'TableComponent',
-                        name: 'rolesTable',
-                        subscribe: 'roles',
+                        type: "DataTableComponent",
+                        name: "rolesTable",
+                        subscribe: "roles",
                         col: 12,
+                        search: true,
+                        filter: true,
+                        add: true,
+                        actions: ['edit', 'delete', 'view'],
                       },
                     ],
                     model: {
                       rolesTable: {
+                        url: 'org/group/read/list',
                         headers: [
                           {
-                            text: 'Internal code',
-                            value: 'name',
+                            text: "Internal code",
+                            value: "name",
                           },
                           {
-                            text: 'Name ar',
-                            value: 'name_ar',
+                            text: "Name ar",
+                            value: "name_ar",
                           },
                           {
-                            text: 'Name en',
-                            value: 'name_en',
+                            text: "Name en",
+                            value: "name_en",
                           },
                           {
-                            text: 'Role code',
-                            value: 'groupCode',
+                            text: "Role code",
+                            value: "groupCode",
                           },
-                          // {
-                          //   text: "Actions",
-                          //   value: "actions",
-                          //   sortable: false,
-                          // },
                         ],
                         data: [],
-                        search: '',
+                        search: "",
                       },
                     },
                   },
                 ],
               },
               {
-                tabId: '3',
+                tabId: "3",
                 isTab: true,
-                type: 'DefaultSection',
+                type: "DefaultSection",
                 isCard: true,
-                display: 'none',
+                display: "none",
                 forms: [
                   {
                     inputs: [
                       {
-                        type: 'TableComponent',
-                        name: 'usersTable',
-                        subscribe: 'users',
+                        type: "DataTableComponent",
+                        name: "usersTable",
+                        subscribe: "users",
                         col: 12,
+                        search: true,
+                        filter: true,
+                        add: true,
+                        actions: ['edit', 'delete', 'view'],
                       },
                     ],
                     model: {
                       usersTable: {
+                        url: 'org/user/read/list',
                         headers: [
                           {
-                            text: 'Username',
-                            value: 'name',
+                            text: "Username",
+                            value: "name",
                           },
                           {
-                            text: 'Display name',
-                            value: 'displayName',
+                            text: "Display name",
+                            value: "displayName",
                           },
                           {
-                            text: 'Email',
-                            value: 'details.email',
+                            text: "Email",
+                            value: "details.email",
                           },
                           {
-                            text: 'Phone',
-                            value: 'details.phone',
+                            text: "Phone",
+                            value: "details.phone",
                           },
-                          // {
-                          //   text: "Actions",
-                          //   value: "actions",
-                          //   sortable: false,
-                          // },
                         ],
                         data: [],
-                        search: '',
+                        search: "",
                       },
                     },
                   },
                 ],
               },
               {
-                tabId: '4',
+                tabId: "4",
                 isTab: true,
-                type: 'DefaultSection',
+                type: "DefaultSection",
                 isCard: true,
-                display: 'none',
+                display: "none",
+                // background: "transparent",
+                forms: [
+                  {
+                    inputs: [
+                      {
+                        type: "D3GraphComponent",
+                        name: "chart",
+                        subscribe: "chart",
+                        col: 12
+                      },
+                    ],
+                    model: {
+                      chart: {
+                        url: "https://gist.githubusercontent.com/bumbeishvili/dc0d47bc95ef359fdc75b63cd65edaf2/raw/c33a3a1ef4ba927e3e92b81600c8c6ada345c64b/orgChart.json",
+                      },
+                    },
+                  },
+                ],
               },
             ],
           },
         ],
       },
-    }
+    };
   },
-  methods: {
-    // getUnits: function () {
-    //   http.post("org/unit/read/list").then((response) => {
-    //     this.$observable.fire("units", {
-    //       type: "modelUpdate",
-    //       model: response.data,
-    //     });
-    //   });
-    // },
-    getRoles: function() {
-      http.post('org/group/read/list').then((response) => {
-        this.$observable.fire('roles', {
-          type: 'modelUpdate',
-          model: response.data,
-        })
-      })
-    },
-    getUsers: function() {
-      http.post('org/user/read/list').then((response) => {
-        this.$observable.fire('users', {
-          type: 'modelUpdate',
-          model: response.data,
-        })
-      })
-    },
-  },
+  methods: {},
 
-  mounted: function() {
-    this.$observable.subscribe('tableUser_View', (data) => {
-      console.log(data)
-    })
-    // this.getUnits();
-    this.getRoles()
-    this.getUsers()
+  mounted: function () {
+    this.$observable.subscribe('unitsTable_view', (data) => {
+      console.log(data);
+      this.$refs.appBuilder.setModelData("unitModal", {
+        id: data.id,
+      });
+      this.$observable.fire("openModal", {
+        modalId: "unitModal",
+        obj: data,
+      });
+    });
   },
-}
+};
 </script>

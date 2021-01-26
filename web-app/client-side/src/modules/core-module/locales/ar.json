@@ -13,6 +13,12 @@
   "incomingMeans": "وسيلة الوارد",
   "login": "تسجيل دخول",
   "logged-in-success": "تم الدخول بنجاح",
+  "nameOfTheFile": "اسم الملف",
+  "typeOfTheFile": "نوع الملف",
+  "writeHereTypeOfTheFile": "نوع الملف يكتب هنا",
+  "writeHereNameOfTheFile": "اسم الملف يكتب هنا",
+  "chooseFileToOpenOrShow": "قم بإختيار ملف لإستعراضه أو عرض بياناته",
+  "pleaseChooseFileTypeToCompleteFileUpload": "الرجاء اختيار النوع و اضافة الملف لتكتمل عملية التحميل",
   "CANNOT_CONNECT_TO_SERVER": "خطأ في الإتصال بالسيرفر",
   "INVALID_CREDENTIALS": "برجاء التأكد من اسم المستخدم و كلمه المرور"
 }

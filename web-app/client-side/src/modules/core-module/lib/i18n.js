@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueI18n from 'vue-i18n'
 
-
+//TODO implement lazy loading https://kazupon.github.io/vue-i18n/guide/lazy-loading.html
 
 Vue.use(VueI18n)
 

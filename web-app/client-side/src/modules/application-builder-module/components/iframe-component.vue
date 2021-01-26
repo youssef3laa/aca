@@ -1,85 +1,66 @@
 <template>
   <div
-    style="  
+      style="
     width:100%;"
   >
-    <!-- <SkeletonLoader
-      v-if="loading"
-      :field="{
-        class: 'mx-auto',
-        width: '100%',
-        height: '500px',
-        loaderType: 'image',
-      }"
-      :loading="loading"
-    /> -->
     <v-container
-      v-if="!loading"
-      :loading="loading"
-      class="attachment-iframe"
-      title="Click to grap a file from your PC!"
+        v-if="placeHolder&&!loading"
+        :loading="loading"
+        class="attachment-iframe"
+        title="Click to grab a file from your PC!"
     >
-      <!-- <v-row align="center" justify="center">
-        <v-col>
-        <v-icon color="outline" style="margin: 10px 10px 0 0; padding: 5px 10px"
-          >mdi-cloud-upload
-        </v-icon>
-        </v-col>
-      </v-row> -->
+
       <v-row align="center" justify="center">
-        <v-col align="center" justify="center" :cols="12">
+        <v-col :cols="12" align="center" justify="center">
           <v-icon
-            color="#9e9e9e"
-            style="margin: 10px 10px 0 0; padding: 5px 10px; font-size: 150px;"
-            >mdi-file-document
-          </v-icon></v-col
+              color="#9e9e9e"
+              style="margin: 10px 10px 0 0; padding: 5px 10px; font-size: 150px;"
+          >mdi-file-document
+          </v-icon>
+        </v-col
         >
-        <v-col align="center" justify="center" :cols="12">
+        <v-col :cols="12" align="center" justify="center">
           <span style="margin: 10px 10px 0 0; padding: 5px 10px; color: #c7c8c8"
-            >قم بإختيار ملف لإستعراضه أو عرض بياناته</span
-          >
+          >{{ $t("chooseFileToOpenOrShow") }}
+          </span>
         </v-col>
       </v-row>
     </v-container>
     <iframe
-      v-else
-      :src="value.src"
-      style="border-width: 0; padding: 0; margin: 0; overflow: hidden; width:100%; height:500px;"
-      @load="iframeLoaded"
+        v-else
+        :src="value.src"
+        style="border-width: 0; padding: 0; margin: 0; overflow: hidden; width:100%; height:500px;"
+        @load="iframeLoaded"
     />
   </div>
 </template>
 
 <script>
-// import SkeletonLoader from '../components/skeleton-loader-component'
 
 export default {
   name: 'iframe-component',
-  components: {
-    // SkeletonLoader,
-  },
+  components: {},
   props: ['val', 'field'],
   data() {
     return {
+      placeHolder: true,
       loading: false,
       value: this.val,
     }
   },
   watch: {
-    val: function(newVal, oldVal) {
+    val: function (newVal, oldVal) {
       console.log(oldVal, newVal)
       this.value = newVal
     },
   },
   created() {
     this.$observable.subscribe('file-component-skeleton', (bool) => {
-      // if (!bool) setTimeout(() => (this.loading = bool), 9000)
-      // else this.loading = bool
       this.loading = bool
     })
   },
   methods: {
-    iframeLoaded: function() {
+    iframeLoaded: function () {
       console.log('iframe is loaded')
     },
   },

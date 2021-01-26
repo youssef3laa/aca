@@ -14,5 +14,6 @@
   "login": "Login",
   "logged-in-success": "Login Success",
   "CANNOT_CONNECT_TO_SERVER": "Cannot connect to the server",
+  "chooseFileToOpenOrShow": "Choose a file to view or view its data",
   "INVALID_CREDENTIALS": "Username or Password is wrong"
 }

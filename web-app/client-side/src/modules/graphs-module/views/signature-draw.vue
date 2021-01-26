@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <v-card>
+    <v-card style="margin: 20px 0; border-radius: 6px">
       <div class="container">
         <v-alert outlined type="info" prominent icon="mdi-draw">
           <p style="font-size: 16px; color: black">
@@ -26,7 +26,7 @@
         </v-row>
       </div>
     </v-card>
-    <v-card style="top: 30px">
+    <v-card style="margin: 50px 0; border-radius: 6px">
       <div class="container">
         <!-- <h3>التأشيرات السابقة</h3> -->
         <v-alert outlined type="info" prominent icon="mdi-draw">
@@ -59,9 +59,11 @@
               >
                 <v-img
                   :src="signature.base64"
-                  style="border: 2px solid #e9e9e9; height: 100px"
+                  style="border: 2px solid #e9e9e9; height: 150px"
                 ></v-img>
-                <v-card-text>{{ signature.date.split("T")[0] }}</v-card-text>
+                <v-card-text style="border-top: 2px solid #e9e9e9">{{
+                  signature.date.split("T")[0]
+                }}</v-card-text>
               </v-card>
             </v-slide-item>
           </v-slide-group>
@@ -81,12 +83,15 @@ export default {
         penColor: "black",
         // backgroundColor: 'rgb(255, 255, 255)'
       },
-      requestId: 665146,
+      // requestId: 665146,
+      signaturesContainer: 705435,
       signatures: [],
       selected: null,
+      folderId: null
     };
   },
   mixins: [signatureMixin],
+  props: ['requestId'],
   methods: {
     undo() {
       this.$refs.signaturePad.undoSignature();
@@ -98,7 +103,8 @@ export default {
       console.log(isEmpty);
       // console.log(data);
 
-      this.uploadToCS(data, this.requestId);
+      await this.uploadToCS(data, this.folderId);
+      await this.reload();
     },
     change() {
       this.options = {
@@ -113,26 +119,47 @@ export default {
     clear() {
       this.$refs.signaturePad.clearSignature();
     },
+    reload: async function(){
+      if(!this.folderId) return;
+      const {
+        data: { data },
+      } = await this.getSubNodes(this.folderId);
+      const signatureList = data.results.map((image) => {
+        return {
+          id: image["data"]["properties"]["id"],
+          date: image["data"]["properties"]["create_date"],
+        };
+      });
+
+      // Download signatures
+      this.signatures = [];
+      signatureList.forEach(async (image) => {
+        const result = await this.downloadFromCS(image["id"]);
+        image["base64"] = `data:image/png;base64,${result}`;
+        this.signatures.push(image);
+      });
+    },
+    initialize: async function(){
+      if(!this.requestId) return;
+      let folder = await this.createFolder(
+              this.signaturesContainer,
+              this.requestId
+      );
+      this.folderId = folder.id
+
+      // List all signatures attached to request id
+      await this.reload();
+    }
   },
   async created() {
-    // List all signatures attached to request id
-    const {
-      data: { data },
-    } = await this.getSubNodes(this.requestId);
-    const signatureList = data.results.map((image) => {
-      return {
-        id: image["data"]["properties"]["id"],
-        date: image["data"]["properties"]["create_date"],
-      };
-    });
-
-    // Download signatures
-    signatureList.forEach(async (image) => {
-      const result = await this.downloadFromCS(image["id"]);
-      image["base64"] = `data:image/png;base64,${result}`;
-      this.signatures.push(image);
-    });
+    // Return folder id
+    await this.initialize();
   },
+  watch: {
+    requestId: function() {
+      this.initialize()
+    }
+  }
 };
 </script>
 
@@ -153,5 +180,8 @@ background-origin: border-box;
 }
 .v-alert--outlined {
   border: none !important ;
+}
+.v-slide-item--active {
+  border: 2px solid #2d7fae !important;
 }
 </style>

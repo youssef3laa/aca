@@ -10,18 +10,23 @@ import AppBuilder from "../../application-builder-module/builders/app-builder";
 
 export default {
   name: "generalProcess-init",
+  mixins: [formPageMixin],
   components: {
     AppBuilder,
   },
-  mixins: [formPageMixin],
+  data() {
+    return {
+      app: {},
+      model: {},
+    };
+  },
   async created() {
     await this.loadForm("generalProcess-init");
-
     this.initiateBrava();
+    this.$observable.subscribe("complete-step", this.submit);
   },
   methods: {
-    completeStep: function () {
-      // if(!this.$refs.appBuilder) return;
+    submit: function () {
       let model = this.$refs.appBuilder.getModelData("form1");
       if (!model._valid) {
         //@TODO show warining
@@ -45,17 +50,6 @@ export default {
       };
       this.initiateProcess(obj);
     },
-  },
-  mounted() {
-    this.$observable.subscribe("complete-step", () => {
-      this.completeStep();
-    });
-  },
-  data() {
-    return {
-      app: {},
-      model: {},
-    };
-  },
+  }
 };
 </script>

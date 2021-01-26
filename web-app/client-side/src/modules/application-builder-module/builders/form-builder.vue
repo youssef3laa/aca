@@ -80,6 +80,8 @@ import chartsComponent from '../components/charts-component'
 import ShowAttachmentComponent from '../components/show-attachment-component'
 import DataTableComponent from '../components/dataTable-component'
 import ModalComponent from '../components/modal-component'
+import D3GraphComponent from '../components/d3-graph-component'
+import SignatureComponent from '../components/signature-component'
 
 export default {
   name: 'FormBuilder',
@@ -105,6 +107,8 @@ export default {
     ShowAttachmentComponent,
     DataTableComponent,
     ModalComponent,
+    D3GraphComponent,
+    SignatureComponent
   },
   data() {
     return {

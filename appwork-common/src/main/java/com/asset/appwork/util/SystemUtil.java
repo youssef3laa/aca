@@ -1,6 +1,7 @@
 package com.asset.appwork.util;
 
 import com.asset.appwork.enums.ResponseCode;
+import com.asset.appwork.exception.AppworkException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
@@ -216,17 +217,33 @@ public class SystemUtil {
 //        return null;
 //    }
 
-    public static String convertJSONtoXML(String json) {
+    public static String convertJSONtoXML(String json) throws AppworkException {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectMapper xmlMapper = new XmlMapper();
             JsonNode tree = objectMapper.readTree(json);
             String xml = xmlMapper.writer().withoutRootName().writeValueAsString(tree);
             return xml.replace("<>", "").replace("</>", "");
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
+            throw new AppworkException(e.getMessage(), ResponseCode.INTERNAL_SERVER_ERROR);
         }
-        return null;
+    }
+
+    public static <T> String convertObjectToXML(T object) throws AppworkException {
+        return convertObjectToXML(object, "");
+    }
+
+    public static <T> String convertObjectToXML(T object, String rootName) throws AppworkException {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectMapper xmlMapper = new XmlMapper();
+            JsonNode tree = objectMapper.readTree(objectMapper.writeValueAsString(object));
+            return xmlMapper.writer().withRootName(rootName).writeValueAsString(tree).replace("<>", "").replace("</>", "");
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new AppworkException(e.getMessage(), ResponseCode.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public static String addNameSpaceToXML(String xml, String nameSpace) {
