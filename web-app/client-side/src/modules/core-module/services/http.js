@@ -36,6 +36,23 @@ export default {
             ],
         })
     },
+
+    put(url, data) {
+        if (Vue.prototype.$user && Vue.prototype.$user.getSAMLart()) {
+            REQUEST.defaults.headers['X-Auth-Token'] = Vue.prototype.$user.getSAMLart()
+        }
+
+        return REQUEST.put(url, data, {
+            transformResponse: [
+                function (response) {
+                    resetHeaders();
+                    if (response.data) return JSON.parse(response.data)
+                    return JSON.parse(response)
+                },
+            ],
+        })
+    },
+
     delete(url) {
         if (Vue.prototype.$user && Vue.prototype.$user.getSAMLart()) {
             REQUEST.defaults.headers['X-Auth-Token'] = Vue.prototype.$user.getSAMLart()

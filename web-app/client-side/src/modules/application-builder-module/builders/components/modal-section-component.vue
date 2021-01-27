@@ -49,9 +49,16 @@ export default {
   methods: {
     submitModal: function() {
       console.log(this.formData.model)
-      this.$observable.fire('updateModal', {
-        obj: this.formData.model,
-      })
+      console.log(this.formData)
+      if (this.modalAction == 'edit') {
+        this.$observable.fire(this.formData.modalId + '_updateModal', {
+          obj: this.formData.model,
+        })
+      } else if (this.modalAction == 'add') {
+        this.$observable.fire(this.formData.modalId + '_addModal', {
+          obj: this.formData.model,
+        })
+      }
       this.dialog = false
     },
   },
@@ -62,6 +69,8 @@ export default {
     this.$observable.context = this
     this.$observable.subscribe('openModal', (modalObj) => {
       console.log(this.dialog)
+      console.log(modalObj.action)
+      this.modalAction = modalObj.action
       // console.log(modalObj.valid)
       // this.dialog = modalObj.valid
       if (modelId == modalObj.modalId) {
