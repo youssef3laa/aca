@@ -15,6 +15,7 @@ public class CreateNode {
     private String name;
     private Long original_id;
     private MultipartFile file;
+    private Long category_id;
     @JsonRawValue
     private String roles;
 }

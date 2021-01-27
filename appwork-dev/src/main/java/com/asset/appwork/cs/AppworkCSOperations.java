@@ -2,6 +2,7 @@ package com.asset.appwork.cs;
 
 
 import com.asset.appwork.dto.CreateNode;
+import com.asset.appwork.dto.Document;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.util.Http;
@@ -203,6 +204,7 @@ public class AppworkCSOperations {
 
     //general
     public void fillURIComponentWithQuery(UriComponentsBuilder uriComponentsBuilder, DocumentQuery documentQuery) throws IllegalAccessException {
+        if (documentQuery == null || uriComponentsBuilder == null) return;
         Class<DocumentQuery> cls = DocumentQuery.class;
         Field[] fields = cls.getDeclaredFields();
         String fieldName;
@@ -214,9 +216,10 @@ public class AppworkCSOperations {
         }
     }
 
-    public Long checkIfDocumentAlreadyExists(Long ParentId, String name, Integer type) throws IllegalAccessException, AppworkException, JsonProcessingException {
+    public Document checkIfDocumentAlreadyExists(Long ParentId, String name, Integer type) throws IllegalAccessException, AppworkException, JsonProcessingException {
 
 //        {{baseUrl}}/v2/nodes/:id/nodes?where_type=0&where_name=testrefaii21&fields=properties{id,name,name_multilingual}
+        // TODO to be refactored
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(CS_API.GET_SUB_NODES.getApiURL());
         DocumentQuery documentQuery = new DocumentQuery();
         documentQuery.setWhere_type(String.valueOf(type));
@@ -234,8 +237,9 @@ public class AppworkCSOperations {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(http.getResponse());
         ArrayNode jsonArray = jsonNode.withArray("results");
-        if (jsonArray.size() == 0) return -1L;
-        if (jsonArray.size() == 1) return jsonArray.get(0).get("data").get("properties").get("id").longValue();
+        if (jsonArray.size() == 0) return null;
+        if (jsonArray.size() == 1)
+            return objectMapper.treeToValue(jsonArray.get(0).get("data").get("properties"), Document.class);
         else
             throw new AppworkException("there are more than on file with the same name", ResponseCode.DUPLICATION_CONFLICT);
     }

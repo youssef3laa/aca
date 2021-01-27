@@ -80,7 +80,28 @@ export default {
                           }
                         }
                       ]
-                    }
+                    },
+                    "inputs": [
+                      {
+                        modalId: "unitModal",
+                        type: "ModalComponent",
+                        name: "unitModal",
+                        forms: [
+                          {
+                            key: "unitModal",
+                            inputs: [
+                              {
+                                type: "InputComponent",
+                                label: "Id",
+                                name: "id",
+                                col: "4",
+                              },
+                            ],
+                            model: {},
+                          }
+                        ],
+                      }
+                    ]
                   }
                 ],
               },
@@ -114,6 +135,8 @@ export default {
   }, mounted() {
     //load list of files
     // this.$observable.fire('load-files-list', 577193);
+
+
   },
   updated() {
     console.log("updated is called")

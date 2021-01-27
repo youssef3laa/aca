@@ -19,7 +19,7 @@
       </v-row>
     </v-container>
     <br/>
-    <span v-if="files.length">
+    <span>
         <span>الملفات المعلقة</span>
         <v-container>
           <v-alert
@@ -69,7 +69,7 @@
             </v-col>
 
             <v-col cols="2">
-              <v-btn style="height: 100%" @click="uploadFile(file)">
+              <v-btn style="height: 100%" @click="uploadFile({file,index})">
                 <v-icon>mdi-plus</v-icon>
                 test3
               </v-btn>
@@ -98,18 +98,22 @@
                 <v-col :cols="2" class="card-icon">
                   <v-icon> mdi-file-pdf-outline</v-icon>
                 </v-col>
-                <v-col :cols="8"
+                <v-col :cols="6"
                        class="card-name"
                        style="cursor: pointer"
-                       @click="openFileInBrave(file)"
+                       @click="openFileInBrave(file.properties.id)"
                 >
 
-                  {{ file.name }} <br/>
-                  {{ file.size_formatted }}
+                  {{ file.properties.name }} <br/>
+                  {{ file.properties.fileTypeValue }}
+                </v-col>
+                <v-col :cols="2" style="cursor: pointer" @click="openVersionsPopup(file)">
+                  <v-icon color="#22B07D"> mdi-folder-multiple</v-icon>
                 </v-col>
                 <v-col :cols="2" style="cursor: pointer" @click="deleteFile(file)">
                   <v-icon color="#ea9cb3"> mdi-delete-circle-outline</v-icon>
                 </v-col>
+
               </div>
             </div>
           </draggable>
@@ -171,10 +175,10 @@ export default {
   data() {
     return {
       bwsId: '',
+      categoryId: '',
       files: [],
       requestEntityId: '',
       filesUploaded: [],
-      filesBeforeUpload: [],
       attachmentSortList: [],
       fileTypes: []
 
@@ -183,27 +187,42 @@ export default {
   created() {
     this.bwsId = 680482;
     this.requestEntityId = 1;
+    this.categoryId = 686057;
   },
   methods: {
+    setFileTypeOnFileUploaded: function (file) {
+      let categoryValue;
+      if (file.categories == undefined || file.categories.length == 0) {
+        //shouldn't go here never...
+        file.properties.fileTypeValue = "لم يتم إدخاله بعد";
+        return;
+      }
+      categoryValue = file.categories[0][this.categoryId + "_2"];
+
+      let lookupObj = this.fileTypes.find((element) => element.value == categoryValue);
+      if (lookupObj == undefined) file.properties.fileTypeValue = "قيمة غير معرفة";
+      else file.properties.fileTypeValue = lookupObj.text;
+    },
     onEnd: function () {
       let tempArr = [];
       for (let i = 0; i < this.filesUploaded.length; ++i) {
         let element = this.filesUploaded[i];
-        let attachmentSortElement = this.attachmentSortList.find(val => val.fileId == element.id);
+        let attachmentSortElement = this.attachmentSortList.find(val => val.fileId == element.properties.id);
         attachmentSortElement.position = i;
         tempArr.push(attachmentSortElement);
       }
       this.updateMultipleAttachmentSortRecords(tempArr);
     },
-    openFileInBrave: function (file) {
-      let fileId = this.filesUploaded.find(element => element.name === file.name).id;
+    openFileInBrave: function (fileId) {
+      // let fileId = this.filesUploaded.find(element => element.name === file.properties.name).properties.id;
       this.$observable.fire('open-file-brava', fileId);
     },
     deleteFile: async function (file) {
+      file = file.properties;
       if (file == undefined || file.id == undefined) return;
       try {
         await Http.delete('/document/delete/' + file.id);
-        this.filesUploaded = this.filesUploaded.filter(element => element.id != file.id);
+        this.filesUploaded = this.filesUploaded.filter(element => element.properties.id != file.id);
         this.files = this.files.filter((fileVal) => fileVal.name != file.name);
         let attachmentSortId;
         this.attachmentSortList = this.attachmentSortList.filter(value => {
@@ -218,7 +237,7 @@ export default {
         let tempArr = [];
         for (let i = 0; i < this.filesUploaded.length; ++i) {
           let element = this.filesUploaded[i];
-          let attachmentSortElement = this.attachmentSortList.find(val => val.fileId == element.id);
+          let attachmentSortElement = this.attachmentSortList.find(val => val.fileId == element.properties.id);
           attachmentSortElement.position = i;
           tempArr.push(attachmentSortElement);
         }
@@ -231,54 +250,14 @@ export default {
     startDrag: function (evt, file) {
       evt.dataTransfer.dropEffect = 'move'
       evt.dataTransfer.effectAllowed = 'move'
-      evt.dataTransfer.setData('itemID', file.id)
+      evt.dataTransfer.setData('itemID', file.properties.id)
     },
-    // uploadFiles: function () {
-    //   const formData = new FormData()
-    //   this.files.forEach((file) => {
-    //     if (!this.filesUploaded.find(element => element.name === file.name))
-    //       formData.append('file', file)
-    //   })
-    //   // formData.append('file', this.files);
-    //   formData.append('parentId', this.bwsId)
-    //   Http.addHeader('Content-Type', 'multipart/form-data')
-    //   Http.post('/document/upload', formData)
-    //       .then((response) => {
-    //         let data = response.data.data;
-    //         let tempFilesArr = [];
-    //         for (let i = 0; i < data.length; ++i) {
-    //           const element = data[i];
-    //           for (let key in element) {
-    //             // eslint-disable-next-line no-prototype-builtins
-    //             if (element.hasOwnProperty(key)) {
-    //               const fileObj = element[key].results.data.properties;
-    //
-    //               tempFilesArr.push({
-    //                 "fileId": fileObj.id,
-    //                 "bwsId": this.bwsId,
-    //                 "requestEntityId": this.requestEntityId,
-    //                 "position": this.filesUploaded.length
-    //               });
-    //
-    //               this.filesUploaded.push(fileObj);
-    //               this.files = this.files.filter(fileElement => fileElement.name !== fileObj.name)
-    //             }
-    //           }
-    //
-    //         }
-    //         this.createAttachmentSortRecord(tempFilesArr);
-    //
-    //       })
-    //       .catch((reason) => {
-    //         console.log(reason)
-    //         this.files = [];
-    //       })
-    // },
+
     listFiles: async function () {
       let nodesResponse
           , attachmentSortResponse;
       try {
-        nodesResponse = await Http.get('/document/list/' + this.bwsId + '?fields=properties');
+        nodesResponse = await Http.get('/document/list/' + this.bwsId + '?fields=properties&fields=categories');
         attachmentSortResponse = await Http.get('/document/sort', {
           params: {
             requestEntityId: this.requestEntityId,
@@ -289,25 +268,27 @@ export default {
         console.log(e);
       }
       if (!nodesResponse) return;
-      let nodeResults = nodesResponse.data.data.results
+      nodesResponse = nodesResponse.data.data;
       this.attachmentSortList = attachmentSortResponse.data.data;
 
 
-      nodeResults.forEach((val) => {
+      nodesResponse.forEach((val) => {
         let attachmentSortElementObj;
-        if ((attachmentSortElementObj = this.attachmentSortList.find(attachmentElement => attachmentElement.fileId == val.data.properties.id)) != null) {
-          val.data.properties.position = attachmentSortElementObj.position;
+        if ((attachmentSortElementObj = this.attachmentSortList.find(attachmentElement => attachmentElement.fileId == val.properties.id)) != null) {
+          val.properties.position = attachmentSortElementObj.position;
           attachmentSortElementObj.exists = true;
         }
+        //TODO move to function
+        this.setFileTypeOnFileUploaded(val);
       });
-      nodeResults.sort((a, b) => (a.data.properties.position > b.data.properties.position) ? 1 : -1)
+      nodesResponse.sort((a, b) => (a.properties.position > b.properties.position) ? 1 : -1)
       let itemsToPost = [];
-      nodeResults.forEach((val, i) => {
+      nodesResponse.forEach((val, i) => {
         // noinspection EqualityComparisonWithCoercionJS
-        if (val.data.properties.position == undefined) {
-          val.data.properties.position = i
+        if (val.properties.position == undefined) {
+          val.properties.position = i
           let itemToPost = {
-            "fileId": val.data.properties.id,
+            "fileId": val.properties.id,
             "bwsId": this.bwsId,
             "requestEntityId": this.requestEntityId,
             "position": i
@@ -338,7 +319,8 @@ export default {
         }
 
       }
-      nodeResults.forEach((val) => this.filesUploaded.push(val.data.properties));
+      this.filesUploaded = [];
+      nodesResponse.forEach((val) => this.filesUploaded.push(val));
     },
     updateAttachmentSortRecord: function (obj) {
       let itemToBeUpdated = this.attachmentSortList.find(val => val.fileId == obj.fileId);
@@ -348,6 +330,7 @@ export default {
           .catch(reason => console.log(reason));
     },
     createAttachmentSortRecord: async function (arr) {
+      if (!(arr instanceof Array) && arr != undefined) arr = [].concat(arr);
       if (arr instanceof Array && arr.length > 0) {
         console.log(arr);
         try {
@@ -367,8 +350,39 @@ export default {
           .then(() => console.log("finished updating position in backend"))
           .catch(reason => console.error(reason))
     },
-    uploadFile: function (file) {
-      console.log(file);
+    uploadFile: async function (obj) {
+      console.log(obj);
+
+      let tempObj = {};
+      let formData = new FormData();
+      formData.append('file', obj.file.file);
+      formData.append('parent_id', this.bwsId)
+      formData.append('name', obj.file.file.name)
+      formData.append('category_id', this.categoryId)
+      tempObj[this.categoryId + "_2"] = obj.file.fileTypeSelected;
+      formData.append('categoriesMap', JSON.stringify(tempObj))
+      Http.addHeader('Content-Type', 'multipart/form-data')
+      try {
+
+        let uploadDataResponse = await Http.post(`document/uploadAndSetCategory`, formData)
+        if (uploadDataResponse.status == 200) {
+          this.files.splice(obj.index, 1);
+          // await this.listFiles();
+          uploadDataResponse = uploadDataResponse.data.data;
+          let toBeCreated = {
+            "fileId": uploadDataResponse.properties.id,
+            "bwsId": this.bwsId,
+            "requestEntityId": this.requestEntityId,
+            "position": this.filesUploaded.length
+          }
+          await this.createAttachmentSortRecord(toBeCreated);
+          this.filesUploaded.push(uploadDataResponse);
+          this.setFileTypeOnFileUploaded(uploadDataResponse);
+        }
+        // console.log(uploadDataResponse);
+      } catch (e) {
+        console.log(e);
+      }
     },
     fillFilesArray: function (filesSource) {
       if (!filesSource) return;
@@ -397,6 +411,12 @@ export default {
       //   })
       //   console.log(element);
       // })
+    },
+    openVersionsPopup: function (file) {
+      this.$observable.fire("openModal", {
+        modalId: "unitModal"
+      });
+      console.log(file);
     }
   },
   async mounted() {
@@ -448,11 +468,9 @@ export default {
         })
       }
     }
-    await this.listFiles();
 
     let lookups = await this.getLookupByCategory("attachmentFileType");
     console.log(lookups, this.$i18n.locale);
-
     let langKey = this.$i18n.locale == 'ar' ? 'arValue' : 'enValue';
     this.fileTypes = Array.from(lookups).map((element) => {
       return {
@@ -460,6 +478,8 @@ export default {
         value: element['key']
       }
     })
+    await this.listFiles();
+
   }
 }
 </script>
