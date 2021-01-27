@@ -15,33 +15,31 @@
         </v-card>
         <div style="padding: 10px"></div>
         <v-card outlined v-if="d.receiverTypes || d.decisionTypes">
-            <v-card-title style="color: #07689F" v-if="d.decisionTypes">
-                <span v-t="decisionLabel"></span>
-                <v-radio-group v-model="decision" row>
-                    <v-radio v-for="(type, index) in d.decisionTypes"
-                             :key="index"
-                             :value="type"
-                             style="font-size: 16px; padding: 0px 50px 0px 50px; font-weight: bold">
-                        <template #label>
-                            <span v-t="getDecisionTypeLabel(type)"></span>
-                        </template>
-                    </v-radio>
-                </v-radio-group>
-            </v-card-title>
+            <v-radio-group v-model="decision" row>
+                <span style="font-size: 20px; padding: 0px 30px 0px 30px; color: #07689F" v-if="d.decisionTypes" v-t="decisionLabel"></span>
+                <v-radio v-for="(type, index) in d.decisionTypes"
+                         :key="index"
+                         :value="type"
+                         :color="(decision == type)? '#07689F': ''"
+                         style="padding: 0px 30px 0px 0px; font-weight: bold">
+                    <template #label>
+                        <span :class="{'radio-selected': decision == type}" v-t="getDecisionTypeLabel(type)"></span>
+                    </template>
+                </v-radio>
+            </v-radio-group>
             <v-divider v-if="showDivider"></v-divider>
-            <v-card-title style="color: #07689F" v-if="showReceiver">
-                <span v-t="receiverLabel"></span>
-                <v-radio-group v-model="receiver" row>
-                    <v-radio v-for="(type, index) in d.receiverTypes"
-                             :key="index"
-                             :value="type"
-                             style="font-size: 16px; padding: 0px 50px 0px 50px; font-weight: bold">
-                        <template #label>
-                            <span v-t="getReceiverTypeLabel(type)"></span>
-                        </template>
-                    </v-radio>
-                </v-radio-group>
-            </v-card-title>
+            <v-radio-group v-model="receiver" v-if="showReceiver" row>
+                <span style="font-size: 20px; padding: 0px 30px 0px 30px; color: #07689F" v-t="receiverLabel"></span>
+                <v-radio v-for="(type, index) in d.receiverTypes"
+                         :key="index"
+                         :value="type"
+                         :color="(receiver == type)? '#07689F': ''"
+                         style="padding: 0px 50px 0px 50px; font-weight: bold">
+                    <template #label>
+                        <span v-t="getReceiverTypeLabel(type)" :class="{'radio-selected': receiver == type}"></span>
+                    </template>
+                </v-radio>
+            </v-radio-group>
             <v-card-text v-if="showReceiver && isSingle">
                 <ReceiverFormComponent :field="{name: 'receiverForm'}" :val="null" @update="onChangeReceiver"></ReceiverFormComponent>
             </v-card-text>
@@ -73,7 +71,8 @@
                 showDivider: false,
                 showReceiver: false,
                 isSingle: false,
-                firstLoad: true
+                firstLoad: true,
+                radioSelectedClass: true
             }
         },
         watch: {
@@ -122,6 +121,8 @@
             handleDefaultValues: function() {
                 if(this.d.decisionTypes instanceof Array && this.d.decisionTypes.length > 0){
                     this.decision = this.d.decisionTypes[0]
+                }else{
+                    this.handleShowReceiver()
                 }
                 if(this.d.receiverTypes instanceof Array && this.d.receiverTypes.length > 0){
                     this.receiver = this.d.receiverTypes[0]
@@ -160,9 +161,9 @@
             getDecisionTypeLabel: function(value) {
                 switch (value) {
                     case "approve":
-                        return "approve-request"
-                    case "fulfillment":
-                        return "request-fulfillment"
+                        return "request-approve"
+                    case "redirection":
+                        return "request-redirection"
                     case "requestModification":
                         return "request-modification"
                 }
@@ -182,4 +183,8 @@
     }
 </script>
 
-<style></style>
+<style>
+    .radio-selected {
+        color: #07689F;
+    }
+</style>

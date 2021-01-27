@@ -6,7 +6,7 @@
       v-slot="{ errors }"
       :vid="field.name"
   >
-    <v-text-field v-model="d" @input="onValueChange" @change="onChange" :disabled="readonly" outlined color="outline">
+    <v-text-field v-model="d" @input="onValueChange" @change="onChange" :type="(password)? 'password':'text'" :disabled="readonly" outlined color="outline">
       <template #label>
         <span v-t="field.label"></span>
       </template>
@@ -28,6 +28,7 @@ export default {
       eventName: this.field.eventName,
       d: this.val,
       readonly: this.field.readonly,
+      password: this.field.password
     };
   },
   methods: {
