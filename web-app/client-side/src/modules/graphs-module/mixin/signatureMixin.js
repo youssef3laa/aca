@@ -18,12 +18,29 @@ export default {
 
       return await http.post("/document/upload", formData);
     },
-    async downloadFromCS(documentId) {
-      const request = await http.get(`/document/download/${documentId}`);
-      return request.data.data;
+    async thumbnail(signatureList) {
+      // const request = await http.get(`/document/download/${documentId}`);
+      // return request.data.data;
+      const token = await http.post(
+        "http://45.240.63.94:8081/otdsws/rest/authentication/credentials",
+        {
+          userName: "admin",
+          password: "Asset99a",
+          ticketType: "OTDSTICKET",
+        }
+      );
+      const thumbnail = signatureList.map((signature) => {
+        return {
+          id: signature["data"]["properties"]["id"],
+          date: signature["data"]["properties"]["create_date"],
+          src: `http://45.240.63.94/otcs/cs.exe?func=thumbnail.fetchthumbnail&nodeid=${signature["data"]["properties"]["id"]}&verNum=1&verType=otthumb&pageNum=1&OTDSTicket=${token.data.ticket}`,
+        };
+      });
+      return thumbnail;
     },
     async getSubNodes(parentId) {
-      return await http.get(`/document/list/${parentId}`);
+      const request = await http.get(`/document/list/${parentId}`);
+      return request.data.data;
     },
 
     async createFolder(parent_id, name) {

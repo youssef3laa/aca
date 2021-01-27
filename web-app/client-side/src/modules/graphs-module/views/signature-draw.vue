@@ -37,7 +37,7 @@
           </p>
         </v-alert>
         <v-img
-          :src="selected"
+          :src="selectedUrl"
           width="100%"
           height="500px"
           id="signature"
@@ -46,7 +46,7 @@
           <v-slide-group v-model="selected" class="pa-4" mandatory show-arrows>
             <v-slide-item
               v-for="signature in signatures"
-              v-bind:value="signature.base64"
+              v-bind:value="signature.src"
               :key="signature.id"
               v-slot="{ active, toggle }"
             >
@@ -58,7 +58,7 @@
                 @click="toggle"
               >
                 <v-img
-                  :src="signature.base64"
+                  :src="signature.src"
                   style="border: 2px solid #e9e9e9; height: 150px"
                 ></v-img>
                 <v-card-text style="border-top: 2px solid #e9e9e9">{{
@@ -84,7 +84,7 @@ export default {
         // backgroundColor: 'rgb(255, 255, 255)'
       },
       // requestId: 665146,
-      signaturesContainer: 705435,
+      signaturesContainer: 715948,
       signatures: [],
       selected: null,
       folderId: null
@@ -121,23 +121,11 @@ export default {
     },
     reload: async function(){
       if(!this.folderId) return;
-      const {
-        data: { data },
-      } = await this.getSubNodes(this.folderId);
-      const signatureList = data.results.map((image) => {
-        return {
-          id: image["data"]["properties"]["id"],
-          date: image["data"]["properties"]["create_date"],
-        };
-      });
+      const subNodes = await this.getSubNodes(this.folderId);
 
-      // Download signatures
+      // Download thumbnails signatures
       this.signatures = [];
-      signatureList.forEach(async (image) => {
-        const result = await this.downloadFromCS(image["id"]);
-        image["base64"] = `data:image/png;base64,${result}`;
-        this.signatures.push(image);
-      });
+      this.signatures = await this.thumbnail(subNodes.results)
     },
     initialize: async function(){
       if(!this.requestId) return;
@@ -158,6 +146,12 @@ export default {
   watch: {
     requestId: function() {
       this.initialize()
+    },
+  },
+  computed: {
+    selectedUrl: function () {
+      if (!this.selected) return
+      return this.selected.replace('&verNum=1&verType=otthumb&pageNum=1', '')
     }
   }
 };
