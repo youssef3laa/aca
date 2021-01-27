@@ -1,6 +1,8 @@
 <template>
-  <div>
-    <div style="display: flex">
+    <v-container class="fill-height" >
+  
+  
+    <div style="width:100%;display: flex">
       <TasksLists></TasksLists>
       <AdvancedSearch></AdvancedSearch>
       <OrgChartBtn></OrgChartBtn>
@@ -9,7 +11,7 @@
     <!-- <v-container>
       <AppBuilder ref="appBuilder" :app="app1" />
     </v-container> -->
-  </div>
+  </v-container>
 </template>
 
 <script>

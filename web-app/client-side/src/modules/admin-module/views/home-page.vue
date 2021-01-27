@@ -30,70 +30,12 @@ export default {
       app: {
         pages: [
           {
-            tabs: [
-              {
-                id: 1,
-                name: "المهام",
-              },
-            ],
             sections: [
-              // {
-              //   tabs: [
-              //     {
-              //       id: 1,
-              //       name: 'بيانات السياسة',
-              //     },
-              //   ],
-              //   forms: [
-              //     {
-              //       publish: 'submit',
-              //       event: 'submit',
-              //       inputs: [
-              //         {
-              //           type: 'InputComponent',
-              //           label: 'First name',
-              //           name: 'Fname',
-              //           col: 4,
-              //           rule: 'required|minmax:2,25',
-              //           //  readonly : true
-              //         },
-              //         {
-              //           type: 'InputComponent',
-              //           label: 'Last name',
-              //           name: 'Lname',
-              //           col: 4,
-              //           rule: 'required|password:@Fname',
-              //           // rule: 'required|minmax:2,25',
-              //         },
-              //         {
-              //           type: 'InputComponent',
-              //           label: 'Email Adress',
-              //           name: 'Email',
-              //           col: 4,
-              //           rule: 'required|minmax:2,25',
-              //         },
-              //         {
-              //           type: 'ButtonComponent',
-              //           action: 'submit',
-              //           label: 'submit',
-              //           name: 'submitBtn',
-              //           col: 4,
-              //           rule: 'required|minmax:2,25',
-              //         },
-              //       ],
-              //       model: {
-              //         Fname: '',
-              //         Lname: '',
-              //         Email: '',
-              //       },
-              //     },
-              //   ],
-              // },
               {
                 "background": "transparent",
-                "isTab": "false",
+                "isTab": false,
                 "type": "DefaultSection",
-                "isCard": "true",
+                "isCard": true,
                 forms: [
                   {
                     key: "form3",
@@ -117,12 +59,24 @@ export default {
                     model: {},
                   },
                 ],
+              }
+            ]
+          },
+          {
+            tabs: [
+              {
+                id: 1,
+                name: "المهام",
+                isActive: true,
+
               },
+            ],
+            sections: [
               {
                 "tabId": "1",
-                "isTab": "true",
+                "isTab": true,
                 "type": "DefaultSection",
-                "isCard": "true",
+                "isCard": true,
                 forms: [
                   {
                     inputs: [

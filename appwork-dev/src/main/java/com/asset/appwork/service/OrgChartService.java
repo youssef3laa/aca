@@ -81,6 +81,18 @@ public class OrgChartService {
         return unitRepository.findAllByUnitCodeNotNull(PageRequest.of(page, size));
     }
 
+    public List<Unit> getUnitChildrenRecursively(String parentUnitCode) {
+        return unitRepository.getUnitChildrenRecursively(parentUnitCode);
+    }
+
+    public List<Unit> getUnitChildrenRecursivelyFilteredByUnitTypeCode(String parentUnitCode, String unitTypeCode) {
+        return unitRepository.getUnitChildrenRecursivelyFilteredByUnitTypeCode(parentUnitCode, unitTypeCode);
+    }
+
+    public Page<Unit> getUnitChildrenRecursivelyFilteredByUnitTypeCode(String parentUnitCode, String unitTypeCode, int page, int size) {
+        return unitRepository.getUnitChildrenRecursivelyFilteredByUnitTypeCode(parentUnitCode, unitTypeCode, PageRequest.of(page, size));
+    }
+
     public void addSubUnitToUnit(Account account, Long id, Long subUnitId) {
         Member.TargetId targetId = new Member.TargetId(subUnitId);
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),

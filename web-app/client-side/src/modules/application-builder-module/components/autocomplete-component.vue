@@ -9,6 +9,7 @@
     dense
     outlined
     small-chips
+    :disabled="readonly"
     v-on:change="autocompleteChange"
     :search-input.sync="search"
     :loading="loading"
@@ -33,6 +34,7 @@ export default {
       value: this.val.value,
       search: null,
       loading: false,
+      readonly: this.field.readonly
     };
   },
   methods: {
@@ -89,10 +91,18 @@ export default {
     },
   },
   watch: {
+    field: function (newVal) {
+      if(newVal.readonly){
+        this.readonly = newVal.readonly
+      }
+    },
     val: function (newVal, oldVal) {
       console.log(oldVal);
       // this.val = newVal
-      if(newVal.url)  this.fetch(null, this.val.url)
+      if(newVal.url){
+        this.items.list = []
+        this.fetch(null,newVal.url)
+      }
       this.items = newVal;
       this.value = newVal.value;
       console.log("val", this.val);

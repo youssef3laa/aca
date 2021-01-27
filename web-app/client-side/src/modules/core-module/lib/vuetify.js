@@ -3,6 +3,8 @@ import Vuetify from 'vuetify/lib'
 import arabic from 'vuetify/es5/locale/ar'
 import arabicpack from '../../core-module/locales/ar.json'
 
+Vuetify.config.silent = true
+
 Vue.use(Vuetify)
 
 const vuetify = new Vuetify({

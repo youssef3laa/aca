@@ -1,11 +1,13 @@
 package com.asset.appwork.schema;
 
+import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.util.SystemUtil;
 import lombok.Data;
 
-import java.util.List;
+import java.util.HashMap;
 
 @Data
-public class OutputSchema {
+public class OutputSchema<T> {
     String taskId;
     String process;
     String stepId;
@@ -22,43 +24,38 @@ public class OutputSchema {
     String parentHistoryId;
     String roleFilter;
     Boolean addApproval;
-    List<String> assignees;
+    HashMap<String,T> extraData = new HashMap<>();
 
     public void setStepId(String stepId){
         this.breakProcess = stepId.equals("end");
         this.stepId = stepId;
     }
 
-    public String getXML(){
-        return  "<assignedCN>\n"+removeNull(this.assignedCN)+"</assignedCN>\n"+
-                "<stepId>\n"+removeNull(this.stepId)+"</stepId>\n"+
-                "<process>\n"+removeNull(this.process)+"</process>\n"+
-                "<subBP>\n"+removeNull(this.subBP)+"</subBP>\n"+
-                "<entityName>\n"+removeNull(this.entityName)+"</entityName>\n"+
-                "<entityId>\n"+removeNull(this.entityId)+"</entityId>\n"+
-                "<parentHistoryId>\n"+removeNull(this.parentHistoryId)+"</parentHistoryId>\n"+
-                "<page>\n"+removeNull(this.page)+"</page>\n"+
-                "<decision>\n"+removeNull(this.decision)+"</decision>\n"+
-                "<comment>\n"+removeNull(this.comment)+"</comment>\n"+
-                "<roleFilter>\n"+removeNull(this.roleFilter)+"</roleFilter>\n"+
-                "<breakProcess>\n"+removeNull(this.breakProcess)+"</breakProcess>\n"+
-                "<addApproval>\n"+removeNull(this.addApproval)+"</addApproval>\n"+
-                "<extraData>\n"+createExtraData()+"</extraData>\n";
+    public String getXML() throws AppworkException{
+        return  "<assignedCN>"+removeNull(this.assignedCN)+"</assignedCN>"+
+                "<stepId>"+removeNull(this.stepId)+"</stepId>"+
+                "<process>"+removeNull(this.process)+"</process>"+
+                "<subBP>"+removeNull(this.subBP)+"</subBP>"+
+                "<entityName>"+removeNull(this.entityName)+"</entityName>"+
+                "<entityId>"+removeNull(this.entityId)+"</entityId>"+
+                "<parentHistoryId>"+removeNull(this.parentHistoryId)+"</parentHistoryId>"+
+                "<page>"+removeNull(this.page)+"</page>"+
+                "<decision>"+removeNull(this.decision)+"</decision>"+
+                "<comment>"+removeNull(this.comment)+"</comment>"+
+                "<roleFilter>"+removeNull(this.roleFilter)+"</roleFilter>"+
+                "<breakProcess>"+removeNull(this.breakProcess)+"</breakProcess>"+
+                "<addApproval>"+removeNull(this.addApproval)+"</addApproval>"+
+                "<extraData>"+createExtraData()+"</extraData>";
     }
 
-    public String getXMLWithNameSpace(){
+    public String getXMLWithNameSpace() throws AppworkException{
         return "<ACA_ProcessRouting_OutputSchemaFragment xmlns=\"http://schemas.cordys.com/\">"+
                     getXML()+
-                "</ACA_ProcessRouting_OutputSchemaFragment>\n";
+                "</ACA_ProcessRouting_OutputSchemaFragment>";
     }
 
-    private String createExtraData(){
-        String extraData = "";
-        if(assignees != null){
-            for(String assignee: assignees){
-                extraData += "<assignee>\n"+assignee+"</assignee>\n";
-            }
-        }
+    private String createExtraData() throws AppworkException{
+        String extraData = SystemUtil.convertObjectToXML(this.extraData);
         return extraData;
     }
 

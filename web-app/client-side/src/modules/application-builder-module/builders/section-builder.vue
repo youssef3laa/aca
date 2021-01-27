@@ -26,6 +26,7 @@ import DefaultSection from '../builders/components/default-section-component.vue
 import Resizable from '../builders/components/resizable-section-component'
 import TitleComponet from '../builders/components/title-component'
 import ModalSection from '../builders/components/modal-section-component'
+import ActionsSection from '../builders/components/actions-section-component'
 // import TabBuilder from './tab-builder'
 // import FormBuilder from './form-builder'
 // import { Splitpanes, Pane } from 'splitpanes'
@@ -39,6 +40,7 @@ export default {
     Resizable,
     TitleComponet,
     ModalSection,
+    ActionsSection,
     // TabBuilder,
     // FormBuilder,
     // Splitpanes,

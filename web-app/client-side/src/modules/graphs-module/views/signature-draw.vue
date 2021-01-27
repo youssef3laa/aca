@@ -37,7 +37,7 @@
           </p>
         </v-alert>
         <v-img
-          :src="selected"
+          :src="selectedUrl"
           width="100%"
           height="500px"
           id="signature"
@@ -46,7 +46,7 @@
           <v-slide-group v-model="selected" class="pa-4" mandatory show-arrows>
             <v-slide-item
               v-for="signature in signatures"
-              v-bind:value="signature.base64"
+              v-bind:value="signature.src"
               :key="signature.id"
               v-slot="{ active, toggle }"
             >
@@ -58,7 +58,7 @@
                 @click="toggle"
               >
                 <v-img
-                  :src="signature.base64"
+                  :src="signature.src"
                   style="border: 2px solid #e9e9e9; height: 150px"
                 ></v-img>
                 <v-card-text style="border-top: 2px solid #e9e9e9">{{
@@ -83,12 +83,15 @@ export default {
         penColor: "black",
         // backgroundColor: 'rgb(255, 255, 255)'
       },
-      requestId: 665146,
+      // requestId: 665146,
+      signaturesContainer: 715948,
       signatures: [],
       selected: null,
+      folderId: null
     };
   },
   mixins: [signatureMixin],
+  props: ['requestId'],
   methods: {
     undo() {
       this.$refs.signaturePad.undoSignature();
@@ -100,7 +103,8 @@ export default {
       console.log(isEmpty);
       // console.log(data);
 
-      this.uploadToCS(data, this.requestId);
+      await this.uploadToCS(data, this.folderId);
+      await this.reload();
     },
     change() {
       this.options = {
@@ -115,26 +119,41 @@ export default {
     clear() {
       this.$refs.signaturePad.clearSignature();
     },
+    reload: async function(){
+      if(!this.folderId) return;
+      const subNodes = await this.getSubNodes(this.folderId);
+
+      // Download thumbnails signatures
+      this.signatures = [];
+      this.signatures = await this.thumbnail(subNodes.results)
+    },
+    initialize: async function(){
+      if(!this.requestId) return;
+      let folder = await this.createFolder(
+              this.signaturesContainer,
+              this.requestId
+      );
+      this.folderId = folder.id
+
+      // List all signatures attached to request id
+      await this.reload();
+    }
   },
   async created() {
-    // List all signatures attached to request id
-    const {
-      data: { data },
-    } = await this.getSubNodes(this.requestId);
-    const signatureList = data.results.map((image) => {
-      return {
-        id: image["data"]["properties"]["id"],
-        date: image["data"]["properties"]["create_date"],
-      };
-    });
-
-    // Download signatures
-    signatureList.forEach(async (image) => {
-      const result = await this.downloadFromCS(image["id"]);
-      image["base64"] = `data:image/png;base64,${result}`;
-      this.signatures.push(image);
-    });
+    // Return folder id
+    await this.initialize();
   },
+  watch: {
+    requestId: function() {
+      this.initialize()
+    },
+  },
+  computed: {
+    selectedUrl: function () {
+      if (!this.selected) return
+      return this.selected.replace('&verNum=1&verType=otthumb&pageNum=1', '')
+    }
+  }
 };
 </script>
 

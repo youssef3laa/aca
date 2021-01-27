@@ -81,6 +81,9 @@ import ShowAttachmentComponent from '../components/show-attachment-component'
 import DataTableComponent from '../components/dataTable-component'
 import ModalComponent from '../components/modal-component'
 import D3GraphComponent from '../components/d3-graph-component'
+import SignatureComponent from '../components/signature-component'
+import ProcessRoutingComponent from '../components/process-routing-component'
+import ReceiverFormComponent from '../components/receiver-form-component'
 
 export default {
   name: 'FormBuilder',
@@ -107,6 +110,9 @@ export default {
     DataTableComponent,
     ModalComponent,
     D3GraphComponent,
+    SignatureComponent,
+    ProcessRoutingComponent,
+    ReceiverFormComponent
   },
   data() {
     return {

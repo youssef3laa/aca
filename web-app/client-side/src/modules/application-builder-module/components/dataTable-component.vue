@@ -2,7 +2,7 @@
   <div>
     <v-row>
       <v-col :cols="7">
-        <button style="padding: 5px; margin: 20px;">
+        <button style="padding: 5px; margin: 20px;" @click="handlAddButton()">
           <v-icon color="info">fas fa-plus</v-icon>
           <span> إضافة </span>
         </button>
@@ -44,7 +44,7 @@
 
         <v-menu top>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn color="primary" dark v-bind="attrs" v-on="on">
+            <v-btn v-bind="attrs" v-on="on">
               <v-icon> fas fa-ellipsis-h </v-icon>
             </v-btn>
           </template>
@@ -52,13 +52,13 @@
           <v-list>
             <v-list-item v-for="(i, index) in field.actions" :key="index">
               <v-list-item-title v-on:click="handleAction(item, i)"
-                ><span v-if="i == 'edit'"
+                ><span class="dropDown-menu" v-if="i == 'edit'"
                   ><v-icon> far fa-edit </v-icon> {{ i }}</span
                 >
-                <span v-else-if="i == 'delete'">
+                <span class="dropDown-menu" v-else-if="i == 'delete'">
                   <v-icon> far fa-trash-alt </v-icon> {{ i }}</span
                 >
-                <span v-else-if="i == 'view'">
+                <span class="dropDown-menu" v-else-if="i == 'view'">
                   <v-icon> fas fa-expand-arrows-alt </v-icon> {{ i }}</span
                 >
               </v-list-item-title>
@@ -75,9 +75,9 @@ export default {
   name: 'DataTableComponent',
   data() {
     return {
-      search: null,
-      d: this.val,
+      search: '',
       totalItems: this.val.data.length,
+      d: this.val,
       loading: true,
       footerProps: {
         'items-per-page-options': [5, 10, 25, -1],
@@ -102,12 +102,16 @@ export default {
     },
   },
   methods: {
+    handlAddButton() {
+      console.log(this.field)
+      this.$observable.fire(this.field.name + '_add')
+    },
     handleAction(item, actionName) {
       console.log(this.field.name + '_' + actionName)
       //   console.log(item)
       //   console.log(actionName)
 
-       this.$observable.fire(this.field.name + '_' + actionName, {item})
+      this.$observable.fire(this.field.name + '_' + actionName, { item })
     },
     getDataFromApi(event) {
       if (!this.d.url) {
@@ -129,8 +133,8 @@ export default {
       http
         .get(URL)
         .then((response) => {
+          this.totalItems = response.data.metaInfo.totalCount
           this.d.data = response.data.data
-          this.totalItems = response.data.metaInfo.totalCount;
           this.loading = false
         })
         .catch((error) => {
@@ -159,3 +163,16 @@ export default {
   props: ['val', 'field'],
 }
 </script>
+<style scoped>
+.v-btn {
+  color: black;
+  background: #eaeaea;
+  padding: 0 5px !important;
+  margin: 0 5px !important;
+  height: 20px !important;
+  min-width: 0 !important;
+}
+/* .dropDown-menu {
+  background: #96969f !important;
+} */
+</style>
