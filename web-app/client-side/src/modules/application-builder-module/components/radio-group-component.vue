@@ -1,46 +1,59 @@
 <template>
-  <v-radio-entity v-model="decision" row>
-    <v-radio
-      v-for="(decision, key) in ApprovalCardDecision"
-      :key="key"
-      :value="decision.value"
-      :label="decision.label"
-      @click="test"
-    >
+  <v-radio-group v-model="selected" row>
+    <span class="radio-group-component-title-class" :style="{color: color}" v-t="title"></span>
+    <v-radio v-for="(type, index) in d.options"
+             :key="index"
+             :value="type.value"
+             :color="(selected == type.value)? color: 'black'"
+             class="radio-group-component-radio-class">
+      <template #label>
+        <span v-t="type.name" :style="{color: (selected == type.value)? color:'black'}"></span>
+      </template>
     </v-radio>
-  </v-radio-entity>
+  </v-radio-group>
 </template>
-
 <script>
 export default {
   name: 'radioGroupComponent',
   props: ['val', 'field'],
-  watch: {
-    val: function(newVal, oldVal) {
-      console.log(oldVal)
-      this.decision = newVal
-    },
+  data() {
+    return {
+      d: this.val,
+      title: this.field.title,
+      color: this.field.color,
+      selected: null
+    }
   },
   methods: {
-    test: function() {
-      // if(this.field.publish){
-
-      // }
-
-      console.log(this.decision)
+    onValueChange: function() {
       this.$emit('update', {
         name: this.field.name,
-        value: this.decision,
-        type: 'inputChange',
+        value: this.selected
       })
     },
   },
-  data() {
-    return {
-      name: 'ahmedEzzat',
-      ApprovalCardDecision: this.field.decisions,
-      decision: '',
+  watch: {
+    val: function(newVal) {
+      for(var key in  newVal){
+        this.d[key] = newVal[key]
+      }
+      this.selected = this.d.value
+    },
+    selected: function() {
+      this.onValueChange()
     }
   },
 }
 </script>
+
+<style>
+  .radio-group-component-title-class {
+    font-size: 20px;
+    padding: 0px 30px 0px 30px;
+  }
+
+  .radio-group-component-radio-class {
+    padding: 0px 50px 0px 50px;
+    font-weight: bold;
+  }
+</style>

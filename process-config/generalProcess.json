@@ -2,83 +2,79 @@
     "processName": "generalProcess",
     "steps": {
         "init": {
-            "hasAutocomplete": true,
-            "roleFilter": "org/group/findByCodes/HGCS,HRCA,HCAO",
             "page": "generalProcess-init",
             "nextStep": {
-                "HRCA": "stepRG",
-                "HGCS": "stepRQ",
-                "HCAO": "stepRE"
+                "AGN": "stepRG",
+                "SCT": "stepRQ",
+                "OFC": "stepRE"
             }
         },
         "stepRG": {
-            "hasAutocomplete": false,
-            "roleFilter": "org/group/findByCodes/HGCS",
+            "router": {
+                "fields": ["comment"],
+                "receiverTypes": ["single"]
+            },
             "page": "generalProcess-early",
             "nextStep": {
-                "approve": "stepRQ"
+                "comment": "stepRQ"
             }
         },
         "stepRQ": {
-            "hasAutocomplete": true,
-            "roleFilter": "org/group/findByCodes/HCAO",
+            "router": {
+                "fields": ["comment"],
+                "receiverTypes": ["single"]
+            },
             "page": "generalProcess-early",
             "nextStep": {
-                "approve": "stepRE"
+                "comment": "stepRE"
             }
         },
         "stepRE": {
-            "hasAutocomplete": true,
-            "roleFilter": "org/group/findByCodes/HCAG,MCAG",
+            "router": {
+                "fields": ["comment"],
+                "receiverTypes": ["single"]
+            },
             "page": "generalProcess-early",
             "nextStep": {
-                "HCAG": "stepRM",
-                "MCAG": "stepMM"
+                "GRP": "stepRM",
+                "comment": "stepMM"
             }
         },
         "stepRM": {
-            "hasAutocomplete": true,
-            "roleFilter": "org/group/findByCodes/MCAG",
+            "router": {
+                "fields": ["comment"],
+                "receiverTypes": ["single"]
+            },
             "page": "generalProcess-early",
             "nextStep": {
-                "approve": "stepMM"
+                "comment": "stepMM"
             }
         },
         "stepMM": {
-            "hasAutocomplete": true,
-            "roleFilter": "org/group/up",
             "page": "generalProcess-member",
             "nextStep": {
                 "approve": "stepApprovals"
             }
         },
         "stepApprovals": {
-            "hasAutocomplete": true,
-            "roleFilter": "org/group/up",
             "page": "generalProcess-approvals",
             "nextStep": {
                 "approve": "stepApprovals2"
             }
         },
         "stepApprovals2": {
-            "hasAutocomplete": true,
-            "roleFilter": "org/group/up",
             "page": "generalProcess-approvals",
             "nextStep": {
                 "approve": "stepApprovals3"
             }
         },
         "stepApprovals3": {
-            "hasAutocomplete": true,
-            "roleFilter": "org/group/findByCodes/HCOC",
             "page": "generalProcess-approvals",
             "nextStep": {
                 "approve": "stepAD"
             }
         },
         "stepAD": {
-            "hasAutocomplete": true,
-            "roleFilter": "org/group/findByCodes/HGCS,HCCA,HTCA,HTVA",
             "page": "generalProcess-stepAD",
             "nextStep": {
                 "approve": ""
@@ -98,8 +94,6 @@
             }
         },
         "parallel": {
-            "hasAutocomplete": true,
-            "roleFilter": "org/group/findByCodes/HRCA",
             "page": "generalProcess-parallel",
             "nextStep": {
                 "comment": "stepRG"

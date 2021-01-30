@@ -1,49 +1,52 @@
 <template>
     <div>
-        <v-card outlined>
-            <v-alert outlined type="info" prominent icon="fas fa-scroll" style="padding-bottom: 5px">
-                <p style="font-size: 16px; color: black">
-                    <span style="font-size: 20px; color: #07689F"> ملاحظات </span>
-                    <br/>
-                    تستخدم هذه المساحة لكتابة ملاحظات
-                </p>
-            </v-alert>
-            <v-card-text style="padding-top: 0px">
-                <TextareaComponent :field="{ name: 'routingNotes', label: 'notes' }"
-                                   @update="onChangeComment"></TextareaComponent>
+        <v-row v-if="d.fields">
+            <v-col v-if="d.fields && d.fields.includes('comment')">
+                <v-card outlined>
+                    <v-alert outlined type="info" prominent icon="fas fa-scroll" style="padding-bottom: 5px">
+                        <p style="font-size: 16px; color: black">
+                            <span style="font-size: 20px; color: #07689F" v-t="'notes'"></span>
+                            <br/>
+                            <span v-t="'this-field-for-notes'"></span> {{displayName}}
+                        </p>
+                    </v-alert>
+                    <v-card-text style="padding-top: 0px">
+                        <TextareaComponent :field="{ name: 'routingNotes', label: 'notes' }"
+                                           @update="onChangeComment"></TextareaComponent>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+            <v-col v-if="d.fields && d.fields.includes('opinion')">
+                <v-card outlined>
+                    <v-alert outlined type="info" prominent icon="far fa-file-alt" style="padding-bottom: 5px">
+                        <p style="font-size: 16px; color: black">
+                            <span style="font-size: 20px; color: #07689F" v-t="'express-opinion'"></span>
+                            <br/>
+                            <span v-t="'this-field-for-opinion'"></span> {{displayName}}
+                        </p>
+                    </v-alert>
+                    <v-card-text style="padding-top: 0px">
+                        <TextareaComponent :field="{ name: 'routingOpinion', label: 'opinion' }"
+                                           @update="onChangeOpinion"></TextareaComponent>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+        <div style="padding: 10px" v-if="d.fields && (decisions || receiverTypes)"></div>
+        <v-card outlined v-if="decisions || receiverTypes">
+            <RadioGroupComponent :field="{ name: 'decision', title: 'decision' , color: '#07689F' }"
+                                 :val="decisions"
+                                 @update="onChangeDecision"
+                                 v-if="decisions"></RadioGroupComponent>
+            <v-divider v-if="decisions && receiverTypes"></v-divider>
+            <RadioGroupComponent :field="{ name: 'receiver', title: 'receiver' , color: '#07689F' }"
+                                 :val="receiverTypes"
+                                 @update="onChangeReceiverType"
+                                 v-if="receiverTypes"></RadioGroupComponent>
+            <v-card-text v-if="receiverTypes && receiverType=='single'">
+                <ReceiverFormComponent :field="{name: 'receiverForm'}" :val="receiverDirection" @update="onChangeReceiver"></ReceiverFormComponent>
             </v-card-text>
-        </v-card>
-        <div style="padding: 10px"></div>
-        <v-card outlined v-if="d.receiverTypes || d.decisionTypes">
-            <v-radio-group v-model="decision" row>
-                <span style="font-size: 20px; padding: 0px 30px 0px 30px; color: #07689F" v-if="d.decisionTypes" v-t="decisionLabel"></span>
-                <v-radio v-for="(type, index) in d.decisionTypes"
-                         :key="index"
-                         :value="type"
-                         :color="(decision == type)? '#07689F': ''"
-                         style="padding: 0px 30px 0px 0px; font-weight: bold">
-                    <template #label>
-                        <span :class="{'radio-selected': decision == type}" v-t="getDecisionTypeLabel(type)"></span>
-                    </template>
-                </v-radio>
-            </v-radio-group>
-            <v-divider v-if="showDivider"></v-divider>
-            <v-radio-group v-model="receiver" v-if="showReceiver" row>
-                <span style="font-size: 20px; padding: 0px 30px 0px 30px; color: #07689F" v-t="receiverLabel"></span>
-                <v-radio v-for="(type, index) in d.receiverTypes"
-                         :key="index"
-                         :value="type"
-                         :color="(receiver == type)? '#07689F': ''"
-                         style="padding: 0px 50px 0px 50px; font-weight: bold">
-                    <template #label>
-                        <span v-t="getReceiverTypeLabel(type)" :class="{'radio-selected': receiver == type}"></span>
-                    </template>
-                </v-radio>
-            </v-radio-group>
-            <v-card-text v-if="showReceiver && isSingle">
-                <ReceiverFormComponent :field="{name: 'receiverForm'}" :val="null" @update="onChangeReceiver"></ReceiverFormComponent>
-            </v-card-text>
-            <v-card-text v-else-if="showReceiver && !isSingle">
+            <v-card-text v-else-if="receiverTypes && receiverType=='multiple'">
 
             </v-card-text>
         </v-card>
@@ -53,51 +56,29 @@
 <script>
     import TextareaComponent from "./textarea-component"
     import ReceiverFormComponent from "./receiver-form-component"
+    import RadioGroupComponent from "./radio-group-component";
+    import userMixin from "../../../mixins/userMixin";
 
     export default {
-        components: {ReceiverFormComponent, TextareaComponent},
+        components: {RadioGroupComponent, ReceiverFormComponent, TextareaComponent},
         props: ["val","field"],
+        mixins: [userMixin],
         data() {
             return{
-                decision: "comment",
+                d: this.val,
+                displayName: null,
                 comment: null,
+                opinion: null,
+                decision: "comment",
                 receiver: null,
+                assignedRole: null,
                 assignee: null,
                 assignees: null,
-                receiverLabel: "receiver",
-                decisionLabel: "decision",
-                d: this.val,
-                userDetails: null,
-                showDivider: false,
-                showReceiver: false,
-                isSingle: false,
-                firstLoad: true,
-                radioSelectedClass: true
-            }
-        },
-        watch: {
-            val: function (newVal) {
-                for(var key in newVal){
-                    this.d[key] = newVal[key]
-                }
-                if(this.firstLoad){
-                    this.handleDefaultValues()
-                    this.firstLoad = false
-                }
-                console.log("Val Watch", this.d)
-            },
-            decision: function (newVal) {
-                console.log("DecisionType", newVal)
-                this.handleShowReceiver()
-                this.onValueChange()
-            },
-            receiver: function (newVal) {
-                console.log("ReceiverType", newVal)
-                this.handleIsSingle()
-                this.onValueChange()
-            },
-            showReceiver: function () {
-                this.handleDivider()
+                code: null,
+                receiverType: null,
+                decisions: null,
+                receiverTypes: null,
+                receiverDirection: null
             }
         },
         methods: {
@@ -107,62 +88,90 @@
                     value: {
                         decision: this.decision,
                         comment: this.comment,
-                        receiver: this.receiver
-                    },
+                        opinion: this.opinion,
+                        receiverType: this.receiverType,
+                        code: this.code,
+                        role: this.assignedRole,
+                        assignedCN: this.assignee,
+                        assignees: this.assignees
+                    }
                 })
             },
             onChangeComment: function(event) {
                 this.comment = event.value
                 this.onValueChange()
             },
-            onChangeReceiver: function(event) {
+            onChangeOpinion: function(event) {
+                this.opinion = event.value
+                this.onValueChange()
+            },
+            onChangeReceiver: async function(event) {
                 console.log("ReceiverForm", event)
+                this.receiver = event
+                this.assignee = event.value.assignedCN
+                this.code = event.value.code
+                this.assignedRole = event.value.role
+                this.onValueChange()
             },
-            handleDefaultValues: function() {
-                if(this.d.decisionTypes instanceof Array && this.d.decisionTypes.length > 0){
-                    this.decision = this.d.decisionTypes[0]
-                }else{
-                    this.handleShowReceiver()
-                }
-                if(this.d.receiverTypes instanceof Array && this.d.receiverTypes.length > 0){
-                    this.receiver = this.d.receiverTypes[0]
-                }
-            },
-            handleIsSingle: function() {
-                if(this.receiver == "single"){
-                    this.isSingle = true
-                }else {
-                    this.isSingle = false
-                }
-            },
-            handleDivider: function() {
-                if(this.d.decisionTypes){
-                    if(this.showReceiver){
-                        this.showDivider = true
-                        return
-                    }
-                }
-                this.showDivider = false
-            },
-            handleShowReceiver: function() {
+            onChangeDecision: function(event) {
+                this.decision = event.value
                 if(this.d.receiverTypes){
-                    if(this.d.decisionTypes){
-                        if(this.decision == "approve"){
-                            this.showReceiver = true
-                            return
+                    this.receiverType = null
+                    // this.receiverDirection = null
+                    this.updateDirection(null)
+                    if(this.d.receiverTypes.includes("multiple")){
+                        switch(this.decision){
+                            case "approve":
+                                this.updateDirection("up")
+                                // this.receiverDirection = { direction: "up" }
+                                this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
+                                break
+                            case "redirect":
+                                this.receiverTypes = this.getReceiverTypeOptions(["single","multiple"], null)
+                                break
+                            case "requestModification":
+                                this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
+                                break
                         }
-                    }else{
-                        this.showReceiver = true
-                        return
+                    }else if(this.d.receiverTypes.includes("single")) {
+                        if(this.decision == "approve") this.updateDirection("up")
+                        this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
                     }
                 }
-                this.showReceiver = false
+                this.onValueChange()
             },
-            getDecisionTypeLabel: function(value) {
+            onChangeReceiverType: function(event) {
+                this.receiverType = event.value
+                this.onValueChange()
+            },
+            getDecisionOptions: function(decisions, value) {
+                if(!decisions) return null
+                let options = [];
+                for(let i in decisions){
+                    options.push({
+                        name: this.getDecisionLabel(decisions[i]),
+                        value: decisions[i]
+                    })
+                }
+                if(options.length == 0) return null
+                return {options: options, value: value}
+            },
+            getReceiverTypeOptions: function(receiverTypes, value) {
+                if(!receiverTypes) return null
+                let options = [];
+                for(let i in receiverTypes){
+                    options.push({
+                        name: this.getReceiverTypeLabel(receiverTypes[i]),
+                        value: receiverTypes[i]
+                    })
+                }
+                return {options: options, value: value}
+            },
+            getDecisionLabel: function(value) {
                 switch (value) {
                     case "approve":
                         return "request-approve"
-                    case "redirection":
+                    case "redirect":
                         return "request-redirection"
                     case "requestModification":
                         return "request-modification"
@@ -176,15 +185,41 @@
                         return "multiple-units"
                 }
             },
+            updateDirection: function(direction) {
+                this.receiverDirection = {
+                    direction: (this.d.decisions)? direction:this.d.direction,
+                    minimumLevel: this.d.minimumLevel
+                }
+            }
+        },
+        watch: {
+            val: function (newVal) {
+                if(newVal.fields){
+                    if(!(newVal.fields instanceof Array)) newVal.fields = [newVal.fields]
+                }
+                if(newVal.decisions){
+                    if(!(newVal.decisions instanceof Array)) newVal.decisions = [newVal.decisions]
+                    this.decisions = this.getDecisionOptions(newVal.decisions)
+                }
+                if(newVal.receiverTypes){
+                    if(!(newVal.receiverTypes instanceof Array)) newVal.receiverTypes = [newVal.receiverTypes]
+                    this.receiverTypes = (newVal.decisions)? null:this.getReceiverTypeOptions(newVal.receiverTypes)
+                }
+
+                // this.d = newVal
+                for(let key in newVal){
+                    this.d[key] = newVal[key]
+                }
+                this.updateDirection(null)
+            }
         },
         async mounted() {
-            this.handleDefaultValues()
+            this.decisions = this.getDecisionOptions(this.val.decisions)
+            this.receiverTypes = (this.val.decisions)? null:this.getReceiverTypeOptions(this.val.receiverTypes)
+            this.updateDirection(null)
+
+            let userDetails = await this.getUserDetails()
+            this.displayName = userDetails.displayName;
         }
     }
 </script>
-
-<style>
-    .radio-selected {
-        color: #07689F;
-    }
-</style>

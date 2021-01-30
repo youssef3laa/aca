@@ -10,8 +10,8 @@
       "col": "12"
     },
     {
-      "type": "AutoCompleteComponent",
-      "name": "receiver",
+      "type": "InputComponent",
+      "name": "incomingUnit",
       "rule": "required",
       "readonly": false,
       "col": "4"
@@ -46,9 +46,6 @@
     }
   ],
   "model": {
-    "stepId": "",
-    "receiver": "",
-    "writingDate": "",
-    "subjectSummary": ""
+    "stepId": ""
   }
 }

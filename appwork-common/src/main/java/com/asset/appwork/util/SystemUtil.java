@@ -94,6 +94,7 @@ public class SystemUtil {
     }
 
     public static ResponseCode getResponseCodeFromInt(Integer code) {
+        if(code == null) return null;
         for (ResponseCode c : ResponseCode.values()) {
             if (c.getCode() == code) {
                 return c;
