@@ -5,7 +5,6 @@ export default {
         getUserDetails: async function() {
             try {
                 let response = await http.get("user/details")
-                console.log("UserDetails",response.data.data)
                 return response.data.data
             }
             catch (error) {

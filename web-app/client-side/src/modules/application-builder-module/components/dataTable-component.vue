@@ -27,7 +27,7 @@
       :headers="d.headers"
       :items="d.data"
       :options.sync="options"
-      :server-items-length="totalItems"
+      :server-items-length="(d.url)?totalItems:-1"
       :loading="loading"
       :footer-props="footerProps"
       :search="search"
@@ -44,8 +44,8 @@
 
         <v-menu top>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn v-bind="attrs" v-on="on">
-              <v-icon> fas fa-ellipsis-h </v-icon>
+            <v-btn elevation="0" v-bind="attrs" v-on="on">
+              <v-icon style="font-size: medium"> fas fa-ellipsis-h </v-icon>
             </v-btn>
           </template>
 
@@ -60,6 +60,9 @@
                 >
                 <span class="dropDown-menu" v-else-if="i == 'view'">
                   <v-icon> fas fa-expand-arrows-alt </v-icon> {{ i }}</span
+                >
+                <span class="dropDown-menu" v-else>
+                  <v-icon> {{i.icon}} </v-icon> {{ i.name }}</span
                 >
               </v-list-item-title>
             </v-list-item>
@@ -107,6 +110,7 @@ export default {
       this.$observable.fire(this.field.name + '_add')
     },
     handleAction(item, actionName) {
+      if(actionName instanceof Object) actionName = actionName.name
       console.log(this.field.name + '_' + actionName)
       //   console.log(item)
       //   console.log(actionName)

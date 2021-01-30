@@ -47,7 +47,7 @@
                 <ReceiverFormComponent :field="{name: 'receiverForm'}" :val="receiverDirection" @update="onChangeReceiver"></ReceiverFormComponent>
             </v-card-text>
             <v-card-text v-else-if="receiverTypes && receiverType=='multiple'">
-
+                <MultipleAssigneeComponent :field="{name: 'multipleComponent'}" @update="onChangeMultipleUnits"></MultipleAssigneeComponent>
             </v-card-text>
         </v-card>
     </div>
@@ -58,9 +58,10 @@
     import ReceiverFormComponent from "./receiver-form-component"
     import RadioGroupComponent from "./radio-group-component";
     import userMixin from "../../../mixins/userMixin";
+    import MultipleAssigneeComponent from "./multiple-assignee-component";
 
     export default {
-        components: {RadioGroupComponent, ReceiverFormComponent, TextareaComponent},
+        components: {MultipleAssigneeComponent, RadioGroupComponent, ReceiverFormComponent, TextareaComponent},
         props: ["val","field"],
         mixins: [userMixin],
         data() {
@@ -105,7 +106,21 @@
                 this.opinion = event.value
                 this.onValueChange()
             },
+            onChangeMultipleUnits: function(event){
+                this.assignees = event.value.assignees
+                if(event.value.nextAssignee){
+                    this.assignee = event.value.nextAssignee.cn
+                    this.code = event.value.nextAssignee.code
+                    this.assignedRole = event.value.nextAssignee.role
+                }else{
+                    this.assignee = null
+                    this.code = null
+                    this.assignedRole = null
+                }
+                this.onValueChange()
+            },
             onChangeReceiver: async function(event) {
+                this.assignees = null
                 console.log("ReceiverForm", event)
                 this.receiver = event
                 this.assignee = event.value.assignedCN
