@@ -66,4 +66,13 @@ public interface UnitRepository extends GenericRepository<Unit, Long> {
     Page<Unit> getUnitChildrenRecursivelyFilteredByUnitTypeCode(@Param("unitCode") String unitCode,
                                                                 @Param("unitTypeCode") String unitTypeCode,
                                                                 Pageable pageable);
+
+    @Query(value = "{call ACA_ORG_SP_getUnitParentsRecursivelyFilteredByUnitTypeCode(:unitCode, :unitTypeCode)}", nativeQuery = true)
+    List<Unit> getUnitParentsRecursivelyFilteredByUnitTypeCode(@Param("unitCode") String unitCode,
+                                                               @Param("unitTypeCode") String unitTypeCode);
+
+    @Query(value = "{call ACA_ORG_SP_getUnitParentsRecursivelyFilteredByUnitTypeCode(:unitCode, :unitTypeCode)}", nativeQuery = true)
+    Page<Unit> getUnitParentsRecursivelyFilteredByUnitTypeCode(@Param("unitCode") String unitCode,
+                                                               @Param("unitTypeCode") String unitTypeCode,
+                                                               Pageable pageable);
 }

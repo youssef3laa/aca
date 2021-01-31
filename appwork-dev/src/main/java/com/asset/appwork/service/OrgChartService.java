@@ -93,6 +93,14 @@ public class OrgChartService {
         return unitRepository.getUnitChildrenRecursivelyFilteredByUnitTypeCode(parentUnitCode, unitTypeCode, PageRequest.of(page, size));
     }
 
+    public List<Unit> getUnitParentsRecursivelyFilteredByUnitTypeCode(String childUnitCode, String unitTypeCode) {
+        return unitRepository.getUnitParentsRecursivelyFilteredByUnitTypeCode(childUnitCode, unitTypeCode);
+    }
+
+    public Page<Unit> getUnitParentsRecursivelyFilteredByUnitTypeCode(String childUnitCode, String unitTypeCode, int page, int size) {
+        return unitRepository.getUnitParentsRecursivelyFilteredByUnitTypeCode(childUnitCode, unitTypeCode, PageRequest.of(page, size));
+    }
+
     public void addSubUnitToUnit(Account account, Long id, Long subUnitId) throws AppworkException {
 //        Unit unit = getUnit(subUnitId);
 //        unit.setParent(Collections.emptyList());
