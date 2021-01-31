@@ -1,10 +1,12 @@
 package com.asset.appwork.schema;
 
+import com.asset.appwork.dto.Router;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.util.SystemUtil;
 import lombok.Data;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Data
 public class OutputSchema<T> {
@@ -22,9 +24,11 @@ public class OutputSchema<T> {
     String page;
     String processId;
     String parentHistoryId;
-    String roleFilter;
+    String receiverType;
     Boolean addApproval;
     HashMap<String,T> extraData = new HashMap<>();
+    List<String> assignees;
+    Router router = new Router();
 
     public void setStepId(String stepId){
         this.breakProcess = stepId.equals("end");
@@ -42,9 +46,9 @@ public class OutputSchema<T> {
                 "<page>"+removeNull(this.page)+"</page>"+
                 "<decision>"+removeNull(this.decision)+"</decision>"+
                 "<comment>"+removeNull(this.comment)+"</comment>"+
-                "<roleFilter>"+removeNull(this.roleFilter)+"</roleFilter>"+
                 "<breakProcess>"+removeNull(this.breakProcess)+"</breakProcess>"+
                 "<addApproval>"+removeNull(this.addApproval)+"</addApproval>"+
+                "<router>"+createRouter()+"</router>"+
                 "<extraData>"+createExtraData()+"</extraData>";
     }
 
@@ -52,6 +56,11 @@ public class OutputSchema<T> {
         return "<ACA_ProcessRouting_OutputSchemaFragment xmlns=\"http://schemas.cordys.com/\">"+
                     getXML()+
                 "</ACA_ProcessRouting_OutputSchemaFragment>";
+    }
+
+    private String createRouter() throws AppworkException{
+        String router = SystemUtil.convertObjectToXML(this.router);
+        return router;
     }
 
     private String createExtraData() throws AppworkException{
