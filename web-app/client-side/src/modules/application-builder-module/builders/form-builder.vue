@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { ValidationObserver } from 'vee-validate'
+import {ValidationObserver} from 'vee-validate'
 import InputComponent from '../components/input-component'
 import ButtonComponent from '../components/button-component'
 import TableComponent from '../components/table-component'
@@ -84,6 +84,7 @@ import D3GraphComponent from '../components/d3-graph-component'
 import SignatureComponent from '../components/signature-component'
 import ProcessRoutingComponent from '../components/process-routing-component'
 import ReceiverFormComponent from '../components/receiver-form-component'
+import VersionGridComponent from "@/modules/application-builder-module/components/VersionGridComponent";
 
 export default {
   name: 'FormBuilder',
@@ -112,7 +113,8 @@ export default {
     D3GraphComponent,
     SignatureComponent,
     ProcessRoutingComponent,
-    ReceiverFormComponent
+    ReceiverFormComponent,
+    VersionGridComponent
   },
   data() {
     return {

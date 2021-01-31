@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" persistent width="600">
+  <v-dialog :value="dialog" eager persistent width="600">
     <!-- <template v-slot:activator="{ on, attrs }">
       <v-btn color="primary" dark v-bind="attrs" v-on="on">
         Open Dialog
@@ -9,7 +9,7 @@
     <v-card>
       <v-card-title class="headline">Title</v-card-title>
       <span>
-        <FormBuilder :forms="field.forms[0]" :model="field.forms[0].model" />
+        <FormBuilder :forms="field.forms[0]" :model="field.forms[0].model"/>
       </span>
 
       <!-- <v-card-title class="headline">
@@ -40,10 +40,11 @@ export default {
   },
   data() {
     return {
-      dialog: false,
+      dialog: true
     }
   },
   mounted() {
+    this.dialog = false;
     console.log(this.field.modalId)
     let modelId = this.field.modalId
     this.$observable.context = this

@@ -81,30 +81,36 @@ export default {
                         }
                       ]
                     },
-                    "inputs": [
-                      {
-                        modalId: "unitModal",
-                        type: "ModalComponent",
-                        name: "unitModal",
-                        forms: [
-                          {
-                            key: "unitModal",
-                            inputs: [
-                              {
-                                type: "InputComponent",
-                                label: "Id",
-                                name: "id",
-                                col: "4",
-                              },
-                            ],
-                            model: {},
-                          }
-                        ],
-                      }
-                    ]
                   }
                 ],
               },
+              {
+                key: 'versionsModal',
+                type: 'ModalSection',
+                name: 'versionsModal',
+                isCard: true,
+                forms: [
+                  {
+                    modalTitle: 'اسم الملف يكتب هنا',
+                    key: 'fileVersionsModal',
+                    modalId: 'versionModal',
+                    inputs: [
+                      {
+                        type: 'VersionGridComponent',
+                        name: 'versionGrid',
+                        col: '12',
+                      },
+                    ],
+                    model: {
+                      versionGrid: {
+                        nodeId: ''
+                      },
+                    },
+                  },
+
+                ],
+              },
+
             ],
           },
         ],
@@ -113,10 +119,8 @@ export default {
   }
   ,
   created() {
-    this.$observable.subscribe('open-file-brava', async (fileId) => {
+    this.$observable.subscribe('open-file-brava', async ({fileId, verNum}) => {
       this.$observable.fire('file-component-skeleton', true)
-      console.log("openfilebrava");
-      console.log(fileId);
       let userToken;
       try {
         userToken = await http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
@@ -124,23 +128,30 @@ export default {
           "password": "Asset99a",
           "ticketType": "OTDSTICKET"
         });
-        this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
-            'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
-        console.log(userToken);
-        // this.$observable.fire('file-component-skeleton', false)
+        if (verNum) {
+          this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
+              'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&vernum=' + verNum + '&OTDSTicket=' + userToken.data.ticket;
+        } else {
+          this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
+              'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
+        }
+
       } catch (e) {
         console.log(e);
       }
     });
   }, mounted() {
-    //load list of files
-    // this.$observable.fire('load-files-list', 577193);
 
+    this.$observable.subscribe("openVersionsModal", (file) => {
+      this.$observable.fire("versionModal");
+      this.$refs.appBuilder.setModelData("fileVersionsModal", {
+        versionGrid: {
+          nodeId: file.properties.id
+        }
+      });
+    })
 
-  },
-  updated() {
-    console.log("updated is called")
   }
 }
-;
+
 </script>

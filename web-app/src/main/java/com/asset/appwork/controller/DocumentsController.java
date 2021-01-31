@@ -51,6 +51,7 @@ public class DocumentsController {
 //                                                            @RequestParam("file") MultipartFile file,
 //                                                            @RequestParam("parentId") Long parentId,
 //                                                            @RequestParam("name") String name) {
+
     @PostMapping("/upload")
     public ResponseEntity<AppResponse<Document>> uploadFile(@RequestHeader("X-Auth-Token") String token,
                                                             CreateNode createNode) {

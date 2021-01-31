@@ -86,36 +86,43 @@
           <draggable :animation="150" :list="filesUploaded" :swapThreshold="0.5" class="row" tag="div"
 
                      @end="onEnd($event)">
+
             <div
                 v-for="(file, index) in filesUploaded"
                 :key="index"
-                class="card col-5"
                 @dragstart="startDrag($event, file)"
                 @dragover.prevent
                 @dragenter.prevent
-            >
-              <div class="row pa-1">
-                <v-col :cols="2" class="card-icon">
-                  <v-icon> mdi-file-pdf-outline</v-icon>
-                </v-col>
-                <v-col :cols="6"
-                       class="card-name"
-                       style="cursor: pointer"
-                       @click="openFileInBrave(file.properties.id)"
-                >
+                class="col-6">
+              <div
 
-                  {{ file.properties.name }} <br/>
-                  {{ file.properties.fileTypeValue }}
-                </v-col>
-                <v-col :cols="2" style="cursor: pointer" @click="openVersionsPopup(file)">
-                  <v-icon color="#22B07D"> mdi-folder-multiple</v-icon>
-                </v-col>
-                <v-col :cols="2" style="cursor: pointer" @click="deleteFile(file)">
-                  <v-icon color="#ea9cb3"> mdi-delete-circle-outline</v-icon>
-                </v-col>
+                  class="card"
 
+              >
+                <div class="row pa-1">
+                  <v-col :cols="2" class="card-icon">
+                    <v-icon> mdi-file-pdf-outline</v-icon>
+                  </v-col>
+                  <v-col :cols="6"
+                         class="card-name"
+                         style="cursor: pointer"
+                         @click="openFileInBrave(file.properties.id)"
+                  >
+
+                    {{ file.properties.name }} <br/>
+                    {{ file.properties.fileTypeValue }}
+                  </v-col>
+                  <v-col :cols="2" style="cursor: pointer" @click="openVersionsPopup(file)">
+                    <v-icon color="#22B07D"> mdi-folder-multiple</v-icon>
+                  </v-col>
+                  <v-col :cols="2" style="cursor: pointer" @click="deleteFile(file)">
+                    <v-icon color="#ea9cb3"> mdi-delete-circle-outline</v-icon>
+                  </v-col>
+
+                </div>
               </div>
             </div>
+
           </draggable>
         </v-col>
 
@@ -215,7 +222,7 @@ export default {
     },
     openFileInBrave: function (fileId) {
       // let fileId = this.filesUploaded.find(element => element.name === file.properties.name).properties.id;
-      this.$observable.fire('open-file-brava', fileId);
+      this.$observable.fire('open-file-brava', {fileId});
     },
     deleteFile: async function (file) {
       file = file.properties;
@@ -413,9 +420,9 @@ export default {
       // })
     },
     openVersionsPopup: function (file) {
-      this.$observable.fire("openModal", {
-        modalId: "unitModal"
-      });
+
+      this.$observable.fire("openVersionsModal", file)
+
       console.log(file);
     }
   },

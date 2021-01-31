@@ -1,0 +1,118 @@
+<template>
+<span>
+
+  <v-card-subtitle>
+            الإصدار الأخير
+  </v-card-subtitle>
+
+  <v-card-text v-if="latestVersion!=null">
+    <div class="card col-3">
+      <v-col>
+        <div class="row pa-1">
+          <v-col :cols="2" class="card-icon">
+            <v-icon> mdi-file-pdf-outline</v-icon>
+          </v-col>
+          <v-col :cols="8"
+                 class="card-name"
+                 style="cursor: pointer"
+          >
+            {{ latestVersion.name }} <br/>
+            {{ latestVersion.modify_date }}
+          </v-col>
+          <v-col :cols="2" style="cursor: pointer" @click="openVersionInBrava(latestVersion)">
+            <v-icon color="#07689F"> mdi-eye-outline</v-icon>
+          </v-col>
+
+
+        </div>
+      </v-col>
+
+    </div>
+
+  </v-card-text>
+
+    <v-card-subtitle>
+            الإصدارات السابقة
+  </v-card-subtitle>
+  <v-card-text>
+    <v-row>
+      <div
+          v-for="(file, index) in fileVersions"
+          :key="index"
+          class="card col-3"
+      >
+      <v-col>
+        <div class="row pa-1">
+          <v-col :cols="2" class="card-icon">
+            <v-icon> mdi-file-pdf-outline</v-icon>
+          </v-col>
+          <v-col :cols="8"
+                 class="card-name"
+                 style="cursor: pointer"
+          >
+            {{ file.name }} <br/>
+            {{ file.modify_date }}
+          </v-col>
+          <v-col :cols="2" style="cursor: pointer" @click="openVersionInBrava(file)">
+            <v-icon color="#07689F"> mdi-eye-outline</v-icon>
+          </v-col>
+        </div>
+      </v-col>
+
+    </div>
+    </v-row>
+
+  </v-card-text>
+
+</span>
+</template>
+
+<script>
+import Http from "../../core-module/services/http"
+
+export default {
+  name: "VersionGridComponent",
+  data() {
+    return {
+      fileVersions: [],
+      latestVersion: null,
+      nodeId: ""
+    }
+  },
+  props: ['val', 'field'],
+  watch: {
+    val: function (newVal, oldVal) {
+      console.log(oldVal, newVal)
+      if (newVal.nodeId) {
+        this.nodeId = newVal.nodeId;
+        this.getFileVersions()
+      }
+    },
+  },
+  methods: {
+    getFileVersions: async function () {
+      this.fileVersions = [];
+      this.latestVersion = null;
+      let fileVersionsResponse = await Http.get('/document/version/list/' + this.nodeId + "?order=desc");
+      console.log(fileVersionsResponse.data.data.results);
+      fileVersionsResponse = fileVersionsResponse.data.data.results
+      this.latestVersion = fileVersionsResponse[0].data.versions;
+      for (let i = 1; i < fileVersionsResponse.length; ++i) {
+        let element = fileVersionsResponse[i].data.versions;
+        // element = element.modify_date.replace("T", " ");
+        this.fileVersions.push(element);
+      }
+    },
+    openVersionInBrava(file) {
+      this.$observable.fire("open-file-brava", {fileId: this.nodeId, verNum: file.version_number});
+      this.$observable.fire("versionModal");
+
+    }
+  }
+
+}
+</script>
+
+<style scoped>
+
+</style>
