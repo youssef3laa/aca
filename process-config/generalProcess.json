@@ -12,7 +12,17 @@
         "stepRG": {
             "router": {
                 "fields": ["comment"],
-                "receiverTypes": ["single"]
+                "receiverTypes": ["single","multiple"]
+            },
+            "page": "generalProcess-early",
+            "nextStep": {
+                "comment": "stepRQ",
+                "multiple": "parallel1"
+            }
+        },
+        "parallel1": {
+            "router": {
+                "fields": ["comment","opinion"]
             },
             "page": "generalProcess-early",
             "nextStep": {
@@ -78,19 +88,6 @@
             "page": "generalProcess-stepAD",
             "nextStep": {
                 "approve": ""
-            },
-            "subBP": "ACA_SubBP_parallelTasks",
-            "extraData": {
-                "assignees": { 
-                    "assignee": [
-                        "cn=HCAO,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local", 
-                        "cn=HCAG,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local" , 
-                        "cn=MCAG,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local"
-                    ] 
-                },
-                "stepIdSBP": "parallel",
-                "roleFilterSBP": "org/group/findByCodes/HRCA",
-                "pageSBP": "generalProcess-parallel"
             }
         },
         "parallel": {

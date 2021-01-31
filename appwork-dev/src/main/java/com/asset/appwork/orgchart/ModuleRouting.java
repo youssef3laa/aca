@@ -26,6 +26,7 @@ public class ModuleRouting {
     private final String approveString = "approve";
     private final String redirectString = "redirect";
     private final String commentString = "comment";
+    private final String parallelString = "multiple";
     private final String requestModificationString = "requestModification";
 
     String config;
@@ -118,7 +119,7 @@ public class ModuleRouting {
     private <T> void calculateNextStep(T outputSchema) throws AppworkException {
         //TODO: Create Setter function in reflection class
         try {
-            String nextStep, nextPage = "", nextSubBP = "";
+            String nextStep = "", nextPage = "", nextSubBP = "";
             Router nextRouter = new Router();
 
             RoutingConfig routingConfig = generateRoutingConfig();
@@ -143,27 +144,33 @@ public class ModuleRouting {
                 throw new AppworkException(ResponseCode.MODULE_ROUTING_INPUTS_ERROR);
             }
 
-            decision[0] = getDecisionString(decision[0]);
+            if(receiverType[0].equals("multiple")){
+                nextStep = getIdFromNextSteps(routingConfig, currentStepId[0], parallelString);
+            }
 
-            switch (decision[0]){
-                case approveString:
-                    nextStep = handleApprovalCase(routingConfig, currentStepId[0], codeSelected[0]);
-                    break;
-                case redirectString:
-                    nextStep = handleRedirectCase(routingConfig, currentStepId[0], codeSelected[0], receiverType[0]);
-                    break;
-                case requestModificationString:
-                    nextStep = handleRequestModificationCase(outputSchema, routingConfig, currentStepId[0], parentHistoryId[0]);
-                    break;
-                case commentString:
-                    nextStep = getIdFromNextSteps(routingConfig, currentStepId[0], commentString);
-                    break;
-                case rejectString:
-                    nextStep = breakString;
-                    break;
-                default:
-                    nextStep = handleDefaultCase(routingConfig, currentStepId[0], codeSelected[0], decision[0]);
-                    break;
+            if(nextStep.isEmpty()) {
+                decision[0] = getDecisionString(decision[0]);
+
+                switch (decision[0]) {
+                    case approveString:
+                        nextStep = handleApprovalCase(routingConfig, currentStepId[0], codeSelected[0]);
+                        break;
+                    case redirectString:
+                        nextStep = handleRedirectCase(routingConfig, currentStepId[0], codeSelected[0]);
+                        break;
+                    case requestModificationString:
+                        nextStep = handleRequestModificationCase(outputSchema, routingConfig, currentStepId[0], parentHistoryId[0]);
+                        break;
+                    case commentString:
+                        nextStep = getIdFromNextSteps(routingConfig, currentStepId[0], commentString);
+                        break;
+                    case rejectString:
+                        nextStep = breakString;
+                        break;
+                    default:
+                        nextStep = handleDefaultCase(routingConfig, currentStepId[0], codeSelected[0], decision[0]);
+                        break;
+                }
             }
 
             if(nextStep.isEmpty()){
@@ -181,14 +188,18 @@ public class ModuleRouting {
                         throw new AppworkException(ResponseCode.MODULE_ROUTING_INPUTS_ERROR);
                     }
 
-                    String[] assignedCN = {""};
-                    ReflectionUtil.of(outputSchema).ifPresent("getAssignedCN", (s) -> {
-                        assignedCN[0] = (String) s;
-                    });
-                    if(assignedCN[0].isEmpty()){
-                        throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
-                    }
+//                    String[] assignedCN = {""};
+//                    ReflectionUtil.of(outputSchema).ifPresent("getAssignedCN", (s) -> {
+//                        assignedCN[0] = (String) s;
+//                    });
+//                    if(assignedCN[0].isEmpty()){
+//                        throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
+//                    }
                 }
+            }
+
+            if(receiverType[0].equals("multiple")) {
+                nextSubBP = "ACA_SubBP_parallelTasks";
             }
 
             updateOutputSchemaExtraData(outputSchema, routingConfig, currentStepId[0]);
@@ -222,16 +233,12 @@ public class ModuleRouting {
         return step;
     }
 
-    private String handleRedirectCase(RoutingConfig routingConfig, String currentStepId, String codeSelected, String receiverType){
-        if(receiverType != null && receiverType.equals("multiple")){
-            return "";
-        }else{
-            String step = getIdFromNextSteps(routingConfig, currentStepId, codeSelected);
-            if (step.isEmpty()) {
-                return getIdFromNextSteps(routingConfig, currentStepId, redirectString);
-            }
-            return step;
+    private String handleRedirectCase(RoutingConfig routingConfig, String currentStepId, String codeSelected){
+        String step = getIdFromNextSteps(routingConfig, currentStepId, codeSelected);
+        if (step.isEmpty()) {
+            return getIdFromNextSteps(routingConfig, currentStepId, redirectString);
         }
+        return step;
     }
 
     private <T> String handleRequestModificationCase(T outputSchema, RoutingConfig routingConfig, String currentStepId, String parentHistoryId){

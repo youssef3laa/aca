@@ -78,7 +78,7 @@
 
                 console.log(model)
                 console.log(model2)
-                var data = {
+                let data = {
                     taskId: this.taskId,
                     entityId: this.inputSchema.entityId,
                     stepId: this.inputSchema.stepId,
@@ -89,6 +89,8 @@
                     assignedCN: model2.routing.assignedCN,
                     decision: model2.routing.decision,
                     comment: model2.routing.comment,
+                    assignees: model2.routing.assignees,
+                    receiverType: model2.routing.receiverType,
                 };
                 this.completeStep(data);
             }

@@ -59,15 +59,19 @@
     import RadioGroupComponent from "./radio-group-component";
     import userMixin from "../../../mixins/userMixin";
     import MultipleAssigneeComponent from "./multiple-assignee-component";
+    import orgChartMixin from "../../../mixins/orgChartMixin";
 
     export default {
         components: {MultipleAssigneeComponent, RadioGroupComponent, ReceiverFormComponent, TextareaComponent},
         props: ["val","field"],
-        mixins: [userMixin],
+        mixins: [userMixin,orgChartMixin],
         data() {
             return{
                 d: this.val,
+                firstTime: true,
                 displayName: null,
+                userDetails: null,
+                parent: null,
                 comment: null,
                 opinion: null,
                 decision: "comment",
@@ -84,13 +88,18 @@
         },
         methods: {
             onValueChange: function() {
+                if(!this.assignedCN && this.parent && this.decision == "comment") {
+                    this.assignedCN = this.parent.cn
+                    this.code = this.parent.groupCode
+                    this.assignedRole = this.parent
+                }
                 this.$emit('update', {
                     name: this.field.name,
                     value: {
                         decision: this.decision,
                         comment: this.comment,
                         opinion: this.opinion,
-                        receiverType: this.receiverType,
+                        receiverType: (this.receiverType)? this.receiverType:'single',
                         code: this.code,
                         role: this.assignedRole,
                         assignedCN: this.assignee,
@@ -221,20 +230,28 @@
                     this.receiverTypes = (newVal.decisions)? null:this.getReceiverTypeOptions(newVal.receiverTypes)
                 }
 
-                // this.d = newVal
-                for(let key in newVal){
-                    this.d[key] = newVal[key]
+                if(this.firstTime){
+                    if(newVal.fields || newVal.decisions || newVal.receiverTypes){
+                        this.d = newVal
+                    }
+                    this.firstTime=false
+                    this.onValueChange()
+                }else{
+                    for(let key in newVal){
+                        this.d[key] = newVal[key]
+                    }
                 }
-                this.updateDirection(null)
             }
         },
-        async mounted() {
+        async created() {
             this.decisions = this.getDecisionOptions(this.val.decisions)
             this.receiverTypes = (this.val.decisions)? null:this.getReceiverTypeOptions(this.val.receiverTypes)
-            this.updateDirection(null)
 
-            let userDetails = await this.getUserDetails()
-            this.displayName = userDetails.displayName;
+            this.userDetails = await this.getUserDetails()
+            this.displayName = this.userDetails.displayName
+            this.parent = await this.getParentDetails()
+
+            this.onValueChange()
         }
     }
 </script>
