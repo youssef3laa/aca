@@ -127,6 +127,8 @@
             },
             onChangeSector: function(event) {
                 if(this.field.readonly || this.sector.field.readonly) return
+                this.sectorSelected = null
+                this.office.val = this.getAutocompleteVal('')
                 if (event.value.value) {
                     this.sectorSelected = event.value.value.object
                     if(this.direction && this.direction.includes("up")){
@@ -135,9 +137,6 @@
                     else if(this.checkCanSelectNext(event.value.value.value,"SCT")) {
                         this.office.val = this.getAutocompleteVal('org/unit/' + event.value.value.value + '/down/all/unitTypeCode/ADM,OFC')
                     }
-                } else {
-                    this.sectorSelected = null
-                    this.office.val = this.getAutocompleteVal('')
                 }
                 this.group.val = this.getAutocompleteVal('')
                 this.member.val = this.getAutocompleteVal('')
@@ -145,22 +144,23 @@
             },
             onChangeAdminOffice: function(event) {
                 if(this.field.readonly || this.office.field.readonly) return
+                this.officeSelected = null
+                this.group.val = this.getAutocompleteVal('')
                 if(event.value.value){
                     this.officeSelected = event.value.value.object
                     if(this.direction && this.direction.includes("up")){
                         this.group.val = this.getAutocompleteVal('org/unit/'+this.userDetails.groups[0].unit.unitCode+'/up/all/unitTypeCode/GRP')
                     }
-                    else if(this.checkCanSelectNext(event.value.value.value,"OFC") || this.checkCanSelectNext(event.value.value.value,"ADM")) {
+                    else if(this.checkCanSelectNext(event.value.value.value,"OFC,ADM")) {
                         this.group.val = this.getAutocompleteVal('org/unit/' + event.value.value.value + '/down/all/unitTypeCode/GRP')
                     }
-                }else{
-                    this.officeSelected = null
-                    this.group.val = this.getAutocompleteVal('')
                 }
                 this.member.val = this.getAutocompleteVal('')
                 this.onValueChange()
             },
             onChangeGroup: function(event) {
+                this.groupSelected = null
+                this.member.val = this.getAutocompleteVal('')
                 if(this.field.readonly || this.group.field.readonly) return
                 if (event.value.value) {
                     this.groupSelected = event.value.value.object
@@ -170,9 +170,6 @@
                     else if(this.checkCanSelectNext(event.value.value.value,"GRP")) {
                         this.member.val = this.getAutocompleteVal('org/group/findByUnitCodes/' + event.value.value.value)
                     }
-                } else {
-                    this.groupSelected = null
-                    this.member.val = this.getAutocompleteVal('')
                 }
                 this.onValueChange()
             },
@@ -364,7 +361,7 @@
             checkCanSelectNext: function(unitCode,unitTypeCode) {
                 console.log(unitCode, unitTypeCode)
                 if(this.direction != "up"){
-                    if(this.userDetails.groups[0].unit.unitTypeCode == unitTypeCode){
+                    if(unitTypeCode.includes(this.userDetails.groups[0].unit.unitTypeCode)){
                         return (this.userDetails.groups[0].unit.unitCode == unitCode)
                     }
                     return true
