@@ -178,7 +178,7 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            orgChartService.addSubUnitToUnit(account, id, subUnitId);
+            orgChartService.addSubUnitToUnit(id, subUnitId);
             respBuilder.info("infoMessage", "Sub Unit added Successfully");
             respBuilder.status(ResponseCode.SUCCESS);
         } catch (AppworkException e) {
@@ -200,7 +200,7 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            orgChartService.addSubUnitToUnit(account, code, subUnitCode);
+            orgChartService.addSubUnitToUnit(code, subUnitCode);
             respBuilder.info("infoMessage", "Sub Unit added Successfully");
             respBuilder.status(ResponseCode.SUCCESS);
         } catch (AppworkException e) {
