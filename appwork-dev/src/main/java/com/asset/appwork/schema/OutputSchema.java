@@ -1,30 +1,34 @@
 package com.asset.appwork.schema;
 
+import com.asset.appwork.dto.Router;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.util.SystemUtil;
 import lombok.Data;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Data
 public class OutputSchema<T> {
     String taskId;
     String process;
     String stepId;
-    String assignedCN;
     Boolean breakProcess;
     String subBP;
-    String decision;
-    String comment;
-    String code;
     String entityName;
     String entityId;
     String page;
     String processId;
     String parentHistoryId;
-    String roleFilter;
+    String decision;
+    String comment;
     Boolean addApproval;
+    String code;
+    String assignedCN;
+    String receiverType;
+    HashMap<String, T> assignees = new HashMap<>();
     HashMap<String,T> extraData = new HashMap<>();
+    Router router = new Router();
 
     public void setStepId(String stepId){
         this.breakProcess = stepId.equals("end");
@@ -42,10 +46,11 @@ public class OutputSchema<T> {
                 "<page>"+removeNull(this.page)+"</page>"+
                 "<decision>"+removeNull(this.decision)+"</decision>"+
                 "<comment>"+removeNull(this.comment)+"</comment>"+
-                "<roleFilter>"+removeNull(this.roleFilter)+"</roleFilter>"+
                 "<breakProcess>"+removeNull(this.breakProcess)+"</breakProcess>"+
                 "<addApproval>"+removeNull(this.addApproval)+"</addApproval>"+
-                "<extraData>"+createExtraData()+"</extraData>";
+                "<router>"+getObjectXML(this.router)+"</router>"+
+                "<assignees>"+getObjectXML(this.assignees)+"</assignees>"+
+                "<extraData>"+getObjectXML(this.extraData)+"</extraData>";
     }
 
     public String getXMLWithNameSpace() throws AppworkException{
@@ -54,9 +59,9 @@ public class OutputSchema<T> {
                 "</ACA_ProcessRouting_OutputSchemaFragment>";
     }
 
-    private String createExtraData() throws AppworkException{
-        String extraData = SystemUtil.convertObjectToXML(this.extraData);
-        return extraData;
+    private <T> String getObjectXML(T object) throws AppworkException{
+        String xml = SystemUtil.convertObjectToXML(object);
+        return xml;
     }
 
     public String getProcessFilePath(String basePath){

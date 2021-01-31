@@ -52,6 +52,12 @@ export default {
                 code: element["groupCode"],
                 object: element
               }
+            }else if(element["unitCode"]){
+              obj = {
+                value: element["unitCode"],
+                text: element["name_ar"],
+                object: element
+              }
             }else{
               obj = {
                 value: element["key"],
@@ -66,6 +72,11 @@ export default {
             return (e.name || "").indexOf(v || "") > -1;
           });
             console.log(this.items.list);
+
+          if((v==null || v == "") && this.field.autofill && this.items.list.length == 1 ){
+            this.value = this.items.list[0].value
+            this.autocompleteChange()
+          }
 
           this.loading = false;
         })
@@ -101,7 +112,7 @@ export default {
       // this.val = newVal
       if(newVal.url){
         this.items.list = []
-        this.fetch(null,newVal.url)
+        this.querySelections("",newVal.url)
       }
       this.items = newVal;
       this.value = newVal.value;
@@ -115,7 +126,7 @@ export default {
   },
   mounted() {
     if (this.val.url) {
-      this.fetch(null, this.val.url)
+      this.querySelections(null, this.val.url)
     }
     // this.autocompleteChange();
   },

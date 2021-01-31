@@ -93,7 +93,18 @@ public class OrgChartService {
         return unitRepository.getUnitChildrenRecursivelyFilteredByUnitTypeCode(parentUnitCode, unitTypeCode, PageRequest.of(page, size));
     }
 
-    public void addSubUnitToUnit(Account account, Long id, Long subUnitId) {
+    public List<Unit> getUnitParentsRecursivelyFilteredByUnitTypeCode(String childUnitCode, String unitTypeCode) {
+        return unitRepository.getUnitParentsRecursivelyFilteredByUnitTypeCode(childUnitCode, unitTypeCode);
+    }
+
+    public Page<Unit> getUnitParentsRecursivelyFilteredByUnitTypeCode(String childUnitCode, String unitTypeCode, int page, int size) {
+        return unitRepository.getUnitParentsRecursivelyFilteredByUnitTypeCode(childUnitCode, unitTypeCode, PageRequest.of(page, size));
+    }
+
+    public void addSubUnitToUnit(Account account, Long id, Long subUnitId) throws AppworkException {
+//        Unit unit = getUnit(subUnitId);
+//        unit.setParent(Collections.emptyList());
+//        unitRepository.save(unit);
         Member.TargetId targetId = new Member.TargetId(subUnitId);
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
                 "OrganizationalUnit").addRelation(id, "SubUnits", Collections.singletonList(targetId).toString());
@@ -427,7 +438,7 @@ public class OrgChartService {
         Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
         otds.updateUserByUserId(userId, member.toString());
 
-        otds.resetPassword(userId, member.getPasswordResetJsonString(SystemUtil.getJsonByPtrExpr(props, "/password")));
+//        otds.resetPassword(userId, member.getPasswordResetJsonString(SystemUtil.getJsonByPtrExpr(props, "/password")));
 
         return getUserByUserId(userId);
 

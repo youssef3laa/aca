@@ -28,24 +28,28 @@ export default {
   methods: {
     submit: function () {
       let model = this.$refs.appBuilder.getModelData("form1");
+      let model2 = this.$refs.appBuilder.getModelData("form2");
       if (!model._valid) {
         //@TODO show warining
         return;
       }
 
+      console.log("Model", model)
+      console.log("Receiver", model2)
       let obj = {
         generalProcessEntity: {
           writingDate: model.writingDate,
           summary: model.subjectSummary,
           workType: model.workType.value.value,
-          incomingMeans: model.incomingMeans.value.value
+          incomingMeans: model.incomingMeans.value.value,
+          incomingUnit: model.incomingUnit.value.text
         },
         processModel: {
           process: "generalProcess",
           stepId: "init",
           entityName: "ACA_Entity_generalProcess",
-          code: model.receiver.value.code,
-          assignedCN: model.receiver.value.value
+          code: model2.receiver.role.unit.unitTypeCode,
+          assignedCN: model2.receiver.assignedCN
         }
       };
       this.initiateProcess(obj);

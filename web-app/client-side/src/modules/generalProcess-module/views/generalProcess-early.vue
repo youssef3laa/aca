@@ -48,18 +48,18 @@
                 this.$refs.appBuilder.setModelData("form1", {
                     stepId: this.inputSchema.stepId,
                     subjectSummary: entityData.summary,
+                    incomingUnit: entityData.incomingUnit,
                     workType: workTypeObj.arValue,
                     incomingMeans: incomingMeansObj.arValue,
-                    receiver: {
-                        url: this.inputSchema.roleFilter,
-                        list: [],
-                        value: ""
-                    },
                     writingDate: entityData.writingDate.split("Z")[0],
                 });
 
                 this.$refs.appBuilder.setModelData("historyTable", {
                     taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
+                });
+
+                this.$refs.appBuilder.setModelData("processRoutingForm", {
+                    routing: this.inputSchema.router
                 });
 
                 this.$refs.appBuilder.setModelData("signaturePage", {
@@ -70,23 +70,27 @@
             },
             submit: function () {
                 let model = this.$refs.appBuilder.getModelData("form1");
-                let approvalModel = this.$refs.appBuilder.getModelData("ApprovalForm");
+                let model2 = this.$refs.appBuilder.getModelData("processRoutingForm");
                 // if (!model._valid){
                 //   //@TODO show warning
                 //   return;
                 // }
 
-                var data = {
+                console.log(model)
+                console.log(model2)
+                let data = {
                     taskId: this.taskId,
                     entityId: this.inputSchema.entityId,
                     stepId: this.inputSchema.stepId,
                     process: this.inputSchema.process,
                     parentHistoryId: this.inputSchema.parentHistoryId,
 
-                    code: model.receiver.value.code,
-                    assignedCN: model.receiver.value.value,
-                    decision: approvalModel.approval.decision,
-                    comment: approvalModel.approval.comment,
+                    code: model2.routing.code,
+                    assignedCN: model2.routing.assignedCN,
+                    decision: model2.routing.decision,
+                    comment: model2.routing.comment,
+                    assignees: model2.routing.assignees,
+                    receiverType: model2.routing.receiverType,
                 };
                 this.completeStep(data);
             }

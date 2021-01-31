@@ -9,6 +9,7 @@ public class GeneralProcessModel {
     String writingDate;
     String workType;
     String incomingMeans;
+    String incomingUnit;
 
     public String toString(){
         return SystemUtil.writeObjectIntoString(this);

@@ -248,6 +248,41 @@ public class OrgChartController {
     }
 
     @Transactional
+    @GetMapping("/unit/{code}/up/all/unitTypeCode/{unitTypeCode}")
+    public ResponseEntity<AppResponse<JsonNode>> readUnitParentsRecursivelyFilteredByUnitTypeCode(@RequestHeader("X-Auth-Token") String token,
+                                                                                                   @PathVariable("code") String code,
+                                                                                                   @PathVariable("unitTypeCode") String unitTypeCode,
+                                                                                                   @RequestParam(value = "page") Optional<Integer> page,
+                                                                                                   @RequestParam(value = "size") Optional<Integer> size
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                if (page.isPresent() && size.isPresent()) {
+                    Page<Unit> unitPage = orgChartService.getUnitParentsRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(unitPage.getContent().toString()));
+                    respBuilder.info("totalCount", unitPage.getTotalElements());
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUnitParentsRecursivelyFilteredByUnitTypeCode(code, unitTypeCode).toString()));
+                }
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
     @PostMapping("/unit/{unitId}/position/create")
     public ResponseEntity<AppResponse<JsonNode>> createPosition(@RequestHeader("X-Auth-Token") String token,
                                                                 @PathVariable("unitId") Long unitId,
