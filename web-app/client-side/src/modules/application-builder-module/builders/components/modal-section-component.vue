@@ -22,8 +22,8 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          style="color:#07689f;height: 36px !important;background-color: transparent;"
-          @click="dialog = false"
+            style="color:#07689f;height: 36px !important;background-color: transparent;"
+            @click="dialog = false"
         >
           إلغاء
         </v-btn>
@@ -38,6 +38,7 @@
 <script>
 // import FormBuilder from '../builders/form-builder'
 import FormBuilder from '../form-builder'
+
 export default {
   components: {
     FormBuilder,
@@ -48,7 +49,7 @@ export default {
     }
   },
   methods: {
-    submitModal: function() {
+    submitModal: function () {
       if (this.modalAction == 'edit') {
         this.$observable.fire(this.formData.modalId + '_updateModal', {
           obj: this.formData.model,
@@ -66,7 +67,8 @@ export default {
     console.log(this.formData.modalId)
     this.$observable.context = this
     this.$observable.subscribe(this.formData.modalId, (modalObj) => {
-      this.modalAction = modalObj.action
+      if (modalObj && modalObj.action)
+        this.modalAction = modalObj.action
       this.dialog = !this.dialog;
 
     })
