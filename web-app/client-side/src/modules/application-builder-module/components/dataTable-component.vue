@@ -84,6 +84,7 @@ export default {
       loading: true,
       footerProps: {
         'items-per-page-options': [5, 10, 25, -1],
+        'show-first-last-page': true
       },
       options: {},
     }
