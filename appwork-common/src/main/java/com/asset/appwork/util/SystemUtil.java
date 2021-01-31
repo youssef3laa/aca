@@ -12,21 +12,11 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import org.docx4j.convert.in.xhtml.XHTMLImporterImpl;
-import org.docx4j.openpackaging.exceptions.Docx4JException;
-import org.docx4j.openpackaging.exceptions.InvalidFormatException;
-import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
-import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
-import org.docx4j.openpackaging.parts.WordprocessingML.NumberingDefinitionsPart;
-import org.docx4j.wml.Text;
-import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.core.env.Environment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -40,58 +30,6 @@ import java.util.*;
  * Created by karim on 10/26/20.
  */
 public class SystemUtil {
-
-    public static void exportJsonToDocx(String json, String html, String fileName) {
-        File file = new File(fileName + ".docx");
-        JacksonJsonParser jackson = new JacksonJsonParser();
-        List list = jackson.parseList(json);
-        String jsonString = list.toString();
-
-        try {
-            WordprocessingMLPackage wordPackage = WordprocessingMLPackage.createPackage();
-
-            NumberingDefinitionsPart ndp = new NumberingDefinitionsPart();
-            wordPackage.getMainDocumentPart().addTargetPart(ndp);
-            ndp.unmarshalDefaultNumbering();
-            XHTMLImporterImpl XHTMLImporter = new XHTMLImporterImpl(wordPackage);
-            XHTMLImporter.setHyperlinkStyle("Hyperlink");
-            wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert(html, null));
-            wordPackage.save(file);
-
-            MainDocumentPart mainDocumentPart = wordPackage.getMainDocumentPart();
-            //mainDocumentPart.addStyledParagraphOfText("Title", "Hello World!");
-            mainDocumentPart.addParagraphOfText(jsonString);
-            wordPackage.save(file);
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
-        } catch (Docx4JException e) {
-            e.printStackTrace();
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static String importDocxToJson(String fileName) {
-        String text = "";
-        try {
-            File file = new File(fileName + ".docx");
-            WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(file);
-            MainDocumentPart mainDocumentPart = wordMLPackage.getMainDocumentPart();
-            String textNodesXPath = "//w:t";
-            List<Object> textNodes = mainDocumentPart.getJAXBNodesViaXPath(textNodesXPath, true);
-            for (Object obj : textNodes) {
-                Text tempText = (Text) ((JAXBElement) obj).getValue();
-                String textValue = tempText.getValue();
-                text.concat(textValue + "/n");
-            }
-            System.out.println(text);
-        } catch (Docx4JException e) {
-            e.printStackTrace();
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
-        return text;
-    }
 
     public static ResponseCode getResponseCodeFromInt(Integer code) {
         if(code == null) return null;

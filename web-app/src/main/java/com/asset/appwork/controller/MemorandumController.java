@@ -10,6 +10,7 @@ import com.asset.appwork.platform.soap.memorandumSOAP;
 import com.asset.appwork.repository.MemosRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
+import com.asset.appwork.util.Docx;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,6 +38,8 @@ public class MemorandumController {
     CordysService cordysService;
     @Autowired
     MemosRepository memosRepository;
+    @Autowired
+    Docx docx;
 
     @PostMapping("/create")
     public ResponseEntity<AppResponse<String>> createMemorandum(@RequestHeader("X-Auth-Token") String token,@RequestBody() Memos memos){
@@ -53,6 +56,7 @@ public class MemorandumController {
 
             String addRecordToMemorandumValues = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memos, id));
             respBuilder.data(addRecordToMemorandumValues);
+            docx.exportJsonToDocx("147459", "Test");
 
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());

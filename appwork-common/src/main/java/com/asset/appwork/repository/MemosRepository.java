@@ -8,6 +8,7 @@ import java.util.List;
 @Repository
 public interface MemosRepository extends GenericRepository<Memorandum, String> {
     List<Memorandum> findByJsonId(String key);
+    List<Memorandum> findByRequestId(String requestId);
     List<Memorandum> findByJsonIdAndRequestId(String jsonId, String requestId);
     List<Memorandum> findAll();
 }
