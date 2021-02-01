@@ -805,6 +805,33 @@ public class OrgChartController {
     }
 
     @Transactional
+    @PutMapping("/group/updateAndGetBoth/{id}")
+    public ResponseEntity<AppResponse<JsonNode>> updateGroupAndGetBoth(@RequestHeader("X-Auth-Token") String token,
+                                                             @PathVariable("id") Long id,
+                                                             @RequestBody String props
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.updateGroupAndGetBoth(account, id, props).toString()));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
     @PutMapping("/group/{groupId}/relation/unit/add")
     public ResponseEntity<AppResponse<JsonNode>> updateGroupUnitRelation(@RequestHeader("X-Auth-Token") String token,
                                                                          @PathVariable("groupId") Long groupId,

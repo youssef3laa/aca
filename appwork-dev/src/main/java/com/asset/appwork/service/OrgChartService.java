@@ -359,7 +359,12 @@ public class OrgChartService {
         }
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
                 "Group").update(group.getId(), Group.fromString(props).toPlatformString());
+
         return getGroup(group.getId());
+    }
+
+    public List<Group> updateGroupAndGetBoth(Account account, Long id, String props) throws AppworkException {
+        return new ArrayList<>(List.of(getGroup(id), updateGroup(account, id, props)));
     }
 
     public void updateGroupUnitRelation(Account account, Long id, String props) throws AppworkException {
@@ -429,6 +434,10 @@ public class OrgChartService {
         return userRepository.findById(id).orElseThrow(
                 () -> new AppworkException("Could not get User of id " + id, ResponseCode.READ_ENTITY_FAILURE)
         );
+    }
+
+    public User getLoggedInUser(Account account) throws AppworkException {
+        return getUserByUserId(account.getUsername() + "@" + env.getProperty("otds.partition"));
     }
 
     public User getUserByUserId(String userId) throws AppworkException {
