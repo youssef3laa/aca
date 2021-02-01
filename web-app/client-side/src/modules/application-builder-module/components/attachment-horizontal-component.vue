@@ -23,7 +23,7 @@
             <div
               v-for="(file, index) in filesUploaded"
               :key="index"
-              class="card col-5"
+              class="card col-6"
               @dragstart="startDrag($event, file)"
               @dragover.prevent
               @dragenter.prevent
@@ -33,14 +33,17 @@
                   <v-icon> mdi-file-pdf-outline</v-icon>
                 </v-col>
                 <v-col
-                  :cols="8"
+                  :cols="6"
                   class="card-name"
                   style="cursor: pointer"
                   @click="openFileInBrave(file)"
                 >
-                  {{ file.name }} <br />
-                  {{ file.size_formatted }}
+                  {{ file.properties.name }} <br />
+                  {{ file.properties.fileTypeValue }}
                 </v-col>
+                <v-col :cols="2" style="cursor: pointer" @click="openVersionsPopup(file)">
+                    <v-icon color="#22B07D"> mdi-folder-multiple</v-icon>
+                  </v-col>
                 <v-col
                   :cols="2"
                   style="cursor: pointer"
@@ -60,9 +63,11 @@
 <script>
 import draggable from "vuedraggable";
 import Http from "../../core-module/services/http";
+import formPageMixin from "../../../mixins/formPageMixin";
 
 export default {
   components: { draggable },
+  mixins: [formPageMixin],
 
   name: "file-input-component",
   props: ["val", "field", "bwsId", "requestEntityId"],
@@ -71,16 +76,36 @@ export default {
       // bwsId: "",
       files: [],
       // requestEntityId: "",
+      categoryId: "",
       filesUploaded: [],
       attachmentSortList: [],
+      fileTypes: [],
     };
   },
   created() {
     // this.bwsId = 680482;
     // this.requestEntityId = 1;
+    this.categoryId = 686057;
+
     console.log(this.bwsId);
   },
   methods: {
+    setFileTypeOnFileUploaded: function (file) {
+      let categoryValue;
+      if (file.categories == undefined || file.categories.length == 0) {
+        //shouldn't go here never...
+        file.properties.fileTypeValue = "لم يتم إدخاله بعد";
+        return;
+      }
+      categoryValue = file.categories[0][this.categoryId + "_2"];
+
+      let lookupObj = this.fileTypes.find(
+        (element) => element.value == categoryValue
+      );
+      if (lookupObj == undefined)
+        file.properties.fileTypeValue = "قيمة غير معرفة";
+      else file.properties.fileTypeValue = lookupObj.text;
+    },
     scroll(scrollPixels) {
       const content = this.$refs.content.clientWidth;
       // content.scrollLeft -=300;
@@ -88,15 +113,14 @@ export default {
       const element = document.getElementById("content");
 
       // element.animate({scrollLeft: '=-300'},1000);
-       var scroll = scrollPixels/10; 
-       var scrolled = 0;
-     const interval=  setInterval(() => {
+      var scroll = scrollPixels / 10;
+      var scrolled = 0;
+      const interval = setInterval(() => {
         element.scrollLeft += scroll;
         scrolled += scroll;
-       if(scrolled ==scrollPixels){
-         clearInterval(interval);
-
-       }
+        if (scrolled == scrollPixels) {
+          clearInterval(interval);
+        }
       }, 20);
     },
     scrollRight() {
@@ -170,7 +194,9 @@ export default {
       let nodesResponse, attachmentSortResponse;
       try {
         nodesResponse = await Http.get(
-          "/document/list/" + this.bwsId + "?fields=properties"
+          "/document/list/" +
+            this.bwsId +
+            "?fields=properties&fields=categories"
         );
         attachmentSortResponse = await Http.get("/document/sort", {
           params: {
@@ -182,31 +208,32 @@ export default {
         console.log(e);
       }
       if (!nodesResponse) return;
-      let nodeResults = nodesResponse.data.data.results;
+      nodesResponse = nodesResponse.data.data;
       this.attachmentSortList = attachmentSortResponse.data.data;
 
-      nodeResults.forEach((val) => {
+      nodesResponse.forEach((val) => {
         let attachmentSortElementObj;
         if (
           (attachmentSortElementObj = this.attachmentSortList.find(
-            (attachmentElement) =>
-              attachmentElement.fileId == val.data.properties.id
+            (attachmentElement) => attachmentElement.fileId == val.properties.id
           )) != null
         ) {
-          val.data.properties.position = attachmentSortElementObj.position;
+          val.properties.position = attachmentSortElementObj.position;
           attachmentSortElementObj.exists = true;
         }
+        //TODO move to function
+        this.setFileTypeOnFileUploaded(val);
       });
-      nodeResults.sort((a, b) =>
-        a.data.properties.position > b.data.properties.position ? 1 : -1
+      nodesResponse.sort((a, b) =>
+        a.properties.position > b.properties.position ? 1 : -1
       );
       let itemsToPost = [];
-      nodeResults.forEach((val, i) => {
+      nodesResponse.forEach((val, i) => {
         // noinspection EqualityComparisonWithCoercionJS
-        if (val.data.properties.position == undefined) {
-          val.data.properties.position = i;
+        if (val.properties.position == undefined) {
+          val.properties.position = i;
           let itemToPost = {
-            fileId: val.data.properties.id,
+            fileId: val.properties.id,
             bwsId: this.bwsId,
             requestEntityId: this.requestEntityId,
             position: i,
@@ -241,9 +268,8 @@ export default {
           console.log(e);
         }
       }
-      nodeResults.forEach((val) =>
-        this.filesUploaded.push(val.data.properties)
-      );
+      this.filesUploaded = [];
+      nodesResponse.forEach((val) => this.filesUploaded.push(val));
     },
 
     updateMultipleAttachmentSortRecords: function (arr) {
@@ -251,8 +277,24 @@ export default {
         .then(() => console.log("finished updating position in backend"))
         .catch((reason) => console.error(reason));
     },
+        openVersionsPopup: function (file) {
+
+      this.$observable.fire("openVersionsModal", file)
+
+      console.log(file);
+    }
   },
-  mounted() {
+  async mounted() {
+    let lookups = await this.getLookupByCategory("attachmentFileType");
+    console.log(lookups, this.$i18n.locale);
+    let langKey = this.$i18n.locale == "ar" ? "arValue" : "enValue";
+    this.fileTypes = Array.from(lookups).map((element) => {
+      return {
+        text: element[langKey],
+        value: element["key"],
+      };
+    });
+
     this.listFiles();
   },
 };

@@ -36,16 +36,6 @@
       v-model="drawer"
       app
     >
-      <!-- <v-list-item>
-        <v-list-item-content>
-          <v-list-item-title class="bar-item">
-            <div class="bar-icon-wrapper">
-              <i class="far fa-edit"></i>
-            </div>
-            <span>{{ page }}</span>
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item> -->
       <v-list dense>
         <v-list-item
           v-for="item in items"
@@ -77,25 +67,12 @@
               :key="i"
               link
             >
-              <!-- <v-list-item-icon>
-                <v-icon style="font-size:24px" v-text="option.icon"></v-icon>
-              </v-list-item-icon> -->
               <v-list-item-title class="group-item-title">
                 <i :class="option.icon"></i>
                 <span>{{ option.title }}</span></v-list-item-title
               >
             </v-list-item>
-            <!-- <v-list-group :value="true" no-action sub-group>
-              <template v-slot:activator>
-                <v-list-item-content>
-                  <v-list-item-title>Admin</v-list-item-title>
-                </v-list-item-content>
-                
-              </template>
-            </v-list-group> -->
           </v-list-group>
-
-          <!-- <div v-if="item.options" v-for="item" ></div> -->
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -120,23 +97,25 @@ export default {
         {
           title: "المهام",
           icon: "fas fa-bolt",
-          action:this.about,
+          action: this.about,
           options: [
             {
               title: "إنشاء وارد جديد",
               icon: "far fa-edit",
               action: this.process,
             },
-            { title: "تسجيل موضوع", icon: "far fa-edit",action: this.about },
-            { title: "إنشاء تكليف", icon: "far fa-edit",action: this.about },
-            { title: "شاشة التوجيهات", icon: "far fa-edit",action: this.about },
-
+            { title: "تسجيل موضوع", icon: "far fa-edit", action: this.about },
+            { title: "إنشاء تكليف", icon: "far fa-edit", action: this.about },
+            {
+              title: "شاشة التوجيهات",
+              icon: "far fa-edit",
+              action: this.about,
+            },
           ],
         },
         { title: "التقارير", icon: "fas fa-chart-pie", action: this.about },
         { title: "Logout", icon: "fas fa-sign-out-alt", action: this.logout },
       ],
-
     };
   },
   methods: {
@@ -179,13 +158,13 @@ export default {
   align-items: center;
   background-color: rgba(7, 104, 159, 0.05);
   height: 40px;
-    /* font-weight: bold !important; */
+  /* font-weight: bold !important; */
 
   border-radius: 5px;
   padding: 16px;
 }
 .bar-group-item-title {
-    /* font-weight: bold !important; */
+  /* font-weight: bold !important; */
 
   display: flex;
   justify-content: flex-start;
@@ -195,8 +174,6 @@ export default {
 }
 
 .bar-group {
-
-
   background-color: rgba(7, 104, 159, 0.05) !important;
   /* margin: 10px;
   height: 40px;

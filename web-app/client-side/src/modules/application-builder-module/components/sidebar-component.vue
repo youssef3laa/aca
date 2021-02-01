@@ -1,6 +1,6 @@
 <template>
   <div class="sidebar-wrapper">
-    <div v-for="(d,key) in data" :key="key" class="sidebar-item">
+    <div v-for="(d,key) in data" :key="key" @click="btnClicked(d.action)" class="sidebar-item">
       <span> <span> {{d.name}}</span> {{d.number}}</span>
       <div class="icon-wrapper">
      <i :class=d.icon></i>
@@ -15,10 +15,15 @@ export default {
   props:["val","field"],
   data(){
     return{
-        data:[{name:"الوارد",number:21, icon:"fas fa-download"},{name:"الصادر",number:34, icon:"far fa-paper-plane"},
+        data:[{name:"الوارد",number:21, icon:"fas fa-download",action:"viewReceived"},{name:"المرسل",number:34, icon:"far fa-paper-plane",action:"viewSent"},
         ]
     };
   },
+  methods:{
+    btnClicked(action){
+      this.$emit('btnClicked',action);
+    }
+  }
   
 };
 </script>

@@ -66,7 +66,7 @@ export default {
                   {
                     inputs: [
                       {
-                        type: "TableComponent",
+                        type: "DataTableComponent",
                         name: "taskTable",
                         subscribe: "tasks",
                         col: 12,

@@ -10,11 +10,6 @@ import com.asset.appwork.repository.ApprovalHistoryRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by Bassel on 28/12/2020.
@@ -37,6 +31,8 @@ public class ApprovalHistoryController {
     TokenService tokenService;
     @Autowired
     CordysService cordysService;
+
+    //TODO make approval history service and move repository to it
     @Autowired
     ApprovalHistoryRepository historyRepository;
 
@@ -74,7 +70,7 @@ public class ApprovalHistoryController {
 
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            Page<ApprovalHistory> histories = historyRepository.findByProcessNameAndEntityId(processName, entityId, PageRequest.of(pageNumber, pageSize));
+            Page<ApprovalHistory> histories = historyRepository.findByProcessNameAndEntityIdOrderByApprovalDateDesc(processName, entityId, PageRequest.of(pageNumber, pageSize));
             if(histories.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
 
             respBuilder.info("totalCount", histories.getTotalElements());
@@ -90,4 +86,5 @@ public class ApprovalHistoryController {
         }
         return respBuilder.build().getResponseEntity();
     }
+
 }

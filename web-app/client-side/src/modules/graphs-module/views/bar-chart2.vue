@@ -19,6 +19,11 @@ export default {
             backgroundColor: "purple",
             data: [30, 40, 100, 120, 2000],
           },
+           {
+            label: "تقييم",
+            backgroundColor: "purple",
+            data: [30, 40, 100, 120, 2000],
+          },
         ],
       },
     };
