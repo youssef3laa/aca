@@ -629,16 +629,14 @@ export default {
         });
       });
       this.$observable.subscribe("unitsTable_add", () => {
-        this.$observable.fire("openModal", {
-          modalId: "addUnitModal",
+        this.$observable.fire("addUnitModal", {
           action: "add",
         })
       });
       this.$observable.subscribe("unitsTable_edit", (data) => {
         data.item.parentCode = (data.item.parent.length > 0) ? data.item.parent[0].name : null;
         this.$refs.appBuilder.setModelData("editUnitModal", data.item)
-        this.$observable.fire("openModal", {
-          modalId: "editUnitModal",
+        this.$observable.fire("editUnitModal", {
           action: "edit",
           obj: data.item,
         })
@@ -700,16 +698,14 @@ export default {
         });
       });
       this.$observable.subscribe("rolesTable_add", () => {
-        this.$observable.fire("openModal", {
-          modalId: "addRoleModal",
+        this.$observable.fire("addRoleModal", {
           action: "add",
         })
       });
       this.$observable.subscribe("rolesTable_edit", (data) => {
         data.item.unitCode = (data.item.unit !== undefined) ? data.item.unit.name : null;
         this.$refs.appBuilder.setModelData("editRoleModal", data.item)
-        this.$observable.fire("openModal", {
-          modalId: "editRoleModal",
+        this.$observable.fire("editRoleModal", {
           action: "edit",
           obj: data.item,
         })
@@ -765,8 +761,7 @@ export default {
         });
       });
       this.$observable.subscribe("usersTable_add", () => {
-        this.$observable.fire("openModal", {
-          modalId: "addUserModal",
+        this.$observable.fire("addUserModal", {
           action: "add",
         })
       });
@@ -778,8 +773,7 @@ export default {
           "groupCode": (data.item.groups.length > 0)? data.item.groups[0].name: null,
         };
         this.$refs.appBuilder.setModelData("editUserModal", data.item);
-        this.$observable.fire("openModal", {
-          modalId: "editUserModal",
+        this.$observable.fire("editUserModal", {
           action: "edit",
           obj: data.item,
         })
