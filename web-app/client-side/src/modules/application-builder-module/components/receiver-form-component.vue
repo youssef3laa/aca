@@ -108,6 +108,8 @@
             },
             onChangeAgency: function(event) {
                 if(this.field.readonly || this.agency.field.readonly) return
+                this.agencySelected = null
+                this.sector.val = this.getAutocompleteVal('')
                 if (event.value.value) {
                     this.agencySelected = event.value.value.object
                     if(this.direction && this.direction.includes("up")){
@@ -116,9 +118,6 @@
                     else if(this.checkCanSelectNext(event.value.value.value,"AGN")) {
                         this.sector.val = this.getAutocompleteVal('org/unit/' + event.value.value.value + '/down/all/unitTypeCode/SCT')
                     }
-                } else {
-                    this.agencySelected = null
-                    this.sector.val = this.getAutocompleteVal('')
                 }
                 this.office.val = this.getAutocompleteVal('')
                 this.group.val = this.getAutocompleteVal('')
@@ -159,9 +158,9 @@
                 this.onValueChange()
             },
             onChangeGroup: function(event) {
+                if(this.field.readonly || this.group.field.readonly) return
                 this.groupSelected = null
                 this.member.val = this.getAutocompleteVal('')
-                if(this.field.readonly || this.group.field.readonly) return
                 if (event.value.value) {
                     this.groupSelected = event.value.value.object
                     if(this.direction && this.direction.includes("up")){
