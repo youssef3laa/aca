@@ -67,6 +67,21 @@ public class OrgChartService {
     public void deleteUnit(Long id) throws AppworkException {
         // TODO: Find solution to the Transaction Exception Roll back overriding AppworkException
         try {
+            Unit unit = getUnit(id);
+            List<Unit> children = (List<Unit>) unit.getChild();
+            List<Unit> parent = (List<Unit>) unit.getParent();
+            unit.setParent(Collections.emptyList());
+            unit.setChild(Collections.emptyList());
+            unitRepository.save(unit);
+            children.forEach(child -> {
+                try {
+                    addSubUnitToUnit(parent.get(0).getId(), child.getId());
+                } catch (AppworkException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
+                }
+            });
+
             unitRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
             throw new AppworkException("No Unit of Id " + id.toString() + " exists", ResponseCode.DELETE_ENTITY_FAILURE);
@@ -101,20 +116,17 @@ public class OrgChartService {
         return unitRepository.getUnitParentsRecursivelyFilteredByUnitTypeCode(childUnitCode, unitTypeCode, PageRequest.of(page, size));
     }
 
-    public void addSubUnitToUnit(Account account, Long id, Long subUnitId) throws AppworkException {
-//        Unit unit = getUnit(subUnitId);
-//        unit.setParent(Collections.emptyList());
-//        unitRepository.save(unit);
-        Member.TargetId targetId = new Member.TargetId(subUnitId);
-        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
-                "OrganizationalUnit").addRelation(id, "SubUnits", Collections.singletonList(targetId).toString());
+    public void addSubUnitToUnit(Long id, Long subUnitId) throws AppworkException {
+        Unit unit = getUnit(subUnitId);
+        unit.setParent(new ArrayList<>(List.of(getUnit(id))));
+        unitRepository.save(unit);
     }
 
-    public void addSubUnitToUnit(Account account, String parentUnitCode, String subUnitCode) throws AppworkException {
+    public void addSubUnitToUnit(String parentUnitCode, String subUnitCode) throws AppworkException {
         Long id = getUnitByName(parentUnitCode).getId();
         Long subUnitId = getUnitByName(subUnitCode).getId();
 
-        addSubUnitToUnit(account, id, subUnitId);
+        addSubUnitToUnit(id, subUnitId);
     }
 
     public Position createPosition(Account account, Long unitId, String props) throws AppworkException {
@@ -347,18 +359,33 @@ public class OrgChartService {
         }
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
                 "Group").update(group.getId(), Group.fromString(props).toPlatformString());
+
         return getGroup(group.getId());
+    }
+
+    public List<Group> updateGroupAndGetBoth(Account account, Long id, String props) throws AppworkException {
+        return new ArrayList<>(List.of(getGroup(id), updateGroup(account, id, props)));
     }
 
     public void updateGroupUnitRelation(Account account, Long id, String props) throws AppworkException {
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group")
                 .addRelation(id, "Unit", props);
         Group group = getGroup(id);
-        Position position = new Position();
-        position.setName(group.getName());
-        position.setDescription(group.getDescription());
-        position.setIsLead(group.getIsHeadRole());
-        createPosition(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), position.toPlatformString());
+        Position position;
+
+        try {
+            position = getPositionByName(group.getName());
+            position.setName(group.getName());
+            position.setDescription(group.getDescription());
+            position.setIsLead(group.getIsHeadRole());
+            updatePosition(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), position.getId(), position.toPlatformString());
+        } catch (AppworkException e) {
+            position = new Position();
+            position.setName(group.getName());
+            position.setDescription(group.getDescription());
+            position.setIsLead(group.getIsHeadRole());
+            createPosition(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), position.toPlatformString());
+        }
     }
 
     public void updateGroupUnitRelationByCodes(Account account, String groupCode, String unitCode) throws AppworkException {
@@ -407,6 +434,10 @@ public class OrgChartService {
         return userRepository.findById(id).orElseThrow(
                 () -> new AppworkException("Could not get User of id " + id, ResponseCode.READ_ENTITY_FAILURE)
         );
+    }
+
+    public User getLoggedInUser(Account account) throws AppworkException {
+        return getUserByUserId(account.getUsername() + "@" + env.getProperty("otds.partition"));
     }
 
     public User getUserByUserId(String userId) throws AppworkException {

@@ -32,14 +32,14 @@ public class Unit extends BaseIdentity<Unit> {
 //    @JsonProperty("positions")
     @JsonIgnore
     Collection<Position> position;
-    @ManyToMany(mappedBy = "child", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-//    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = "O9OpenTextEntityIdentityComponentsOrganizationalUnitOrganizationalUnit",
-//            joinColumns = {@JoinColumn(name = "OrganizationalUnit_Id")},
-//            inverseJoinColumns = {@JoinColumn(name = "OrganizationIdA7A9FD625B78137F")},
-//            uniqueConstraints = {@UniqueConstraint(columnNames = {"OrganizationIdA7A9FD625B78137F", "OrganizationalUnit_Id"})}
-//    )
+//    @ManyToMany(mappedBy = "child", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "O9OpenTextEntityIdentityComponentsOrganizationalUnitOrganizationalUnit",
+            joinColumns = {@JoinColumn(name = "OrganizationalUnit_Id")},
+            inverseJoinColumns = {@JoinColumn(name = "OrganizationIdA7A9FD625B78137F")},
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"OrganizationIdA7A9FD625B78137F", "OrganizationalUnit_Id"})}
+    )
 //    @JsonIgnore
 //    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 //    @JsonIdentityReference(alwaysAsId=true)
