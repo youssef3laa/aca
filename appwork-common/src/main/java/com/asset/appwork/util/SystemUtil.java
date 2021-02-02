@@ -24,6 +24,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -31,8 +32,16 @@ import java.util.*;
  */
 public class SystemUtil {
 
+
+    public static Object[] unpackObjectToArrayOfObjects(Object array) {
+        Object[] array2 = new Object[Array.getLength(array)];
+        for (int i = 0; i < array2.length; i++)
+            array2[i] = Array.get(array, i);
+        return array2;
+    }
+
     public static ResponseCode getResponseCodeFromInt(Integer code) {
-        if(code == null) return null;
+        if (code == null) return null;
         for (ResponseCode c : ResponseCode.values()) {
             if (c.getCode() == code) {
                 return c;
@@ -59,12 +68,12 @@ public class SystemUtil {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(json);
         jsonNode = jsonNode.get(name);
-        if(jsonNode != null){
-            if(jsonNode.isArray()){
+        if (jsonNode != null) {
+            if (jsonNode.isArray()) {
                 return mapper.convertValue(jsonNode, ArrayList.class);
-            }else{
+            } else {
                 ArrayList<LinkedHashMap> arrayList = new ArrayList<>();
-                arrayList.add(mapper.convertValue(jsonNode,LinkedHashMap.class));
+                arrayList.add(mapper.convertValue(jsonNode, LinkedHashMap.class));
                 return arrayList;
             }
         }
@@ -75,13 +84,13 @@ public class SystemUtil {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(json);
         jsonNode = jsonNode.get(name);
-        if(jsonNode != null){
-            if(jsonNode.isArray()){
+        if (jsonNode != null) {
+            if (jsonNode.isArray()) {
                 return mapper.convertValue(jsonNode, mapper.getTypeFactory().constructCollectionType(List.class, type));
 //                return mapper.convertValue(jsonNode, List.class);
-            }else{
+            } else {
                 ArrayList<T> arrayList = new ArrayList<>();
-                arrayList.add(mapper.convertValue(jsonNode,type));
+                arrayList.add(mapper.convertValue(jsonNode, type));
                 return arrayList;
             }
         }
@@ -205,7 +214,7 @@ public class SystemUtil {
 
     public static String getJsonByPtrExpr(String json, String jsonPtrExpr) {
         try {
-            return  new ObjectMapper().readTree(json).at(jsonPtrExpr).asText();
+            return new ObjectMapper().readTree(json).at(jsonPtrExpr).asText();
         } catch (JsonProcessingException e) {
             return "";
         }
@@ -213,7 +222,7 @@ public class SystemUtil {
 
     public static String getJsonObjectByPtrExpr(String json, String jsonPtrExpr) {
         try {
-            return  new ObjectMapper().readTree(json).at(jsonPtrExpr).toString();
+            return new ObjectMapper().readTree(json).at(jsonPtrExpr).toString();
         } catch (JsonProcessingException e) {
             return "{}";
         }

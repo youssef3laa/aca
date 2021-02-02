@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+
 public class AppworkCSOperations {
 
     // content server host
@@ -54,7 +55,7 @@ public class AppworkCSOperations {
         return http;
     }
 
-    public Http deleteNode(Long nodeId) throws AppworkException {
+    public void deleteNode(Long nodeId) throws AppworkException {
         String urlStr = CS_API.NODE_ACTION.getApiURL() + "/" +
                 nodeId;
         Http http = new Http().setDoAuthentication(true)
@@ -63,10 +64,16 @@ public class AppworkCSOperations {
                 .delete(urlStr);
         if (!http.isSuccess())
             throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
-        return http;
     }
 
     public Http uploadDocument(CreateNode createNode) throws AppworkException, IllegalAccessException, NoSuchFieldException, IOException {
+
+        Document resultDocument = checkIfDocumentAlreadyExists(createNode.getParent_id(),
+                createNode.getName(),
+                createNode.getType());
+        if (resultDocument != null) {
+            throw new AppworkException(ResponseCode.DUPLICATION_CONFLICT);
+        }
 
         Class<CreateNode> createNodeClass = CreateNode.class;
 
@@ -90,14 +97,6 @@ public class AppworkCSOperations {
             }
         }
         String urlStr = CS_API.NODE_ACTION.getApiURL();
-//        Part[] parts =
-//                {
-//                        new FilePart("file", new ByteArrayPartSource(createNode.getName(), createNode.getFile().getBytes())),
-//                        new StringPart("name", createNode.getName()),
-//                        new StringPart("parent_id", String.valueOf(createNode.getParent_id())),
-//                        new StringPart("type", String.valueOf(createNode.getType()))
-//                };
-
         Part[] partsArray = new Part[parts.size()];
         partsArray = parts.toArray(partsArray);
         Http http = new Http().setDoAuthentication(true)
@@ -106,7 +105,7 @@ public class AppworkCSOperations {
                 .setData(partsArray)
                 .post(urlStr);
         if (!http.isSuccess())
-            throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+            throw new AppworkException(http.getResponse(), ResponseCode.INTERNAL_SERVER_ERROR);
 
         return http;
     }
@@ -139,25 +138,30 @@ public class AppworkCSOperations {
     }
 
     //versioning
-    public Http getNodeVersions(Long nodeId, DocumentQuery documentQuery) throws IllegalAccessException {
+    public Http getNodeVersions(Long nodeId, DocumentQuery documentQuery) throws IllegalAccessException, AppworkException {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(CS_API.GET_NODES_VERSIONS.getApiURL());
-        Class<DocumentQuery> cls = DocumentQuery.class;
-        Field[] fields = cls.getDeclaredFields();
-        String fieldName;
-        for (Field field : fields) {
-            fieldName = field.getName();
-            JsonProperty[] jsonProperties = field.getAnnotationsByType(JsonProperty.class);
-            if (jsonProperties.length > 0) fieldName = jsonProperties[0].value();
-
-            uriComponentsBuilder.queryParamIfPresent(fieldName, Optional.ofNullable(field.get(documentQuery)));
-        }
+        fillURIComponentWithQuery(uriComponentsBuilder, documentQuery);
+//        Class<DocumentQuery> cls = DocumentQuery.class;
+//        Field[] fields = cls.getDeclaredFields();
+//        String fieldName;
+//        for (Field field : fields) {
+//            fieldName = field.getName();
+//            JsonProperty[] jsonProperties = field.getAnnotationsByType(JsonProperty.class);
+//            if (jsonProperties.length > 0) fieldName = jsonProperties[0].value();
+//
+//            uriComponentsBuilder.queryParamIfPresent(fieldName, Optional.ofNullable(field.get(documentQuery)));
+//        }
         System.out.println(uriComponentsBuilder);
         Map<String, Long> pathVariables = new HashMap<>();
         pathVariables.put("id", nodeId);
-        return new Http().setDoAuthentication(true)
+
+        Http http = new Http().setDoAuthentication(true)
                 .basicAuthentication(this.userName, this.password)
                 .setContentType(Http.ContentType.JSON_REQUEST)
                 .get(uriComponentsBuilder.encode().buildAndExpand(pathVariables).toString());
+        if (!http.isSuccess())
+            throw new AppworkException(http.getResponse(), ResponseCode.INTERNAL_SERVER_ERROR);
+        return http;
     }
 
     public Http getSpecifiedNodeVersion(Long nodeId, Integer versionId, DocumentQuery documentQuery) throws IllegalAccessException, AppworkException {
@@ -197,7 +201,7 @@ public class AppworkCSOperations {
                 .put(uriComponentsBuilder.encode().buildAndExpand(pathVariables).toString());
 
         if (!http.isSuccess())
-            throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+            throw new AppworkException(http.getResponse(), ResponseCode.INTERNAL_SERVER_ERROR);
 
         return http;
     }
@@ -212,7 +216,15 @@ public class AppworkCSOperations {
             fieldName = field.getName();
             JsonProperty[] jsonProperties = field.getAnnotationsByType(JsonProperty.class);
             if (jsonProperties.length > 0) fieldName = jsonProperties[0].value();
-            uriComponentsBuilder.queryParamIfPresent(fieldName, Optional.ofNullable(field.get(documentQuery)));
+            Optional<Object> o = Optional.ofNullable(field.get(documentQuery));
+            if (o.isPresent() && o.get().getClass().isArray()) {
+
+                Object[] objects = SystemUtil.unpackObjectToArrayOfObjects(o.get());
+                for (Object object :
+                        objects) {
+                    uriComponentsBuilder.queryParam(fieldName, object);
+                }
+            }
         }
     }
 
@@ -224,7 +236,7 @@ public class AppworkCSOperations {
         DocumentQuery documentQuery = new DocumentQuery();
         documentQuery.setWhere_type(String.valueOf(type));
         documentQuery.setWhere_name(name);
-        documentQuery.setFields("properties{id}");
+//        documentQuery.setFields("properties");
         fillURIComponentWithQuery(uriComponentsBuilder, documentQuery);
         Map<String, Object> pathVariables = new HashMap<>();
         pathVariables.put("id", ParentId);
@@ -239,7 +251,8 @@ public class AppworkCSOperations {
         ArrayNode jsonArray = jsonNode.withArray("results");
         if (jsonArray.size() == 0) return null;
         if (jsonArray.size() == 1)
-            return objectMapper.treeToValue(jsonArray.get(0).get("data").get("properties"), Document.class);
+            return objectMapper.treeToValue(jsonArray.get(0).get("data"), Document.class);
+            // should never happens 100%
         else
             throw new AppworkException("there are more than on file with the same name", ResponseCode.DUPLICATION_CONFLICT);
     }
@@ -288,7 +301,7 @@ public class AppworkCSOperations {
         String where_name;
 
         String sort;
-        String fields;
+        String[] fields;
         String page;
         String limit;
         String order;

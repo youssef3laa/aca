@@ -19,7 +19,6 @@ import java.util.Optional;
 @Service
 public class AttachmentSortService {
 
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     AttachmentSortRepository attachmentSortRepository;
 

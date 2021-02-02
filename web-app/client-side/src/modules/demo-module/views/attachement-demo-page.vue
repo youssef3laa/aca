@@ -44,73 +44,56 @@ export default {
                 "tabId": "1",
                 "isTab": true,
                 "isCard": true,
-                "type": "Resizable",
+                "type": "DefaultSection",
                 "display": "block",
                 "forms": [
                   {
-                    "resizable": {
-                      "forms": [
-                        {
-                          "key": "iframeObj",
-                          "background": "white",
-                          "inputs": [
-                            {
-                              "type": "IframeComponent",
-                              "name": "iframeObj",
-                              "col": 12
-                            }
-                          ],
-                          "model": {
-                            "iframeObj": {
-                              "src": ""
-                            }
-                          }
-                        },
-                        {
-                          "background": "white",
-                          "inputs": [
-                            {
-                              "type": "InputFileComponent",
-                              "name": "inputFile",
-                              "col": 12
-                            }
-                          ],
-                          "model": {
-                            "inputFile": ""
-                          }
-                        }
-                      ]
-                    },
+                    "key": "AttachmentComponent",
+                    "inputs": [
+                      {
+                        "type": "AttachmentComponent",
+                        "name": "attachmentComponent",
+                        "col": 12
+                      }
+                    ],
+                    "model": {}
+
+                    // "resizable": {
+                    //   "forms": [
+                    //     {
+                    //       "key": "iframeObj",
+                    //       "background": "white",
+                    //       "inputs": [
+                    //         {
+                    //           "type": "IframeComponent",
+                    //           "name": "iframeObj",
+                    //           "col": 12
+                    //         }
+                    //       ],
+                    //       "model": {
+                    //         "iframeObj": {
+                    //           "src": ""
+                    //         }
+                    //       }
+                    //     },
+                    //     {
+                    //       "background": "white",
+                    //       "inputs": [
+                    //         {
+                    //           "type": "InputFileComponent",
+                    //           "name": "inputFile",
+                    //           "col": 12
+                    //         }
+                    //       ],
+                    //       "model": {
+                    //         "inputFile": ""
+                    //       }
+                    //     }
+                    //   ]
+                    // },
                   }
                 ],
               },
-              {
-                key: 'versionsModal',
-                type: 'ModalSection',
-                name: 'versionsModal',
-                isCard: true,
-                forms: [
-                  {
-                    modalTitle: 'اسم الملف يكتب هنا',
-                    key: 'fileVersionsModal',
-                    modalId: 'versionModal',
-                    inputs: [
-                      {
-                        type: 'VersionGridComponent',
-                        name: 'versionGrid',
-                        col: '12',
-                      },
-                    ],
-                    model: {
-                      versionGrid: {
-                        nodeId: ''
-                      },
-                    },
-                  },
-
-                ],
-              },
-
             ],
           },
         ],

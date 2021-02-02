@@ -46,12 +46,6 @@ public class DocumentsController {
     @Autowired
     Environment environment;
 
-    //    @PostMapping("/upload")
-//    public ResponseEntity<AppResponse<JsonNode>> uploadFile(@RequestHeader("X-Auth-Token") String token,
-//                                                            @RequestParam("file") MultipartFile file,
-//                                                            @RequestParam("parentId") Long parentId,
-//                                                            @RequestParam("name") String name) {
-
     @PostMapping("/upload")
     public ResponseEntity<AppResponse<Document>> uploadFile(@RequestHeader("X-Auth-Token") String token,
                                                             CreateNode createNode) {
@@ -61,27 +55,10 @@ public class DocumentsController {
             if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
             try {
-//                CreateNode createNode = new CreateNode();
-//                createNode.setFile(file.getBytes());
-//                createNode.setName(name);
-//                createNode.setParentId(parentId);
                 createNode.setType(144);
-
-                //TODO move below code to service
-                Document resultDocument = appworkCSOperations.checkIfDocumentAlreadyExists(createNode.getParent_id(),
-                        createNode.getName(),
-                        144);
-                if (resultDocument != null) {
-//                    document.setId(nodeId);
-                    respBuilder.status(ResponseCode.SUCCESS);
-                    respBuilder.data(resultDocument);
-                    return respBuilder.build().getResponseEntity();
-                }
-                Document document = new Document();
+                Document document;
                 Http http = appworkCSOperations.
                         uploadDocument(createNode);
-                System.out.println(http.getResponse());
-                System.out.println(http.getStatusCode());
                 ObjectMapper mapper = new ObjectMapper();
                 document = mapper.treeToValue(mapper.readTree(http.getResponse()).get("results").get("data"), Document.class);
                 respBuilder.status(ResponseCode.SUCCESS);
@@ -98,7 +75,7 @@ public class DocumentsController {
             }
         } catch (AppworkException e) {
             log.error(e.getMessage());
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            respBuilder.status(e.getCode());
         }
 
         return respBuilder.build().getResponseEntity();
@@ -113,30 +90,11 @@ public class DocumentsController {
             if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
             try {
-//                CreateNode createNode = new CreateNode();
-//                createNode.setFile(file.getBytes());
-//                createNode.setName(name);
-//                createNode.setParentId(parentId);
                 createNode.setType(0);
-
-
-                // TODO move below code to service
-                // TODO to be refactored
-
-                Document document = appworkCSOperations.checkIfDocumentAlreadyExists(createNode.getParent_id(),
-                        createNode.getName(),
-                        0);
-                if (document != null) {
-                    respBuilder.status(ResponseCode.SUCCESS);
-                    respBuilder.data(document);
-                    return respBuilder.build().getResponseEntity();
-                }
                 Http http = appworkCSOperations.
                         uploadDocument(createNode);
-                System.out.println(http.getResponse());
-                System.out.println(http.getStatusCode());
                 ObjectMapper mapper = new ObjectMapper();
-                document = mapper.treeToValue(mapper.readTree(http.getResponse()).get("results").get("data"), Document.class);
+                Document document = mapper.treeToValue(mapper.readTree(http.getResponse()).get("results").get("data"), Document.class);
                 respBuilder.status(ResponseCode.SUCCESS);
                 respBuilder.data(document);
             } catch (IllegalAccessException | NoSuchFieldException e) {
@@ -151,12 +109,6 @@ public class DocumentsController {
         } catch (AppworkException e) {
             log.error(e.getMessage());
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-//            try {
-//                respBuilder.data(new ObjectMapper().readTree(e.getMessage()));
-//            } catch (JsonProcessingException jsonProcessingException) {
-//                jsonProcessingException.printStackTrace();
-//            }
-
         }
 
         return respBuilder.build().getResponseEntity();
@@ -203,7 +155,6 @@ public class DocumentsController {
             List<Document> documentList = new ArrayList<>();
             while (results.hasNext()) {
                 JsonNode dataNode = results.next();
-//                Document document=
                 documentList.add(mapper.treeToValue(dataNode.get("data"), Document.class));
             }
             respBuilder.data(documentList);
@@ -224,14 +175,10 @@ public class DocumentsController {
         try {
             Account account = tokenService.get(token);
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
-            Http http = appworkCSOperations.deleteNode(nodeId);
-            respBuilder.status(SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+            appworkCSOperations.deleteNode(nodeId);
+            respBuilder.status(ResponseCode.SUCCESS);
         } catch (AppworkException e) {
             e.printStackTrace();
-            ObjectNode obj = new ObjectNode(JsonNodeFactory.instance);
-            obj.put("error", e.getMessage());
-            obj.put("statusCode", e.getCode().getCode());
-            respBuilder.data(obj);
             respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
@@ -479,21 +426,6 @@ public class DocumentsController {
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
             uploadNodeAndSetCategory.setType(144);
 
-            //TODO move below code to service
-            Document document = appworkCSOperations.checkIfDocumentAlreadyExists(uploadNodeAndSetCategory.getParent_id(),
-                    uploadNodeAndSetCategory.getName(),
-                    144);
-            if (document != null) {
-                ObjectMapper mapper = new ObjectMapper();
-                //TODO optimize
-                Map<String, String> result = mapper.convertValue(mapper.readTree(uploadNodeAndSetCategory.getCategoriesMap()), new TypeReference<>() {
-                });
-                appworkCSOperations.updateCategoryOnNode(document.getProperties().getId(), uploadNodeAndSetCategory.getCategory_id(), result);
-                respBuilder.status(ResponseCode.SUCCESS);
-                respBuilder.data(document);
-                return respBuilder.build().getResponseEntity();
-            }
-
             CreateNode createNode = new CreateNode();
             createNode.setType(144);
             createNode.setName(uploadNodeAndSetCategory.getName());
@@ -501,9 +433,6 @@ public class DocumentsController {
             createNode.setParent_id(uploadNodeAndSetCategory.getParent_id());
             Http http = appworkCSOperations.
                     uploadDocument(createNode);
-            System.out.println(http.getResponse());
-            System.out.println(http.getStatusCode());
-
             ObjectMapper mapper = new ObjectMapper();
             Document documentResult = mapper.treeToValue(mapper.readTree(http.getResponse()).get("results").get("data"), Document.class);
 
@@ -511,8 +440,8 @@ public class DocumentsController {
             Map<String, String> result = mapper.convertValue(mapper.readTree(uploadNodeAndSetCategory.getCategoriesMap()), new TypeReference<>() {
             });
 
-            documentResult.setCategories(List.of((LinkedHashMap<String, String>) result));
             appworkCSOperations.updateCategoryOnNode(documentResult.getProperties().getId(), uploadNodeAndSetCategory.getCategory_id(), result);
+            documentResult.setCategories(List.of((LinkedHashMap<String, String>) result));
             respBuilder.status(ResponseCode.SUCCESS);
             respBuilder.data(documentResult);
         } catch (AppworkException e) {
@@ -526,8 +455,4 @@ public class DocumentsController {
         }
         return respBuilder.build().getResponseEntity();
     }
-
-//    uploadThenUpdateCategory
-
-
 }
