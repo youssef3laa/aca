@@ -17,12 +17,23 @@
             "page": "generalProcess-early",
             "nextStep": {
                 "comment": "stepRQ",
+                "responsible": "responsible",
                 "multiple": "parallel1"
+            }
+        },
+        "responsible": {
+            "router": {
+                "fields": ["comment"],
+                "receiverTypes": ["single"]
+            },
+            "page": "generalProcess-early",
+            "nextStep": {
+                "comment": "stepRQ"
             }
         },
         "parallel1": {
             "router": {
-                "fields": ["comment","opinion"]
+                "fields": ["comment"]
             },
             "page": "generalProcess-early",
             "nextStep": {
