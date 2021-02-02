@@ -1,5 +1,6 @@
 package com.asset.appwork.schema;
 
+import com.asset.appwork.dto.Assignees;
 import com.asset.appwork.dto.Router;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.util.SystemUtil;
@@ -10,10 +11,11 @@ import java.util.List;
 
 @Data
 public class OutputSchema<T> {
+    Boolean breakProcess;
+    Boolean addApproval;
     String taskId;
     String process;
     String stepId;
-    Boolean breakProcess;
     String subBP;
     String entityName;
     String entityId;
@@ -22,13 +24,12 @@ public class OutputSchema<T> {
     String parentHistoryId;
     String decision;
     String comment;
-    Boolean addApproval;
     String code;
     String assignedCN;
     String receiverType;
-    HashMap<String, T> assignees = new HashMap<>();
-    HashMap<String,T> extraData = new HashMap<>();
     Router router = new Router();
+    Assignees assignees = new Assignees();
+    HashMap<String,T> extraData = new HashMap<>();
 
     public void setStepId(String stepId){
         this.breakProcess = stepId.equals("end");
