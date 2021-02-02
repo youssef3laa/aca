@@ -2,7 +2,7 @@
   <v-card
     v-if="sec.isCard"
     v-bind:style="{ background: sec.background }"
-    style="margin-bottom: 10px"
+    
     flat
   >
     <span>
@@ -80,7 +80,7 @@ export default {
   props: ['section'],
 }
 </script>
-<style>
+<style scoped>
 .actions-contianer {
   border-radius: 5px;
   background: white;
