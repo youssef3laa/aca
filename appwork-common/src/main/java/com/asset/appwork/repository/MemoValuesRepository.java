@@ -5,6 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Created by Bassel on 31/1/2021.
+ */
 @Repository
 public interface MemoValuesRepository extends GenericRepository<memoValues, String> {
     List<memoValues> findByMemosId(String memosId);
