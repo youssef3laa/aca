@@ -51,7 +51,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .tab-btn {
   padding: 6px 10px;
   background: #ffffff;
