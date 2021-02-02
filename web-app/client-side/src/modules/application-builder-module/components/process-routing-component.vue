@@ -34,12 +34,12 @@
         </v-row>
         <div style="padding: 10px" v-if="d.fields && (decisions || receiverTypes)"></div>
         <v-card outlined v-if="decisions || receiverTypes">
-            <RadioGroupComponent :field="{ name: 'decision', title: 'decision' , color: '#07689F' }"
+            <RadioGroupComponent :field="{ name: 'decision', title: 'decision' }"
                                  :val="decisions"
                                  @update="onChangeDecision"
                                  v-if="decisions"></RadioGroupComponent>
             <v-divider v-if="decisions && receiverTypes"></v-divider>
-            <RadioGroupComponent :field="{ name: 'receiver', title: 'receiver' , color: '#07689F' }"
+            <RadioGroupComponent :field="{ name: 'receiver', title: 'receiver' }"
                                  :val="receiverTypes"
                                  @update="onChangeReceiverType"
                                  v-if="receiverTypes"></RadioGroupComponent>

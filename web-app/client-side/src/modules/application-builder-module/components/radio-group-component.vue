@@ -20,7 +20,7 @@ export default {
     return {
       d: this.val,
       title: this.field.title,
-      color: this.field.color,
+      color: (this.field.color)? this.field.color:'#07689F',
       selected: null
     }
   },
