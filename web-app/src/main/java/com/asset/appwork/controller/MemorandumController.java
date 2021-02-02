@@ -1,7 +1,10 @@
 package com.asset.appwork.controller;
 
 import com.asset.appwork.config.TokenService;
+import com.asset.appwork.cs.AppworkCSOperations;
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.dto.CreateNode;
+import com.asset.appwork.dto.Document;
 import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
@@ -11,17 +14,20 @@ import com.asset.appwork.repository.MemosRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.util.Docx;
+import com.asset.appwork.util.Http;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -42,22 +48,38 @@ public class MemorandumController {
     Docx docx;
 
     @PostMapping("/create")
-    public ResponseEntity<AppResponse<String>> createMemorandum(@RequestHeader("X-Auth-Token") String token,@RequestBody() Memos memos){
+    public ResponseEntity<AppResponse<String>> createMemorandum(@RequestHeader("X-Auth-Token") String token, @RequestBody() Memos memos) {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
             String addRecordToMemorandum = cordysService.sendRequest(account, new memorandumSOAP().createMemorandum(memos));
 
             String XMLtoJSON = SystemUtil.convertXMLtoJSON(addRecordToMemorandum);
             ObjectMapper objectMapper = new ObjectMapper();
-                long id = objectMapper.readTree(XMLtoJSON).get("Body").get("CreateACA_Entity_MemosResponse").get("ACA_Entity_Memos").get("ACA_Entity_Memos-id").get("Id").asLong();
+            long id = objectMapper.readTree(XMLtoJSON).get("Body").get("CreateACA_Entity_MemosResponse").get("ACA_Entity_Memos").get("ACA_Entity_Memos-id").get("Id").asLong();
 
             String addRecordToMemorandumValues = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memos, id));
             respBuilder.data(addRecordToMemorandumValues);
-            docx.exportJsonToDocx("147459", "Test");
 
+            File file = docx.exportJsonToDocx("147459", "Test");
+
+            AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
+            CreateNode createNode = new CreateNode();
+            createNode.setType(144);
+            createNode.setName(file.getName());
+            createNode.setFile(new MockMultipartFile("file", new FileInputStream(file)));
+            //TODO get Ids from env or get them from request
+            createNode.setParent_id(680482L);
+            Http http = appworkCSOperations.uploadDocument(createNode);
+            Document documentResult = objectMapper.treeToValue(objectMapper.readTree(http.getResponse()).get("results").get("data"), Document.class);
+            LinkedHashMap<String, String> categoryLinkedHashMap = new LinkedHashMap<>();
+            categoryLinkedHashMap.put("717725_2", file.getName());
+            documentResult.setCategories(List.of(categoryLinkedHashMap));
+            Http categoryHttp = appworkCSOperations.updateCategoryOnNode(documentResult.getProperties().getId(), 717725L, categoryLinkedHashMap);
+            System.out.println(http.getResponse());
+            System.out.println(http.getStatusCode());
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -67,7 +89,17 @@ public class MemorandumController {
             e.printStackTrace();
             respBuilder.status(e.getCode());
         } catch (IOException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        } catch (IllegalAccessException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        } catch (NoSuchFieldException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
         return respBuilder.build().getResponseEntity();
     }
@@ -75,14 +107,14 @@ public class MemorandumController {
     @GetMapping("/get/{jsonId}/{requestId}")
     public ResponseEntity<AppResponse<List<Memorandum>>> getMemorandum(@RequestHeader("X-Auth-Token") String token,
                                                                        @PathVariable("jsonId") String jsonId,
-                                                                       @PathVariable("requestId") String requestId){
+                                                                       @PathVariable("requestId") String requestId) {
         AppResponse.ResponseBuilder<List<Memorandum>> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
             List<Memorandum> s = memosRepository.findByJsonIdAndRequestId(jsonId, requestId);
-            if(s.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
+            if (s.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
             respBuilder.data(s);
 
         } catch (AppworkException e) {

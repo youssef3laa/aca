@@ -191,7 +191,7 @@ public class AppworkCSOperations {
         for (Map.Entry<String, String> entry : categoryValues.entrySet()) {
             System.out.println("Key = " + entry.getKey() +
                     ", Value = " + entry.getValue());
-            parts[index] = new StringPart(entry.getKey(), entry.getValue());
+            parts[index] = new StringPart(entry.getKey(), entry.getValue(), StandardCharsets.UTF_8.name());
             ++index;
         }
         Http http = new Http().setDoAuthentication(true)

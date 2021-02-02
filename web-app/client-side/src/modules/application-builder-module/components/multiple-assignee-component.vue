@@ -72,6 +72,51 @@
                     this.unitSelected = null
                 }
             },
+            addUnit: async function () {
+                if((!this.unitSelected) || (this.getUnitIndex(this.unitSelected) != -1)) return
+                let role = await this.getHeadRoleByUnitCode(this.unitSelected.unitCode)
+                this.tableData.push({unit: this.unitSelected, role: role})
+                if(this.tableData.length == 1){
+                    this.nextAssignee = {
+                        cn : role.cn,
+                        code : role.groupCode,
+                        role : role
+                    }
+                }else{
+                    this.assignees.assignee.push(role.cn)
+                }
+                this.onValueChange()
+            },
+            deleteUnit: function(object){
+                if(this.nextAssignee && object.item.role.cn == this.nextAssignee.cn) this.nextAssignee = null
+                if(this.getUnitIndex(object.item.unit) > -1)this.tableData.splice(this.getUnitIndex(object.item.unit),1)
+                if(this.getAssigneeCNIndex(object.item.role.cn) > -1) this.assignees.assignee.splice(this.getAssigneeCNIndex(object.item.role.cn),1)
+                this.updateTableVal(this.tableData)
+                this.onValueChange()
+            },
+            assignUnit: function(object){
+                if(this.nextAssignee && this.nextAssignee.cn) this.assignees.assignee.push(this.nextAssignee.cn)
+                this.nextAssignee = {
+                    cn : object.item.role.cn,
+                    code : object.item.role.groupCode,
+                    role : object.item.role
+                }
+                if(this.getAssigneeCNIndex(object.item.role.cn) > -1) this.assignees.assignee.splice(this.getAssigneeCNIndex(object.item.role.cn),1)
+                alert("Assigned")
+                this.onValueChange()
+            },
+            getAssigneeCNIndex: function(cn){
+                for(let element in this.assignees.assignee){
+                    if(this.assignees.assignee[element] == cn) return parseInt(element)
+                }
+                return -1
+            },
+            getUnitIndex: function(unit){
+                for(let element in this.tableData){
+                    if(this.tableData[element].unit.unitCode == unit.unitCode) return parseInt(element)
+                }
+                return -1
+            },
             updateTableVal: function(data) {
                 this.table.val = {
                     headers: [
@@ -99,41 +144,6 @@
                     ],
                     data: data
                 }
-            },
-            getUnitIndex: function(unit){
-                for(var element in this.tableData){
-                    if(this.tableData[element].unit.unitCode == unit.unitCode) return parseInt(element)
-                }
-                return -1
-            },
-            addUnit: async function () {
-                if((!this.unitSelected) || (this.getUnitIndex(this.unitSelected) != -1)) return
-                let role = await this.getHeadRoleByUnitCode(this.unitSelected.unitCode)
-                this.tableData.push({unit: this.unitSelected, role: role})
-                this.assignees.assignee.push(role.cn)
-                if(this.tableData.length == 1){
-                    this.nextAssignee = {
-                        cn : role.cn,
-                        code : role.groupCode,
-                        role : role
-                    }
-                }
-                this.onValueChange()
-            },
-            deleteUnit: function(object){
-                if(this.nextAssignee && object.item.role.cn == this.nextAssignee.cn) this.nextAssignee = null
-                this.tableData.splice(this.getUnitIndex(object.item.unit),1)
-                this.assignees.assignee.splice(this.getUnitIndex(object.item.unit),1)
-                this.updateTableVal(this.tableData)
-                this.onValueChange()
-            },
-            assignUnit: function(object){
-                this.nextAssignee = {
-                    cn : object.item.role.cn,
-                    code : object.item.role.groupCode,
-                    role : object.item.role
-                }
-                this.onValueChange()
             }
         },
         watch: {

@@ -1,6 +1,7 @@
 package com.asset.appwork.orgchart;
 
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.dto.Assignees;
 import com.asset.appwork.dto.Router;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
@@ -26,8 +27,10 @@ public class ModuleRouting {
     private final String approveString = "approve";
     private final String redirectString = "redirect";
     private final String commentString = "comment";
-    private final String parallelString = "multiple";
+    private final String multipleString = "multiple";
+    private final String parallelString = "parallel";
     private final String requestModificationString = "requestModification";
+    private final String multipleResponsibleString = "responsible";
 
     String config;
     Account account;
@@ -144,62 +147,60 @@ public class ModuleRouting {
                 throw new AppworkException(ResponseCode.MODULE_ROUTING_INPUTS_ERROR);
             }
 
-            if(receiverType[0].equals("multiple")){
-                nextStep = getIdFromNextSteps(routingConfig, currentStepId[0], parallelString);
+            decision[0] = getDecisionString(decision[0]);
+
+            if(receiverType[0].equals(multipleString)) {
+                nextSubBP = "ACA_SubBP_multipleUnits";
+                handleParallelTasks(outputSchema, routingConfig, currentStepId[0], multipleString);
+                decision[0] = multipleResponsibleString;
             }
 
-            if(nextStep.isEmpty()) {
-                decision[0] = getDecisionString(decision[0]);
-
-                switch (decision[0]) {
-                    case approveString:
-                        nextStep = handleApprovalCase(routingConfig, currentStepId[0], codeSelected[0]);
-                        break;
-                    case redirectString:
-                        nextStep = handleRedirectCase(routingConfig, currentStepId[0], codeSelected[0]);
-                        break;
-                    case requestModificationString:
-                        nextStep = handleRequestModificationCase(outputSchema, routingConfig, currentStepId[0], parentHistoryId[0]);
-                        break;
-                    case commentString:
-                        nextStep = getIdFromNextSteps(routingConfig, currentStepId[0], commentString);
-                        break;
-                    case rejectString:
-                        nextStep = breakString;
-                        break;
-                    default:
-                        nextStep = handleDefaultCase(routingConfig, currentStepId[0], codeSelected[0], decision[0]);
-                        break;
-                }
+            switch (decision[0]) {
+                case approveString:
+                    nextStep = handleApprovalCase(routingConfig, currentStepId[0], codeSelected[0]);
+                    break;
+                case redirectString:
+                    nextStep = handleRedirectCase(routingConfig, currentStepId[0], codeSelected[0]);
+                    break;
+                case requestModificationString:
+                    nextStep = handleRequestModificationCase(outputSchema, routingConfig, currentStepId[0], parentHistoryId[0]);
+                    break;
+                case parallelString:
+                    nextSubBP = "ACA_SubBP_parallelTasks";
+                    nextStep = handleParallelTasks(outputSchema, routingConfig, currentStepId[0], parallelString);
+                    break;
+                case commentString:
+                    nextStep = getIdFromNextSteps(routingConfig, currentStepId[0], commentString);
+                    break;
+                case rejectString:
+                    nextStep = breakString;
+                    break;
+                default:
+                    nextStep = handleDefaultCase(routingConfig, currentStepId[0], codeSelected[0], decision[0]);
+                    break;
             }
 
             if(nextStep.isEmpty()){
                 if (!routingConfig.getSteps().get(currentStepId[0]).subBP.isEmpty()){
                     nextSubBP = routingConfig.getSteps().get(currentStepId[0]).subBP;
-                }else {
-                    nextStep = breakString;
                 }
-            }else {
-                if(!nextStep.equals(breakString)){
-                    if (routingConfig.getSteps().containsKey(nextStep)) {
-                        nextRouter = routingConfig.getSteps().get(nextStep).getRouter();
-                        nextPage = routingConfig.getSteps().get(nextStep).getPage();
-                    }else{
-                        throw new AppworkException(ResponseCode.MODULE_ROUTING_INPUTS_ERROR);
-                    }
-
-//                    String[] assignedCN = {""};
-//                    ReflectionUtil.of(outputSchema).ifPresent("getAssignedCN", (s) -> {
-//                        assignedCN[0] = (String) s;
-//                    });
-//                    if(assignedCN[0].isEmpty()){
-//                        throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
-//                    }
+//                else {
+//                    nextStep = breakString;
+//                }
+            }else if(!nextStep.equals(breakString)){
+                if (routingConfig.getSteps().containsKey(nextStep)) {
+                    nextRouter = routingConfig.getSteps().get(nextStep).getRouter();
+                    nextPage = routingConfig.getSteps().get(nextStep).getPage();
+                }else{
+                    throw new AppworkException(ResponseCode.MODULE_ROUTING_INPUTS_ERROR);
                 }
-            }
-
-            if(receiverType[0].equals("multiple")) {
-                nextSubBP = "ACA_SubBP_parallelTasks";
+//                String[] assignedCN = {""};
+//                ReflectionUtil.of(outputSchema).ifPresent("getAssignedCN", (s) -> {
+//                    assignedCN[0] = (String) s;
+//                });
+//                if(assignedCN[0].isEmpty()){
+//                    throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
+//                }
             }
 
             updateOutputSchemaExtraData(outputSchema, routingConfig, currentStepId[0]);
@@ -260,6 +261,18 @@ public class ModuleRouting {
         return step;
     }
 
+    private <T> String handleParallelTasks(T outputSchema, RoutingConfig routingConfig, String currentStepId, String decision){
+        String multipleNextStep = getIdFromNextSteps(routingConfig, currentStepId, decision);
+        if(!multipleNextStep.isEmpty() && !multipleNextStep.equals(breakString)){
+            if (routingConfig.getSteps().containsKey(multipleNextStep)) {
+                Router multipleNextRouter = routingConfig.getSteps().get(multipleNextStep).getRouter();
+                String multipleNextPage = routingConfig.getSteps().get(multipleNextStep).getPage();
+                updateOutputSchemaAssignees(outputSchema, multipleNextStep, multipleNextPage, multipleNextRouter);
+            }
+        }
+        return multipleNextStep;
+    }
+
     private String getIdFromNextSteps(RoutingConfig routingConfig, String currentStepId, String inputCase){
         if (routingConfig.getSteps().get(currentStepId).getNextStep().containsKey(inputCase) ) {
             return routingConfig.getSteps().get(currentStepId).getNextStep().get(inputCase).toString();
@@ -272,6 +285,18 @@ public class ModuleRouting {
         ((OutputSchema) outputSchema).setPage(nextPage);
         ((OutputSchema) outputSchema).setSubBP(nextSubBP);
         ((OutputSchema) outputSchema).setRouter(nextRouter);
+    }
+
+    private <T> void updateOutputSchemaAssignees(T outputSchema, String stepId, String page, Router router){
+        Assignees[] assignees = {new Assignees()};
+        ReflectionUtil.of(outputSchema).ifPresent("getAssignees", (s) -> {
+            assignees[0] = (Assignees) s;
+        });
+        assignees[0].setStepId(stepId);
+        assignees[0].setPage(page);
+        assignees[0].setRouter(router);
+
+        ((OutputSchema) outputSchema).setAssignees(assignees[0]);
     }
 
     private <T> void updateOutputSchemaExtraData(T outputSchema, RoutingConfig routingConfig, String currentStep){

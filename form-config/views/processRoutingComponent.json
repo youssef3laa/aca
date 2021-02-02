@@ -1,0 +1,32 @@
+{
+    "key": "processRouting",
+    "type": "DefaultSection",
+    "isCard": true,
+    "forms": [
+        {
+            "key": "processRoutingForm",
+            "inputs": [
+                {
+                    "type": "ProcessRoutingComponent",
+                    "name": "routing"
+                }
+            ],
+            "model": {
+                "routing": {
+                    "fields": [
+                        "comment",
+                        "opinion"
+                    ],
+                    "decisions": [
+                        "approve",
+                        "redirect"
+                    ],
+                    "receiverTypes": [
+                        "single",
+                        "multiple"
+                    ]
+                }
+            }
+        }
+    ]
+}

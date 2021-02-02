@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
@@ -43,9 +42,14 @@ public class Docx {
     @Autowired
     Environment env;
 
-    public void exportJsonToDocx(String requestId, String fileName) throws AppworkException {
+    public File exportJsonToDocx(String requestId, String fileName) throws AppworkException {
         try {
-            File file = new File(fileName + ".docx");
+            /*
+                create tempfile
+                wordpck.save()=>
+                return file
+                from controller => upload file on Contentserver handle errors if there are any
+            */
 
             WordprocessingMLPackage wordPackage = WordprocessingMLPackage.createPackage();
             MainDocumentPart mainDocumentPart = wordPackage.getMainDocumentPart();
@@ -82,7 +86,10 @@ public class Docx {
                 }
             }
 //            mainDocumentPart.addParagraphOfText(jsonString);
+            File file = new File(fileName + ".docx");
             wordPackage.save(file);
+            return file;
+
         } catch (JsonParseException e) {
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());
