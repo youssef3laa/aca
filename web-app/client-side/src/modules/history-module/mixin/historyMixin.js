@@ -41,6 +41,43 @@ export default {
                 ],
                 data: []
             }
+        },
+        createSentHistoryTableModel() {
+            return {
+                url:"history/user",
+                headers: [
+                    {
+                        text: "عنوان الموضوع",
+                        value: "processName",
+                      },
+                      {
+                        text: "المرسل",
+                        value: "userCN",
+                      },
+                
+                    {
+                      text: "التاريخ",
+
+                      value: "approvalDate",
+                    },
+              
+                    {
+                      text: "الجهة",
+                      value: "",
+                    },
+                    {
+                        text: "رقم الوارد",
+                        value: "processId",
+                      },
+                      {
+                        text: "",
+                        value: "actions",
+                        sortable: false,
+                      }
+               
+                  ],
+                  data: [],
+            }
         }
     }
 }

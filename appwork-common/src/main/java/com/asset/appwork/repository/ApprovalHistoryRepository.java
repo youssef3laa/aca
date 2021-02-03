@@ -20,5 +20,5 @@ public interface ApprovalHistoryRepository extends PagingAndSortingRepository<Ap
 
 //    Optional<ApprovalHistory> findTop1ByProcessNameAndEntityIdOrderByIdDesc(String processName, String entityId);
 
-    Page<ApprovalHistory> findByUserCNOrderByApprovalDate(String userCN,Pageable pageable);
+    Page<ApprovalHistory> findByUserCNOrderByApprovalDateDesc(String userCN,Pageable pageable);
 }

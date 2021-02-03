@@ -1,5 +1,5 @@
 <template>
-  <div class="row org-chart-wrapper">
+  <div class="row org-chart-wrapper top-bar">
  
       <div class="org-icon-wrapper">
         <i class="fas fa-sitemap"></i>
@@ -35,11 +35,10 @@ export default {
 
 .org-chart-wrapper {
   display: flex;
-  height: 80px;
-  background: white;
+
   margin: 10px;
   padding: 10px;
-  border-radius: 10px ;
+
   align-items: center !important;
   justify-content: space-around;
 }

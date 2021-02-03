@@ -1,5 +1,5 @@
 <template>
-  <div class="row advanced-search-wrapper">
+  <div class="row advanced-search-wrapper top-bar">
  
       <div class="search-icon-wrapper">
         <i class="fas fa-search"></i>
@@ -35,11 +35,8 @@ export default {
 
 .advanced-search-wrapper {
   display: flex;
-  height: 80px;
-  background: white;
   margin: 10px;
   padding: 10px;
-  border-radius: 10px ;
   align-items: center !important;
   justify-content: space-around;
 }
