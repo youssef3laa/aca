@@ -16,4 +16,6 @@ public interface UserRepository extends GenericRepository<User, Long> {
     Page<User> findAllByUserIdNotNull(Pageable pageable);
 
     Optional<User> findByUserId(String userId);
+
+    void deleteById(Long id);
 }

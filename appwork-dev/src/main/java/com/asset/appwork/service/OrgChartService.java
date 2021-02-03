@@ -147,6 +147,10 @@ public class OrgChartService {
         );
     }
 
+    public List<Position> getPositionByUnitName(Unit unit) throws AppworkException {
+        return positionRepository.findByUnit(unit);
+    }
+
     public Position updatePosition(Account account, Long unitId, Long id, String props) throws AppworkException {
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
                 "OrganizationalUnit").updateChild(unitId, "Position", id,
@@ -237,7 +241,7 @@ public class OrgChartService {
                 e.printStackTrace();
             }
             counter++;
-        } while (counter > 5 || groupRepository.findByName(createdGroupName).isEmpty());
+        } while (counter < 5 || groupRepository.findByName(createdGroupName).isEmpty());
 
         if (groupRepository.findByName(createdGroupName).isEmpty()) {
             throw new AppworkException("Could not update group with name " + createdGroupName, ResponseCode.UPDATE_ENTITY_FAILURE);
@@ -356,29 +360,40 @@ public class OrgChartService {
             Member member = new Member(env.getProperty("otds.partition"), SystemUtil.getJsonByPtrExpr(props, "/name"), Collections.emptyList());
             new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
                     .updateGroupByGroupName(group.getName(), member.toString());
+
+//            group.setDisplayName(SystemUtil.getJsonByPtrExpr(props, "/name"));
+//            groupRepository.save(group);
         }
+
+        Group newGroup = Group.fromString(props);
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
-                "Group").update(group.getId(), Group.fromString(props).toPlatformString());
+                "Group").update(group.getId(), newGroup.toPlatformString());
 
-        return getGroup(group.getId());
+        if (SystemUtil.isFieldInJson(props, "unitCode")) {
+            Unit unit = getUnitByName(SystemUtil.getJsonByPtrExpr(props, "/unitCode"));
+            String updateRelationProps = new Member.TargetId(unit.getId()).toString();
+            newGroup.setId(group.getId());
+            newGroup.setUnit(unit);
+            updateGroupUnitRelation(account, newGroup, group.getName(), updateRelationProps);
+        }
+        
+        return getGroup(id);
     }
 
-    public List<Group> updateGroupAndGetBoth(Account account, Long id, String props) throws AppworkException {
-        return new ArrayList<>(List.of(getGroup(id), updateGroup(account, id, props)));
-    }
-
-    public void updateGroupUnitRelation(Account account, Long id, String props) throws AppworkException {
+    public void updateGroupUnitRelation(Account account, Long id, String oldGroupCode, String props) throws AppworkException {
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group")
                 .addRelation(id, "Unit", props);
         Group group = getGroup(id);
         Position position;
 
         try {
-            position = getPositionByName(group.getName());
+            position = getPositionByName(oldGroupCode);
             position.setName(group.getName());
             position.setDescription(group.getDescription());
             position.setIsLead(group.getIsHeadRole());
-            updatePosition(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), position.getId(), position.toPlatformString());
+            position.setUnit(group.getUnit());
+            positionRepository.save(position);
+//            updatePosition(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), position.getId(), position.toPlatformString());
         } catch (AppworkException e) {
             position = new Position();
             position.setName(group.getName());
@@ -388,12 +403,31 @@ public class OrgChartService {
         }
     }
 
-    public void updateGroupUnitRelationByCodes(Account account, String groupCode, String unitCode) throws AppworkException {
-        Group group = getGroupByName(groupCode);
-        Long groupId = group.getId();
-        Long unitId = getUnitByName(unitCode).getId();
-        String props = new Member.TargetId(unitId).toString();
-        updateGroupUnitRelation(account, groupId, props);
+    public void updateGroupUnitRelation(Account account, Group group, String oldGroupCode, String props) throws AppworkException {
+        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group")
+                .addRelation(group.getId(), "Unit", props);
+        Position position;
+
+        try {
+            position = getPositionByName(oldGroupCode);
+            position.setName(group.getName());
+            position.setDescription(group.getDescription());
+            position.setIsLead(group.getIsHeadRole());
+            position.setUnit(group.getUnit());
+            positionRepository.save(position);
+//            updatePosition(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), position.getId(), position.toPlatformString());
+        } catch (AppworkException e) {
+            position = new Position();
+            position.setName(group.getName());
+            position.setDescription(group.getDescription());
+            position.setIsLead(group.getIsHeadRole());
+            createPosition(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), position.toPlatformString());
+        }
+    }
+
+    public void updateGroupUnitRelationByCodes(Account account, String oldGroupCode, String groupCode, String unitCode) throws AppworkException {
+        String props = new Member.TargetId(getUnitByName(unitCode).getId()).toString();
+        updateGroupUnitRelation(account, getGroupByName(groupCode).getId(), oldGroupCode, props);
     }
 
     public void deleteGroup(Account account, Long id) throws AppworkException {
@@ -420,7 +454,7 @@ public class OrgChartService {
                 e.printStackTrace();
             }
             counter++;
-        } while (counter > 5 || userRepository.findByUserId(createdUserId).isEmpty());
+        } while (counter < 5 || userRepository.findByUserId(createdUserId).isEmpty());
 
         if (userRepository.findByUserId(createdUserId).isEmpty()) {
             throw new AppworkException("Could not get user with usedId " + createdUserId, ResponseCode.READ_ENTITY_FAILURE);
@@ -478,12 +512,15 @@ public class OrgChartService {
     public void deleteUser(Account account, Long id) throws AppworkException {
         new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
                 .deleteUserByUserId(getUser(id).getUserId());
+
+        //TODO: Remove this after consolidation is fixed
+        userRepository.deleteById(id);
     }
 
     public void assignUserToGroup(Account account, String userId, String groupCode) throws JsonProcessingException, AppworkException {
         Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
         otds.assignUserToGroupsByUserId(userId, new Member.StringList(
-                Collections.singletonList(groupCode + "@" + env.getProperty("otds.partition"))
+                Collections.singletonList(groupCode)
         ));
 
         User user = getUserByUserId(userId);
