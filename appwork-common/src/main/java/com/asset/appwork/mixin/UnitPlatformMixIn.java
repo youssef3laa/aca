@@ -24,6 +24,9 @@ public abstract class UnitPlatformMixIn {
     @JsonAlias({"name_ar", "Name_ar"})
     @JsonProperty("Name_ar")
     String name_ar;
+    @JsonAlias({"displayName", "IdentityDisplayName"})
+    @JsonProperty("IdentityDisplayName")
+    String displayName;
 
     @JsonAlias({"unitTypeCode", "UnitTypeCode"})
     @JsonProperty("UnitTypeCode")

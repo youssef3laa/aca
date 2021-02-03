@@ -20,6 +20,9 @@ public abstract class GroupPlatformMixIn {
     @JsonAlias({"name_ar", "Name_ar"})
     @JsonProperty("Name_ar")
     String name_ar;
+    @JsonAlias({"displayName", "IdentityDisplayName"})
+    @JsonProperty("IdentityDisplayName")
+    String displayName;
 
     @JsonAlias({"groupCode", "GroupCode"})
     @JsonProperty("GroupCode")

@@ -658,9 +658,10 @@ export default {
           "groupCode": item.groupCode,
           // "isHeadRole": item.isHeadRole,
           // "isViceRole": item.isViceRole,
+          "unitCode": item.unitCode,
         }
         http.post("/org/group/create", item).then(() => {
-          http.put("/org/group/" + item.groupCode + "/relation/unit/add/" + unitCode, {}).then(() => {
+          http.put("/org/group/" + item.groupCode + "/was/" + item.groupCode + "/relation/unit/add/" + unitCode, {}).then(() => {
             alert("Added Successfully");
           }).catch((response) => {
             console.log(response);
@@ -675,7 +676,7 @@ export default {
       this.$observable.subscribe("editRoleModal_updateModal", (obj) => {
         let item = obj.obj;
         let id = item.id;
-        let unitCode = item.unitCode;
+        // let unitCode = item.unitCode;
         item = {
           "name": item.groupCode,
           "name_en": item.name_en,
@@ -683,15 +684,19 @@ export default {
           "groupCode": item.groupCode,
           // "isHeadRole": item.isHeadRole,
           // "isViceRole": item.isViceRole,
+          "unitCode": item.unitCode,
         }
 
-        http.put("/org/group/update/" + id, item).then(() => {
-          http.put("/org/group/" + item.groupCode + "/relation/unit/add/" + unitCode, {}).then(() => {
-            alert("Updated Successfully");
-          }).catch((response) => {
-            // alert(response.data.metaInfo.errorMessage);
-            alert(response);
-          });
+        http.put("/org/group/update/" + id, item).then((updatedItem) => {
+          console.log("**************************");
+          console.log(updatedItem);
+          console.log("**************************");
+          // http.put("/org/group/" + item.groupCode + "/relation/unit/add/" + unitCode, {}).then(() => {
+          alert("Updated Successfully");
+          // }).catch((response) => {
+          // alert(response.data.metaInfo.errorMessage);
+          // alert(response);
+          // });
         }).catch((response) => {
           // alert(response.data.metaInfo.errorMessage);
           alert(response);
@@ -725,8 +730,8 @@ export default {
           "password": item.password,
           "email": item.email,
         };
-        http.post("/org/user/create", item).then(() => {
-          http.put("/org/user/" + item.username + "/assign/group/" + groupCode, {}).then(() => {
+        http.post("/org/user/create", item).then((createdUser) => {
+          http.put("/org/user/" + createdUser.data.data.userId + "/assign/group/" + groupCode, {}).then(() => {
             alert("Added Successfully");
           }).catch((response) => {
             console.log(response);
@@ -747,8 +752,8 @@ export default {
           "username": item.username,
           "email": item.email,
         };
-        http.put("/org/user/update/" + id, item).then(() => {
-          http.put("/org/user/" + item.username + "/assign/group/" + groupCode, {}).then(() => {
+        http.put("/org/user/update/" + id, item).then((updatedUser) => {
+          http.put("/org/user/" + updatedUser.data.data.userId + "/assign/group/" + groupCode, {}).then(() => {
             alert("Updated Successfully");
           }).catch((response) => {
             console.log(response);
@@ -770,7 +775,7 @@ export default {
           "id": data.item.id,
           "username": data.item.name,
           "email": data.item.details.email,
-          "groupCode": (data.item.groups.length > 0)? data.item.groups[0].name: null,
+          "groupCode": (data.item.groups.length > 0) ? data.item.groups[0].name : null,
         };
         this.$refs.appBuilder.setModelData("editUserModal", data.item);
         this.$observable.fire("editUserModal", {

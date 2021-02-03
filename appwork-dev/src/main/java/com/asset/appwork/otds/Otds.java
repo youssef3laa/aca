@@ -55,7 +55,7 @@ public final class Otds {
     public String deleteGroupByGroupName(String roleName) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
-                .delete(this.apiBaseUrl + String.format(API.GROUPS_DELETE.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .delete(this.apiBaseUrl + String.format(API.GROUPS_DELETE.getUrl(), URLEncoder.encode(roleName, StandardCharsets.UTF_8.name())));
         return http.getResponse();
     }
 
