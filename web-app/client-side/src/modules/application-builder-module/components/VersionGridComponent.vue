@@ -6,28 +6,30 @@
   </v-card-subtitle>
 
   <v-card-text v-if="latestVersion!=null">
-    <div class="card col-3">
-      <v-col>
-        <div class="row pa-1">
-          <v-col :cols="2" class="card-icon">
-            <v-icon> mdi-file-pdf-outline</v-icon>
-          </v-col>
-          <v-col :cols="8"
-                 class="card-name"
-                 style="cursor: pointer"
-          >
-            {{ latestVersion.name }} <br/>
-            {{ latestVersion.modify_date }}
-          </v-col>
-          <v-col :cols="2" style="cursor: pointer" @click="openVersionInBrava(latestVersion)">
-            <v-icon color="#07689F"> mdi-eye-outline</v-icon>
-          </v-col>
+     <v-row>
+        <v-col :cols="6">
+        <div class="card pa-1">
+        <v-row>
+            <v-col :cols="2" class="card-icon">
+              <v-icon> mdi-file-pdf-outline</v-icon>
+            </v-col>
+            <v-col :cols="8"
+                   class="card-name"
+                   style="cursor: pointer"
+            >
+              {{ latestVersion.name }} <br/>
+              {{ latestVersion.modify_date }}
+            </v-col>
+            <v-col :cols="2" style="cursor: pointer" @click="openVersionInBrava(latestVersion)">
+              <v-icon color="#07689F"> mdi-eye-outline</v-icon>
+            </v-col>
+        </v-row>
+
 
 
         </div>
       </v-col>
-
-    </div>
+      </v-row>
 
   </v-card-text>
 
@@ -36,13 +38,14 @@
   </v-card-subtitle>
   <v-card-text>
     <v-row>
-      <div
-          v-for="(file, index) in fileVersions"
-          :key="index"
-          class="card col-3"
-      >
-      <v-col>
-        <div class="row pa-1">
+         <v-col
+             v-for="(file, index) in fileVersions"
+             :key="index"
+             :cols="6"
+
+         >
+           <div class="card pa-1">
+         <v-row>
           <v-col :cols="2" class="card-icon">
             <v-icon> mdi-file-pdf-outline</v-icon>
           </v-col>
@@ -53,13 +56,15 @@
             {{ file.name }} <br/>
             {{ file.modify_date }}
           </v-col>
-          <v-col :cols="2" style="cursor: pointer" @click="openVersionInBrava(file)">
+          <v-col :cols="2" style="cursor: pointer; align-self: center;" @click="openVersionInBrava(file)">
             <v-icon color="#07689F"> mdi-eye-outline</v-icon>
           </v-col>
-        </div>
-      </v-col>
+        </v-row>
 
-    </div>
+           </div>
+
+    </v-col>
+
     </v-row>
 
   </v-card-text>
@@ -76,7 +81,7 @@ export default {
     return {
       fileVersions: [],
       latestVersion: null,
-      nodeId: ""
+      nodeId: this.val.nodeId
     }
   },
   props: ['val', 'field'],

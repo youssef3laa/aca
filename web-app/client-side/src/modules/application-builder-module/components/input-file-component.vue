@@ -99,7 +99,7 @@
                   class="card"
 
               >
-                <div class="row pa-1">
+                <div class="row pa-3">
                   <v-col :cols="2" class="card-icon">
                     <v-icon> mdi-file-pdf-outline</v-icon>
                   </v-col>
@@ -200,7 +200,7 @@ export default {
     setFileTypeOnFileUploaded: function (file) {
       let categoryValue;
       if (file.categories == undefined || file.categories.length == 0) {
-        //shouldn't go here never...
+        //shouldn't go here...
         file.properties.fileTypeValue = "لم يتم إدخاله بعد";
         return;
       }
@@ -219,6 +219,11 @@ export default {
         tempArr.push(attachmentSortElement);
       }
       this.updateMultipleAttachmentSortRecords(tempArr);
+    },
+    startDrag: function (evt, file) {
+      evt.dataTransfer.dropEffect = 'move'
+      evt.dataTransfer.effectAllowed = 'move'
+      evt.dataTransfer.setData('itemID', file.properties.id)
     },
     openFileInBrave: function (fileId) {
       // let fileId = this.filesUploaded.find(element => element.name === file.properties.name).properties.id;
@@ -254,12 +259,6 @@ export default {
       }
 
     },
-    startDrag: function (evt, file) {
-      evt.dataTransfer.dropEffect = 'move'
-      evt.dataTransfer.effectAllowed = 'move'
-      evt.dataTransfer.setData('itemID', file.properties.id)
-    },
-
     listFiles: async function () {
       let nodesResponse
           , attachmentSortResponse;

@@ -8,6 +8,7 @@ import com.asset.appwork.repository.MemoValuesRepository;
 import com.asset.appwork.repository.MemosRepository;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.docx4j.convert.in.xhtml.XHTMLImporterImpl;
@@ -26,6 +27,8 @@ import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -42,15 +45,8 @@ public class Docx {
     @Autowired
     Environment env;
 
-    public File exportJsonToDocx(String requestId, String fileName) throws AppworkException {
+    public File exportJsonToDocx(String requestId) throws AppworkException {
         try {
-            /*
-                create tempfile
-                wordpck.save()=>
-                return file
-                from controller => upload file on Contentserver handle errors if there are any
-            */
-
             WordprocessingMLPackage wordPackage = WordprocessingMLPackage.createPackage();
             MainDocumentPart mainDocumentPart = wordPackage.getMainDocumentPart();
             NumberingDefinitionsPart ndp = new NumberingDefinitionsPart();
@@ -65,28 +61,21 @@ public class Docx {
                 String jsonId = memo.get(i).getJsonId();
                 String memoId = memo.get(i).getId().toString();
 
-                ObjectMapper mapper = new ObjectMapper();
-                Map<?, ?> map = mapper.readValue(Paths.get("E:\\aca\\form-config\\output\\" + jsonId + ".json").toFile(), Map.class);
-                for (Map.Entry<?, ?> entry : map.entrySet()) {
-                    String json = entry.getKey() + "=" + entry.getValue();
+                JsonNode jsonNode = SystemUtil.convertStringToJsonNode(SystemUtil.readFile(System.getProperty("user.dir") + env.getProperty("memosPath") + jsonId + ".json"));
 
-                    int start = json.indexOf("name") + 5;
-                    int end = json.indexOf(",", start);
-                    String name = json.substring(start, end);
-                    mainDocumentPart.addStyledParagraphOfText("Title", name);
+                String name = jsonNode.at("/app/pages/0/sections/0/forms/0/name").asText();
+                mainDocumentPart.addStyledParagraphOfText("Title", name);
 
-                    start = json.indexOf("name", 109) + 5;
-                    end = json.indexOf(",", start);
-                    String jsonKey = json.substring(start, end);
-                    List<memoValues> memoVales = memoValuesRepository.findByMemosIdAndJsonKey(memoId, jsonKey);
-                    for (int j = 0; j < memoVales.size(); j++)
-                    {
-                        wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert(memoVales.get(j).getValue(), null));
-                    }
+                String jsonKey = jsonNode.at("/app/pages/0/sections/0/forms/0/inputs/0/name").asText();
+                List<memoValues> memoVales = memoValuesRepository.findByMemosIdAndJsonKey(memoId, jsonKey);
+                for (int j = 0; j < memoVales.size(); j++)
+                {
+                    wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert(memoVales.get(j).getValue(), null));
                 }
             }
-//            mainDocumentPart.addParagraphOfText(jsonString);
-            File file = new File(fileName + ".docx");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy HH-mm-ss");
+            Date date = new Date();
+            File file = new File("Memo" + requestId + " " + dateFormat.format(date) + ".docx");
             wordPackage.save(file);
             return file;
 

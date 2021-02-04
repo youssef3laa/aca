@@ -34,28 +34,29 @@ export default {
           {
             tabs: [
               {
-                id: 1,
+                key : 'tab1',
+                id: '1',
                 name: "استيفاء",
                 icon: "fas fa-copy",
                 isActive: true,
               },
               {
-                id: 2,
+                id: '2',
                 name: "للتأشير",
                 icon: "fas fa-pen-square",
               },
               {
-                id: 3,
+                id: '3',
                 name: "لإبداء الرأي",
                 icon: "fas fa-comments",
               },
               {
-                id: 4,
+                id: '4',
                 name: "تكليفات",
                 icon: "fas fa-copy",
               },
               {
-                id: 5,
+                id: '5',
                 name: "مراسلات داخلية",
                 icon: "fas fa-inbox",
               },
@@ -63,7 +64,7 @@ export default {
             sections: [
               {
                 tabId: "1",
-                isTab: "true",
+                isTab: true,
                 type: "DefaultSection",
                 isCard: "true",
                 forms: [

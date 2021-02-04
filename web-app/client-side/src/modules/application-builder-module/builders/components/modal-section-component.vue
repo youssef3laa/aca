@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" eager persistent width="1200">
+  <v-dialog v-model="dialog" :width="modalWidth" eager persistent>
     <v-card>
       <v-row>
         <v-col :cols="10">
@@ -45,7 +45,8 @@ export default {
   },
   data() {
     return {
-      dialog: false,
+      dialog: this.dialogState,
+      modalWidth: this.width
     }
   },
   methods: {
@@ -75,7 +76,17 @@ export default {
     // console.log(this.formData.forms[0])
     // console.log(this.val)
   },
-  props: ['formData'],
+
+  props: {
+    formData: Object,
+    width: {
+      default: 1200
+    },
+    dialogState: {
+      default: false
+    },
+  }
+
 }
 </script>
 <style>

@@ -10,7 +10,7 @@ import java.util.List;
  */
 @Repository
 public interface MemoValuesRepository extends GenericRepository<memoValues, String> {
-    List<memoValues> findByMemosId(String memosId);
     List<memoValues> findByMemosIdAndJsonKey(String memosId, String jsonKey);
+    List<memoValues> findByMemosId(String memosId);
     List<memoValues> findAll();
 }
