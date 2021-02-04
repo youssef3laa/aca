@@ -14,18 +14,13 @@ public class OutputSchema<T> {
     Boolean breakProcess;
     Boolean addApproval;
     String taskId;
-    String process;
-    String stepId;
     String subBP;
-    String entityName;
-    String entityId;
-    String page;
-    String processId;
     String parentHistoryId;
-    String decision;
-    String comment;
-    String code;
-    String assignedCN;
+    String process, processId, stepId;
+    String entityName, entityId;
+    String component, config, readonlyComponent;
+    String decision, comment;
+    String code, assignedCN;
     String receiverType;
     Router router = new Router();
     Assignees assignees = new Assignees();
@@ -44,7 +39,9 @@ public class OutputSchema<T> {
                 "<entityName>"+removeNull(this.entityName)+"</entityName>"+
                 "<entityId>"+removeNull(this.entityId)+"</entityId>"+
                 "<parentHistoryId>"+removeNull(this.parentHistoryId)+"</parentHistoryId>"+
-                "<page>"+removeNull(this.page)+"</page>"+
+                "<component>"+removeNull(this.component)+"</component>"+
+                "<config>"+removeNull(this.config)+"</config>"+
+                "<readonlyComponent>"+removeNull(this.readonlyComponent)+"</readonlyComponent>"+
                 "<decision>"+removeNull(this.decision)+"</decision>"+
                 "<comment>"+removeNull(this.comment)+"</comment>"+
                 "<breakProcess>"+removeNull(this.breakProcess)+"</breakProcess>"+

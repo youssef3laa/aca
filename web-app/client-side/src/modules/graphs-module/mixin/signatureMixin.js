@@ -29,13 +29,16 @@ export default {
           ticketType: "OTDSTICKET",
         }
       );
-      const thumbnail = signatureList.map((signature) => {
-        return {
-          id: signature["data"]["properties"]["id"],
-          date: signature["data"]["properties"]["create_date"],
-          src: `http://45.240.63.94/otcs/cs.exe?func=thumbnail.fetchthumbnail&nodeid=${signature["data"]["properties"]["id"]}&verNum=1&verType=otthumb&pageNum=1&OTDSTicket=${token.data.ticket}`,
-        };
-      });
+      let thumbnail = null;
+      if(signatureList){
+       thumbnail = signatureList.map((signature) => {
+          return {
+            id: signature["properties"]["id"],
+            date: signature["properties"]["modify_date"],
+            src: `http://45.240.63.94/otcs/cs.exe?func=thumbnail.fetchthumbnail&nodeid=${signature["properties"]["id"]}&verNum=1&verType=otthumb&pageNum=1&OTDSTicket=${token.data.ticket}`,
+          };
+        });
+      }
       return thumbnail;
     },
     async getSubNodes(parentId) {

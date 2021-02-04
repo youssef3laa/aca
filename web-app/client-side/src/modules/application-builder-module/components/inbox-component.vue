@@ -129,7 +129,7 @@ export default {
         let taskId = item.item.TaskId,
           page =
             item.item.TaskData.ApplicationData
-              .ACA_ProcessRouting_InputSchemaFragment.page
+              .ACA_ProcessRouting_InputSchemaFragment.component
         router.push({
           name: page,
           params: { taskId: taskId },

@@ -42,7 +42,10 @@ export default {
           summary: model.subjectSummary,
           workType: model.workType.value.value,
           incomingMeans: model.incomingMeans.value.value,
-          incomingUnit: model.incomingUnit.value.text
+          incomingUnit: model.incomingUnit.value.text,
+          agency: (model2.receiver.agency)? model2.receiver.agency.name_ar: null,
+          sector: (model2.receiver.sector)? model2.receiver.sector.name_ar: null,
+          office: (model2.receiver.office)? model2.receiver.office.name_ar: null,
         },
         processModel: {
           process: "generalProcess",

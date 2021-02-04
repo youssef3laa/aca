@@ -2,7 +2,9 @@
     "processName": "generalProcess",
     "steps": {
         "init": {
-            "page": "generalProcess-init",
+            "component": "generalProcess-init",
+            "config": "generalProcess-init",
+            "readonlyComponent": "generalProcess-read",
             "nextStep": {
                 "AGN": "stepRG",
                 "SCT": "stepRQ",
@@ -10,11 +12,13 @@
             }
         },
         "stepRG": {
+            "component": "generalProcess-early",
+            "config": "generalProcess-early",
+            "readonlyComponent": "generalProcess-read",
             "router": {
                 "fields": ["comment"],
                 "receiverTypes": ["single","multiple"]
             },
-            "page": "generalProcess-early",
             "nextStep": {
                 "comment": "stepRQ",
                 "responsible": "responsible",
@@ -22,87 +26,109 @@
             }
         },
         "responsible": {
+            "component": "generalProcess-early",
+            "config": "generalProcess-early",
+            "readonlyComponent": "generalProcess-read",
             "router": {
                 "fields": ["comment"],
                 "receiverTypes": ["single"]
             },
-            "page": "generalProcess-early",
             "nextStep": {
                 "comment": "stepRQ"
             }
         },
         "parallel1": {
+            "component": "generalProcess-early",
+            "config": "generalProcess-early",
+            "readonlyComponent": "generalProcess-read",
             "router": {
                 "fields": ["comment"]
             },
-            "page": "generalProcess-early",
             "nextStep": {
                 "comment": "stepRQ"
             }
         },
         "stepRQ": {
+            "component": "generalProcess-early",
+            "config": "generalProcess-early",
+            "readonlyComponent": "generalProcess-read",
             "router": {
                 "fields": ["comment"],
                 "receiverTypes": ["single"]
             },
-            "page": "generalProcess-early",
             "nextStep": {
                 "comment": "stepRE"
             }
         },
         "stepRE": {
+            "component": "generalProcess-early",
+            "config": "generalProcess-early",
+            "readonlyComponent": "generalProcess-read",
             "router": {
                 "fields": ["comment"],
                 "receiverTypes": ["single"]
             },
-            "page": "generalProcess-early",
             "nextStep": {
                 "GRP": "stepRM",
                 "comment": "stepMM"
             }
         },
         "stepRM": {
+            "component": "generalProcess-early",
+            "config": "generalProcess-early",
+            "readonlyComponent": "generalProcess-read",
             "router": {
                 "fields": ["comment"],
                 "receiverTypes": ["single"]
             },
-            "page": "generalProcess-early",
             "nextStep": {
                 "comment": "stepMM"
             }
         },
         "stepMM": {
-            "page": "generalProcess-member",
+            "component": "generalProcess-member",
+            "config": "generalProcess-member",
+            "readonlyComponent": "generalProcess-read",
             "nextStep": {
                 "approve": "stepApprovals"
             }
         },
         "stepApprovals": {
-            "page": "generalProcess-approvals",
+            "component": "generalProcess-approvals",
+            "config": "generalProcess-approvals",
+            "readonlyComponent": "generalProcess-read",
             "nextStep": {
                 "approve": "stepApprovals2"
             }
         },
         "stepApprovals2": {
-            "page": "generalProcess-approvals",
+            "component": "generalProcess-approvals",
+            "config": "generalProcess-approvals",
+            "readonlyComponent": "generalProcess-read",
             "nextStep": {
                 "approve": "stepApprovals3"
             }
         },
         "stepApprovals3": {
-            "page": "generalProcess-approvals",
+            "component": "generalProcess-approvals",
+            "config": "generalProcess-approvals",
+            "readonlyComponent": "generalProcess-read",
             "nextStep": {
                 "approve": "stepAD"
             }
         },
         "stepAD": {
-            "page": "generalProcess-stepAD",
+            "component": "generalProcess-stepAD",
+            "config": "generalProcess-stepAD",
+            "readonlyComponent": "generalProcess-read",
             "nextStep": {
                 "approve": ""
             }
         },
         "parallel": {
-            "page": "generalProcess-parallel",
+            "component": "generalProcess-parallel",
+            "config": "generalProcess-parallel",
+            "readonlyComponent": "generalProcess-read",
             "nextStep": {
                 "comment": "stepRG"
             }

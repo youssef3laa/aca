@@ -31,7 +31,7 @@
 
             this.taskData = await this.getTaskData(this.taskId);
             this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
-            this.loadForm("generalProcess-early", this.fillForm);
+            this.loadForm(this.inputSchema.config, this.fillForm);
 
             this.$observable.subscribe("complete-step", this.submit);
         },
@@ -54,23 +54,27 @@
                     writingDate: entityData.writingDate.split("Z")[0],
                 });
 
+                this.$refs.appBuilder.setModelData("form2", {
+                    receiver: entityData
+                });
+
                 this.$refs.appBuilder.setModelData("historyTable", {
                     taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
                 });
 
-                this.$refs.appBuilder.setModelData("processRoutingForm", {
+                this.$refs.appBuilder.setModelData("approvalForm", {
                     routing: this.inputSchema.router
                 });
-
-                this.$refs.appBuilder.setModelData("signaturePage", {
-                    signature: {
-                        requestId: this.inputSchema.requestId   
-                    }
-                });
+                
+                // this.$refs.appBuilder.setModelData("signaturePage", {
+                //     signature: {
+                //         requestId: this.inputSchema.requestId
+                //     }
+                // });
             },
             submit: function () {
                 let model = this.$refs.appBuilder.getModelData("form1");
-                let model2 = this.$refs.appBuilder.getModelData("processRoutingForm");
+                let model2 = this.$refs.appBuilder.getModelData("approvalForm");
                 // if (!model._valid){
                 //   //@TODO show warning
                 //   return;

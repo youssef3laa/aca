@@ -6,6 +6,7 @@ import com.asset.appwork.dto.Router;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.ApprovalHistory;
+import com.asset.appwork.model.User;
 import com.asset.appwork.platform.soap.Process;
 import com.asset.appwork.platform.soap.Workflow;
 import com.asset.appwork.platform.util.CordysUtil;
@@ -56,7 +57,7 @@ public class ModuleRouting {
     static class StepConfig<T> {
         Boolean addApproval = true;
         Router router = new Router();
-        String page = "" ;
+        String component = "" , config = "" , readonlyComponent = "";
         String subBP = "";
         HashMap<String, String> nextStep = new HashMap<>();
         HashMap<String, T> extraData = new HashMap<>();
@@ -122,7 +123,7 @@ public class ModuleRouting {
     private <T> void calculateNextStep(T outputSchema) throws AppworkException {
         //TODO: Create Setter function in reflection class
         try {
-            String nextStep = "", nextPage = "", nextSubBP = "";
+            String nextStep = "", nextComponent = "", nextConfig = "", nextReadonlyCompnent = "", nextSubBP = "";
             Router nextRouter = new Router();
 
             RoutingConfig routingConfig = generateRoutingConfig();
@@ -190,7 +191,9 @@ public class ModuleRouting {
             }else if(!nextStep.equals(breakString)){
                 if (routingConfig.getSteps().containsKey(nextStep)) {
                     nextRouter = routingConfig.getSteps().get(nextStep).getRouter();
-                    nextPage = routingConfig.getSteps().get(nextStep).getPage();
+                    nextComponent = routingConfig.getSteps().get(nextStep).getComponent();
+                    nextConfig = routingConfig.getSteps().get(nextStep).getConfig();
+                    nextReadonlyCompnent = routingConfig.getSteps().get(nextStep).getReadonlyComponent();
                 }else{
                     throw new AppworkException(ResponseCode.MODULE_ROUTING_INPUTS_ERROR);
                 }
@@ -204,7 +207,8 @@ public class ModuleRouting {
             }
 
             updateOutputSchemaExtraData(outputSchema, routingConfig, currentStepId[0]);
-            updateOutputSchema(outputSchema, nextStep, nextPage, nextSubBP, nextRouter);
+            updateOutputSchema(outputSchema, nextStep,
+                    nextComponent, nextConfig, nextReadonlyCompnent, nextSubBP, nextRouter);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             log.error("ModuleRouting: "+ e.getMessage());
@@ -266,8 +270,11 @@ public class ModuleRouting {
         if(!multipleNextStep.isEmpty() && !multipleNextStep.equals(breakString)){
             if (routingConfig.getSteps().containsKey(multipleNextStep)) {
                 Router multipleNextRouter = routingConfig.getSteps().get(multipleNextStep).getRouter();
-                String multipleNextPage = routingConfig.getSteps().get(multipleNextStep).getPage();
-                updateOutputSchemaAssignees(outputSchema, multipleNextStep, multipleNextPage, multipleNextRouter);
+                String multipleNextComponent = routingConfig.getSteps().get(multipleNextStep).getComponent();
+                String multipleNextConfig = routingConfig.getSteps().get(multipleNextStep).getConfig();
+                String multipleNextReadOnlyComponent = routingConfig.getSteps().get(multipleNextStep).getReadonlyComponent();
+                updateOutputSchemaAssignees(outputSchema, multipleNextStep,
+                        multipleNextComponent, multipleNextConfig, multipleNextReadOnlyComponent, multipleNextRouter);
             }
         }
         return multipleNextStep;
@@ -280,20 +287,32 @@ public class ModuleRouting {
         return "";
     }
 
-    private <T> void updateOutputSchema(T outputSchema, String nextStep, String nextPage, String nextSubBP, Router nextRouter) {
+    private <T> void updateOutputSchema(T outputSchema, String nextStep,
+                                        String nextComponent, String nextConfig, String nextReadonlyComponent,
+                                        String nextSubBP, Router nextRouter) {
         ((OutputSchema) outputSchema).setStepId(nextStep);
-        ((OutputSchema) outputSchema).setPage(nextPage);
+        ((OutputSchema) outputSchema).setComponent(nextComponent);
+        ((OutputSchema) outputSchema).setConfig(nextConfig);
+        ((OutputSchema) outputSchema).setReadonlyComponent(nextReadonlyComponent);
         ((OutputSchema) outputSchema).setSubBP(nextSubBP);
         ((OutputSchema) outputSchema).setRouter(nextRouter);
     }
 
-    private <T> void updateOutputSchemaAssignees(T outputSchema, String stepId, String page, Router router){
+    private <T> void updateOutputSchemaAssignees(T outputSchema, String stepId,
+                                                 String component, String config, String readonlyComponent,
+                                                 Router router){
         Assignees[] assignees = {new Assignees()};
+        String[] assignedCN = {""};
         ReflectionUtil.of(outputSchema).ifPresent("getAssignees", (s) -> {
             assignees[0] = (Assignees) s;
+        }).ifPresent("getAssignedCN", (s) -> {
+            assignedCN[0] = (String) s;
         });
+        assignees[0].setOwner(assignedCN[0]);
         assignees[0].setStepId(stepId);
-        assignees[0].setPage(page);
+        assignees[0].setComponent(component);
+        assignees[0].setConfig(config);
+        assignees[0].setReadonlyComponent(readonlyComponent);
         assignees[0].setRouter(router);
 
         ((OutputSchema) outputSchema).setAssignees(assignees[0]);

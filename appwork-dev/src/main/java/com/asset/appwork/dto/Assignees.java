@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class Assignees {
     List<String> assignee;
-    String stepId, page;
+    String owner;
+    String stepId, component, config, readonlyComponent;
     Router router;
 }
