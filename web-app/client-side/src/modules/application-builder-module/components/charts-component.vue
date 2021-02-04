@@ -1,9 +1,8 @@
 <template>
   <v-container>
     <v-card class="mx-auto">
-      <button @click="changeVal">click me</button>
+     
       <component
-        v-if="loaded"
         :chartdata="chartdata"
         :is="field.chartType"
         style="padding: 15px"
@@ -16,6 +15,8 @@
 import PieChart from "../../graphs-module/views/pie-chart.vue";
 import BarChart from "../../graphs-module/views/bar-chart.vue";
 import BubbleChart from "../../graphs-module/views/bubble-chart.vue";
+import DoughnutChart from "../../graphs-module/views/doughnut-chart.vue";
+
 import chartsMixin from "../../../mixins/chartsMixin";
 
 export default {
@@ -26,18 +27,10 @@ export default {
     components: {
     PieChart,
     BarChart,
+    DoughnutChart,
     BubbleChart,
   },
-  async mounted() {
-    this.loaded = false;
-    console.log(this.val);
-    try {
-      this.response = await this.getDynamicReport(this.val.requestData);
-      this.loaded = true;
-    } catch (e) {
-      console.error(e);
-    }
-  },
+
   data() {
     return {
       drawCharts: "",
@@ -69,19 +62,29 @@ export default {
         ],
       },
       loaded: false,
-
+      
       response: {},
+      // d:{
+      //   labels: this.val.labels,
+      //   datasets: [
+      //     {
+      //       label: this.field.name,
+      //       data: this.val.data,
+      //       backgroundColor: this.val.backgroundColor,
+      //     },
+      //   ],
+      // }
     };
   },
 
   computed: {
     chartdata() {
       return {
-        labels: this.response.labels,
+        labels: this.val.labels,
         datasets: [
           {
             label: this.field.name,
-            data: this.response.data,
+            data: this.val.data,
             backgroundColor: this.val.backgroundColor,
           },
         ],
@@ -89,31 +92,20 @@ export default {
 
     },
   },
-  watch: {
-    val: {
-      immediate: true,
-      async handler() {
-        try {
-          this.response = await this.getDynamicReport(this.requestData);
-          this.loaded = true;
-          console.log(this.response);
-          console.log(this.chartdata);
-        } catch (e) {
-          console.error(e);
-        }
-      },
-    },
-  },
+//  watch:{
+//    val(newVal){
+//       this.d={
+//         labels: newVal.labels,
+//         datasets: [
+//           {
+//             label: this.field.name,
+//             data: newVal.data,
+//             backgroundColor: newVal.backgroundColor,
+//           },
+//         ],
+//       }
+//    }
+//  }
 
-  methods: {
-    async changeVal() {
-      try {
-        this.response = await this.getDynamicReport(this.requestData);
-        this.loaded = true;
-      } catch (e) {
-        console.error(e);
-      }
-    },
-  },
 };
 </script>

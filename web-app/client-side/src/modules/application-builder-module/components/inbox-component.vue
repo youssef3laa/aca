@@ -28,7 +28,7 @@ export default {
   data() {
     return {
       response: [],
-
+      sidebarItem:"",
       app: {
         pages: [
           {
@@ -123,6 +123,7 @@ export default {
   },
   methods: {
     viewTask(item) {
+      if(this.sidebarItem=="viewReceived"){
       console.log('item obj in table', item)
       try {
         let taskId = item.item.TaskId,
@@ -136,6 +137,8 @@ export default {
       } catch (e) {
         console.error(e)
       }
+      }
+      
     },
     getTasks: function() {
       http.get('workflow/human/tasks').then((response) => {
@@ -184,10 +187,12 @@ export default {
     },
     updateView($event) {
       if ($event == 'viewSent') {
+        this.sidebarItem = 'viewSent';
         this.$refs.appBuilder.setModelData('userHistoryTable', {
           taskTable: this.createSentHistoryTableModel(),
         })
       } else if ($event == 'viewReceived') {
+        this.sidebarItem = 'viewReceived';
         this.createTasks(this.getTasks())
       }
     },
