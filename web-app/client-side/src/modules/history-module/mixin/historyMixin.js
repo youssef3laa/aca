@@ -35,6 +35,11 @@ export default {
                         value: "userCN",
                     },
                     {
+                        text: "المرحلة",
+                        align: "start",
+                        value: "stepId",
+                    },
+                    {
                         text: "التاريخ",
                         value: "approvalDate",
                     },

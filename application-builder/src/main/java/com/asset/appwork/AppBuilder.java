@@ -27,7 +27,6 @@ public class AppBuilder {
                 System.out.println(path);
                 String file = readFile(rootPath + "\\views\\" + path+".json").toString();
                 fileContent = fileContent.replace(matcher.start() - 6, matcher.end() + 1, file);
-
             }
             writeFile(rootPath + "\\output\\"  + nameOfViewFolder + ".json", fileContent.toString());
 

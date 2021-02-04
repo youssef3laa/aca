@@ -1,0 +1,25 @@
+{
+    "key": "versionsModal",
+    "type": "ModalSection",
+    "name": "versionsModal",
+    "isCard": true,
+    "forms": [
+        {
+            "modalTitle": "الإصدارات",
+            "key": "fileVersionsModal",
+            "modalId": "versionModal",
+            "inputs": [
+                {
+                    "type": "VersionGridComponent",
+                    "name": "versionGrid",
+                    "col": "12"
+                }
+            ],
+            "model": {
+                "versionGrid": {
+                    "nodeId": ""
+                }
+            }
+        }
+    ]
+}

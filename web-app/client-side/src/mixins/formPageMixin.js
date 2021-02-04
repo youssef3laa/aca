@@ -59,12 +59,21 @@ export default {
                 console.log(error);
             }
         },
+        checkParallelTasksFinished: async function(requestId){
+            try {
+                let response = await http.get("parallel/finished/" + requestId);
+                console.log("Parallel Tasks Finished", response.data);
+                return response.data.data;
+            } catch (error) {
+                console.log(error);
+            }
+        },
         initiateProcess: function (data){
             http.post("/process/initiate", data)
                 .then((response) => {
                     console.log(response);
                     // alert("Initiate Complete!");
-                    router.push('home')
+                    router.push({name: 'HomePage'})
                 })
                 .catch((error) => console.error(error));
         },
@@ -73,7 +82,7 @@ export default {
                 .then((response) => {
                     console.log(response);
                     // alert("Step Complete!");
-                    router.push('home')
+                    router.push({name: 'HomePage'})
                 })
                 .catch((error) => console.error(error));
         },

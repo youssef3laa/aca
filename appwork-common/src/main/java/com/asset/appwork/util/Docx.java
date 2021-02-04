@@ -70,7 +70,13 @@ public class Docx {
                 List<memoValues> memoVales = memoValuesRepository.findByMemosIdAndJsonKey(memoId, jsonKey);
                 for (int j = 0; j < memoVales.size(); j++)
                 {
-                    wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert(memoVales.get(j).getValue(), null));
+                    wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n" +
+                            "\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n" +
+                            "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
+                            "<body>\n" +
+                            memoVales.get(j).getValue()+"\n" +
+                            "</body>\n" +
+                            "</html>", null));
                 }
             }
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy HH-mm-ss");
@@ -82,27 +88,27 @@ public class Docx {
         } catch (JsonParseException e) {
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.BAD_REQUEST);
+            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (JsonMappingException e) {
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.BAD_REQUEST);
+            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (IOException e) {
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.BAD_REQUEST);
+            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (InvalidFormatException e) {
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.BAD_REQUEST);
+            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (Docx4JException e) {
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.BAD_REQUEST);
+            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (JAXBException e) {
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.BAD_REQUEST);
+            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -123,11 +129,11 @@ public class Docx {
         } catch (Docx4JException e) {
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.BAD_REQUEST);
+            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (JAXBException e) {
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.BAD_REQUEST);
+            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         }
         return text;
     }

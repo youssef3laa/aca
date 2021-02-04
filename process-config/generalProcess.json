@@ -26,7 +26,7 @@
             }
         },
         "responsible": {
-            "component": "generalProcess-early",
+            "component": "generalProcess-responsible",
             "config": "generalProcess-early",
             "readonlyComponent": "generalProcess-read",
             "router": {
@@ -89,6 +89,10 @@
             "component": "generalProcess-member",
             "config": "generalProcess-member",
             "readonlyComponent": "generalProcess-read",
+            "router": {
+                "fields": ["comment"],
+                "receiverTypes": ["single"]
+            },
             "nextStep": {
                 "approve": "stepApprovals"
             }

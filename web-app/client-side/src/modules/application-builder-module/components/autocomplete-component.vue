@@ -13,6 +13,7 @@
     v-on:change="autocompleteChange"
     :search-input.sync="search"
     :loading="loading"
+    allow-overflow
   >
     <template #label>
       <span v-t="field.name"></span>

@@ -49,14 +49,14 @@
                 this.$refs.appBuilder.setModelData("form1", {
                     stepId: this.inputSchema.stepId,
                     subjectSummary: entityData.summary,
+                    incomingUnit: entityData.incomingUnit,
                     workType: workTypeObj.arValue,
                     incomingMeans: incomingMeansObj.arValue,
-                    receiver: {
-                        url: this.inputSchema.roleFilter,
-                        list: [],
-                        value: ""
-                    },
                     writingDate: entityData.writingDate.split("Z")[0],
+                });
+
+                this.$refs.appBuilder.setModelData("form2", {
+                    receiver: entityData
                 });
 
                 this.$refs.appBuilder.setModelData("memoPage", {
@@ -67,6 +67,13 @@
 
                 this.$refs.appBuilder.setModelData("historyTable", {
                     taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
+                });
+
+                this.$refs.appBuilder.setModelData("approvalForm", {
+                    routing: {
+                        "fields": ["comment"],
+                        "receiverTypes": ["single"]
+                    }
                 });
             },
             submit: function () {

@@ -227,7 +227,14 @@
         }
         if(newVal.receiverTypes){
           if(!(newVal.receiverTypes instanceof Array)) newVal.receiverTypes = [newVal.receiverTypes]
-          this.receiverTypes = (newVal.decisions)? null:this.getReceiverTypeOptions(newVal.receiverTypes)
+          if(newVal.decisions){
+            this.receiverTypes = null
+          }else if(newVal.receiverTypes instanceof Array && newVal.receiverTypes.length == 1){
+            this.receiverTypes = this.getReceiverTypeOptions(newVal.receiverTypes ,newVal.receiverTypes[0])
+            this.receiverType = newVal.receiverTypes[0]
+          }else{
+            this.receiverTypes = this.getReceiverTypeOptions(newVal.receiverTypes)
+          }
         }
 
         if(this.firstTime){
@@ -245,7 +252,14 @@
     },
     async created() {
       this.decisions = this.getDecisionOptions(this.val.decisions)
-      this.receiverTypes = (this.val.decisions)? null:this.getReceiverTypeOptions(this.val.receiverTypes)
+      if(this.val.decisions){
+        this.receiverTypes = null
+      }else if(this.val.receiverTypes instanceof Array && this.val.receiverTypes.length == 1){
+        this.receiverTypes = this.getReceiverTypeOptions(this.val.receiverTypes ,this.val.receiverTypes[0])
+        this.receiverType = this.val.receiverTypes[0]
+      }else{
+        this.receiverTypes = this.getReceiverTypeOptions(this.val.receiverTypes)
+      }
 
       this.userDetails = await this.getUserDetails()
       this.displayName = this.userDetails.displayName

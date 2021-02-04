@@ -21,7 +21,7 @@ export default {
       d: this.val,
       title: this.field.title,
       color: (this.field.color)? this.field.color:'#07689F',
-      selected: null
+      selected: this.val.value
     }
   },
   methods: {

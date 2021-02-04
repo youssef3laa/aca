@@ -11,6 +11,7 @@
     },
     {
       "type": "InputComponent",
+      "label": "incomingUnit",
       "name": "incomingUnit",
       "rule": "required",
       "readonly": false,

@@ -10,7 +10,7 @@
     import historyMixin from "../../history-module/mixin/historyMixin";
 
     export default {
-        name: "generalProcess-early",
+        name: "generalProcess-responsible",
         mixins: [formPageMixin, historyMixin],
         components: {
             AppBuilder,
@@ -78,6 +78,12 @@
                 //   //@TODO show warning
                 //   return;
                 // }
+
+                let allFinished = await this.checkParallelTasksFinished(this.inputSchema.requestId)
+                if(!allFinished){
+                    alert("Please Wait All Tasks To Finish")
+                    return
+                }
 
                 console.log(model)
                 console.log(model2)
