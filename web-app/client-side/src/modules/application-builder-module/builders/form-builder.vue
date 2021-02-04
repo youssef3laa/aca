@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import {ValidationObserver} from 'vee-validate'
+import { ValidationObserver } from 'vee-validate'
 import InputComponent from '../components/input-component'
 import ButtonComponent from '../components/button-component'
 import TableComponent from '../components/table-component'
@@ -84,7 +84,7 @@ import D3GraphComponent from '../components/d3-graph-component'
 import SignatureComponent from '../components/signature-component'
 import ProcessRoutingComponent from '../components/process-routing-component'
 import ReceiverFormComponent from '../components/receiver-form-component'
-import VersionGridComponent from "@/modules/application-builder-module/components/VersionGridComponent";
+import VersionGridComponent from '@/modules/application-builder-module/components/VersionGridComponent'
 
 export default {
   name: 'FormBuilder',
@@ -114,12 +114,13 @@ export default {
     SignatureComponent,
     ProcessRoutingComponent,
     ReceiverFormComponent,
-    VersionGridComponent
+    VersionGridComponent,
   },
   data() {
     return {
       formModel: this.model,
       content: '',
+      test: null,
     }
   },
   methods: {
@@ -165,6 +166,16 @@ export default {
   },
   props: ['forms', 'model'],
   created() {
+    // for (let i = 0; i < this.forms.inputs.length; i++) {
+    //   if (this.forms.inputs[i].show) {
+    //     console.log(this.forms.inputs[i].show)
+    //     if (this.model[this.forms.inputs[i].show].value.length > 0) {
+    //       this.test = true
+    //       // console.log(this.model[this.forms.inputs[i].show].value.length)
+    //     }
+    //   }
+    // }
+    console.log(this.model)
     var self = this
     if (this.forms.subscribe) {
       console.log('subscribe')
