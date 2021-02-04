@@ -62,7 +62,7 @@
                   style="border: 2px solid #e9e9e9; height: 150px"
                 ></v-img>
                 <v-card-text style="border-top: 2px solid #e9e9e9">{{
-                  signature.date.split("T")[0]
+                  signature.date.split('T')[0]
                 }}</v-card-text>
               </v-card>
             </v-slide-item>
@@ -74,74 +74,78 @@
 </template>
 
 <script>
-import signatureMixin from "../mixin/signatureMixin";
+import signatureMixin from '../mixin/signatureMixin'
 
 export default {
   data() {
     return {
       options: {
-        penColor: "black",
+        penColor: 'black',
+        onBegin: () => {
+          
+          this.$refs.signaturePad.resizeCanvas();
+        },
         // backgroundColor: 'rgb(255, 255, 255)'
       },
       // requestId: 665146,
       signaturesContainer: 715948,
       signatures: [],
       selected: null,
-      folderId: null
-    };
+      folderId: null,
+    }
   },
   mixins: [signatureMixin],
   props: ['requestId'],
   methods: {
     undo() {
-      this.$refs.signaturePad.undoSignature();
+      this.$refs.signaturePad.undoSignature()
     },
     async save() {
-      const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
+      const { isEmpty, data } = this.$refs.signaturePad.saveSignature()
 
-      alert("Open DevTools see the save data.");
-      console.log(isEmpty);
+      alert('Open DevTools see the save data.')
+      console.log(isEmpty)
       // console.log(data);
 
-      await this.uploadToCS(data, this.folderId);
-      await this.reload();
+      await this.uploadToCS(data, this.folderId)
+      await this.reload()
     },
     change() {
       this.options = {
-        penColor: "#00f",
-      };
+        penColor: '#00f',
+      }
     },
     resume() {
       this.options = {
-        penColor: "#c0f",
-      };
+        penColor: '#c0f',
+      }
     },
     clear() {
-      this.$refs.signaturePad.clearSignature();
+      this.$refs.signaturePad.clearSignature()
     },
-    reload: async function(){
-      if(!this.folderId) return;
-      const subNodes = await this.getSubNodes(this.folderId);
+    reload: async function() {
+      if (!this.folderId) return
+      const subNodes = await this.getSubNodes(this.folderId)
 
       // Download thumbnails signatures
-      this.signatures = [];
+      this.signatures = []
       this.signatures = await this.thumbnail(subNodes.results)
     },
-    initialize: async function(){
-      if(!this.requestId) return;
+    initialize: async function() {
+      if (!this.requestId) return
       let folder = await this.createFolder(
-              this.signaturesContainer,
-              this.requestId
-      );
+        this.signaturesContainer,
+        this.requestId
+      )
       this.folderId = folder.id
 
       // List all signatures attached to request id
-      await this.reload();
-    }
+      await this.reload()
+    },
   },
   async created() {
     // Return folder id
-    await this.initialize();
+    await this.initialize()
   },
   watch: {
     requestId: function() {
@@ -149,12 +153,18 @@ export default {
     },
   },
   computed: {
-    selectedUrl: function () {
+    selectedUrl: function() {
       if (!this.selected) return
       return this.selected.replace('&verNum=1&verType=otthumb&pageNum=1', '')
-    }
-  }
-};
+    },
+  },
+  mounted() {
+    this.$observable.subscribe('resizeCanvas', () => {
+      console.log('canvas')
+      this.clear();
+    })
+  },
+}
 </script>
 
 <style>

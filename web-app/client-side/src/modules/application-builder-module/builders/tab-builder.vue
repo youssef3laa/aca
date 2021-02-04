@@ -37,12 +37,15 @@ export default {
           }
         }
         if (section.tabId == this.selected.id) {
-          if (section.visibility) {
-            this.page.sections[i].visibility = 'visible'
-          } else {
-            this.page.sections[i].display = 'block'
-            console.log(this.page.sections[i].display)
+          this.page.sections[i].display = 'block'
+          if (section.isCanvas) {
+            this.$observable.fire('resizeCanvas')
+            // this.page.sections[i].visibility = 'visible'
           }
+          // else {
+          //   this.page.sections[i].display = 'block'
+          //   console.log(this.page.sections[i].display)
+          // }
         }
       }
     },

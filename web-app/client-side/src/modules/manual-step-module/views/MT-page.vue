@@ -311,8 +311,9 @@ export default {
                 tabId: '4',
                 isTab: true,
                 isCard: true,
-                // display: 'block',
-                visibility: 'hidden',
+                isCanvas : true,
+                display: 'none',
+                // visibility: 'hidden',
                 type: 'DefaultSection',
                 name: 'النص',
                 forms: [
