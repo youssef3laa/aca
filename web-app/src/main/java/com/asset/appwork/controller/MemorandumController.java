@@ -4,7 +4,6 @@ import com.asset.appwork.config.TokenService;
 import com.asset.appwork.cs.AppworkCSOperations;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.dto.CreateNode;
-import com.asset.appwork.dto.Document;
 import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
@@ -14,7 +13,6 @@ import com.asset.appwork.repository.MemosRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.util.Docx;
-import com.asset.appwork.util.Http;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -72,14 +70,9 @@ public class MemorandumController {
             createNode.setFile(new MockMultipartFile("file", new FileInputStream(file)));
             //TODO get Ids from env or get them from request
             createNode.setParent_id(680482L);
-            Http http = appworkCSOperations.uploadDocument(createNode);
-            Document documentResult = objectMapper.treeToValue(objectMapper.readTree(http.getResponse()).get("results").get("data"), Document.class);
             LinkedHashMap<String, String> categoryLinkedHashMap = new LinkedHashMap<>();
             categoryLinkedHashMap.put("717725_2", file.getName());
-            documentResult.setCategories(List.of(categoryLinkedHashMap));
-            Http categoryHttp = appworkCSOperations.updateCategoryOnNode(documentResult.getProperties().getId(), 717725L, categoryLinkedHashMap);
-            System.out.println(http.getResponse());
-            System.out.println(http.getStatusCode());
+            appworkCSOperations.uploadNodeAndSetCategory(createNode, new AppworkCSOperations.DocumentQuery(), categoryLinkedHashMap);
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
             e.printStackTrace();
