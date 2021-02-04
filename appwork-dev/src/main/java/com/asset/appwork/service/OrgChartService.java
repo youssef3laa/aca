@@ -302,9 +302,9 @@ public class OrgChartService {
     public Group getGroupParent(String code) throws AppworkException {
         Group group = getGroupByName(code);
         List<Group> siblings = (List<Group>) group.getUnit().getGroup();
-        Boolean headHasUsers = !userRepository.findByGroup(siblings.stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0)).isEmpty();
-        Boolean viceHeadHasUsers = !userRepository.findByGroup(siblings.stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0)).isEmpty();
-        Boolean memberHeadHasUsers = !userRepository.findByGroup(siblings.stream().filter(sibling -> (sibling.getIsHeadRole() && sibling.getIsViceRole())).collect(Collectors.toList()).get(0)).isEmpty();
+//        Boolean headHasUsers = !userRepository.findByGroup(siblings.stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0)).isEmpty();
+//        Boolean viceHeadHasUsers = !userRepository.findByGroup(siblings.stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0)).isEmpty();
+//        Boolean memberHeadHasUsers = !userRepository.findByGroup(siblings.stream().filter(sibling -> (sibling.getIsHeadRole() && sibling.getIsViceRole())).collect(Collectors.toList()).get(0)).isEmpty();
         if (siblings.stream().anyMatch(Group::getIsViceRole) && (!group.getIsHeadRole() && !group.getIsViceRole()))
             return siblings.stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0);
         if (siblings.stream().noneMatch(Group::getIsViceRole) && (!group.getIsHeadRole()))
