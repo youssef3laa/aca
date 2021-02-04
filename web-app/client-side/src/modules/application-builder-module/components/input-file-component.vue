@@ -99,7 +99,7 @@
                   class="card"
 
               >
-                <div class="row pa-1">
+                <div class="row pa-3">
                   <v-col :cols="2" class="card-icon">
                     <v-icon> mdi-file-pdf-outline</v-icon>
                   </v-col>

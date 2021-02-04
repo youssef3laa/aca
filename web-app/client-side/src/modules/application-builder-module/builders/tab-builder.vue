@@ -34,12 +34,13 @@ export default {
         }
         if (section.tabId == this.selected.id) {
           this.page.sections[i].display = 'block'
-          console.log(this.page.sections[i].display);
+          console.log(this.page.sections[i].display)
         }
       }
     },
   },
   mounted() {
+    console.log(this.page)
     for (let i = 0; this.page.tabs && i < this.page.tabs.length; i++) {
       if (this.page.tabs[i].isActive) {
         this.selected = this.page.tabs[i]
@@ -47,7 +48,7 @@ export default {
       }
     }
   },
-    props: ['page'],
+  props: ['page'],
 }
 </script>
 
