@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.Part;
@@ -24,8 +25,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
-
+@Slf4j
 public class AppworkCSOperations {
 
     // content server host
@@ -43,13 +45,15 @@ public class AppworkCSOperations {
     }
 
     //document management
-    public Http getNodeDetails(Long nodeId) throws AppworkException {
-        String urlStr = CS_API.NODE_ACTION.getApiURL() + "/" +
-                nodeId;
+    public Http getNodeDetails(Long nodeId, DocumentQuery documentQuery) throws AppworkException, IllegalAccessException {
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(CS_API.NODE_ACTION.getApiURL());
+        uriComponentsBuilder.path("/" + nodeId);
+        fillURIComponentWithQuery(uriComponentsBuilder, documentQuery);
+
         Http http = new Http().setDoAuthentication(true)
                 .basicAuthentication(this.userName, this.password)
                 .setContentType(Http.ContentType.JSON_REQUEST)
-                .get(urlStr);
+                .get(uriComponentsBuilder.encode().build().toString());
         if (!http.isSuccess())
             throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
         return http;
@@ -67,13 +71,12 @@ public class AppworkCSOperations {
     }
 
     public Http uploadDocument(CreateNode createNode) throws AppworkException, IllegalAccessException, NoSuchFieldException, IOException {
-
-        Document resultDocument = checkIfDocumentAlreadyExists(createNode.getParent_id(),
+        if (createNode.getName() == null || createNode.getName().length() == 0)
+            createNode.setName(createNode.getFile().getOriginalFilename());
+        checkIfDocumentAlreadyExists(createNode.getParent_id(),
                 createNode.getName(),
                 createNode.getType());
-        if (resultDocument != null) {
-            throw new AppworkException(ResponseCode.DUPLICATION_CONFLICT);
-        }
+
 
         Class<CreateNode> createNodeClass = CreateNode.class;
 
@@ -181,9 +184,30 @@ public class AppworkCSOperations {
 
 
     //categories
-    public Http updateCategoryOnNode(Long nodeId, Long categoryId, Map<String, String> categoryValues) throws AppworkException {
+    public void updateCategoryOnNode(Long nodeId, Long categoryId, Map<String, String> categoryValues) throws AppworkException, JsonProcessingException {
+
+
+        List<Document> categoriesListOnNode = getCategoriesOnNode(nodeId);
+        boolean categoryAppliedOnNode = false;
+        for (Document categoryOnDocument :
+                categoriesListOnNode) {
+            Set<String> set = categoryOnDocument.getCategories().get(0).keySet()
+                    .stream()
+                    .filter(s -> s.startsWith(categoryId.toString()))
+                    .collect(Collectors.toSet());
+
+            if (!set.isEmpty()) {
+                categoryAppliedOnNode = true;
+                break;
+            }
+        }
+        if (!categoryAppliedOnNode) {
+            applyCategoryOnNode(nodeId, categoryId, categoryValues);
+            return;
+        }
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(CS_API.UPDATE_CATEGORY_ON_NODE.getApiURL());
         Map<String, Object> pathVariables = new HashMap<>();
+
         pathVariables.put("id", nodeId);
         pathVariables.put("category_id", categoryId);
         Part[] parts = new Part[categoryValues.size()];
@@ -202,8 +226,64 @@ public class AppworkCSOperations {
 
         if (!http.isSuccess())
             throw new AppworkException(http.getResponse(), ResponseCode.INTERNAL_SERVER_ERROR);
+    }
 
-        return http;
+    public List<Document> getCategoriesOnNode(Long nodeId) throws AppworkException, JsonProcessingException {
+        UriComponentsBuilder listCatOnNodesUriComponentBuilder = UriComponentsBuilder.fromUriString(CS_API.LIST_CATEGORIES_ON_NODE.getApiURL());
+        Map<String, Object> pathVariables = new HashMap<>();
+        pathVariables.put("id", nodeId);
+
+        Http listCatOnNodeHttp = new Http().setDoAuthentication(true)
+                .basicAuthentication(this.userName, this.password)
+                .setContentType(Http.ContentType.JSON_REQUEST)
+                .get(listCatOnNodesUriComponentBuilder.encode().buildAndExpand(pathVariables).toString());
+        if (!listCatOnNodeHttp.isSuccess())
+            throw new AppworkException(listCatOnNodeHttp.getResponse(), ResponseCode.INTERNAL_SERVER_ERROR);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Iterator<JsonNode> results = objectMapper.readTree(listCatOnNodeHttp.getResponse()).withArray("results").elements();
+        List<Document> documentList = new ArrayList<>();
+        while (results.hasNext()) {
+            JsonNode dataNode = results.next();
+            Document document = new Document();
+
+            List<LinkedHashMap<String, String>> tempListHashMap = new ArrayList<>();
+            Iterator<Map.Entry<String, JsonNode>> nodes = dataNode.get("data").get("categories").fields();
+            LinkedHashMap<String, String> stringLinkedHashMap = new LinkedHashMap<>();
+
+            while (nodes.hasNext()) {
+                Map.Entry<String, JsonNode> entry = nodes.next();
+                stringLinkedHashMap.put(entry.getKey(), String.valueOf(entry.getValue()));
+            }
+            tempListHashMap.add(stringLinkedHashMap);
+            document.setCategories(tempListHashMap);
+            documentList.add(document);
+        }
+        return documentList;
+    }
+
+    public void applyCategoryOnNode(Long nodeId, Long categoryId, Map<String, String> categoryValues) throws AppworkException {
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(CS_API.LIST_CATEGORIES_ON_NODE.getApiURL());
+        Map<String, Object> pathVariables = new HashMap<>();
+
+        pathVariables.put("id", nodeId);
+        categoryValues.put("category_id", categoryId.toString());
+        Part[] parts = new Part[categoryValues.size()];
+        int index = 0;
+        for (Map.Entry<String, String> entry : categoryValues.entrySet()) {
+            System.out.println("Key = " + entry.getKey() +
+                    ", Value = " + entry.getValue());
+            parts[index] = new StringPart(entry.getKey(), entry.getValue(), StandardCharsets.UTF_8.name());
+            ++index;
+        }
+        Http http = new Http().setDoAuthentication(true)
+                .basicAuthentication(this.userName, this.password)
+                .setData(parts)
+                .setContentType(Http.ContentType.FORM_REQUEST)
+                .post(uriComponentsBuilder.encode().buildAndExpand(pathVariables).toString());
+
+        if (!http.isSuccess())
+            throw new AppworkException(http.getResponse(), ResponseCode.INTERNAL_SERVER_ERROR);
+
     }
 
     //general
@@ -224,11 +304,13 @@ public class AppworkCSOperations {
                         objects) {
                     uriComponentsBuilder.queryParam(fieldName, object);
                 }
+            } else {
+                uriComponentsBuilder.queryParamIfPresent(fieldName, Optional.ofNullable(field.get(documentQuery)));
             }
         }
     }
 
-    public Document checkIfDocumentAlreadyExists(Long ParentId, String name, Integer type) throws IllegalAccessException, AppworkException, JsonProcessingException {
+    public void checkIfDocumentAlreadyExists(Long ParentId, String name, Integer type) throws IllegalAccessException, AppworkException, JsonProcessingException {
 
 //        {{baseUrl}}/v2/nodes/:id/nodes?where_type=0&where_name=testrefaii21&fields=properties{id,name,name_multilingual}
         // TODO to be refactored
@@ -249,12 +331,20 @@ public class AppworkCSOperations {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(http.getResponse());
         ArrayNode jsonArray = jsonNode.withArray("results");
-        if (jsonArray.size() == 0) return null;
-        if (jsonArray.size() == 1)
-            return objectMapper.treeToValue(jsonArray.get(0).get("data"), Document.class);
-            // should never happens 100%
-        else
+        if (jsonArray.size() > 0)
             throw new AppworkException("there are more than on file with the same name", ResponseCode.DUPLICATION_CONFLICT);
+    }
+
+    // Multiple operations
+    public Document uploadNodeAndSetCategory(CreateNode createNode, DocumentQuery documentQuery, LinkedHashMap<String, String> categoriesLinkedHashMaps) throws IOException, AppworkException, NoSuchFieldException, IllegalAccessException {
+
+        Http http = uploadDocument(createNode);
+        ObjectMapper mapper = new ObjectMapper();
+        Document documentResult = mapper.treeToValue(mapper.readTree(http.getResponse()).get("results").get("data"), Document.class);
+
+        updateCategoryOnNode(documentResult.getProperties().getId(), createNode.getCategory_id(), categoriesLinkedHashMaps);
+        Http nodeDetailsHttp = getNodeDetails(documentResult.getProperties().getId(), documentQuery);
+        return mapper.treeToValue(mapper.readTree(nodeDetailsHttp.getResponse()).get("results").get("data"), Document.class);
     }
 
     public enum CS_API {
@@ -277,7 +367,8 @@ public class AppworkCSOperations {
         GET_SPECIFIED_NODE_VERSION("{id}/versions/{version_number}"),
 
         //categories
-        UPDATE_CATEGORY_ON_NODE("{id}/categories/{category_id}");
+        UPDATE_CATEGORY_ON_NODE("{id}/categories/{category_id}"),
+        LIST_CATEGORIES_ON_NODE("{id}/categories");
 
         private final String apiURL;
 

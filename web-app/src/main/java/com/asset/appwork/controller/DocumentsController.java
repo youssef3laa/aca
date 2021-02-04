@@ -91,6 +91,7 @@ public class DocumentsController {
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
             try {
                 createNode.setType(0);
+
                 Http http = appworkCSOperations.
                         uploadDocument(createNode);
                 ObjectMapper mapper = new ObjectMapper();
@@ -399,10 +400,9 @@ public class DocumentsController {
         try {
             Account account = tokenService.get(token);
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
-            Http http = appworkCSOperations.updateCategoryOnNode(nodeId, categoryId, categoryValues);
-            respBuilder.status(SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
-            respBuilder.data(SystemUtil.convertStringToJsonNode(http.getResponse()));
-            log.info("updatedNodeOnDocument: " + http.getResponse());
+            appworkCSOperations.updateCategoryOnNode(nodeId, categoryId, categoryValues);
+            respBuilder.status(ResponseCode.SUCCESS);
+            log.info("updatedNodeOnDocument: " + nodeId);
         } catch (AppworkException e) {
             log.error(e.getMessage());
             respBuilder.status(e.getCode());
@@ -417,7 +417,8 @@ public class DocumentsController {
     //Multiple operations
     @PostMapping("uploadAndSetCategory")
     public ResponseEntity<AppResponse<Document>> uploadAndUpdateCategoryOnNode(@RequestHeader("X-Auth-Token") String token,
-                                                                               UploadNodeAndSetCategory uploadNodeAndSetCategory) {
+                                                                               UploadNodeAndSetCategory uploadNodeAndSetCategory,
+                                                                               AppworkCSOperations.DocumentQuery documentQuery) {
 
         AppResponse.ResponseBuilder<Document> respBuilder = AppResponse.builder();
         try {
@@ -431,17 +432,12 @@ public class DocumentsController {
             createNode.setName(uploadNodeAndSetCategory.getName());
             createNode.setFile(uploadNodeAndSetCategory.getFile());
             createNode.setParent_id(uploadNodeAndSetCategory.getParent_id());
-            Http http = appworkCSOperations.
-                    uploadDocument(createNode);
+            createNode.setCategory_id(uploadNodeAndSetCategory.getCategory_id());
             ObjectMapper mapper = new ObjectMapper();
-            Document documentResult = mapper.treeToValue(mapper.readTree(http.getResponse()).get("results").get("data"), Document.class);
 
-            //TODO optimize
             Map<String, String> result = mapper.convertValue(mapper.readTree(uploadNodeAndSetCategory.getCategoriesMap()), new TypeReference<>() {
             });
-
-            appworkCSOperations.updateCategoryOnNode(documentResult.getProperties().getId(), uploadNodeAndSetCategory.getCategory_id(), result);
-            documentResult.setCategories(List.of((LinkedHashMap<String, String>) result));
+            Document documentResult = appworkCSOperations.uploadNodeAndSetCategory(createNode, documentQuery, (LinkedHashMap<String, String>) result);
             respBuilder.status(ResponseCode.SUCCESS);
             respBuilder.data(documentResult);
         } catch (AppworkException e) {
