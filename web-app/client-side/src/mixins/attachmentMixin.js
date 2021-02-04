@@ -15,7 +15,6 @@ export default {
             let lookupObj = this.fileTypes.find((element) => element.value == categoryValue);
             properties.fileTypeValue = lookupObj?.text ?? "قيمة غير معرفة";
         },
-
         openFileInBrave: async function ({fileId, verNum}) {
 
             this.$observable.fire('file-component-skeleton', true)

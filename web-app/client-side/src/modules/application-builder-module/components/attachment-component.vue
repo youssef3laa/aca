@@ -14,10 +14,11 @@
         style="background: white">
       <div>
         <v-container
+            id="inputFileContainer"
             class="input-file-prim"
             title="Click to grap a file from your PC!"
         >
-          <input multiple style="display: none" type="file"/>
+          <input id="fileInput" multiple style="display: none" type="file"/>
 
           <v-row align="center" justify="center">
             <v-icon color="outline" style="margin: 10px 10px 0 0; padding: 5px 10px"
@@ -114,17 +115,17 @@
                       </v-col>
                       <v-col :cols="6"
                              class="card-name"
-                             style="cursor: pointer"
+                             style="cursor: pointer ;align-self: center;"
                              @click="openFileInBrave({fileId:file.properties.id})"
                       >
 
                         {{ file.properties.name }} <br/>
                         {{ file.properties.fileTypeValue }}
                       </v-col>
-                      <v-col :cols="2" style="cursor: pointer" @click="openVersionsPopup(file)">
+                      <v-col :cols="2" style="cursor: pointer; align-self: center;" @click="openVersionsPopup(file)">
                         <v-icon color="#22B07D"> mdi-folder-multiple</v-icon>
                       </v-col>
-                      <v-col :cols="2" style="cursor: pointer" @click="deleteFile(file)">
+                      <v-col :cols="2" style="cursor: pointer; align-self: center;" @click="deleteFile(file)">
                         <v-icon color="#ea9cb3"> mdi-delete-circle-outline</v-icon>
                       </v-col>
 
@@ -146,6 +147,7 @@
   <FileVersionsModalComponent :dialogState="versionsDialogState"
                               :modalTitle="selectedFile.modalTitle"
                               :nodeIdVal="selectedFile.nodeId"
+                              @openVersionInBrava="openVersionInBrava"
                               @versionsModalClosed="versionsModalClosed">
 
   </FileVersionsModalComponent>
@@ -195,8 +197,11 @@ export default {
   },
 
   async mounted() {
-    const dropzone = this.$el.firstElementChild
-    const fileUpload = dropzone.firstElementChild
+    const dropzone = this.$el.querySelector("#inputFileContainer");
+    console.log(this.$el)
+    const fileUpload = this.$el.querySelector("#fileInput");
+    console.log(fileUpload)
+
     if (dropzone) {
       dropzone.addEventListener('dragenter', (e) => {
         e.preventDefault()
@@ -258,6 +263,24 @@ export default {
   methods: {
     versionsModalClosed() {
       this.versionsDialogState = false;
+    },
+    onEnd: function () {
+      let tempArr = [];
+      for (let i = 0; i < this.filesUploaded.length; ++i) {
+        let element = this.filesUploaded[i];
+        let attachmentSortElement = this.attachmentSortList.find(val => val.fileId == element.properties.id);
+        attachmentSortElement.position = i;
+        tempArr.push(attachmentSortElement);
+      }
+      this.updateMultipleAttachmentSortRecords(tempArr);
+    },
+    startDrag: function (evt, file) {
+      evt.dataTransfer.dropEffect = 'move'
+      evt.dataTransfer.effectAllowed = 'move'
+      evt.dataTransfer.setData('itemID', file.properties.id)
+    },
+    openVersionInBrava(obj) {
+      this.openFileInBrave(obj)
     }
   }
 };
