@@ -1,14 +1,18 @@
 <template>
   <span>
     <div v-for="(section, key) in page.sections" :key="key">
-      <span v-if=" page.tabs && key ==0 && section.type!='TitleComponet'" >
+      <span v-if="page.tabs && key == 0 && section.type != 'TitleComponet'">
         <TabBuilder :page="page" />
       </span>
       <SectionBuilder
+        v-else
         v-bind:style="[
           section.isTab && section.display == 'none'
             ? { display: 'none' }
             : { display: 'block' },
+          section.isTab && section.visibility == 'hidden'
+            ? { visibility: 'hidden' }
+            : { visibility: 'visible' },
         ]"
         v-on:modelChange="dataChange"
         :section="section"

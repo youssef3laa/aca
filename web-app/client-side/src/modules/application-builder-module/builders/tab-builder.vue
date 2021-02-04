@@ -30,11 +30,19 @@ export default {
       for (let i = 0; i < this.page.sections.length; i++) {
         const section = this.page.sections[i]
         if (section.isTab) {
-          this.page.sections[i].display = 'none'
+          if (section.visibility) {
+            this.page.sections[i].visibility = 'hidden'
+          } else {
+            this.page.sections[i].display = 'none'
+          }
         }
         if (section.tabId == this.selected.id) {
-          this.page.sections[i].display = 'block'
-          console.log(this.page.sections[i].display)
+          if (section.visibility) {
+            this.page.sections[i].visibility = 'visible'
+          } else {
+            this.page.sections[i].display = 'block'
+            console.log(this.page.sections[i].display)
+          }
         }
       }
     },
