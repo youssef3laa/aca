@@ -5,7 +5,6 @@
         <TabBuilder :page="page" />
       </span>
       <SectionBuilder
-        v-else
         v-bind:style="[
           section.isTab && section.display == 'none'
             ? { display: 'none' }
