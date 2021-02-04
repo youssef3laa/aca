@@ -27,6 +27,8 @@ import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +73,9 @@ public class Docx {
                     wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert(memoVales.get(j).getValue(), null));
                 }
             }
-            File file = new File("Test" + ".docx");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy HH-mm-ss");
+            Date date = new Date();
+            File file = new File("Memo" + requestId + " " + dateFormat.format(date) + ".docx");
             wordPackage.save(file);
             return file;
 

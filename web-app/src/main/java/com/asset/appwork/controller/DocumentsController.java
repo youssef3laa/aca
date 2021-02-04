@@ -92,6 +92,15 @@ public class DocumentsController {
             try {
                 createNode.setType(0);
 
+                Document existedDocument = appworkCSOperations.checkIfDocumentAlreadyExists(createNode.getParent_id(),
+                        createNode.getName(),
+                        createNode.getType());
+                if (existedDocument != null) {
+                    respBuilder.data(existedDocument);
+                    respBuilder.status(ResponseCode.SUCCESS);
+                    return respBuilder.build().getResponseEntity();
+                }
+
                 Http http = appworkCSOperations.
                         uploadDocument(createNode);
                 ObjectMapper mapper = new ObjectMapper();
