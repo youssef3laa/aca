@@ -1,13 +1,17 @@
 <template>
-    <v-container class="fill-height" >
-  
-  
-    <div style="width:100%;display: flex">
+  <v-container class="fill-height">
+    <div style="width: 100%;  display: flex">
+      <Charts :field="{ name: 'richTextChart', chartType: 'BarChart' }" :val="richtextChart"> </Charts>
+      <Charts :field="{ name: 'process', chartType: 'PieChart' }" :val="processHistory"> </Charts>
+      <Charts :field="{ name: 'process', chartType: 'PieChart' }" :val="processHistory"> </Charts>
+
+    </div>
+    <div style="width: 100%; display: flex">
       <TasksLists></TasksLists>
       <AdvancedSearch></AdvancedSearch>
       <OrgChartBtn></OrgChartBtn>
     </div>
-      <Inbox></Inbox>
+    <Inbox></Inbox>
     <!-- <v-container>
       <AppBuilder ref="appBuilder" :app="app1" />
     </v-container> -->
@@ -20,8 +24,8 @@ import formPageMixin from "../../../mixins/formPageMixin";
 import TasksLists from "../../application-builder-module/components/tasks-list-component";
 import AdvancedSearch from "../../application-builder-module/components/advanced-search-component";
 import OrgChartBtn from "../../application-builder-module/components/org-chart-btn-component";
-
-import Inbox from "../../application-builder-module/components/inbox-component"
+import Charts from "../../application-builder-module/components/charts-component";
+import Inbox from "../../application-builder-module/components/inbox-component";
 
 import http from "../../core-module/services/http";
 
@@ -31,7 +35,8 @@ export default {
     TasksLists,
     AdvancedSearch,
     OrgChartBtn,
-    Inbox
+    Inbox,
+    Charts,
   },
   mixins: [correspondenceMixin, formPageMixin],
 
@@ -52,323 +57,49 @@ export default {
   data() {
     return {
       response: [],
-
-      app: {
-        pages: [
-          {
-            tabs: [
-              {
-                id: 1,
-                name: "المهام",
-              },
-            ],
-            sections: [
-              {
-                tabId: "1",
-                isTab: "true",
-                type: "DefaultSection",
-                isCard: "true",
-                forms: [
-                  {
-                    inputs: [
-                      {
-                        type: "TableComponent",
-                        name: "taskTable",
-                        subscribe: "tasks",
-                        col: 12,
-                      },
-                    ],
-                    model: {
-                      taskTable: {
-                        headers: [
-                          {
-                            text: "",
-                            value: "actions",
-                            sortable: false,
-                          },
-                          {
-                            text: "التاريخ",
-                            align: "start",
-                            filterable: false,
-                            value: "",
-                          },
-                          {
-                            text: "رقم الوارد",
-                            value: "",
-                          },
-                          {
-                            text: "الجهة",
-                            value:
-                              "",
-                          },
-                          {
-                            text: "المرسل",
-                            value: "",
-                          },
-                          {
-                            text: "عنوان الموضوع",
-                            value: "",
-                          },
-                  
-                        ],
-                        data: [],
-                        search: "",
-                      },
-                    },
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+      richtextChart: {
+        backgroundColor: ["#22B07D", "#22B07D", "#22B07D"],
+        requestData: {
+          table: "memoValues",
+          aggregations: [
+            {
+              function: "count",
+              column: "jsonKey",
+            },
+          ],
+          columns: ["jsonKey"],
+          groupBy: ["jsonKey"],
+        },
       },
-      app1: {
-        pages: [
-          {
-            key: "page1",
-            tabs: [
-              {
-                key: "tab1",
-                id: "1",
-                isActive: true,
-                name: "البيانات الأساسية",
-                icon: "far fa-file-alt",
-              },
-              {
-                key: "tab2",
-                id: "2",
-                name: "الآراء السابقة",
-                icon: "fas fa-history",
-              },
-              {
-                key: "tab3",
-                id: "3",
-                name: "مذكرة العرض",
-                icon: "fas fa-print",
-              },
-              {
-                key: "tab4",
-                id: "4",
-                name: "المرفقات",
-                icon: "fas fa-paperclip",
-              },
-            ],
-            sections: [
-              {
-                key: "section1",
-                type: "TitleComponet",
-                name: "بيانات المكاتبة",
-                actions: ["cancel", "complete"],
-              },
-              {
-                key: "section1",
-                tabId: "1",
-                isTab: true,
-                type: "DefaultSection",
-                isCard: true,
-                display: "block",
-                forms: [
-                  {
-                    key: "form1",
-                    publish: "form1Change",
-                    inputs: [
-                      {
-                        type: "InputComponent",
-                        label: "Step Name",
-                        name: "stepId",
-                        readonly: false,
-                        col: "12",
-                      },
-                      {
-                        type: "AutoCompleteComponent",
-                        name: "receiver",
-                        rule: "required",
-                        readonly: false,
-                        col: "6",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "requestDate",
-                        name: "requestDate",
-                        readonly: false,
-                        col: "6",
-                      },
-                      {
-                        type: "TextareaComponent",
-                        label: "notes",
-                        name: "notes",
-                        readonly: false,
-                        col: "12",
-                      },
-                    ],
-                    model: {
-                      stepId: "",
-                      receiver: "",
-                      requestDate: "",
-                      notes: "",
-                    },
-                  },
-                ],
-              },
-              {
-                key: "section2",
-                tabId: "2",
-                isTab: true,
-                type: "DefaultSection",
-                isCard: true,
-                display: "none",
-                forms: [
-                  {
-                    key: "historyTable",
-                    inputs: [
-                      {
-                        type: "TableComponent",
-                        name: "taskTable",
-                        subscribe: "tasks",
-                        col: 12,
-                      },
-                    ],
-                    model: {
-                      taskTable: {
-                        headers: [
-                          {
-                            text: "الاسم",
-                            align: "start",
-                            filterable: false,
-                            value: "userCN",
-                          },
-                          {
-                            text: "التاريخ",
-                            value: "approvalDate",
-                          },
-                        ],
-                        data: [],
-                        search: "",
-                      },
-                    },
-                  },
-                ],
-              },
-              {
-                key: "section3",
-                tabId: "3",
-                isTab: true,
-                type: "DefaultSection",
-                isCard: true,
-                display: "none",
-                forms: [
-                  {
-                    key: "memoPage",
-                    name: "القسم الأول",
-                    inputs: [
-                      {
-                        type: "MemoComponent",
-                        name: "memoComp",
-                        label: "memorandumType",
-                        col: 12,
-                      },
-                    ],
-                    model: {
-                      memoComp: {
-                        list: [
-                          {
-                            value: "1",
-                            text: "memo1",
-                          },
-                          {
-                            value: "2",
-                            text: "memo2",
-                          },
-                        ],
-                        requestId: "",
-                      },
-                    },
-                  },
-                ],
-              },
-              {
-                key: "section4",
-                tabId: "4",
-                isTab: true,
-                type: "DefaultSection",
-                isCard: true,
-                display: "none",
-                forms: [
-                  {
-                    resizable: {
-                      forms: [
-                        {
-                          key: "iframeObj",
-                          background: "white",
-                          inputs: [
-                            {
-                              type: "IframeComponent",
-                              name: "iframeObj",
-                              col: 12,
-                            },
-                          ],
-                          model: {
-                            iframeObj: {
-                              src: "",
-                            },
-                          },
-                        },
-                        {
-                          background: "white",
-                          inputs: [
-                            {
-                              type: "InputFileComponent",
-                              name: "inputFile",
-                              col: 12,
-                            },
-                          ],
-                          model: {
-                            inputFile: "",
-                          },
-                        },
-                      ],
-                    },
-                  },
-                ],
-              },
-              {
-                key: "section5",
-                type: "DefaultSection",
-                isCard: true,
-                name: "الموافقة على الطلب",
-                forms: [
-                  {
-                    key: "ApprovalForm",
-                    inputs: [
-                      {
-                        type: "ApprovalComponent",
-                        title: "الرجاء الموافقة على الطلب",
-                        commentLabel: "notes",
-                        name: "approval",
-                        actions: [
-                          {
-                            value: "approve",
-                            label: "الموافقة على الطلب",
-                          },
-                          {
-                            value: "requestModification",
-                            label: "طلب تعديل",
-                          },
-                        ],
-                      },
-                    ],
-                    model: {
-                      approval: {
-                        decision: "",
-                        comment: "",
-                      },
-                    },
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+      processHistory: {
+        backgroundColor: ["#22B07D", "#D91828"],
+        requestData: {
+          table: "ApprovalHistory",
+          aggregations: [
+            {
+              function: "count",
+              column: "processName",
+            },
+          ],
+          columns: ["processName"],
+          groupBy: ["processName"],
+          where: [
+            {
+              or: [
+                {
+                  type: "equal",
+                  column: "processName",
+                  value: "generalProcess",
+                },
+                {
+                  type: "equal",
+                  column: "processName",
+                  value: "process-1",
+                },
+              ],
+            },
+          ],
+        },
       },
     };
   },

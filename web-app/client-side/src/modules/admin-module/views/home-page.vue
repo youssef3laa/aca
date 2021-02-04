@@ -1,137 +1,45 @@
 <template>
-  <div>
-    <v-container>
-      <AppBuilder :app="app" />
-    </v-container>
-  </div>
+  <v-container class="fill-height">
+    <div style="width: 100%;  display: flex">
+      <Charts :field="{ name: 'richTextChart', chartType: 'BarChart' }" :val="richtextChart"> </Charts>
+      <Charts :field="{ name: 'process', chartType: 'PieChart' }" :val="processHistory"> </Charts>
+      <Charts :field="{ name: 'process', chartType: 'PieChart' }" :val="processHistory"> </Charts>
+
+    </div>
+    <div style="width: 100%; display: flex">
+      <TasksLists></TasksLists>
+      <AdvancedSearch></AdvancedSearch>
+      <OrgChartBtn></OrgChartBtn>
+    </div>
+    <Inbox></Inbox>
+    <!-- <v-container>
+      <AppBuilder ref="appBuilder" :app="app1" />
+    </v-container> -->
+  </v-container>
 </template>
 
 <script>
-import AppBuilder from "../../application-builder-module/builders/app-builder";
-import http from "../../core-module/services/http";
-import { extend } from "vee-validate";
 
-extend("password", {
-  params: ["target"],
-  validate(value, { target }) {
-    return value === target;
-  },
-  message: "Password confirmation does not match",
-});
+import formPageMixin from "../../../mixins/formPageMixin";
+import TasksLists from "../../application-builder-module/components/tasks-list-component";
+import AdvancedSearch from "../../application-builder-module/components/advanced-search-component";
+import OrgChartBtn from "../../application-builder-module/components/org-chart-btn-component";
+import Charts from "../../application-builder-module/components/charts-component";
+import Inbox from "../../application-builder-module/components/inbox-component";
+
+import http from "../../core-module/services/http";
 
 export default {
   name: "HomePage",
   components: {
-    AppBuilder,
+    TasksLists,
+    AdvancedSearch,
+    OrgChartBtn,
+    Inbox,
+    Charts,
   },
-  data() {
-    return {
-      // componentName: null,
-      app: {
-        pages: [
-          {
-            sections: [
-              {
-                "background": "transparent",
-                "isTab": false,
-                "type": "DefaultSection",
-                "isCard": true,
-                forms: [
-                  {
-                    key: "form3",
-                    inputs: [
-                      {
-                        type: "chartsComponent",
-                        chartType: "BarChart",
-                        col: 4,
-                      },
-                      {
-                        type: "chartsComponent",
-                        chartType: "PieChart",
-                        col: 4,
-                      },
-                      {
-                        type: "chartsComponent",
-                        chartType: "BubbleChart",
-                        col: 4,
-                      },
-                    ],
-                    model: {},
-                  },
-                ],
-              }
-            ]
-          },
-          {
-            tabs: [
-              {
-                id: 1,
-                name: "المهام",
-                isActive: true,
+  mixins: [ formPageMixin],
 
-              },
-            ],
-            sections: [
-              {
-                "tabId": "1",
-                "isTab": true,
-                "type": "DefaultSection",
-                "isCard": true,
-                forms: [
-                  {
-                    inputs: [
-                      {
-                        type: "TableComponent",
-                        name: "taskTable",
-                        subscribe: "tasks",
-                        col: 12,
-                      },
-                    ],
-                    model: {
-                      taskTable: {
-                        headers: [
-                          {
-                            text: "Task",
-                            align: "start",
-                            filterable: false,
-                            value: "Activity",
-                          },
-                          {
-                            text: "Sender Name",
-                            value: "Sender.displayName",
-                          },
-                          {
-                            text: "Process Name",
-                            value:
-                              "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process",
-                          },
-                          {
-                            text: "Date",
-                            value: "DeliveryDate",
-                          },
-                          {
-                            text: "Target Type",
-                            value: "Target.type",
-                          },
-                          {
-                            text: "Actions",
-                            value: "actions",
-                            sortable: false,
-                          },
-                        ],
-                        data: [],
-                        search: "",
-                      },
-                    },
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    };
-  },
   methods: {
     getTasks: function () {
       http.get("workflow/human/tasks").then((response) => {
@@ -146,38 +54,57 @@ export default {
     },
   },
 
-  mounted: function () {
-    this.getTasks();
-    this.$observable.subscribe("submit", (model) => {
-      console.log(model);
-      this.getTasks();
-      if (model.valid) {
-        http
-          .post("employee/initiate/", model.model)
-          .then((response) => {
-            console.log(response);
-            this.getTasks();
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      }
-    });
+  data() {
+    return {
+      response: [],
+      richtextChart: {
+        backgroundColor: ["#22B07D", "#22B07D", "#22B07D"],
+        requestData: {
+          table: "memoValues",
+          aggregations: [
+            {
+              function: "count",
+              column: "jsonKey",
+            },
+          ],
+          columns: ["jsonKey"],
+          groupBy: ["jsonKey"],
+        },
+      },
+      processHistory: {
+        backgroundColor: ["#22B07D", "#D91828"],
+        requestData: {
+          table: "ApprovalHistory",
+          aggregations: [
+            {
+              function: "count",
+              column: "processName",
+            },
+          ],
+          columns: ["processName"],
+          groupBy: ["processName"],
+          where: [
+            {
+              or: [
+                {
+                  type: "equal",
+                  column: "processName",
+                  value: "generalProcess",
+                },
+                {
+                  type: "equal",
+                  column: "processName",
+                  value: "process-1",
+                },
+              ],
+            },
+          ],
+        },
+      },
+    };
   },
 };
-
-// <component
-//         v-if="formBuilder != null"
-//         v-bind:is="formBuilder"
-//       ></component>
-
-// computed: {
-//   formBuilder: function () {
-//     if (this.componentName) {
-//       // return () => import(`../../application-builder-module/components/${this.componentName}`)
-//       return () => import(`../../../components/${this.componentName}`);
-//     }
-//     return null;
-//   },
-// },
 </script>
+
+<style>
+</style>

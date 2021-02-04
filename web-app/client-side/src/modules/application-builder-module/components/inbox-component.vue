@@ -10,12 +10,13 @@
 </template>
 
 <script>
+import http from "../../core-module/services/http";
 import Sidebar from "../../application-builder-module/components/sidebar-component";
 import AppBuilder from "../../application-builder-module/builders/app-builder";
 import { Splitpanes, Pane } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 import historyMixin from "../../history-module/mixin/historyMixin";
-
+import router from "../../../router"
 export default {
   mixins: [historyMixin],
   components: {
@@ -72,15 +73,40 @@ export default {
                       {
                         type: "DataTableComponent",
                         name: "taskTable",
+                        actions: ["view"],
                         subscribe: "tasks",
                         col: 12,
                       },
                     ],
                     model: {
                       taskTable: {
-                        url: "",
-                        headers: [],
+                        headers: [
+                          {
+                            text: "Task",
+                            align: "start",
+                            filterable: false,
+                            value: "Activity",
+                          },
+                          {
+                            text: "Sender Name",
+                            value: "Sender.displayName",
+                          },
+                          {
+                            text: "Process Name",
+                            value:
+                              "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process",
+                          },
+                          {
+                            text: "Date",
+                            value: "DeliveryDate",
+                          },
+                          {
+                            text: "",
+                            value: "action",
+                          },
+                        ],
                         data: [],
+                        search: "",
                       },
                     },
                   },
@@ -93,13 +119,80 @@ export default {
     };
   },
   methods: {
+
+    viewTask(item) {
+      console.log("item obj in table", item)
+      try {
+        let taskId = item.item.TaskId, page = item.item.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.page;
+        router.push({
+          name: page,
+          params: {taskId: taskId}
+        })
+      } catch (e) {
+        console.error(e);
+      }}
+      ,
+    getTasks: function () {
+      http.get("workflow/human/tasks").then((response) => {
+        console.log(response);
+        var data = JSON.parse(response.data.data);
+        console.log(data);
+        this.$observable.fire("tasks", {
+          type: "modelUpdate",
+          model: data,
+        });
+      });
+    },
+    createTasks(data){
+      this.$refs.appBuilder.setModelData("userHistoryTable",{
+        taskTable: {
+                        url:null,
+                        headers: [
+                          {
+                            text: "Task",
+                            align: "start",
+                            filterable: false,
+                            value: "Activity",
+                          },
+                          {
+                            text: "Sender Name",
+                            value: "Sender.displayName",
+                          },
+                          {
+                            text: "Process Name",
+                            value:
+                              "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process",
+                          },
+                          {
+                            text: "Date",
+                            value: "DeliveryDate",
+                          },
+                          {
+                            text: "",
+                            value: "action",
+                          },
+                        ],
+                        data: data,
+                        search: "",
+                      }
+        
+      })
+    },
     updateView($event) {
       if ($event == "viewSent") {
         this.$refs.appBuilder.setModelData("userHistoryTable", {
           taskTable: this.createSentHistoryTableModel(),
         });
+      } else if ($event == "viewReceived") {
+        this.createTasks(this.getTasks());
       }
     },
+  },
+  mounted: function () {
+    this.createTasks(this.getTasks());
+  },
+  created() {
+    this.$observable.subscribe("taskTable_view", (item)=>{this.viewTask(item)});
   },
 };
 </script>

@@ -71,7 +71,7 @@ export default {
                       },
                       {
                         text: "",
-                        value: "actions",
+                        value: "action",
                         sortable: false,
                       }
                

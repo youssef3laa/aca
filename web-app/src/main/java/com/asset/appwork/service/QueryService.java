@@ -27,17 +27,25 @@ public class QueryService {
                 List<Object> labels = new ArrayList<>();
                 ObjectMapper mapper = new ObjectMapper();
                 ObjectNode output = mapper.createObjectNode();
+                List<LinkedHashMap> listClone = new ArrayList<>(list);
 
+                listClone.stream().forEach(x->{
+                   x.forEach((k,v) ->{
+                       if(Objects.isNull(v)) {
+                           list.remove(x);}
+                   });
+                });
 
                 list.stream().forEach(x -> {
-                    for( Object k : x.keySet() ){
-                        if (x.get(k) instanceof Long){
+                    x.forEach((k,v) ->{
+
+                        if (v instanceof Long){
                             data.add(x.get(k));
                         }
-                        else if(x.get(k) instanceof String){
+                        else if(v instanceof String){
                             labels.add(x.get(k));
                         }
-                    }
+                    });
                 });
                 output.putPOJO("data",data);
                 output.putPOJO("labels",labels);

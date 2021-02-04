@@ -1,7 +1,13 @@
 <template>
   <v-container>
     <v-card class="mx-auto">
-      <component v-if="loaded" :chartdata="chartdata" :is="field.chartType" style="padding: 15px"></component>
+      <button @click="changeVal">click me</button>
+      <component
+        v-if="loaded"
+        :chartdata="chartdata"
+        :is="field.chartType"
+        style="padding: 15px"
+      ></component>
     </v-card>
   </v-container>
 </template>
@@ -13,82 +19,101 @@ import BubbleChart from "../../graphs-module/views/bubble-chart.vue";
 import chartsMixin from "../../../mixins/chartsMixin";
 
 export default {
-  name: "charts",
-  mixins: [chartsMixin],
-  async mounted() {
-   this.loaded = false;
-     try {
-      this.response = await this.getDynamicReport(this.requestData);
-      this.loaded = true
-    } catch (e) {
-      console.error(e)
-    }
+  name: "Charts",
+  props: ["val", "field"],
 
+  mixins: [chartsMixin],
+    components: {
+    PieChart,
+    BarChart,
+    BubbleChart,
+  },
+  async mounted() {
+    this.loaded = false;
+    console.log(this.val);
+    try {
+      this.response = await this.getDynamicReport(this.val.requestData);
+      this.loaded = true;
+    } catch (e) {
+      console.error(e);
+    }
   },
   data() {
     return {
       drawCharts: "",
       requestData: {
-        table: "memoValues",
+        table: "ApprovalHistory",
         aggregations: [
           {
             function: "count",
-            column: "jsonKey",
+            column: "processName",
           },
         ],
-        columns: ["jsonKey"],
-        groupBy: ["jsonKey"],
+        columns: ["processName"],
+        groupBy: ["processName"],
+        where: [
+          {
+            or: [
+              {
+                type: "equal",
+                column: "processName",
+                value: "generalProcess",
+              },
+              {
+                type: "equal",
+                column: "processName",
+                value: "process-1",
+              },
+            ],
+          },
+        ],
       },
-      loaded:false,
+      loaded: false,
 
-      response:{},
-      
+      response: {},
     };
   },
 
-  computed:{
-    chartdata(){
+  computed: {
+    chartdata() {
       return {
         labels: this.response.labels,
         datasets: [
           {
-            label: "richtext",
+            label: this.field.name,
             data: this.response.data,
-            backgroundColor: "rgba(224, 248, 255)",
-
+            backgroundColor: this.val.backgroundColor,
           },
-          ]
-          }
-      // return  {
-      //   labels: [
-      //     "January",
-      //     "February",
-      //     "March",
-      //     "April",
-      //     "May",
-      //     "June",
-      //     "July",
-      //     "August",
-      //     "September",
-      //     "October",
-      //     "November",
-      //     "December"
-      //   ],
-      //   datasets: [
-      //     {
-      //       label: "تقييم",
-      //       backgroundColor: "green",
-      //       data: [40, 20, 18, 39, 17, 40, 39, 80, 40, 20, 12, 11],
-      //     },
-      //   ],
-      // }
-    }
+        ],
+      };
+
+    },
   },
-  components: {
-    PieChart,
-    BarChart,
-    BubbleChart,
+  watch: {
+    val: {
+      immediate: true,
+      async handler() {
+        try {
+          this.response = await this.getDynamicReport(this.requestData);
+          this.loaded = true;
+          console.log(this.response);
+          console.log(this.chartdata);
+        } catch (e) {
+          console.error(e);
+        }
+      },
+    },
   },
-  props: ["val", "field"],
+
+  methods: {
+    async changeVal() {
+      try {
+        this.response = await this.getDynamicReport(this.requestData);
+        this.loaded = true;
+      } catch (e) {
+        console.error(e);
+      }
+    },
+  },
 };
 </script>

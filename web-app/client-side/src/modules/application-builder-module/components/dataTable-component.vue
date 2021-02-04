@@ -102,6 +102,8 @@ export default {
       }
       if (this.d.url) {
         this.getDataFromApi({ page: 1, itemsPerPage: 10 })
+      }else{
+        this.loading = false
       }
     },
   },
