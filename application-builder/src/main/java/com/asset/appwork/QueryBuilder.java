@@ -81,7 +81,7 @@ public class QueryBuilder<T> {
             columns.stream().forEach(column -> {
                 String columnName = column.getAlias();
                 Object value = null;
-                if(l.getClass() != Object[].class){
+                if(l == null || l.getClass() != Object[].class){
                     value = l;
                 } else {
                     value = ((Object[]) l)[columnIndex[0]];

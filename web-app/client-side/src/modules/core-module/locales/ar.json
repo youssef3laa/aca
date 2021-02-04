@@ -19,6 +19,7 @@
   "incomingMeans": "وسيلة الوارد",
   "incomingUnit": "جهة الوارد",
   "login": "تسجيل دخول",
+  "logout": "تسجيل خروج",
   "logged-in-success": "تم الدخول بنجاح",
   "nameOfTheFile": "اسم الملف",
   "typeOfTheFile": "نوع الملف",
@@ -38,5 +39,12 @@
   "chooseFileToOpenOrShow": "قم بإختيار ملف لإستعراضه أو عرض بياناته",
   "pleaseChooseFileTypeToCompleteFileUpload": "الرجاء اختيار النوع و اضافة الملف لتكتمل عملية التحميل",
   "CANNOT_CONNECT_TO_SERVER": "خطأ في الإتصال بالسيرفر",
-  "INVALID_CREDENTIALS": "برجاء التأكد من اسم المستخدم و كلمه المرور"
-}
+  "INVALID_CREDENTIALS": "برجاء التأكد من اسم المستخدم و كلمه المرور",
+  "homePage":"الصفحة الرئيسية",
+  "tasks": "المهام",
+  "createNewImport": "إنشاء وارد جديد",
+  "registerTopic": "تسجيل موضوع",
+  "createAssignment": "إنشاء تكليف",
+  "directionsScreen":"شاشة التوجيهات",
+  "reports":"التقارير"
+  }

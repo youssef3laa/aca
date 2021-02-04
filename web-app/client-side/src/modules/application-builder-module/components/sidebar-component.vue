@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar-wrapper">
-    <div v-for="(d,key) in data" :key="key" class="sidebar-item">
-      <span> <span> {{d.name}}</span> {{d.number}}</span>
+    <div v-for="(d,key) in data" :key="key" @click="btnClicked(d.action)" class="sidebar-item">
+      <span> <span> {{d.name}}</span> {{d.notifications}}</span>
       <div class="icon-wrapper">
      <i :class=d.icon></i>
       </div>
@@ -15,10 +15,17 @@ export default {
   props:["val","field"],
   data(){
     return{
-        data:[{name:"الوارد",number:21, icon:"fas fa-download"},{name:"الصادر",number:34, icon:"far fa-paper-plane"},
-        ]
+        data:[{name:"الوارد",notifications:21, icon:"fas fa-download",action:"viewReceived"},{name:"المرسل",notifications:34, icon:"far fa-paper-plane",action:"viewSent"},
+        ],
+        selected : null
     };
   },
+  methods:{
+    btnClicked(action){
+      this.selected = action;
+      this.$emit('btnClicked',action);
+    }
+  }
   
 };
 </script>
@@ -36,6 +43,20 @@ export default {
   display: flex;
   align-items: center;
   background-color: rgba(7, 104, 159, 0.05);
+  margin: 10px;
+  height: 40px;
+  width: 85%;
+  cursor:pointer;
+  padding: 10px;
+  justify-content: center;
+  border-radius: 5px;
+  margin-right:4px ;
+  color: #0278ae;
+}
+.sidebar-item--selected {
+  display: flex;
+  align-items: center;
+  background-color: rgba(62, 66, 68, 0.05);
   margin: 10px;
   height: 40px;
   width: 85%;

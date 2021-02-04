@@ -63,7 +63,7 @@ public class MemorandumController {
             String addRecordToMemorandumValues = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memos, id));
             respBuilder.data(addRecordToMemorandumValues);
 
-            File file = docx.exportJsonToDocx("147459", "Test");
+            File file = docx.exportJsonToDocx("147459");
 
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
             CreateNode createNode = new CreateNode();

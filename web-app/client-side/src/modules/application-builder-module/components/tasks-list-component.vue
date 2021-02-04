@@ -1,20 +1,20 @@
 <template>
-  <div class="row task-list-wrapper">
+  <div class="row task-list-wrapper top-bar">
     <div class="task-list-heading">
       <div class="bolt-icon-wrapper">
         <i class="fas fa-bolt"></i>
       </div>
       <span>شريط المهام</span>
     </div>
-    <div id="task-list">
-      <div v-for="(task, key) in taskList" :key="key" class="task">
+    <div ref="taskList" id="task-list">
+      <div  v-for="(task, key) in taskList" :key="key" class="task">
         <i class="far fa-edit"></i>
         <span class="task-name">{{ task.title }}</span>
       </div>
     </div>
     <div class="scroller-wrapper">
-      <v-btn @click="scroll(300,'task-list')" class="scroller"> <i class="fas fa-chevron-right"></i> </v-btn>
-      <v-btn @click="scroll(-300,'task-list')" class="scroller"> <i class="fas fa-chevron-left"></i> </v-btn>
+      <v-btn @click="scroll('right','task-list')" class="scroller"> <i class="fas fa-chevron-right"></i> </v-btn>
+      <v-btn @click="scroll('left','task-list')" class="scroller"> <i class="fas fa-chevron-left"></i> </v-btn>
     </div>
   </div>
 </template>
@@ -36,16 +36,22 @@ export default {
     };
   },
   methods: {
-    scroll(scrollPixels,content) {
+    scroll(direction, content) {
+      let scrollPixels = 180  ;
+      if(direction == 'left') scrollPixels = -scrollPixels;
 
+      console.log(scrollPixels);
       const element = document.getElementById(content);
       // element.animate({scrollLeft: '=-300'},1000);
       var scroll = scrollPixels / 10;
+
       var scrolled = 0;
       const interval = setInterval(() => {
         element.scrollLeft += scroll;
         scrolled += scroll;
-        if (scrolled == scrollPixels) {
+        console.log(scrolled);
+        console.log(scrollPixels);
+        if (Math.round(scrolled) == Math.round(scrollPixels)) {
           clearInterval(interval);
         }
       }, 20);
@@ -57,7 +63,6 @@ export default {
 <style>
 .task-list-heading {
   display: flex;
-  margin-right: 20px;
   height: 100%;
   align-items: center;
   padding-left: 2% ;
@@ -84,18 +89,18 @@ export default {
   margin: 10px;
   height: 40px;
   padding: 10px;
+  min-width: 180px;
+  justify-content: center;
   border-radius: 5px;
   color: #0278ae;
 }
 .task i {
   margin-left: 10px;
 }
+
 .task-list-wrapper {
-  height: 80px;
-  background: white;
   width: 70%;
   margin: 10px;
-  border-radius: 10px;
   align-items: center !important;
   justify-content: space-around;
 }
@@ -103,7 +108,7 @@ export default {
   overflow-x: hidden;
   overflow-y: hidden;
   display: flex;
-  width: 68%;
+  max-width: 65%;
 }
 .scroller {
   min-width: 24px !important;

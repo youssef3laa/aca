@@ -14,8 +14,6 @@ import java.util.HashSet;
 public class User extends BaseIdentity<User> {
     @Column(name = "UserId")
     String userId;
-    @Column(name = "IdentityDisplayName")
-    String displayName;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(
@@ -57,14 +55,6 @@ public class User extends BaseIdentity<User> {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
     }
 
     public Person getPerson() {

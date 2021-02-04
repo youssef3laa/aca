@@ -4,7 +4,7 @@
       <AppBuilder dir="rtl" ref="appBuilder" :app="app" />
     </pane>
     <pane max-size="20" size="14">
-      <Sidebar></Sidebar>
+      <Sidebar @btnClicked="updateView"></Sidebar>
     </pane>
   </splitpanes>
 </template>
@@ -14,7 +14,10 @@ import Sidebar from "../../application-builder-module/components/sidebar-compone
 import AppBuilder from "../../application-builder-module/builders/app-builder";
 import { Splitpanes, Pane } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
+import historyMixin from "../../history-module/mixin/historyMixin";
+
 export default {
+  mixins: [historyMixin],
   components: {
     Sidebar,
     Splitpanes,
@@ -64,9 +67,10 @@ export default {
                 isCard: "true",
                 forms: [
                   {
+                    key: "userHistoryTable",
                     inputs: [
                       {
-                        type: "TableComponent",
+                        type: "DataTableComponent",
                         name: "taskTable",
                         subscribe: "tasks",
                         col: 12,
@@ -74,37 +78,9 @@ export default {
                     ],
                     model: {
                       taskTable: {
-                        headers: [
-                          {
-                            text: "",
-                            value: "actions",
-                            sortable: false,
-                          },
-                          {
-                            text: "التاريخ",
-                            align: "start",
-                            filterable: false,
-                            value: "",
-                          },
-                          {
-                            text: "رقم الوارد",
-                            value: "",
-                          },
-                          {
-                            text: "الجهة",
-                            value: "",
-                          },
-                          {
-                            text: "المرسل",
-                            value: "",
-                          },
-                          {
-                            text: "عنوان الموضوع",
-                            value: "",
-                          },
-                        ],
+                        url: "",
+                        headers: [],
                         data: [],
-                        search: "",
                       },
                     },
                   },
@@ -115,6 +91,15 @@ export default {
         ],
       },
     };
+  },
+  methods: {
+    updateView($event) {
+      if ($event == "viewSent") {
+        this.$refs.appBuilder.setModelData("userHistoryTable", {
+          taskTable: this.createSentHistoryTableModel(),
+        });
+      }
+    },
   },
 };
 </script>

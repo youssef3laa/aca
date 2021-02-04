@@ -1,5 +1,6 @@
 package com.asset.appwork.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -11,6 +12,7 @@ import java.util.Optional;
 
 @MappedSuperclass
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class BaseIdentity<T extends BaseIdentity> {
     @Id
     @Column(name = "Id")
@@ -23,6 +25,8 @@ public abstract class BaseIdentity<T extends BaseIdentity> {
     String name_en;
     @Column(name = "Name_ar")
     String name_ar;
+    @Column(name = "IdentityDisplayName")
+    String displayName;
 
     @SneakyThrows
     public String toString() {
@@ -67,5 +71,13 @@ public abstract class BaseIdentity<T extends BaseIdentity> {
 
     public void setName_ar(String name_ar) {
         this.name_ar = name_ar;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 }

@@ -56,9 +56,14 @@ h1 {
 h1 {
   font-size: 26px;
 }
+.top-bar{
+  height: 80px;
+  background: white;
+  border-radius: 10px;
+}
 </style>
 <script>
-import TheNavbar from './modules/core-module/components/the-new-nav-bar'
+import TheNavbar from './modules/core-module/components/the-nav-bar'
 import SystemUser from './config/user'
 import Vue from 'vue'
 // import dynamicView from './components/DynamicView'
