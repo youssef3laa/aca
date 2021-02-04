@@ -1,33 +1,18 @@
 <template>
     <div>
         <v-row v-if="d.fields">
-            <v-col v-if="d.fields && d.fields.includes('comment')">
+            <v-col v-for="(field, index) in d.fields" :key="index" :cols="(d.fields.length>1)? 6:0">
                 <v-card outlined>
-                    <v-alert outlined type="info" prominent icon="fas fa-scroll" style="padding-bottom: 5px">
+                    <v-alert outlined type="info" prominent :icon="field.icon" style="padding-bottom: 5px">
                         <p style="font-size: 16px; color: black">
-                            <span style="font-size: 20px; color: #07689F" v-t="'notes'"></span>
+                            <span style="font-size: 20px; color: #07689F" v-t="field.title"></span>
                             <br/>
-                            <span v-t="'this-field-for-notes'"></span> {{displayName}}
+                            <span v-t="field.text"></span> {{displayName}}
                         </p>
                     </v-alert>
                     <v-card-text style="padding-top: 0px">
-                        <TextareaComponent :field="{ name: 'routingNotes', label: 'notes' }"
-                                           @update="onChangeComment"></TextareaComponent>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-            <v-col v-if="d.fields && d.fields.includes('opinion')">
-                <v-card outlined>
-                    <v-alert outlined type="info" prominent icon="far fa-file-alt" style="padding-bottom: 5px">
-                        <p style="font-size: 16px; color: black">
-                            <span style="font-size: 20px; color: #07689F" v-t="'express-opinion'"></span>
-                            <br/>
-                            <span v-t="'this-field-for-opinion'"></span> {{displayName}}
-                        </p>
-                    </v-alert>
-                    <v-card-text style="padding-top: 0px">
-                        <TextareaComponent :field="{ name: 'routingOpinion', label: 'opinion' }"
-                                           @update="onChangeOpinion"></TextareaComponent>
+                        <TextareaComponent :field="{ name: 'fields', label: field.label }"
+                                           @update="onChangeField($event,field)"></TextareaComponent>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -72,8 +57,7 @@
                 displayName: null,
                 userDetails: null,
                 parent: null,
-                comment: null,
-                opinion: null,
+                fields: {},
                 decision: "comment",
                 receiver: null,
                 assignedRole: null,
@@ -97,8 +81,7 @@
                     name: this.field.name,
                     value: {
                         decision: this.decision,
-                        comment: this.comment,
-                        opinion: this.opinion,
+                        comments: this.fields,
                         receiverType: (this.receiverType)? this.receiverType:'single',
                         code: this.code,
                         role: this.assignedRole,
@@ -107,12 +90,9 @@
                     }
                 })
             },
-            onChangeComment: function(event) {
-                this.comment = event.value
-                this.onValueChange()
-            },
-            onChangeOpinion: function(event) {
-                this.opinion = event.value
+            onChangeField: function(event, field) {
+                this.fields[field.name] = event.value
+                console.log("Fields",this.fields)
                 this.onValueChange()
             },
             onChangeMultipleUnits: function(event){
@@ -220,6 +200,7 @@
             val: function (newVal) {
                 if(newVal.fields){
                     if(!(newVal.fields instanceof Array)) newVal.fields = [newVal.fields]
+                    this.fields = {}
                 }
                 if(newVal.decisions){
                     if(!(newVal.decisions instanceof Array)) newVal.decisions = [newVal.decisions]

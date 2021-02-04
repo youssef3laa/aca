@@ -331,7 +331,7 @@ public class AppworkCSOperations {
 
         if (jsonArray.size() == 0) return null;
         if (jsonArray.size() == 1) {
-            Http nodeDetailsHttp = getNodeDetails(Long.valueOf(jsonArray.get(0).get("data").get("properties").get("id").textValue()), documentQuery);
+            Http nodeDetailsHttp = getNodeDetails(jsonArray.get(0).get("data").get("properties").get("id").asLong(), documentQuery);
             return objectMapper.treeToValue(objectMapper.readTree(nodeDetailsHttp.getResponse()).get("results").get("data"), Document.class);
         }
         if (jsonArray.size() > 0)

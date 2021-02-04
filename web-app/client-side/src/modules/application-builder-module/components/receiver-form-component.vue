@@ -88,6 +88,7 @@
         },
         methods: {
             onValueChange: async function() {
+                if(this.field.readonly) return
                 await this.handleReceiverFormOutput()
                 this.$emit('update', {
                     name: this.field.name,

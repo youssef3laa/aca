@@ -263,7 +263,7 @@ export default {
       let nodesResponse
           , attachmentSortResponse;
       try {
-        nodesResponse = await Http.get('/document/list/' + this.bwsId + '?fields=properties&fields=categories');
+        nodesResponse = await Http.get('/document/list/' + this.bwsId + '?fields=properties&fields=categories&where_type=-3');
         attachmentSortResponse = await Http.get('/document/sort', {
           params: {
             requestEntityId: this.requestEntityId,

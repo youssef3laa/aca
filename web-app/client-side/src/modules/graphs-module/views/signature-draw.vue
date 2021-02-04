@@ -129,7 +129,7 @@ export default {
 
       // Download thumbnails signatures
       this.signatures = []
-      this.signatures = await this.thumbnail(subNodes.results)
+      this.signatures = await this.thumbnail(subNodes)
     },
     initialize: async function() {
       if (!this.requestId) return
@@ -137,7 +137,7 @@ export default {
         this.signaturesContainer,
         this.requestId
       )
-      this.folderId = folder.id
+      this.folderId = folder.properties.id
 
       // List all signatures attached to request id
       await this.reload()

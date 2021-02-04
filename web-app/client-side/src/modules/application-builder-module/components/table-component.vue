@@ -26,7 +26,7 @@ export default {
     edit: function (item) {
       console.log("item obj in table", item)
       try {
-        let taskId = item.TaskId, page = item.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.page;
+        let taskId = item.TaskId, page = item.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.component;
         router.push({
           name: page,
           params: {taskId: taskId}
