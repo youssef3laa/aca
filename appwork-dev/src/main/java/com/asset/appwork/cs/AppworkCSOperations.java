@@ -73,9 +73,6 @@ public class AppworkCSOperations {
     public Http uploadDocument(CreateNode createNode) throws AppworkException, IllegalAccessException, NoSuchFieldException, IOException {
         if (createNode.getName() == null || createNode.getName().length() == 0)
             createNode.setName(createNode.getFile().getOriginalFilename());
-        checkIfDocumentAlreadyExists(createNode.getParent_id(),
-                createNode.getName(),
-                createNode.getType());
 
 
         Class<CreateNode> createNodeClass = CreateNode.class;
@@ -310,7 +307,7 @@ public class AppworkCSOperations {
         }
     }
 
-    public void checkIfDocumentAlreadyExists(Long ParentId, String name, Integer type) throws IllegalAccessException, AppworkException, JsonProcessingException {
+    public Document checkIfDocumentAlreadyExists(Long ParentId, String name, Integer type) throws IllegalAccessException, AppworkException, JsonProcessingException {
 
 //        {{baseUrl}}/v2/nodes/:id/nodes?where_type=0&where_name=testrefaii21&fields=properties{id,name,name_multilingual}
         // TODO to be refactored
@@ -331,8 +328,15 @@ public class AppworkCSOperations {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(http.getResponse());
         ArrayNode jsonArray = jsonNode.withArray("results");
+
+        if (jsonArray.size() == 0) return null;
+        if (jsonArray.size() == 1) {
+            Http nodeDetailsHttp = getNodeDetails(Long.valueOf(jsonArray.get(0).get("data").get("properties").get("id").textValue()), documentQuery);
+            return objectMapper.treeToValue(objectMapper.readTree(nodeDetailsHttp.getResponse()).get("results").get("data"), Document.class);
+        }
         if (jsonArray.size() > 0)
             throw new AppworkException("there are more than on file with the same name", ResponseCode.DUPLICATION_CONFLICT);
+        return null;
     }
 
     // Multiple operations
