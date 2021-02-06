@@ -52,12 +52,13 @@ export default {
     val: function (newVal, oldVal) {
       console.log(oldVal, newVal)
       this.value = newVal
+      if(newVal.src) this.loading = true;
     },
   },
   created() {
-    this.$observable.subscribe('file-component-skeleton', (bool) => {
-      this.loading = bool
-    })
+    // this.$observable.subscribe('file-component-skeleton', (bool) => {
+    //
+    // })
   },
   methods: {
     iframeLoaded: function () {

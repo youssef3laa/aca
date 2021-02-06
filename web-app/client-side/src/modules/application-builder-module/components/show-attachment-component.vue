@@ -3,7 +3,8 @@
     <splitpanes horizontal class="default-theme" style="height: 600px">
       <pane class="bg-white" size="31">
         <!-- <InputFileComponent></InputFileComponent> -->
-        <v-expansion-panels dir="rtl">
+        <v-expansion-panels v-model="panel"
+                            multiple dir="rtl">
           <v-expansion-panel>
             <v-expansion-panel-header>
               <v-row no-gutters>
@@ -16,6 +17,7 @@
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               <AttachmentComponent
+                @attachmentHorizontalChange="attachmentHorizontalChange"
                 :bwsId="bwsId"
                 :requestEntityId="requestEntityId"
               ></AttachmentComponent>
@@ -23,7 +25,7 @@
           </v-expansion-panel>
         </v-expansion-panels>
       </pane>
-      <pane> <IframeComponent :val="iFrameObj"> </IframeComponent></pane
+      <pane> <IframeComponent :val="{ src: iframeSrc }"> </IframeComponent></pane
     ></splitpanes>
   </div>
 </template>
@@ -34,9 +36,10 @@ import { Splitpanes, Pane } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 // import InputFileComponent from "./input-file-component"
 import AttachmentComponent from "./attachment-horizontal-component";
-import http from "../../core-module/services/http";
+import attachmentMixin from "../../../mixins/attachmentMixin";
 export default {
   props: ["bwsId", "requestEntityId"],
+  mixins:[attachmentMixin],
   components: {
     IframeComponent,
     Splitpanes,
@@ -46,31 +49,17 @@ export default {
   },
   data() {
     return {
-      iFrameObj: {
-        src: ""
-      }
+      panel: [0],
+      iframeSrc:''
+    }
+  },
+  methods:{
+    attachmentHorizontalChange: async function (obj) {
+      await this.openFileInBrave(obj);
+      console.log("Horizontal SRC Change", this.iframeSrc)
     }
   },
   mounted() {
-    this.$observable.subscribe('open-memo-file-brava', async (fileId) => {
-      this.$observable.fire('file-component-skeleton', true)
-      console.log("openfilebrava");
-      console.log(fileId);
-      let userToken;
-      try {
-        userToken = await http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
-          "userName": "admin",
-          "password": "Asset99a",
-          "ticketType": "OTDSTICKET"
-        });
-        this.iFrameObj.src =
-                'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
-        console.log(userToken);
-        // this.$observable.fire('file-component-skeleton', false)
-      } catch (e) {
-        console.log(e);
-      }
-    });
   }
 };
 </script>

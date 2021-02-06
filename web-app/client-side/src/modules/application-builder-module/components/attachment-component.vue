@@ -248,31 +248,13 @@ export default {
     });
     await this.listFiles();
 
-    this.$observable.subscribe("refreshAttachmentFiles", function () {
-      this.listFiles();
-    });
+    this.$observable.subscribe("refreshAttachmentFiles", this.listFiles);
   },
   methods: {
     versionsModalClosed() {
       this.versionsDialogState = false;
     },
-    onEnd: function () {
-      let tempArr = [];
-      for (let i = 0; i < this.filesUploaded.length; ++i) {
-        let element = this.filesUploaded[i];
-        let attachmentSortElement = this.attachmentSortList.find(
-          (val) => val.fileId == element.properties.id
-        );
-        attachmentSortElement.position = i;
-        tempArr.push(attachmentSortElement);
-      }
-      this.updateMultipleAttachmentSortRecords(tempArr);
-    },
-    startDrag: function (evt, file) {
-      evt.dataTransfer.dropEffect = "move";
-      evt.dataTransfer.effectAllowed = "move";
-      evt.dataTransfer.setData("itemID", file.properties.id);
-    },
+
     openVersionInBrava(obj) {
       this.openFileInBrave(obj);
     },

@@ -64,11 +64,6 @@
                     routing: this.inputSchema.router
                 });
 
-                // this.$refs.appBuilder.setModelData("signaturePage", {
-                //     signature: {
-                //         requestId: this.inputSchema.requestId
-                //     }
-                // });
             },
             submit:async function () {
                 let model = this.$refs.appBuilder.getModelData("form1");

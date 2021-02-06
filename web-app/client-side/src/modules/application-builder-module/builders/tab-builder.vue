@@ -27,6 +27,13 @@ export default {
   methods: {
     selectedTab: function(tab) {
       this.selected = tab
+      if(tab.publish){
+        if(!(tab.publish instanceof Array)) tab.publish = [tab.publish];
+        for(let key in tab.publish){
+          this.$observable.fire(tab.publish[key])
+        }
+      }
+      console.log("Tab Selected", tab)
       for (let i = 0; i < this.page.sections.length; i++) {
         const section = this.page.sections[i]
         if (section.isTab) {
