@@ -14,7 +14,7 @@ export default {
             let lookupObj = this.fileTypes.find((element) => element.value == categoryValue);
             properties.fileTypeValue = lookupObj?.text ?? "قيمة غير معرفة";
         },
-        openFileInBrave: async function ({ fileId, verNum }) {
+        openFileInBrave: async function ({fileId, verNum}) {
             // this.$observable.fire('file-component-skeleton', true)
             let userToken;
             try {
@@ -215,8 +215,8 @@ export default {
             this.versionsDialogState = true;
             this.selectedFile = { nodeId: file.properties.id, modalTitle: file.properties.name };
             // this.$observable.fire("openVersionsModal", file)
-        },
-        onEnd: function () {
+        }
+        , onEnd: function () {
             let tempArr = [];
             for (let i = 0; i < this.filesUploaded.length; ++i) {
                 let element = this.filesUploaded[i];

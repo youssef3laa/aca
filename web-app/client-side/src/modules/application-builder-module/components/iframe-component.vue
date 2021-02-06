@@ -57,6 +57,9 @@ export default {
     },
   },
   created() {
+    // this.$observable.subscribe('file-component-skeleton', (bool) => {
+    //
+    // })
   },
   methods: {
     iframeLoaded: function () {
