@@ -1,5 +1,4 @@
 <template>
-  <v-container>
     <v-container>
       <v-row>
         <v-col :cols="12">
@@ -17,7 +16,6 @@
             :swapThreshold="0.5"
             class="row horizontal-scroll"
             tag="div"
-            @change="onChange"
             @end="onEnd($event)"
           >
             <div
@@ -36,7 +34,7 @@
                   :cols="6"
                   class="card-name"
                   style="cursor: pointer"
-                  @click="openFileInBrave(file)"
+                  @click="openHorizontalFile( {fileId: file.properties.id })"
                 >
                   {{ file.properties.name }} <br />
                   {{ file.properties.fileTypeValue }}
@@ -56,18 +54,27 @@
           </draggable>
         </v-col>
       </v-row>
+      <FileVersionsModalComponent
+              :dialogState="versionsDialogState"
+              :modalTitle="selectedFile.modalTitle"
+              :nodeIdVal="selectedFile.nodeId"
+              @openVersionInBrava="openHorizontalFile"
+              @versionsModalClosed="versionsModalClosed"
+      >
+      </FileVersionsModalComponent>
     </v-container>
-  </v-container>
 </template>
 
 <script>
 import draggable from "vuedraggable";
-import Http from "../../core-module/services/http";
+// import Http from "../../core-module/services/http";
 import formPageMixin from "../../../mixins/formPageMixin";
+import attachmentMixin from "../../../mixins/attachmentMixin";
+import FileVersionsModalComponent from "./file-versions-modal-component";
 
 export default {
-  components: { draggable },
-  mixins: [formPageMixin],
+  components: { draggable,FileVersionsModalComponent },
+  mixins: [formPageMixin,attachmentMixin],
 
   name: "file-input-component",
   props: ["val", "field", "bwsId", "requestEntityId"],
@@ -80,6 +87,8 @@ export default {
       filesUploaded: [],
       attachmentSortList: [],
       fileTypes: [],
+      versionsDialogState: false,
+      selectedFile: {}
     };
   },
   created() {
@@ -90,21 +99,9 @@ export default {
     console.log(this.bwsId);
   },
   methods: {
-    setFileTypeOnFileUploaded: function (file) {
-      let categoryValue;
-      if (file.categories == undefined || file.categories.length == 0) {
-        //shouldn't go here never...
-        file.properties.fileTypeValue = "لم يتم إدخاله بعد";
-        return;
-      }
-      categoryValue = file.categories[0][this.categoryId + "_2"];
 
-      let lookupObj = this.fileTypes.find(
-        (element) => element.value == categoryValue
-      );
-      if (lookupObj == undefined)
-        file.properties.fileTypeValue = "قيمة غير معرفة";
-      else file.properties.fileTypeValue = lookupObj.text;
+    versionsModalClosed() {
+      this.versionsDialogState = false;
     },
     scroll(scrollPixels) {
       const content = this.$refs.content.clientWidth;
@@ -130,159 +127,11 @@ export default {
       const element = document.getElementById("content");
       element.scrollLeft += 300;
     },
-    onChange: function (evt) {
-      console.log("onChange", evt);
-    },
-    onEnd: function () {
-      let tempArr = [];
-      for (let i = 0; i < this.filesUploaded.length; ++i) {
-        let element = this.filesUploaded[i];
-        let attachmentSortElement = this.attachmentSortList.find(
-          (val) => val.fileId == element.id
-        );
-        attachmentSortElement.position = i;
-        tempArr.push(attachmentSortElement);
-      }
-      this.updateMultipleAttachmentSortRecords(tempArr);
-    },
-    openFileInBrave: function (file) {
-      let fileId = this.filesUploaded.find(
-        (element) => element.name === file.name
-      ).id;
-      this.$observable.fire("open-memo-file-brava", fileId);
-    },
-    deleteFile: async function (file) {
-      if (file == undefined || file.id == undefined) return;
-      try {
-        await Http.delete("/document/delete/" + file.id);
-        this.filesUploaded = this.filesUploaded.filter(
-          (element) => element.id != file.id
-        );
-        this.files = this.files.filter((fileVal) => fileVal.name != file.name);
-        let attachmentSortId;
-        this.attachmentSortList = this.attachmentSortList.filter((value) => {
-          if (value.fileId != file.id) {
-            return true;
-          } else {
-            attachmentSortId = value.id;
-            return false;
-          }
-        });
-        if (!attachmentSortId)
-          await Http.delete("/document/sort/" + attachmentSortId);
-        let tempArr = [];
-        for (let i = 0; i < this.filesUploaded.length; ++i) {
-          let element = this.filesUploaded[i];
-          let attachmentSortElement = this.attachmentSortList.find(
-            (val) => val.fileId == element.id
-          );
-          attachmentSortElement.position = i;
-          tempArr.push(attachmentSortElement);
-        }
-        this.updateMultipleAttachmentSortRecords(tempArr);
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    startDrag: function (evt, file) {
-      evt.dataTransfer.dropEffect = "move";
-      evt.dataTransfer.effectAllowed = "move";
-      evt.dataTransfer.setData("itemID", file.id);
+    openHorizontalFile: function (file) {
+      // console.log(file.properties.id);
+      this.$emit("attachmentHorizontalChange",file)
     },
 
-    listFiles: async function () {
-      let nodesResponse, attachmentSortResponse;
-      try {
-        nodesResponse = await Http.get(
-          "/document/list/" +
-            this.bwsId +
-            "?fields=properties&fields=categories"
-        );
-        attachmentSortResponse = await Http.get("/document/sort", {
-          params: {
-            requestEntityId: this.requestEntityId,
-            bwsId: this.bwsId,
-          },
-        });
-      } catch (e) {
-        console.log(e);
-      }
-      if (!nodesResponse) return;
-      nodesResponse = nodesResponse.data.data;
-      this.attachmentSortList = attachmentSortResponse.data.data;
-
-      nodesResponse.forEach((val) => {
-        let attachmentSortElementObj;
-        if (
-          (attachmentSortElementObj = this.attachmentSortList.find(
-            (attachmentElement) => attachmentElement.fileId == val.properties.id
-          )) != null
-        ) {
-          val.properties.position = attachmentSortElementObj.position;
-          attachmentSortElementObj.exists = true;
-        }
-        //TODO move to function
-        this.setFileTypeOnFileUploaded(val);
-      });
-      nodesResponse.sort((a, b) =>
-        a.properties.position > b.properties.position ? 1 : -1
-      );
-      let itemsToPost = [];
-      nodesResponse.forEach((val, i) => {
-        // noinspection EqualityComparisonWithCoercionJS
-        if (val.properties.position == undefined) {
-          val.properties.position = i;
-          let itemToPost = {
-            fileId: val.properties.id,
-            bwsId: this.bwsId,
-            requestEntityId: this.requestEntityId,
-            position: i,
-          };
-          itemsToPost.push(itemToPost);
-        }
-      });
-      if (itemsToPost.length > 0) {
-        try {
-          let documentSortResponse = await Http.post(
-            "/document/sort/bulk",
-            itemsToPost
-          );
-          documentSortResponse.data.data.forEach((element) => {
-            element.exists = true;
-            this.attachmentSortList.push(element);
-          });
-        } catch (e) {
-          console.log(e);
-        }
-      }
-      let attachmentSortListsToBeDeleted = this.attachmentSortList.filter(
-        (element) => !element.exists
-      );
-      let ids = attachmentSortListsToBeDeleted
-        .map((element) => element.id)
-        .join(",");
-      if (attachmentSortListsToBeDeleted.length > 0) {
-        try {
-          await Http.delete("/document/sort/bulk/" + ids);
-        } catch (e) {
-          console.log(e);
-        }
-      }
-      this.filesUploaded = [];
-      nodesResponse.forEach((val) => this.filesUploaded.push(val));
-    },
-
-    updateMultipleAttachmentSortRecords: function (arr) {
-      Http.post("/document/sort/update/bulk", arr)
-        .then(() => console.log("finished updating position in backend"))
-        .catch((reason) => console.error(reason));
-    },
-        openVersionsPopup: function (file) {
-
-      this.$observable.fire("openVersionsModal", file)
-
-      console.log(file);
-    }
   },
   async mounted() {
     let lookups = await this.getLookupByCategory("attachmentFileType");
@@ -295,7 +144,7 @@ export default {
       };
     });
 
-    this.listFiles();
+    await this.listFiles();
   },
 };
 </script>

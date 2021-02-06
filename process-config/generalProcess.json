@@ -91,7 +91,9 @@
             "readonlyComponent": "generalProcess-read",
             "router": {
                 "fields": ["comment"],
-                "receiverTypes": ["single"]
+                "receiverTypes": ["single"],
+                "direction": "up",
+                "minimumLevel": "office"
             },
             "nextStep": {
                 "approve": "stepApprovals"

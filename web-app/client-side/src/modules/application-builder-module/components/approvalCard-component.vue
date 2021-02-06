@@ -83,7 +83,9 @@
         receiverType: null,
         decisions: null,
         receiverTypes: null,
-        receiverDirection: null
+        receiverDirection: null,
+        direction: null,
+        minimumLevel: null
       }
     },
     methods: {
@@ -211,13 +213,19 @@
       },
       updateDirection: function(direction) {
         this.receiverDirection = {
-          direction: (this.d.decisions)? direction:this.d.direction,
-          minimumLevel: this.d.minimumLevel
+          direction: (this.d.decisions)? direction:this.direction,
+          minimumLevel: this.minimumLevel
         }
       }
     },
     watch: {
       val: function (newVal) {
+        if(newVal.direction){
+          this.direction = newVal.direction
+        }
+        if(newVal.minimumLevel){
+          this.minimumLevel = newVal.minimumLevel
+        }
         if(newVal.fields){
           if(!(newVal.fields instanceof Array)) newVal.fields = [newVal.fields]
         }
@@ -241,6 +249,7 @@
           if(newVal.fields || newVal.decisions || newVal.receiverTypes){
             this.d = newVal
           }
+          this.updateDirection()
           this.firstTime=false
           this.onValueChange()
         }else{
@@ -264,7 +273,7 @@
       this.userDetails = await this.getUserDetails()
       this.displayName = this.userDetails.displayName
       this.parent = await this.getParentDetails()
-
+      this.updateDirection()
       this.onValueChange()
     }
   }

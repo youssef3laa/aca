@@ -1,5 +1,4 @@
 import Http from "@/modules/core-module/services/http";
-import http from "@/modules/core-module/services/http";
 
 export default {
     methods: {
@@ -16,12 +15,10 @@ export default {
             properties.fileTypeValue = lookupObj?.text ?? "قيمة غير معرفة";
         },
         openFileInBrave: async function ({ fileId, verNum }) {
-
-            console.log("openFileInBrava");
-            this.$observable.fire('file-component-skeleton', true)
+            // this.$observable.fire('file-component-skeleton', true)
             let userToken;
             try {
-                userToken = await http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
+                userToken = await Http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
                     "userName": "admin",
                     "password": "Asset99a",
                     "ticketType": "OTDSTICKET"
@@ -216,11 +213,25 @@ export default {
         openVersionsPopup: function (file) {
             console.log("openVersions popup === attachmentMixinjs");
             this.versionsDialogState = true;
-            console.log("versionsDialogState=== attachmentMixinjs");
-
             this.selectedFile = { nodeId: file.properties.id, modalTitle: file.properties.name };
-            console.log("selectedFile === attachmentMixinjs");
-
-        }
+            // this.$observable.fire("openVersionsModal", file)
+        },
+        onEnd: function () {
+            let tempArr = [];
+            for (let i = 0; i < this.filesUploaded.length; ++i) {
+                let element = this.filesUploaded[i];
+                let attachmentSortElement = this.attachmentSortList.find(
+                    (val) => val.fileId == element.properties.id
+                );
+                attachmentSortElement.position = i;
+                tempArr.push(attachmentSortElement);
+            }
+            this.updateMultipleAttachmentSortRecords(tempArr);
+        },
+        startDrag: function (evt, file) {
+            evt.dataTransfer.dropEffect = "move";
+            evt.dataTransfer.effectAllowed = "move";
+            evt.dataTransfer.setData("itemID", file.properties.id);
+        },
     }
 }

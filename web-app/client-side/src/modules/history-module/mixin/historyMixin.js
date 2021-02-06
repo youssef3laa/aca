@@ -32,7 +32,7 @@ export default {
                     {
                         text: "الاسم",
                         align: "start",
-                        value: "userCN",
+                        value: "displayName",
                     },
                     {
                         text: "المرحلة",
@@ -57,7 +57,7 @@ export default {
                       },
                       {
                         text: "المرسل",
-                        value: "userCN",
+                        value: "displayName",
                       },
                 
                     {

@@ -67,11 +67,14 @@
                     taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
                 });
 
-                this.$refs.appBuilder.setModelData("approvalForm", {
-                    routing: {
-                        "fields": ["comment"],
-                        "receiverTypes": ["single"]
+                this.$refs.appBuilder.setModelData("signaturePage", {
+                    signature: {
+                        requestId: this.inputSchema.requestId
                     }
+                });
+
+                this.$refs.appBuilder.setModelData("approvalForm", {
+                    routing: this.inputSchema.router
                 });
             },
             submit: function () {
