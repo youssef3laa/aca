@@ -26,7 +26,6 @@
         },
         async created() {
             this.taskId = this.$route.params.taskId;
-            this.initiateBrava();
             this.claimTask(this.taskId);
             this.taskData = await this.getTaskData(this.taskId);
             this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;

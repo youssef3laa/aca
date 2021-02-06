@@ -26,8 +26,6 @@
         },
         async created() {
             this.taskId = this.$route.params.taskId;
-            this.initiateBrava();
-            this.initAttachmentVersionsModal();
             this.claimTask(this.taskId);
 
             this.taskData = await this.getTaskData(this.taskId);
