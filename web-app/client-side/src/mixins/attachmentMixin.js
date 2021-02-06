@@ -3,7 +3,7 @@ import http from "@/modules/core-module/services/http";
 
 export default {
     methods: {
-        setFileTypeOnFileUploaded: function ({categories, properties}) {
+        setFileTypeOnFileUploaded: function ({ categories, properties }) {
             let categoryValue;
             if (categories == undefined || categories.length == 0) {
                 //shouldn't go here...
@@ -15,8 +15,9 @@ export default {
             let lookupObj = this.fileTypes.find((element) => element.value == categoryValue);
             properties.fileTypeValue = lookupObj?.text ?? "قيمة غير معرفة";
         },
-        openFileInBrave: async function ({fileId, verNum}) {
+        openFileInBrave: async function ({ fileId, verNum }) {
 
+            console.log("openFileInBrava");
             this.$observable.fire('file-component-skeleton', true)
             let userToken;
             try {
@@ -26,10 +27,10 @@ export default {
                     "ticketType": "OTDSTICKET"
                 });
                 if (verNum) {
-                    this.iframeSrc =
+                    this.iframeOjbect.src =
                         'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&vernum=' + verNum + '&OTDSTicket=' + userToken.data.ticket;
                 } else {
-                    this.iframeSrc =
+                    this.iframeOjbect.src =
                         'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
                 }
 
@@ -134,7 +135,7 @@ export default {
                 }
 
             }
-            this.filesUploaded = [];
+            this.filesUploaded.splice(0);
             nodesResponse.forEach((val) => this.filesUploaded.push(val));
         },
         updateAttachmentSortRecord: function (obj) {
@@ -213,10 +214,13 @@ export default {
             })
         },
         openVersionsPopup: function (file) {
-
+            console.log("openVersions popup === attachmentMixinjs");
             this.versionsDialogState = true;
-            this.selectedFile = {nodeId: file.properties.id, modalTitle: file.properties.name};
-            // this.$observable.fire("openVersionsModal", file)
+            console.log("versionsDialogState=== attachmentMixinjs");
+
+            this.selectedFile = { nodeId: file.properties.id, modalTitle: file.properties.name };
+            console.log("selectedFile === attachmentMixinjs");
+
         }
     }
 }

@@ -2,7 +2,7 @@
   <span>
     <splitpanes class="default-theme" dir="ltr">
       <pane dir="rtl" style="background: white">
-        <IframeComponent :val="{ src: iframeSrc }"> </IframeComponent>
+        <IframeComponent :val="iframeOjbect"> </IframeComponent>
       </pane>
       <pane dir="rtl" style="background: white">
         <div>
@@ -92,7 +92,6 @@
           <v-container>
             <draggable
               :animation="150"
-              :list="filesUploaded"
               :swapThreshold="0.5"
               class="row"
               tag="div"
@@ -179,7 +178,7 @@ export default {
   mixins: [attachmentMixin, formPageMixin],
   data() {
     return {
-      iframeSrc: "",
+      iframeOjbect: {src:""},
       bwsId: "",
       categoryId: "",
       files: [],
@@ -273,8 +272,9 @@ export default {
       evt.dataTransfer.effectAllowed = "move";
       evt.dataTransfer.setData("itemID", file.properties.id);
     },
-    openVersionInBrava(obj) {
-      this.openFileInBrave(obj);
+    async openVersionInBrava(obj) {
+      console.log("openVersionInBrava === attachment components");
+      await this.openFileInBrave(obj);
     },
   },
 };
