@@ -34,11 +34,7 @@ export default {
                         align: "start",
                         value: "displayName",
                     },
-                    {
-                        text: "المرحلة",
-                        align: "start",
-                        value: "stepId",
-                    },
+
                     {
                         text: "التاريخ",
                         value: "approvalDate",

@@ -13,6 +13,8 @@
   "opinion": "الرأي",
   "express-opinion": "إبداء الرأي",
   "subjectSummary": "ملخص الموضوع",
+  "initiate": "بدء الطلب",
+  "comment": "إبداء ملاحظات",
   "writingDate": "تاريخ المكاتبة",
   "memorandumType": "نوع مذكرة العرض",
   "workType": "نوع العمل",
@@ -41,11 +43,11 @@
   "pleaseChooseFileTypeToCompleteFileUpload": "الرجاء اختيار النوع و اضافة الملف لتكتمل عملية التحميل",
   "CANNOT_CONNECT_TO_SERVER": "خطأ في الإتصال بالسيرفر",
   "INVALID_CREDENTIALS": "برجاء التأكد من اسم المستخدم و كلمه المرور",
-  "homePage":"الصفحة الرئيسية",
+  "homePage": "الصفحة الرئيسية",
   "tasks": "المهام",
   "createNewImport": "إنشاء وارد جديد",
   "registerTopic": "تسجيل موضوع",
   "createAssignment": "إنشاء تكليف",
-  "directionsScreen":"شاشة التوجيهات",
-  "reports":"التقارير"
-  }
+  "directionsScreen": "شاشة التوجيهات",
+  "reports": "التقارير"
+}
