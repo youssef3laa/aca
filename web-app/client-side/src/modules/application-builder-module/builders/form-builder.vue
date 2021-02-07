@@ -35,17 +35,19 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-expansion-panels>
+
           <component
-            :is="field.type"
             v-else-if="formModel"
+            :is="field.type"
             :field="field"
             :val="formModel[field.name]"
+            :model="formModel"
             v-on:update="updateText"
           ></component>
 
           <component
-            :is="field.type"
             v-else
+            :is="field.type"
             :field="field"
             v-on:update="updateText"
           ></component>
@@ -166,15 +168,6 @@ export default {
   },
   props: ['forms', 'model'],
   created() {
-    // for (let i = 0; i < this.forms.inputs.length; i++) {
-    //   if (this.forms.inputs[i].show) {
-    //     console.log(this.forms.inputs[i].show)
-    //     if (this.model[this.forms.inputs[i].show].value.length > 0) {
-    //       this.test = true
-    //       // console.log(this.model[this.forms.inputs[i].show].value.length)
-    //     }
-    //   }
-    // }
     console.log(this.model)
     var self = this
     if (this.forms.subscribe) {
