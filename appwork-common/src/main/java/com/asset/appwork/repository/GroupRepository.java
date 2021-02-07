@@ -23,7 +23,8 @@ public interface GroupRepository extends GenericRepository<Group, Long> {
     List<Group> findByNameInAndGroupCodeNotNull(List<String> names);
     Page<Group> findByNameInAndGroupCodeNotNull(List<String> names, Pageable pageable);
 
-    Optional<Group> findByUnit(Unit unit);
+    List<Group> findByUnit(Unit unit);
+    Page<Group> findByUnit(Unit unit, Pageable pageable);
 
     List<Group> findByUnitIn(Set<Unit> units);
     Page<Group> findByUnitIn(Set<Unit> units, Pageable pageable);
