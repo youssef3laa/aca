@@ -1,9 +1,8 @@
 import Http from "@/modules/core-module/services/http";
-import http from "@/modules/core-module/services/http";
 
 export default {
     methods: {
-        setFileTypeOnFileUploaded: function ({categories, properties}) {
+        setFileTypeOnFileUploaded: function ({ categories, properties }) {
             let categoryValue;
             if (categories == undefined || categories.length == 0) {
                 //shouldn't go here...
@@ -16,20 +15,19 @@ export default {
             properties.fileTypeValue = lookupObj?.text ?? "قيمة غير معرفة";
         },
         openFileInBrave: async function ({fileId, verNum}) {
-
-            this.$observable.fire('file-component-skeleton', true)
+            // this.$observable.fire('file-component-skeleton', true)
             let userToken;
             try {
-                userToken = await http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
+                userToken = await Http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
                     "userName": "admin",
                     "password": "Asset99a",
                     "ticketType": "OTDSTICKET"
                 });
                 if (verNum) {
-                    this.iframeSrc =
+                    this.iframeOjbect.src =
                         'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&vernum=' + verNum + '&OTDSTicket=' + userToken.data.ticket;
                 } else {
-                    this.iframeSrc =
+                    this.iframeOjbect.src =
                         'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
                 }
 
@@ -72,7 +70,7 @@ export default {
             let nodesResponse
                 , attachmentSortResponse;
             try {
-                nodesResponse = await Http.get('/document/list/' + this.bwsId + '?fields=properties&fields=categories');
+                nodesResponse = await Http.get('/document/list/' + this.bwsId + '?fields=properties&fields=categories&where_type=-3');
                 attachmentSortResponse = await Http.get('/document/sort', {
                     params: {
                         requestEntityId: this.requestEntityId,
@@ -134,7 +132,7 @@ export default {
                 }
 
             }
-            this.filesUploaded = [];
+            this.filesUploaded.splice(0);
             nodesResponse.forEach((val) => this.filesUploaded.push(val));
         },
         updateAttachmentSortRecord: function (obj) {
@@ -213,10 +211,28 @@ export default {
             })
         },
         openVersionsPopup: function (file) {
-
+            console.log("openVersions popup === attachmentMixinjs");
             this.versionsDialogState = true;
-            this.selectedFile = {nodeId: file.properties.id, modalTitle: file.properties.name};
+            this.selectedFile.nodeId = file.properties.id
+            this.selectedFile.modalTitle = file.properties.name;
             // this.$observable.fire("openVersionsModal", file)
         }
+        , onEnd: function () {
+            let tempArr = [];
+            for (let i = 0; i < this.filesUploaded.length; ++i) {
+                let element = this.filesUploaded[i];
+                let attachmentSortElement = this.attachmentSortList.find(
+                    (val) => val.fileId == element.properties.id
+                );
+                attachmentSortElement.position = i;
+                tempArr.push(attachmentSortElement);
+            }
+            this.updateMultipleAttachmentSortRecords(tempArr);
+        },
+        startDrag: function (evt, file) {
+            evt.dataTransfer.dropEffect = "move";
+            evt.dataTransfer.effectAllowed = "move";
+            evt.dataTransfer.setData("itemID", file.properties.id);
+        },
     }
 }

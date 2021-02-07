@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.Date;
 
 /**
@@ -25,6 +26,8 @@ public class ApprovalHistory {
     String processName;
     String stepId;
     String parent;
+    @Transient
+    String displayName;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd , hh:mm:ss a")
     Date approvalDate;

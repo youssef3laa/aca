@@ -14,11 +14,11 @@
       </v-col>
       <v-col :cols="4">
         <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Search"
-          single-line
-          hide-details
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="بحث"
+            single-line
+            hide-details
         ></v-text-field>
       </v-col>
     </v-row>
@@ -74,6 +74,7 @@
 </template>
 <script>
 import http from '../../core-module/services/http'
+
 export default {
   name: 'DataTableComponent',
   data() {
@@ -140,8 +141,20 @@ export default {
       http
         .get(URL)
         .then((response) => {
-          this.totalItems = response.data.metaInfo.totalCount
-          this.d.data = response.data.data
+
+          if(response.data.data) {
+            this.totalItems = response.data.metaInfo.totalCount
+            for (var key in response.data.data) {
+              for (var i = 0; i < this.d.headers.length; i++) {
+                console.log("dataTable log ", response.data.data[key][this.d.headers[i].value]);
+                response.data.data[key][this.d.headers[i].value] = this.$t(response.data.data[key][this.d.headers[i].value])
+              }
+            }
+            this.d.data = response.data.data
+          }else{
+            this.totalItems = 0
+            this.d.data = []
+          }
           this.loading = false
         })
         .catch((error) => {

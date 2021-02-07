@@ -1,10 +1,11 @@
 <template>
-  <splitpanes class="default-theme" dir="ltr">
+
+  <splitpanes style="height:auto" class="default-theme" dir="ltr">
     <pane>
       <AppBuilder dir="rtl" ref="appBuilder" :app="app" />
     </pane>
-    <pane max-size="20" size="14">
-      <Sidebar @btnClicked="updateView"></Sidebar>
+    <pane style="height:auto" max-size="20" size="14">
+      <Sidebar  @btnClicked="updateView"></Sidebar>
     </pane>
   </splitpanes>
 </template>
@@ -28,7 +29,7 @@ export default {
   data() {
     return {
       response: [],
-      sidebarItem:"",
+      sidebarItem: "viewReceived",
       app: {
         pages: [
           {
@@ -123,6 +124,7 @@ export default {
   },
   methods: {
     viewTask(item) {
+      console.log("SideBarItem", this.sidebarItem)
       if(this.sidebarItem=="viewReceived"){
       console.log('item obj in table', item)
       try {
@@ -143,11 +145,15 @@ export default {
     getTasks: function() {
       http.get('workflow/human/tasks').then((response) => {
         console.log(response)
-        var data = JSON.parse(response.data.data)
+        let data = JSON.parse(response.data.data)
         console.log(data)
+        for(let key in data.data){
+          data.data[key].DeliveryDate = new Date(data.data[key].DeliveryDate).toLocaleString()
+          data.data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process = this.$t(data.data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process)
+        }
         this.$observable.fire('tasks', {
           type: 'modelUpdate',
-          model: data,
+          model: data
         })
       })
     },
@@ -157,23 +163,22 @@ export default {
           url: null,
           headers: [
             {
-              text: 'Task',
+              text: 'الموضوع',
               align: 'start',
               filterable: false,
-              value: 'Activity',
+              value: 'TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process',
             },
             {
-              text: 'Sender Name',
+              text: 'المنشئ',
               value: 'Sender.displayName',
             },
             {
-              text: 'Process Name',
-              value:
-                'TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process',
+              text: 'تاريخ الارسال',
+              value: 'DeliveryDate',
             },
             {
-              text: 'Date',
-              value: 'DeliveryDate',
+              text: 'رقم الطلب',
+              value: 'TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestId',
             },
             {
               text: '',

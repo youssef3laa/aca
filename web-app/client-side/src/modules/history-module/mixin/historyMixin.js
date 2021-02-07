@@ -32,13 +32,9 @@ export default {
                     {
                         text: "الاسم",
                         align: "start",
-                        value: "userCN",
+                        value: "displayName",
                     },
-                    {
-                        text: "المرحلة",
-                        align: "start",
-                        value: "stepId",
-                    },
+
                     {
                         text: "التاريخ",
                         value: "approvalDate",
@@ -57,7 +53,7 @@ export default {
                       },
                       {
                         text: "المرسل",
-                        value: "userCN",
+                        value: "displayName",
                       },
                 
                     {

@@ -2,8 +2,9 @@
   <div>
     <v-app-bar
       class="app-bar"
-      height="100"
+      height="80"
       flat
+      fixed
       :style="[$vuetify.rtl ? { direction: 'rtl' } : { direction: 'ltr' }]"
     >
       <template v-if="$vuetify.breakpoint.smAndUp">
@@ -31,7 +32,7 @@
       <v-spacer></v-spacer>
     </v-app-bar>
     <v-navigation-drawer
-      style="margin-top: 100px"
+      style="margin-top: 80px"
       right
       v-model="drawer"
       app

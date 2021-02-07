@@ -43,14 +43,12 @@ public class WorkflowController {
                 NodeList tasks = document.getElementsByTagName("NOTF_TASK_INSTANCE");
                 String data = "{\n" +
                         "\"data\": [\n";
-//                String data = "[\n";
                 if (tasks.getLength() > 0) {
                     for (int i = 0; i < tasks.getLength(); i++) {
                         data += SystemUtil.convertDocumentNodetoJSON(tasks.item(i)) + ",\n";
                     }
                     data = data.substring(0, data.length() - 2);
                 }
-//                data += "]";
                 data += "]\n}";
                 respBuilder.data(data);
             }

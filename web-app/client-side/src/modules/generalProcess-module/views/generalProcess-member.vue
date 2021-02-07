@@ -26,8 +26,6 @@
         },
         async created() {
             this.taskId = this.$route.params.taskId;
-            this.initiateBrava();
-            this.initAttachmentVersionsModal();
             this.claimTask(this.taskId);
 
             this.taskData = await this.getTaskData(this.taskId);
@@ -69,11 +67,14 @@
                     taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
                 });
 
-                this.$refs.appBuilder.setModelData("approvalForm", {
-                    routing: {
-                        "fields": ["comment"],
-                        "receiverTypes": ["single"]
+                this.$refs.appBuilder.setModelData("signaturePage", {
+                    signature: {
+                        requestId: this.inputSchema.requestId
                     }
+                });
+
+                this.$refs.appBuilder.setModelData("approvalForm", {
+                    routing: this.inputSchema.router
                 });
             },
             submit: function () {

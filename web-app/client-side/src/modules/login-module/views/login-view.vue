@@ -117,6 +117,7 @@ export default {
         }
     },
     mounted: function() {
+        localStorage.removeItem("user")
     }
 }
 </script>
