@@ -25,18 +25,21 @@
           </v-expansion-panel>
         </v-expansion-panels>
       </pane>
-      <pane> <IframeComponent :val="{ src: iframeSrc }"> </IframeComponent></pane
-    ></splitpanes>
+      <pane>
+        <IframeComponent :val="iframeOjbect"></IframeComponent>
+      </pane
+      ></splitpanes>
   </div>
 </template>
 
 <script>
 import IframeComponent from "./iframe-component.vue";
-import { Splitpanes, Pane } from "splitpanes";
+import {Pane, Splitpanes} from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 // import InputFileComponent from "./input-file-component"
 import AttachmentComponent from "./attachment-horizontal-component";
 import attachmentMixin from "../../../mixins/attachmentMixin";
+
 export default {
   props: ["bwsId", "requestEntityId"],
   mixins:[attachmentMixin],
@@ -50,13 +53,13 @@ export default {
   data() {
     return {
       panel: [0],
-      iframeSrc:''
+      iframeOjbect: {src: ""}
     }
   },
   methods:{
     attachmentHorizontalChange: async function (obj) {
       await this.openFileInBrave(obj);
-      console.log("Horizontal SRC Change", this.iframeSrc)
+      console.log("Horizontal SRC Change", this.iframeOjbect)
     }
   },
   mounted() {

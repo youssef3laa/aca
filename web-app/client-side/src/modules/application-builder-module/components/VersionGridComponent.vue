@@ -7,19 +7,19 @@
         <v-col :cols="6">
           <div class="card pa-1">
             <v-row>
-              <v-col :cols="2" class="card-icon">
-                <v-icon> mdi-file-pdf-outline</v-icon>
+              <v-col :cols="2">
+                <v-icon size="60"> mdi-file-pdf-outline</v-icon>
               </v-col>
               <v-col :cols="8" class="card-name" style="cursor: pointer">
-                {{ latestVersion.name }} <br />
+                {{ latestVersion.name }} <br/>
                 {{ latestVersion.modify_date }}
               </v-col>
               <v-col
-                :cols="2"
-                style="cursor: pointer; align-self: center"
-                @click="openVersionInBrava(latestVersion)"
+                  :cols="2"
+                  style="cursor: pointer; align-self: center"
+                  @click="openVersionInBrava(latestVersion)"
               >
-                <v-icon color="#07689F"> mdi-eye-outline</v-icon>
+                <v-icon color="#07689F" size="25"> mdi-eye-outline</v-icon>
               </v-col>
             </v-row>
           </div>
@@ -33,19 +33,19 @@
         <v-col v-for="(file, index) in fileVersions" :key="index" :cols="6">
           <div class="card pa-1">
             <v-row>
-              <v-col :cols="2" class="card-icon">
-                <v-icon> mdi-file-pdf-outline</v-icon>
+              <v-col :cols="2">
+                <v-icon size="60"> mdi-file-pdf-outline</v-icon>
               </v-col>
               <v-col :cols="8" class="card-name" style="cursor: pointer">
-                {{ file.name }} <br />
+                {{ file.name }} <br/>
                 {{ file.modify_date }}
               </v-col>
               <v-col
-                :cols="2"
-                style="cursor: pointer; align-self: center"
-                @click="openVersionInBrava(file)"
+                  :cols="2"
+                  style="cursor: pointer; align-self: center"
+                  @click="openVersionInBrava(file)"
               >
-                <v-icon color="#07689F"> mdi-eye-outline</v-icon>
+                <v-icon color="#07689F" size="25"> mdi-eye-outline</v-icon>
               </v-col>
             </v-row>
           </div>
@@ -74,7 +74,8 @@ export default {
       handler: function (newValue, oldValue) {
         console.log(newValue, oldValue);
         this.nodeId = newValue.nodeId;
-        this.getFileVersions();
+        if (this.nodeId && this.nodeId.toString().length > 0)
+          this.getFileVersions();
       },
     },
 

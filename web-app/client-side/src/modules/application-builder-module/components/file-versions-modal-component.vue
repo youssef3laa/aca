@@ -25,8 +25,8 @@
       </v-row>
       <span>
         <VersionGridComponent
-          :val="{ nodeId: nodeId }"
-          @openVersionInBrava="openVersionInBrava"
+            :val="nodeIdObj"
+            @openVersionInBrava="openVersionInBrava"
         >
         </VersionGridComponent>
       </span>
@@ -43,12 +43,12 @@ export default {
   data() {
     return {
       dialog: this.dialogState,
-      nodeId: this.nodeIdVal,
+      nodeIdObj: {nodeId: this.nodeIdVal},
     };
   },
   watch: {
     nodeIdVal: function (newVal) {
-      this.nodeId = newVal;
+      this.nodeIdObj.nodeId = newVal;
     },
     dialogState: function (newVal) {
       console.log("dialogState", newVal);

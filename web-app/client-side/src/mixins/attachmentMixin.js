@@ -213,7 +213,8 @@ export default {
         openVersionsPopup: function (file) {
             console.log("openVersions popup === attachmentMixinjs");
             this.versionsDialogState = true;
-            this.selectedFile = { nodeId: file.properties.id, modalTitle: file.properties.name };
+            this.selectedFile.nodeId = file.properties.id
+            this.selectedFile.modalTitle = file.properties.name;
             // this.$observable.fire("openVersionsModal", file)
         }
         , onEnd: function () {

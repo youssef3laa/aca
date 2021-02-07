@@ -50,10 +50,13 @@ export default {
     };
   },
   watch: {
-    val: function (newVal, oldVal) {
-      console.log(oldVal, newVal)
-      this.value = newVal
-      if(newVal.src) this.loading = true;
+    val: {
+      deep: true,
+      handler: function (newVal, oldVal) {
+        console.log(oldVal, newVal);
+        this.value = newVal;
+        if (newVal.src) this.loading = true;
+      },
     },
   },
   created() {

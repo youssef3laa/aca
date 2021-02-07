@@ -82,7 +82,6 @@
                     @click="uploadFile({ file, index })"
                   >
                     <v-icon>mdi-plus</v-icon>
-                    test3
                   </v-btn>
                 </v-col>
               </v-row>
@@ -98,40 +97,42 @@
               @end="onEnd($event)"
             >
               <div
-                v-for="(file, index) in filesUploaded"
-                :key="index"
-                class="col-6"
-                @dragstart="startDrag($event, file)"
-                @dragover.prevent
-                @dragenter.prevent
+                  v-for="(file, index) in filesUploaded"
+                  :key="index"
+                  class="col-6"
+                  @dragstart="startDrag($event, file)"
+                  @dragover.prevent
+                  @dragenter.prevent
               >
-                <div class="card">
-                  <div class="row pa-1">
-                    <v-col :cols="2" class="card-icon">
-                      <v-icon> mdi-file-pdf-outline</v-icon>
+                <div class="card" max-height="100%" min-height="100%">
+                  <div class="row pa-1" style="height: 100px">
+                    <v-col :cols="2" style="align-self: center">
+                      <v-icon size="60"> mdi-file-pdf-outline</v-icon>
                     </v-col>
                     <v-col
-                      :cols="6"
-                      class="card-name"
-                      style="cursor: pointer; align-self: center"
-                      @click="openFileInBrave({ fileId: file.properties.id })"
+                        :cols="6"
+                        class="card-name"
+                        style="cursor: pointer; align-self: center"
+                        @click="openFileInBrave({ fileId: file.properties.id })"
                     >
-                      {{ file.properties.name }} <br />
+                      {{ file.properties.name }} <br/>
                       {{ file.properties.fileTypeValue }}
                     </v-col>
                     <v-col
-                      :cols="2"
-                      style="cursor: pointer; align-self: center"
-                      @click="openVersionsPopup(file)"
+                        :cols="2"
+                        style="cursor: pointer; align-self: center"
+                        @click="openVersionsPopup(file)"
                     >
-                      <v-icon color="#22B07D"> mdi-folder-multiple</v-icon>
+                      <v-icon color="#22B07D" size="25">
+                        mdi-folder-multiple</v-icon
+                      >
                     </v-col>
                     <v-col
                       :cols="2"
                       style="cursor: pointer; align-self: center"
                       @click="deleteFile(file)"
                     >
-                      <v-icon color="#ea9cb3">
+                      <v-icon color="#ea9cb3" size="25">
                         mdi-delete-circle-outline</v-icon
                       >
                     </v-col>
@@ -159,7 +160,7 @@
 import draggable from "vuedraggable";
 import IframeComponent from "../components/iframe-component";
 import attachmentMixin from "@/mixins/attachmentMixin";
-import { Pane, Splitpanes } from "splitpanes";
+import {Pane, Splitpanes} from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 import formPageMixin from "@/mixins/formPageMixin";
 import FileVersionsModalComponent from "@/modules/application-builder-module/components/file-versions-modal-component";
@@ -178,7 +179,7 @@ export default {
   mixins: [attachmentMixin, formPageMixin],
   data() {
     return {
-      iframeOjbect: {src:""},
+      iframeOjbect: {src: ""},
       bwsId: "",
       categoryId: "",
       files: [],
@@ -187,7 +188,7 @@ export default {
       attachmentSortList: [],
       fileTypes: [],
       versionsDialogState: false,
-      selectedFile: {},
+      selectedFile: {modalTitle: "", nodeId: ""},
     };
   },
   created() {
@@ -252,6 +253,8 @@ export default {
   methods: {
     versionsModalClosed() {
       this.versionsDialogState = false;
+      this.selectedFile.nodeId = "";
+      this.selectedFile.modalTitle = "";
     },
     openVersionInBrava(obj) {
       this.openFileInBrave(obj);
@@ -260,7 +263,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 /*colors*/
 $color-prim-font: #1a1a2e;
 $color-prim-border: #94bed6;
@@ -274,18 +277,28 @@ $font-12: 12px;
   color: $color-prim-font;
 }
 
-.card-icon {
-  height: 40px;
-  padding: 5px;
+.card {
+  border: 2px solid #d6d6d6;
   border-radius: 6px;
-  vertical-align: middle;
-  text-align: center;
+  margin: 10px;
 }
 
-.card-icon i {
-  font-size: 35px !important;
-  padding-top: 8px;
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+  border: 2px solid #0278ae;
 }
+
+// .card-icon {
+//   height: 40px;
+//   padding: 5px;
+//   border-radius: 6px;
+//   vertical-align: middle;
+//   text-align: center;
+// }
+
+// .card-icon i {
+//   font-size: 40px !important;
+// }
 
 .vertical-scroll {
   flex-wrap: unset !important;

@@ -1,19 +1,19 @@
 <template>
   <v-autocomplete
-    v-model="value"
-    :items="items.list"
-    chips
-    clearable
-    color="outline"
-    deletable-chips
-    dense
-    outlined
-    small-chips
-    :disabled="readonly"
-    v-on:change="autocompleteChange"
-    :search-input.sync="search"
-    :loading="loading"
-    allow-overflow
+      v-model="value"
+      :items="items.list"
+      chips
+      clearable
+      color="outline"
+      deletable-chips
+      dense
+      outlined
+      small-chips
+      :disabled="readonly"
+      v-on:change="autocompleteChange"
+      :search-input="search"
+      :loading="loading"
+      allow-overflow
   >
     <template #label>
       <span v-t="field.name"></span>
@@ -24,6 +24,7 @@
 
 <script>
 import http from "../../core-module/services/http";
+
 export default {
   name: "autoCompleteComponent",
   data() {
