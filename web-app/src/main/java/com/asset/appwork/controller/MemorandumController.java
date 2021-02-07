@@ -61,7 +61,7 @@ public class MemorandumController {
             String addRecordToMemorandumValues = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memos, id));
             respBuilder.data(addRecordToMemorandumValues);
 
-            File file = docx.exportJsonToDocx("147459");
+            File file = docx.exportJsonToDocx(memos.getRequestId());
 
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
             CreateNode createNode = new CreateNode();
@@ -70,6 +70,7 @@ public class MemorandumController {
             createNode.setFile(new MockMultipartFile("file", new FileInputStream(file)));
             //TODO get Ids from env or get them from request
             createNode.setParent_id(680482L);
+            createNode.setCategory_id(717725L);
             LinkedHashMap<String, String> categoryLinkedHashMap = new LinkedHashMap<>();
             categoryLinkedHashMap.put("717725_2", file.getName());
             appworkCSOperations.uploadNodeAndSetCategory(createNode, new AppworkCSOperations.DocumentQuery(), categoryLinkedHashMap);

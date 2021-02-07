@@ -17,7 +17,7 @@
         </v-col>
       </v-row>
       <span>
-        <VersionGridComponent :val="{'nodeId':nodeId}">
+        <VersionGridComponent :val="{'nodeId':nodeId}" @openVersionInBrava="openVersionInBrava">
 
         </VersionGridComponent>
       </span>
@@ -59,6 +59,11 @@ export default {
   methods: {
     modalClickOutside() {
       this.$emit("versionsModalClosed");
+    },
+    openVersionInBrava(obj) {
+      this.$emit("versionsModalClosed");
+      this.$emit("openVersionInBrava", obj);
+
     }
   }
 }

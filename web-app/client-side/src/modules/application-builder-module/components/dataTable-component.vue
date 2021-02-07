@@ -140,8 +140,14 @@ export default {
       http
         .get(URL)
         .then((response) => {
-          this.totalItems = response.data.metaInfo.totalCount
-          this.d.data = response.data.data
+
+          if(response.data.data){
+            this.totalItems = response.data.metaInfo.totalCount
+            this.d.data = response.data.data
+          }else{
+            this.totalItems = 0
+            this.d.data = []
+          }
           this.loading = false
         })
         .catch((error) => {

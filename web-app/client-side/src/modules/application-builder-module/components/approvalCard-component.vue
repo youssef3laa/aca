@@ -83,7 +83,9 @@
         receiverType: null,
         decisions: null,
         receiverTypes: null,
-        receiverDirection: null
+        receiverDirection: null,
+        direction: null,
+        minimumLevel: null
       }
     },
     methods: {
@@ -211,13 +213,19 @@
       },
       updateDirection: function(direction) {
         this.receiverDirection = {
-          direction: (this.d.decisions)? direction:this.d.direction,
-          minimumLevel: this.d.minimumLevel
+          direction: (this.d.decisions)? direction:this.direction,
+          minimumLevel: this.minimumLevel
         }
       }
     },
     watch: {
       val: function (newVal) {
+        if(newVal.direction){
+          this.direction = newVal.direction
+        }
+        if(newVal.minimumLevel){
+          this.minimumLevel = newVal.minimumLevel
+        }
         if(newVal.fields){
           if(!(newVal.fields instanceof Array)) newVal.fields = [newVal.fields]
         }
@@ -227,13 +235,21 @@
         }
         if(newVal.receiverTypes){
           if(!(newVal.receiverTypes instanceof Array)) newVal.receiverTypes = [newVal.receiverTypes]
-          this.receiverTypes = (newVal.decisions)? null:this.getReceiverTypeOptions(newVal.receiverTypes)
+          if(newVal.decisions){
+            this.receiverTypes = null
+          }else if(newVal.receiverTypes instanceof Array && newVal.receiverTypes.length == 1){
+            this.receiverTypes = this.getReceiverTypeOptions(newVal.receiverTypes ,newVal.receiverTypes[0])
+            this.receiverType = newVal.receiverTypes[0]
+          }else{
+            this.receiverTypes = this.getReceiverTypeOptions(newVal.receiverTypes)
+          }
         }
 
         if(this.firstTime){
           if(newVal.fields || newVal.decisions || newVal.receiverTypes){
             this.d = newVal
           }
+          this.updateDirection()
           this.firstTime=false
           this.onValueChange()
         }else{
@@ -245,12 +261,19 @@
     },
     async created() {
       this.decisions = this.getDecisionOptions(this.val.decisions)
-      this.receiverTypes = (this.val.decisions)? null:this.getReceiverTypeOptions(this.val.receiverTypes)
+      if(this.val.decisions){
+        this.receiverTypes = null
+      }else if(this.val.receiverTypes instanceof Array && this.val.receiverTypes.length == 1){
+        this.receiverTypes = this.getReceiverTypeOptions(this.val.receiverTypes ,this.val.receiverTypes[0])
+        this.receiverType = this.val.receiverTypes[0]
+      }else{
+        this.receiverTypes = this.getReceiverTypeOptions(this.val.receiverTypes)
+      }
 
       this.userDetails = await this.getUserDetails()
       this.displayName = this.userDetails.displayName
       this.parent = await this.getParentDetails()
-
+      this.updateDirection()
       this.onValueChange()
     }
   }

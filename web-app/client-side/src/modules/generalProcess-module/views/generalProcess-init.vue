@@ -22,7 +22,6 @@ export default {
   },
   async created() {
     await this.loadForm("generalProcess-init");
-    this.initiateBrava();
     this.$observable.subscribe("complete-step", this.submit);
   },
   methods: {

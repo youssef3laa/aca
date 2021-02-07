@@ -260,6 +260,9 @@ export default {
 
     },
     listFiles: async function () {
+      this.filesUploaded = [];
+      this.attachmentSortList = [];
+      this.files = [];
       let nodesResponse
           , attachmentSortResponse;
       try {
@@ -486,6 +489,9 @@ export default {
     })
     await this.listFiles();
 
+    this.$observable.subscribe("refreshAttachmentFiles", function () {
+      this.listFiles();
+    })
   }
 }
 </script>

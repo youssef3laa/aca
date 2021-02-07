@@ -50,7 +50,7 @@ public class UserController {
 
         String rootStr = environment.getProperty("form.config");
 
-        try (FileReader fileReader = new FileReader(new File(rootStr + "\\output\\" + key + ".json"))) {
+        try (FileReader fileReader = new FileReader(new File(rootStr +File.separator+ "output"+File.separator + key + ".json"))) {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode outputData = mapper.readTree(fileReader);
             // mesh same3

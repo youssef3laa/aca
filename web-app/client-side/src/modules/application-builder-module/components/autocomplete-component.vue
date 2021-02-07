@@ -13,6 +13,7 @@
     v-on:change="autocompleteChange"
     :search-input.sync="search"
     :loading="loading"
+    allow-overflow
   >
     <template #label>
       <span v-t="field.name"></span>
@@ -115,6 +116,7 @@ export default {
         this.querySelections("",newVal.url)
       }
       this.items = newVal;
+      if(newVal.value == null) newVal.value = undefined
       this.value = newVal.value;
       console.log("val", this.val);
     },

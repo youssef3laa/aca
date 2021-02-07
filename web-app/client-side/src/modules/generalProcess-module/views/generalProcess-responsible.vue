@@ -10,7 +10,7 @@
     import historyMixin from "../../history-module/mixin/historyMixin";
 
     export default {
-        name: "generalProcess-member",
+        name: "generalProcess-responsible",
         mixins: [formPageMixin, historyMixin],
         components: {
             AppBuilder,
@@ -21,22 +21,21 @@
                 taskData: {},
                 inputSchema: {},
                 app: {},
-                model: {},
+                model: {}
             };
         },
         async created() {
             this.taskId = this.$route.params.taskId;
             this.claimTask(this.taskId);
-
             this.taskData = await this.getTaskData(this.taskId);
             this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
-            this.loadForm("generalProcess-member", this.fillForm);
+            this.loadForm(this.inputSchema.config, this.fillForm);
 
             this.$observable.subscribe("complete-step", this.submit);
         },
         methods: {
             fillForm: async function () {
-                this.$refs.appBuilder.disableSection("section1")
+                this.$refs.appBuilder.disableSection("section1");
                 let entityName = this.inputSchema.entityName;
                 let entityId = this.inputSchema.entityId;
 
@@ -57,45 +56,49 @@
                     receiver: entityData
                 });
 
-                this.$refs.appBuilder.setModelData("memoPage", {
-                    memoComp: {
-                        requestId: this.inputSchema.requestId
-                    }
-                })
-
                 this.$refs.appBuilder.setModelData("historyTable", {
                     taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
-                });
-
-                this.$refs.appBuilder.setModelData("signaturePage", {
-                    signature: {
-                        requestId: this.inputSchema.requestId
-                    }
                 });
 
                 this.$refs.appBuilder.setModelData("approvalForm", {
                     routing: this.inputSchema.router
                 });
+
+                // this.$refs.appBuilder.setModelData("signaturePage", {
+                //     signature: {
+                //         requestId: this.inputSchema.requestId
+                //     }
+                // });
             },
-            submit: function () {
+            submit:async function () {
                 let model = this.$refs.appBuilder.getModelData("form1");
-                let approvalModel = this.$refs.appBuilder.getModelData("ApprovalForm");
+                let model2 = this.$refs.appBuilder.getModelData("approvalForm");
                 // if (!model._valid){
                 //   //@TODO show warning
                 //   return;
                 // }
 
-                var data = {
+                let allFinished = await this.checkParallelTasksFinished(this.inputSchema.requestId)
+                if(!allFinished){
+                    alert("Please Wait All Tasks To Finish")
+                    return
+                }
+
+                console.log(model)
+                console.log(model2)
+                let data = {
                     taskId: this.taskId,
                     entityId: this.inputSchema.entityId,
                     stepId: this.inputSchema.stepId,
                     process: this.inputSchema.process,
                     parentHistoryId: this.inputSchema.parentHistoryId,
 
-                    code: model.receiver.value.code,
-                    assignedCN: model.receiver.value.value,
-                    decision: approvalModel.approval.decision,
-                    comment: approvalModel.approval.comment
+                    code: model2.routing.code,
+                    assignedCN: model2.routing.assignedCN,
+                    decision: model2.routing.decision,
+                    comment: model2.routing.comment,
+                    assignees: model2.routing.assignees,
+                    receiverType: model2.routing.receiverType,
                 };
                 this.completeStep(data);
             }

@@ -15,12 +15,12 @@
             </v-col>
             <v-col :cols="8"
                    class="card-name"
-                   style="cursor: pointer"
+                   style="cursor: pointer;"
             >
               {{ latestVersion.name }} <br/>
               {{ latestVersion.modify_date }}
             </v-col>
-            <v-col :cols="2" style="cursor: pointer" @click="openVersionInBrava(latestVersion)">
+            <v-col :cols="2" style="cursor: pointer; align-self: center;" @click="openVersionInBrava(latestVersion)">
               <v-icon color="#07689F"> mdi-eye-outline</v-icon>
             </v-col>
         </v-row>
@@ -88,7 +88,7 @@ export default {
   watch: {
     val: function (newVal, oldVal) {
       console.log(oldVal, newVal)
-      if (newVal.nodeId) {
+      if (newVal.nodeId && (newVal.nodeId !== oldVal.nodeId)) {
         this.nodeId = newVal.nodeId;
         this.getFileVersions()
       }
@@ -109,8 +109,9 @@ export default {
       }
     },
     openVersionInBrava(file) {
-      this.$observable.fire("open-file-brava", {fileId: this.nodeId, verNum: file.version_number});
-      this.$observable.fire("versionModal");
+      this.$emit("openVersionInBrava", {fileId: this.nodeId, verNum: file.version_number})
+      // this.$observable.fire("open-file-brava", {fileId: this.nodeId, verNum: file.version_number});
+      // this.$observable.fire("versionModal");
 
     }
   }

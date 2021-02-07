@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 public class AppBuilder {
     static String rootPath;
 
-    public AppBuilder(String rootPath){
+    public AppBuilder(String rootPath) {
         AppBuilder.rootPath = rootPath;
     }
 
@@ -16,7 +16,7 @@ public class AppBuilder {
         if (args.length == 0) return;
         String nameOfViewFolder = args[0].split("\\.")[0];
 
-        String formPath = rootPath + "\\config\\" +  nameOfViewFolder + ".conf";
+        String formPath = rootPath + File.separator + "config" + File.separator + nameOfViewFolder + ".conf";
         StringBuilder fileContent;
         try {
             fileContent = readFile(formPath);
@@ -25,11 +25,10 @@ public class AppBuilder {
             while (matcher.find()) {
                 String path = matcher.group();
                 System.out.println(path);
-                String file = readFile(rootPath + "\\views\\" + path+".json").toString();
+                String file = readFile(rootPath + File.separator + "views" + File.separator + path + ".json").toString();
                 fileContent = fileContent.replace(matcher.start() - 6, matcher.end() + 1, file);
-
             }
-            writeFile(rootPath + "\\output\\"  + nameOfViewFolder + ".json", fileContent.toString());
+            writeFile(rootPath + File.separator + "output" + File.separator + nameOfViewFolder + ".json", fileContent.toString());
 
         } catch (IOException e) {
             e.printStackTrace();

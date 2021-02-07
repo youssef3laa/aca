@@ -59,12 +59,21 @@ export default {
                 console.log(error);
             }
         },
+        checkParallelTasksFinished: async function(requestId){
+            try {
+                let response = await http.get("parallel/finished/" + requestId);
+                console.log("Parallel Tasks Finished", response.data);
+                return response.data.data;
+            } catch (error) {
+                console.log(error);
+            }
+        },
         initiateProcess: function (data){
             http.post("/process/initiate", data)
                 .then((response) => {
                     console.log(response);
                     // alert("Initiate Complete!");
-                    router.push('home')
+                    router.push({name: 'HomePage'})
                 })
                 .catch((error) => console.error(error));
         },
@@ -73,43 +82,9 @@ export default {
                 .then((response) => {
                     console.log(response);
                     // alert("Step Complete!");
-                    router.push('home')
+                    router.push({name: 'HomePage'})
                 })
                 .catch((error) => console.error(error));
-        },
-        initiateBrava: function(){
-            this.$observable.subscribe('open-file-brava', async ({fileId, verNum}) => {
-                this.$observable.fire('file-component-skeleton', true)
-                let userToken;
-                try {
-                  userToken = await http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
-                    "userName": "admin",
-                    "password": "Asset99a",
-                    "ticketType": "OTDSTICKET"
-                  });
-                  if (verNum) {
-                    this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
-                        'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&vernum=' + verNum + '&OTDSTicket=' + userToken.data.ticket;
-                  } else {
-                    this.$refs.appBuilder.getModelData('iframeObj')['iframeObj']['src'] =
-                        'http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&nodeid=' + fileId + '&viewType=1&OTDSTicket=' + userToken.data.ticket;
-                  }
-          
-                } catch (e) {
-                  console.log(e);
-                }
-              });
-            this.initAttachmentVersionsModal()
-        },
-        initAttachmentVersionsModal:function(){
-            this.$observable.subscribe("openVersionsModal", (file) => {
-                this.$observable.fire("versionModal");
-                this.$refs.appBuilder.setModelData("fileVersionsModal", {
-                  versionGrid: {
-                    nodeId: file.properties.id
-                  }
-                });
-              })
         }
     }
 }

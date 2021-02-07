@@ -274,7 +274,7 @@
                 if(level == "SCT" || level == "OFC" || level == "ADM" || level == "GRP" || level == null){
                     this.agency.field = this.getAutocompleteField(this.agencyLabel, true)
                 }
-                if(level == "OFC" || level == "ADM" || level == null){
+                if(level == "OFC" || level == "ADM" || level == "GRP" || level == null){
                     this.sector.field = this.getAutocompleteField(this.sectorLabel, true)
                 }
                 if(level == "GRP" || level == null){

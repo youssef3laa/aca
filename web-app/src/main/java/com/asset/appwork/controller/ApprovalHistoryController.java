@@ -8,6 +8,7 @@ import com.asset.appwork.model.ApprovalHistory;
 import com.asset.appwork.platform.soap.ApprovalHistorySOAP;
 import com.asset.appwork.repository.ApprovalHistoryRepository;
 import com.asset.appwork.response.AppResponse;
+import com.asset.appwork.service.ApprovalHistoryService;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.service.OrgChartService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,6 +37,8 @@ public class ApprovalHistoryController {
     @Autowired
     OrgChartService orgChartService;
     //TODO make approval history service and move repository to it
+    @Autowired
+    ApprovalHistoryService approvalHistoryService;
     @Autowired
     ApprovalHistoryRepository historyRepository;
 
@@ -77,7 +80,7 @@ public class ApprovalHistoryController {
             if(histories.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
 
             respBuilder.info("totalCount", histories.getTotalElements());
-            respBuilder.data(histories.getContent());
+            respBuilder.data(approvalHistoryService.addDisplayNameToApprovals(histories.getContent()));
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -105,7 +108,7 @@ public class ApprovalHistoryController {
         if (histories.hasContent()) return responseBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
 
         responseBuilder.info("totalCount", histories.getTotalElements());
-        responseBuilder.data(histories.getContent());
+        responseBuilder.data(approvalHistoryService.addDisplayNameToApprovals(histories.getContent()));
     } catch (AppworkException e) {
         log.error(e.getMessage());
         e.printStackTrace();
