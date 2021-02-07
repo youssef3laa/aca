@@ -3,7 +3,7 @@
     <v-app id="inspire">
       <!-- <dynamicView /> -->
     <TheNavbar />
-    <v-content>
+    <v-content class="content">
       <router-view />
       </v-content>
     </v-app>
@@ -15,7 +15,9 @@
 @import url(https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400&display=swap);
 @import url(https://use.fontawesome.com/releases/v5.15.2/css/all.css);
 
-
+.content{
+  margin-top:80px;
+}
 .splitpanes--dragging {
   pointer-events: none;
 }

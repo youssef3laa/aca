@@ -17,6 +17,7 @@ import BarChart from "../../graphs-module/views/bar-chart.vue";
 import BubbleChart from "../../graphs-module/views/bubble-chart.vue";
 import DoughnutChart from "../../graphs-module/views/doughnut-chart.vue";
 
+import HorizontalBarChart from "../../graphs-module/views/horizontal-bar-chart";
 import chartsMixin from "../../../mixins/chartsMixin";
 
 export default {
@@ -26,6 +27,7 @@ export default {
   mixins: [chartsMixin],
     components: {
     PieChart,
+    HorizontalBarChart,
     BarChart,
     DoughnutChart,
     BubbleChart,
