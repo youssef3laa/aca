@@ -105,7 +105,7 @@ public class ApprovalHistoryController {
 
         Page<ApprovalHistory> histories = historyRepository.findByUserCNOrderByApprovalDateDesc(orgChartService.getLoggedInUser(account).getCN(),PageRequest.of(pageNumber,pageSize));
 
-        if (histories.hasContent()) return responseBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
+        if (histories.isEmpty()) return responseBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
 
         responseBuilder.info("totalCount", histories.getTotalElements());
         responseBuilder.data(approvalHistoryService.addDisplayNameToApprovals(histories.getContent()));
