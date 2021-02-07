@@ -1,10 +1,11 @@
 <template>
-  <splitpanes class="default-theme" dir="ltr">
+
+  <splitpanes style="height:auto" class="default-theme" dir="ltr">
     <pane>
       <AppBuilder dir="rtl" ref="appBuilder" :app="app" />
     </pane>
-    <pane max-size="20" size="14">
-      <Sidebar @btnClicked="updateView"></Sidebar>
+    <pane style="height:auto" max-size="20" size="14">
+      <Sidebar  @btnClicked="updateView"></Sidebar>
     </pane>
   </splitpanes>
 </template>
