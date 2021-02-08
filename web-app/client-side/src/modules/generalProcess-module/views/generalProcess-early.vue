@@ -61,19 +61,17 @@
                 });
 
                 this.$refs.appBuilder.setModelData("approvalForm", {
-                    routing: this.inputSchema.router
+                    approval: this.inputSchema.router
                 });
 
             },
             submit:async function () {
-                let model = this.$refs.appBuilder.getModelData("form1");
                 let model2 = this.$refs.appBuilder.getModelData("approvalForm");
                 // if (!model._valid){
                 //   //@TODO show warning
                 //   return;
                 // }
 
-                console.log(model)
                 console.log(model2)
                 let data = {
                     taskId: this.taskId,
@@ -82,12 +80,12 @@
                     process: this.inputSchema.process,
                     parentHistoryId: this.inputSchema.parentHistoryId,
 
-                    code: model2.routing.code,
-                    assignedCN: model2.routing.assignedCN,
-                    decision: model2.routing.decision,
-                    comment: model2.routing.comment,
-                    assignees: model2.routing.assignees,
-                    receiverType: model2.routing.receiverType,
+                    code: model2.approval.code,
+                    assignedCN: model2.approval.assignedCN,
+                    decision: model2.approval.decision,
+                    comment: model2.approval.comment,
+                    assignees: model2.approval.assignees,
+                    receiverType: model2.approval.receiverType,
                 };
                 this.completeStep(data);
             }
