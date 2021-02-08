@@ -91,7 +91,7 @@ export default {
 
     triggerSubmit() {
       var formKeys = this.$refs.appBuilder.getFormKeyByPageKey("memoPage");
-
+      this.richText = {};
       formKeys.forEach((element) => {
         var data = this.$refs.appBuilder.getModelData(element);
         this.richText[element] =   data[element] ;
