@@ -111,10 +111,10 @@ export default {
   max-width: 65%;
 }
 .scroller {
-  min-width: 24px !important;
-  height: 24px !important;
+  min-width: 34px !important;
+  width: 34px !important;
+  height: 34px !important;
   text-indent:0em !important;
-  width: 24px;
   margin-left: 5px;
   background-color: transparent !important;
   border: 1px solid #07689f;

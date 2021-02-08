@@ -149,7 +149,6 @@ export default {
         console.log(data)
         for(let key in data.data){
           data.data[key].DeliveryDate = new Date(data.data[key].DeliveryDate).toLocaleString()
-          data.data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process = this.$t(data.data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process)
         }
         this.$observable.fire('tasks', {
           type: 'modelUpdate',

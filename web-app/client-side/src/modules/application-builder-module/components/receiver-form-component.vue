@@ -189,7 +189,7 @@
                     this.handleDirectionUp(unitCode,unitTypeCode,headRole, false)
                 }else if(this.direction =="up-with"){
                     this.handleDirectionUp(unitCode,unitTypeCode,headRole, true)
-                }else if(this.direction =="down"){
+                }else if(this.direction =="down-with"){
                     this.handleDirectionDown(unitCode,unitTypeCode,headRole, false)
                 }else{
                     this.handleDirectionDown(unitCode,unitTypeCode,headRole, true)

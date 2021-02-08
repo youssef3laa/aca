@@ -42,7 +42,7 @@
           {{item.name_ar}}
         </v-btn> -->
 
-        <v-menu top>
+        <v-menu offset-y left allow-overflow max-width="300">
           <template v-slot:activator="{ on, attrs }">
             <v-btn elevation="0" v-bind="attrs" v-on="on">
               <v-icon style="font-size: medium"> fas fa-ellipsis-h </v-icon>
@@ -50,22 +50,43 @@
           </template>
 
           <v-list>
+            <v-list-item-group>
             <v-list-item v-for="(i, index) in field.actions" :key="index">
-              <v-list-item-title v-on:click="handleAction(item, i)"
-                ><span class="dropDown-menu" v-if="i == 'edit'"
-                  ><v-icon> far fa-edit </v-icon> {{ i }}</span
-                >
-                <span class="dropDown-menu" v-else-if="i == 'delete'">
-                  <v-icon> far fa-trash-alt </v-icon> {{ i }}</span
-                >
-                <span class="dropDown-menu" v-else-if="i == 'view'">
-                  <v-icon> fas fa-expand-arrows-alt </v-icon> {{ i }}</span
-                >
-                <span class="dropDown-menu" v-else>
-                  <v-icon> {{i.icon}} </v-icon> {{ i.name }}</span
-                >
-              </v-list-item-title>
+              <span v-on:click="handleAction(item, i)">
+                <span v-if="i == 'edit'">
+                  <v-list-item-title style="color: black; font-weight: bold; font-size: small">
+                      <v-icon style="color: black; font-size: small">far fa-edit</v-icon>
+                      <span style="margin: 3px"></span>
+                      {{ $t(i) }}
+                    </v-list-item-title>
+                </span>
+
+                <span v-else-if="i == 'delete'">
+                  <v-list-item-title style="color: black; font-weight: bold; font-size: small">
+                      <v-icon style="color: black; font-size: small">far fa-trash-alt</v-icon>
+                      <span style="margin: 3px"></span>
+                      {{ $t(i) }}
+                    </v-list-item-title>
+                </span>
+
+                <span v-else-if="i == 'view'">
+                    <v-list-item-title style="color: black; font-weight: bold; font-size: small">
+                      <v-icon style="color: black; font-size: small">fas fa-expand-arrows-alt</v-icon>
+                      <span style="margin: 3px"></span>
+                      {{ $t(i) }}
+                    </v-list-item-title>
+                </span>
+
+                <span v-else>
+                  <v-list-item-title style="color: black; font-weight: bold; font-size: small">
+                      <v-icon style="color: black; font-size: small">{{i.icon}}</v-icon>
+                      <span style="margin: 3px"></span>
+                      {{ $t(i.name) }}
+                    </v-list-item-title>
+                </span>
+              </span>
             </v-list-item>
+            </v-list-item-group>
           </v-list>
         </v-menu>
       </template>
@@ -100,6 +121,12 @@ export default {
     val: function(newVal) {
       for (var key in newVal) {
         this.d[key] = newVal[key]
+      }
+      if(this.d.data){
+        this.translateData()
+      }
+      if(this.d.headers){
+        this.translateHeaders()
       }
       if (this.d.url) {
         this.getDataFromApi({ page: 1, itemsPerPage: 10 })
@@ -144,13 +171,8 @@ export default {
 
           if(response.data.data) {
             this.totalItems = response.data.metaInfo.totalCount
-            for (var key in response.data.data) {
-              for (var i = 0; i < this.d.headers.length; i++) {
-                console.log("dataTable log ", response.data.data[key][this.d.headers[i].value]);
-                response.data.data[key][this.d.headers[i].value] = this.$t(response.data.data[key][this.d.headers[i].value])
-              }
-            }
             this.d.data = response.data.data
+            this.translateData()
           }else{
             this.totalItems = 0
             this.d.data = []
@@ -161,6 +183,40 @@ export default {
           console.error(error)
         })
     },
+    translateData: function() {
+      for (var key in this.d.data) {
+        for (var i = 0; i < this.d.headers.length; i++) {
+          this.translateProperty(this.d.data[key], this.d.headers[i].value)
+        }
+      }
+    },
+    translateHeaders: function() {
+      for (var key in this.d.headers) {
+          this.d.headers[key].text = this.$t(this.d.headers[key].text)
+      }
+    },
+    translateProperty: function (obj, prop) {
+      var parts = prop.split('.');
+
+      if (Array.isArray(parts)) {
+        var last = parts.pop(),
+                l = parts.length,
+                i = 1,
+                current = parts[0];
+
+        while(current && (obj = obj[current]) && i < l) {
+          current = parts[i];
+          i++;
+        }
+
+        if(obj) {
+          obj[last] = this.$t(obj[last])
+          // return obj[last];
+        }
+      } else {
+        throw 'parts is not valid array';
+      }
+    }
   },
   created() {
     if (this.field.subscribe) {
@@ -173,12 +229,18 @@ export default {
             this.d[key] = data.model[key]
           })
         }
+        if(this.d.data){
+          this.translateData()
+        }
         console.log(data)
       })
     }
   },
   mounted() {
     console.log(this.d)
+    if(this.d.headers){
+      this.translateHeaders()
+    }
   },
   props: ['val', 'field'],
 }
