@@ -8,6 +8,7 @@ import java.util.HashMap;
 public class Memos {
     String requestId;
     String jsonId;
+    Long nodeId;
     HashMap<String, String> values;
 
     public Memos(String requestId, String jsonId) {

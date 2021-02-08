@@ -4,6 +4,7 @@ import com.asset.appwork.config.TokenService;
 import com.asset.appwork.cs.AppworkCSOperations;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.dto.CreateNode;
+import com.asset.appwork.dto.Document;
 import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
@@ -56,11 +57,7 @@ public class MemorandumController {
 
             File file = docx.exportJsonToDocx(memo);
 
-            String addRecordToMemorandum = cordysService.sendRequest(account, new memorandumSOAP().createMemorandum(memo));
 
-            String XMLtoJSON = SystemUtil.convertXMLtoJSON(addRecordToMemorandum);
-            ObjectMapper objectMapper = new ObjectMapper();
-            long id = objectMapper.readTree(XMLtoJSON).get("Body").get("CreateACA_Entity_MemosResponse").get("ACA_Entity_Memos").get("ACA_Entity_Memos-id").get("Id").asLong();
 
             HashMap<String, String> values = new HashMap<>();
             for (Map.Entry value : memo.getValues().entrySet()) {
@@ -68,11 +65,10 @@ public class MemorandumController {
                 values.put(value.getKey().toString(), tempValue);
             }
             memo.setValues(values);
-            String addRecordToMemorandumValues = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memo, id));
-            respBuilder.data(addRecordToMemorandumValues);
 
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
             CreateNode createNode = new CreateNode();
+
             createNode.setType(144);
             createNode.setName(file.getName());
             createNode.setFile(new MockMultipartFile("file", new FileInputStream(file)));
@@ -81,7 +77,19 @@ public class MemorandumController {
             createNode.setCategory_id(717725L);
             LinkedHashMap<String, String> categoryLinkedHashMap = new LinkedHashMap<>();
             categoryLinkedHashMap.put("717725_2", file.getName());
-            appworkCSOperations.uploadNodeAndSetCategory(createNode, new AppworkCSOperations.DocumentQuery(), categoryLinkedHashMap);
+            Document document = appworkCSOperations.uploadNodeAndSetCategory(createNode, new AppworkCSOperations.DocumentQuery(), categoryLinkedHashMap);
+
+            memo.setNodeId(document.getProperties().getId());
+
+            String addRecordToMemorandum = cordysService.sendRequest(account, new memorandumSOAP().createMemorandum(memo));
+
+            String XMLtoJSON = SystemUtil.convertXMLtoJSON(addRecordToMemorandum);
+            ObjectMapper objectMapper = new ObjectMapper();
+            long id = objectMapper.readTree(XMLtoJSON).get("Body").get("CreateACA_Entity_MemosResponse").get("ACA_Entity_Memos").get("ACA_Entity_Memos-id").get("Id").asLong();
+
+            String addRecordToMemorandumValues = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memo, id));
+            respBuilder.data(addRecordToMemorandumValues);
+
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
             e.printStackTrace();
