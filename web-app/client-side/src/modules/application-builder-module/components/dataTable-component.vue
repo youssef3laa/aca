@@ -92,9 +92,9 @@
           </v-list>
         </v-menu>
       </template>
-      <template v-slot:expanded-item="{headers,item}">
+      <template  v-slot:expanded-item="{headers,item}">
         <span v-for="(subHeader,i) in d.subHeaders" :key="i">
-        <td :colspan="headers.length"> {{subHeader.text}}:{{item[subHeader.value]}}response:{{item}}</td>
+        <td :colspan="headers.length"> {{subHeader.text}}:{{item[subHeader.value]}}</td>
         </span>
       </template>
     </v-data-table>

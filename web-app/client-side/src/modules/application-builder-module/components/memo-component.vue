@@ -104,12 +104,6 @@ export default {
         jsonId: this.selected,
         values: this.richText,
       };
-      console.log(data);
-      console.log(this.$refs.appBuilder)
-      this.$refs.appBuilder.setAppData({
-        pages: [{ sections: [{ forms: [{}] }] }],
-      });
-      console.log(this.$refs.appBuilder)
 
       this.setMemoData(data);
     },
