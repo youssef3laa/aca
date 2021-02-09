@@ -46,7 +46,7 @@
 
         <v-menu offset-y left allow-overflow max-width="300">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn elevation="0" v-bind="attrs" v-on="on">
+            <v-btn elevation="0" v-bind="attrs" v-on="on" style="min-height: 24px" width="24px">
               <v-icon style="font-size: medium"> fas fa-ellipsis-h </v-icon>
             </v-btn>
           </template>

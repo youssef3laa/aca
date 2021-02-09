@@ -57,7 +57,7 @@ public class ProcessController {
             Long entityId = entity.create(requestJson.generalProcessEntity);
 
             //Note: Get Next Step
-            requestJson.processModel.setEntityId(entityId.toString());
+//            requestJson.processModel.setEntityId(entityId.toString());
 
             String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
             String config = SystemUtil.readFile(filePath);
