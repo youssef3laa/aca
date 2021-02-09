@@ -212,6 +212,7 @@ export default {
         },
         openVersionsPopup: function (file) {
             console.log("openVersions popup === attachmentMixinjs");
+            console.log(file.properties);
             this.versionsDialogState = true;
             this.selectedFile.nodeId = file.properties.id
             this.selectedFile.modalTitle = file.properties.name;

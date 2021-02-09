@@ -114,17 +114,59 @@ public class MemorandumController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @GetMapping("/get/{jsonId}/{requestId}")
-    public ResponseEntity<AppResponse<List<Memorandum>>> getMemorandum(@RequestHeader("X-Auth-Token") String token,
-                                                                       @PathVariable("jsonId") String jsonId,
-                                                                       @PathVariable("requestId") String requestId) {
-        AppResponse.ResponseBuilder<List<Memorandum>> respBuilder = AppResponse.builder();
+    @PostMapping("update/")
+    public ResponseEntity<AppResponse<String>> updateMemorandum (@RequestHeader("X-Auth-Token") String token,
+                                                                 @RequestBody() Memos memo){
+        AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            List<Memorandum> s = memosRepository.findByJsonIdAndRequestId(jsonId, requestId);
-            if (s.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
+            File file = docx.exportJsonToDocx(memo);
+
+
+
+            HashMap<String, String> values = new HashMap<>();
+            for (Map.Entry value : memo.getValues().entrySet()) {
+                String tempValue = "<![CDATA[" + value.getValue().toString() + "]]>";
+                values.put(value.getKey().toString(), tempValue);
+            }
+            memo.setValues(values);
+
+            String addRecordToMemorandum = cordysService.sendRequest(account, new memorandumSOAP().createMemorandum(memo));
+            String XMLtoJSON = SystemUtil.convertXMLtoJSON(addRecordToMemorandum);
+            ObjectMapper objectMapper = new ObjectMapper();
+            long id = objectMapper.readTree(XMLtoJSON).get("Body").get("CreateACA_Entity_MemosResponse").get("ACA_Entity_Memos").get("ACA_Entity_Memos-id").get("Id").asLong();
+
+            String addRecordToMemorandumValues = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memo, id));
+            respBuilder.data(addRecordToMemorandumValues);
+
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+        return respBuilder.build().getResponseEntity();
+
+    }
+    @GetMapping("/get/{nodeId}")
+    public ResponseEntity<AppResponse<Memorandum>> getMemorandum(@RequestHeader("X-Auth-Token") String token,
+                                                                       @PathVariable("nodeId") String nodeId) {
+        AppResponse.ResponseBuilder<Memorandum> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+
+            Memorandum s = memosRepository.findTopByNodeIdOrderByIdDesc(nodeId);
+            if (s == null) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
             respBuilder.data(s);
 
         } catch (AppworkException e) {
@@ -138,4 +180,6 @@ public class MemorandumController {
         }
         return respBuilder.build().getResponseEntity();
     }
+
+
 }
