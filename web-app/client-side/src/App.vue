@@ -2,9 +2,9 @@
   <div id="app">
     <v-app id="inspire">
       <!-- <dynamicView /> -->
-    <TheNavbar />
-    <v-content class="content">
-      <router-view />
+      <TheNavbar />
+      <v-content class="content">
+        <router-view />
       </v-content>
     </v-app>
   </div>
@@ -15,8 +15,8 @@
 @import url(https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400&display=swap);
 @import url(https://use.fontawesome.com/releases/v5.15.2/css/all.css);
 
-.content{
-  margin-top:80px;
+.content {
+  margin-top: 80px;
 }
 .splitpanes--dragging {
   pointer-events: none;
@@ -26,7 +26,9 @@
   max-width: 98%;
 }
 
-h1, span, label {
+h1,
+span,
+label {
   font-family: 'Cairo', sans-serif;
 }
 
@@ -43,8 +45,10 @@ h1 {
   }
   .red--text {
     color: #900 !important;
+    position: absolute;
+    top: 80px;
   }
-  .v-expansion-panel::before{
+  .v-expansion-panel::before {
     box-shadow: none;
   }
 }
@@ -58,7 +62,7 @@ h1 {
 h1 {
   font-size: 26px;
 }
-.top-bar{
+.top-bar {
   height: 80px;
   background: white;
   border-radius: 10px;
