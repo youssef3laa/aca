@@ -33,10 +33,10 @@ export default {
     _alertSuccess(opts = {}) {
       this.message = opts.message
       this.isVisible = true
-
-      setTimeout(function (){
+      setTimeout(() => {
         this.isVisible = false
-      },5000)
+      }, 2000)
+      // this.isVisible = false
     },
   },
 }
