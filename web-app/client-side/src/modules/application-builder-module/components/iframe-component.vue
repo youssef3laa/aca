@@ -1,30 +1,30 @@
 <template>
   <div style="width: 100%">
     <v-container
-      v-if="placeHolder && !loading"
-      :loading="loading"
-      class="attachment-iframe"
-      title="Click to grab a file from your PC!"
+        v-if="placeHolder && !loading"
+        :loading="loading"
+        class="attachment-iframe"
+        title="Click to grab a file from your PC!"
     >
       <v-row align="center" justify="center">
         <v-col :cols="12" align="center" justify="center">
           <v-icon
-            color="#9e9e9e"
-            style="margin: 10px 10px 0 0; padding: 5px 10px; font-size: 150px"
-            >mdi-file-document
+              color="#9e9e9e"
+              style="margin: 10px 10px 0 0; padding: 5px 10px; font-size: 150px"
+          >mdi-file-document
           </v-icon>
         </v-col>
         <v-col :cols="12" align="center" justify="center">
           <span style="margin: 10px 10px 0 0; padding: 5px 10px; color: #c7c8c8"
-            >{{ $t("chooseFileToOpenOrShow") }}
+          >{{ $t("chooseFileToOpenOrShow") }}
           </span>
         </v-col>
       </v-row>
     </v-container>
     <iframe
-      v-else
-      :src="value.src"
-      style="
+        v-else
+        :src="value.src"
+        style="
         border-width: 0;
         padding: 0;
         margin: 0;
@@ -32,7 +32,7 @@
         width: 100%;
         height: 500px;
       "
-      @load="iframeLoaded"
+        @load="iframeLoaded"
     />
   </div>
 </template>
@@ -55,14 +55,9 @@ export default {
       handler: function (newVal, oldVal) {
         console.log(oldVal, newVal);
         this.value = newVal;
-        if (newVal.src) this.loading = true;
+        this.loading = newVal.src && newVal.src.length > 0;
       },
     },
-  },
-  created() {
-    // this.$observable.subscribe('file-component-skeleton', (bool) => {
-    //
-    // })
   },
   methods: {
     iframeLoaded: function () {

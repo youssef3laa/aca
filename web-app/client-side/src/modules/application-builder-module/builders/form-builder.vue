@@ -35,17 +35,19 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-expansion-panels>
+
           <component
-            :is="field.type"
             v-else-if="formModel"
+            :is="field.type"
             :field="field"
             :val="formModel[field.name]"
+            :model="formModel"
             v-on:update="updateText"
           ></component>
 
           <component
-            :is="field.type"
             v-else
+            :is="field.type"
             :field="field"
             v-on:update="updateText"
           ></component>
@@ -59,7 +61,7 @@
 </template>
 
 <script>
-import { ValidationObserver } from 'vee-validate'
+import {ValidationObserver} from 'vee-validate'
 import InputComponent from '../components/input-component'
 import ButtonComponent from '../components/button-component'
 import TableComponent from '../components/table-component'
@@ -84,7 +86,8 @@ import D3GraphComponent from '../components/d3-graph-component'
 import SignatureComponent from '../components/signature-component'
 import ProcessRoutingComponent from '../components/process-routing-component'
 import ReceiverFormComponent from '../components/receiver-form-component'
-import VersionGridComponent from '@/modules/application-builder-module/components/VersionGridComponent'
+import VersionGridComponent from '../components/version-grid-component'
+import ProcessStatusControl from '../components/process-status-control'
 
 export default {
   name: 'FormBuilder',
@@ -115,6 +118,7 @@ export default {
     ProcessRoutingComponent,
     ReceiverFormComponent,
     VersionGridComponent,
+    ProcessStatusControl
   },
   data() {
     return {
@@ -166,15 +170,6 @@ export default {
   },
   props: ['forms', 'model'],
   created() {
-    // for (let i = 0; i < this.forms.inputs.length; i++) {
-    //   if (this.forms.inputs[i].show) {
-    //     console.log(this.forms.inputs[i].show)
-    //     if (this.model[this.forms.inputs[i].show].value.length > 0) {
-    //       this.test = true
-    //       // console.log(this.model[this.forms.inputs[i].show].value.length)
-    //     }
-    //   }
-    // }
     console.log(this.model)
     var self = this
     if (this.forms.subscribe) {

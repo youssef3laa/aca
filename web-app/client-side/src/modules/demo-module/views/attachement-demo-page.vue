@@ -57,6 +57,17 @@ export default {
                       }
                     ],
                     "model": {}
+                  }, {
+
+                    "key": "processStatusControl",
+                    "inputs": [
+                      {
+                        "type": "ProcessStatusControl",
+                        "name": "processStatusControl",
+                        "col": 12
+                      }
+                    ],
+                    "model": {}
 
                     // "resizable": {
                     //   "forms": [

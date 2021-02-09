@@ -2,10 +2,7 @@ package com.asset.appwork.controller;
 
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.cs.AppworkCSOperations;
-import com.asset.appwork.dto.Account;
-import com.asset.appwork.dto.CreateNode;
-import com.asset.appwork.dto.Document;
-import com.asset.appwork.dto.UploadNodeAndSetCategory;
+import com.asset.appwork.dto.*;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.AttachmentSort;
@@ -20,11 +17,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
@@ -350,25 +349,36 @@ public class DocumentsController {
 
     @SuppressWarnings("DuplicatedCode")
     @GetMapping("/version/list/{nodeId}")
-    public ResponseEntity<AppResponse<JsonNode>> listNodeVersions(@RequestHeader("X-Auth-Token") String token,
+    public ResponseEntity<AppResponse<Document>> listNodeVersions(@RequestHeader("X-Auth-Token") String token,
                                                                   @PathVariable("nodeId") Long nodeId,
                                                                   AppworkCSOperations.DocumentQuery documentQuery) {
 
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        AppResponse.ResponseBuilder<Document> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
             Http http = appworkCSOperations.getNodeVersions(nodeId, documentQuery);
-            respBuilder.status(SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
-            respBuilder.data(SystemUtil.convertStringToJsonNode(http.getResponse()));
-        } catch (AppworkException | IllegalAccessException | JsonProcessingException e) {
+            ObjectMapper mapper = new ObjectMapper();
+            Iterator<JsonNode> results = mapper.readTree(http.getResponse()).withArray("results").elements();
+            List<Version> versionList = new ArrayList<>();
+            while (results.hasNext()) {
+                JsonNode dataNode = results.next();
+                Version version = mapper.treeToValue(dataNode.get("data").get("versions"), Version.class);
+                versionList.add(version);
+            }
+            Document document = new Document();
+            document.setVersions(versionList);
+            respBuilder.status(ResponseCode.SUCCESS);
+            respBuilder.data(document);
+        } catch (IllegalAccessException | JsonProcessingException e) {
             e.printStackTrace();
-            ObjectNode obj = new ObjectNode(JsonNodeFactory.instance);
-            obj.put("error", e.getMessage());
-            obj.put("statusCode", ResponseCode.INTERNAL_SERVER_ERROR.getCode());
-            respBuilder.data(obj);
+            log.error(e.getMessage());
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
     }
@@ -396,6 +406,32 @@ public class DocumentsController {
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
         return respBuilder.build().getResponseEntity();
+    }
+
+
+    @PostMapping("version/{nodeId}")
+    public ResponseEntity<AppResponse<String>> addNodeVersion(@RequestHeader("X-Auth-Token") String token,
+                                                              @NonNull @PathVariable("nodeId") Long nodeId,
+                                                              @NonNull @RequestParam("file") MultipartFile file) {
+
+        AppResponse.ResponseBuilder<String> responseBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
+            AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
+            appworkCSOperations.addNodeVersion(nodeId, file);
+            responseBuilder.status(ResponseCode.SUCCESS);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            responseBuilder.status(e.getCode());
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            responseBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+
+        return responseBuilder.build().getResponseEntity();
     }
 
     //categories
