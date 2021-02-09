@@ -30,7 +30,7 @@
 
             this.taskData = await this.getTaskData(this.taskId);
             this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
-            this.loadForm("generalProcess-member", this.fillForm);
+            this.loadForm(this.inputSchema.config, this.fillForm);
 
             this.$observable.subscribe("complete-step", this.submit);
         },
@@ -78,7 +78,6 @@
                 });
             },
             submit: function () {
-                let model = this.$refs.appBuilder.getModelData("form1");
                 let approvalModel = this.$refs.appBuilder.getModelData("ApprovalForm");
                 // if (!model._valid){
                 //   //@TODO show warning
@@ -92,10 +91,13 @@
                     process: this.inputSchema.process,
                     parentHistoryId: this.inputSchema.parentHistoryId,
 
-                    code: model.receiver.value.code,
-                    assignedCN: model.receiver.value.value,
-                    decision: approvalModel.approval.decision,
-                    comment: approvalModel.approval.comment
+                    code: approvalModel.routing.code,
+                    assignedCN: approvalModel.routing.assignedCN,
+                    // decision: approvalModel.routing.decision,
+                    decision: "end",
+                    comment: approvalModel.routing.comment,
+                    assignees: approvalModel.routing.assignees,
+                    receiverType: approvalModel.routing.receiverType
                 };
                 this.completeStep(data);
             }

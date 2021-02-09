@@ -3,12 +3,12 @@ package com.asset.appwork.dto;
 import lombok.Data;
 
 import java.util.HashMap;
-import java.util.List;
 
 @Data
 public class Memos {
     String requestId;
     String jsonId;
+    Long nodeId;
     HashMap<String, String> values;
 
     public Memos(String requestId, String jsonId) {

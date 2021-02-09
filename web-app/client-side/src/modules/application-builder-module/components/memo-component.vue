@@ -13,7 +13,7 @@
         <v-container>
           <AutocompleteComponent
             :field="{ name: field.label }"
-            :val="{ list :[], url: url }"
+            :val="{ list: [], url: url }"
             @update="changeVal"
           >
           </AutocompleteComponent>
@@ -41,11 +41,16 @@ export default {
     Pane,
   },
   mixins: [memoComponentMixin, formPageMixin],
-
+  mounted() {
+    this.$observable.subscribe("retrieveMemo", (data) => {
+      this.selected = data.jsonId;
+      this.loadForm(this.selected, this.fillForm);
+    });
+  },
   data() {
     return {
       d: this.val,
-      url:'lookup/get/category/memoType',
+      url: "lookup/get/category/memoType",
       selected: "",
       richText: {},
       Memodata: [],
@@ -58,13 +63,17 @@ export default {
   methods: {
     changeVal(event) {
       if (event.value.value) {
-        this.$refs.appBuilder.setAppData({pages:[{sections:[{forms:[]}]}]});
-        console.log( this.$refs.appBuilder);
+        this.$refs.appBuilder.setAppData({
+          pages: [{ sections: [{ forms: [] }] }],
+        });
+        console.log(this.$refs.appBuilder);
         this.selected = event.value.value.value;
-        this.loadForm(this.selected, this.fillForm);
+        this.loadForm(this.selected);
         console.log(this.selected);
       } else {
-        this.$refs.appBuilder.setAppData({pages:[{sections:[{forms:[]}]}]});
+        this.$refs.appBuilder.setAppData({
+          pages: [{ sections: [{ forms: [] }] }],
+        });
       }
     },
 
@@ -82,10 +91,10 @@ export default {
 
     triggerSubmit() {
       var formKeys = this.$refs.appBuilder.getFormKeyByPageKey("memoPage");
-
+      this.richText = {};
       formKeys.forEach((element) => {
         var data = this.$refs.appBuilder.getModelData(element);
-        this.richText[element] = "<![CDATA[" + data[element] + "]]>";
+        this.richText[element] =   data[element] ;
         console.log(data);
         console.log(element);
       });
@@ -95,6 +104,7 @@ export default {
         jsonId: this.selected,
         values: this.richText,
       };
+
       this.setMemoData(data);
     },
   },

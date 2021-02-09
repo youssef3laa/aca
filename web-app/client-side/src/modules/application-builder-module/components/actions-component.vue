@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import router from "../../../router";
+
 export default {
   props: ['actions'],
   data() {
@@ -47,7 +49,7 @@ export default {
       this.$observable.fire('save-step')
     },
     cancelStep: function() {
-      this.$observable.fire('cancel-step')
+        router.push({name: 'HomePage'})
     },
   },
 }

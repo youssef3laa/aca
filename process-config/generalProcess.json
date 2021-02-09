@@ -90,53 +90,10 @@
             "config": "generalProcess-member",
             "readonlyComponent": "generalProcess-read",
             "router": {
-                "fields": ["comment"],
-                "receiverTypes": ["single"],
-                "direction": "up",
-                "minimumLevel": "office"
+                "fields": ["comment"]
             },
             "nextStep": {
-                "approve": "stepApprovals"
-            }
-        },
-        "stepApprovals": {
-            "component": "generalProcess-approvals",
-            "config": "generalProcess-approvals",
-            "readonlyComponent": "generalProcess-read",
-            "nextStep": {
-                "approve": "stepApprovals2"
-            }
-        },
-        "stepApprovals2": {
-            "component": "generalProcess-approvals",
-            "config": "generalProcess-approvals",
-            "readonlyComponent": "generalProcess-read",
-            "nextStep": {
-                "approve": "stepApprovals3"
-            }
-        },
-        "stepApprovals3": {
-            "component": "generalProcess-approvals",
-            "config": "generalProcess-approvals",
-            "readonlyComponent": "generalProcess-read",
-            "nextStep": {
-                "approve": "stepAD"
-            }
-        },
-        "stepAD": {
-            "component": "generalProcess-stepAD",
-            "config": "generalProcess-stepAD",
-            "readonlyComponent": "generalProcess-read",
-            "nextStep": {
-                "approve": ""
-            }
-        },
-        "parallel": {
-            "component": "generalProcess-parallel",
-            "config": "generalProcess-parallel",
-            "readonlyComponent": "generalProcess-read",
-            "nextStep": {
-                "comment": "stepRG"
+                "approve": "end"
             }
         }
     }

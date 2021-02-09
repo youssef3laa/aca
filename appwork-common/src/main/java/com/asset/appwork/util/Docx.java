@@ -3,8 +3,6 @@ package com.asset.appwork.util;
 import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.model.Memorandum;
-import com.asset.appwork.model.memoValues;
 import com.asset.appwork.repository.MemoValuesRepository;
 import com.asset.appwork.repository.MemosRepository;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,10 +23,10 @@ import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Bassel on 19/01/2021.
@@ -59,33 +57,25 @@ public class Docx {
                 String name = jsonNode.at("/app/pages/0/sections/0/forms/0/name").asText();
                 mainDocumentPart.addStyledParagraphOfText("Title", name);
 
-                Collection<String> memoValues = memo.getValues().values();
-                System.out.println("values " + memoValues);
-                wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n" +
-                        "\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n" +
-                        "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-                        "<body>\n" +
-                        memoValues + "\n" +
-                        "</body>\n" +
-                        "</html>", null));
-
-//                memoValues.forEach((key, value) -> {
-//                    try {
-//                        wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n" +
-//                                "\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n" +
-//                                "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-//                                "<body>\n" +
-//                                value + "\n" +
-//                                "</body>\n" +
-//                                "</html>", null));
-//                    } catch (Docx4JException e) {
-//                        System.out.println("7mada");
-//                        e.printStackTrace();
-//                        log.error("Docx: " + e.getMessage());
-//                    }
-//                });
+                HashMap<String, String> memoValues = memo.getValues();
+                String tempValues = "";
+                for(Map.Entry<String, String> memoValue : memoValues.entrySet())
+                {
+                    tempValues += memoValue.getValue() + "\n";
+                }
+                try {
+                    wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n" +
+                            "\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n" +
+                            "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
+                            "<body>\n" +
+                            tempValues + "\n" +
+                            "</body>\n" +
+                            "</html>", null));
+                } catch (Docx4JException e) {
+                    e.printStackTrace();
+                    log.error("Docx: " + e.getMessage());
+                }
             } catch (IOException e) {
-                System.out.println("7mada2");
                 e.printStackTrace();
                 log.error("Docx: " + e.getMessage());
             }
@@ -97,17 +87,14 @@ public class Docx {
             return file;
 
         } catch (InvalidFormatException e) {
-            System.out.println("7mada3");
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());
             throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (Docx4JException e) {
-            System.out.println("7mada4");
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());
             throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (JAXBException e) {
-            System.out.println("7mada5");
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());
             throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);

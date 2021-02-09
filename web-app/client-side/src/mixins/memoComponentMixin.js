@@ -13,10 +13,24 @@ export default {
                 console.log(error);
             }
         },
-        async getMemoData(jsonId,requestId) {
+        // async getMemoData(jsonId,requestId) {
+
+        //     try {
+        //         var response = await http.get("memorandum/get/" + jsonId + "/" + requestId);
+        //         console.log("getMemoResponse",response.data);
+        //         return response.data.data;
+        //     }
+        //     catch (error) {
+        //         console.log(error);
+        //     }
+
+        // },
+
+    },
+     async getMemoData(nodeId,version) {
 
             try {
-                var response = await http.get("memorandum/get/" + jsonId + "/" + requestId);
+                var response = await http.get("memorandum/get/" + nodeId + "/" + version);
                 console.log("getMemoResponse",response.data);
                 return response.data.data;
             }
@@ -36,6 +50,5 @@ export default {
             // catch (error) {
             //     console.log(error);
             // }
-        }
-    }
+        },
 }
