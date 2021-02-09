@@ -49,17 +49,20 @@ export default {
     _confirm() {
       this.$refs.popup.close()
       this.resolvePromise(true)
-    //   console.log('confirm')
+      //   console.log('confirm')
     },
 
     _cancel() {
       this.$refs.popup.close()
-      this.resolvePromise(false)
-    //   console.log('cancel')
+      this.resolvePromise = false
+      console.log('cancel')
 
       // Or you can throw an error
       // this.rejectPromise(new Error('User cancelled the dialogue'))
     },
+  },
+  mounted() {
+    console.log(this.title)
   },
 }
 </script>
