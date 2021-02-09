@@ -17,11 +17,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
@@ -404,6 +406,32 @@ public class DocumentsController {
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
         return respBuilder.build().getResponseEntity();
+    }
+
+
+    @PostMapping("version/{nodeId}")
+    public ResponseEntity<AppResponse<String>> addNodeVersion(@RequestHeader("X-Auth-Token") String token,
+                                                              @NonNull @PathVariable("nodeId") Long nodeId,
+                                                              @NonNull @RequestParam("file") MultipartFile file) {
+
+        AppResponse.ResponseBuilder<String> responseBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
+            AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
+            appworkCSOperations.addNodeVersion(nodeId, file);
+            responseBuilder.status(ResponseCode.SUCCESS);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            responseBuilder.status(e.getCode());
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            responseBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+
+        return responseBuilder.build().getResponseEntity();
     }
 
     //categories

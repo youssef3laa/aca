@@ -261,14 +261,14 @@ export default {
     },
   },
 
-  watch: {
-    'iframeOjbect.src': {
-      handler: function () {
-
-
-      }
-    }
-  }
+  // watch: {
+  //   'iframeOjbect.src': {
+  //     handler: function () {
+  //
+  //
+  //     }
+  //   }
+  // }
 };
 </script>
 
