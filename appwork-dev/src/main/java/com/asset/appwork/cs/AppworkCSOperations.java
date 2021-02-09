@@ -179,6 +179,29 @@ public class AppworkCSOperations {
         return http;
     }
 
+    public Http addNodeVersion(Long nodeId, MultipartFile file) throws AppworkException, IOException {
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(CS_API.GET_NODES_VERSIONS.getApiURL());
+        Map<String, Long> pathVariables = new HashMap<>();
+        pathVariables.put("id", nodeId);
+
+        Part[] partsArray = new Part[]{
+                new FilePart("file",
+                        new ByteArrayPartSource(file.getOriginalFilename(),
+                                file.getBytes()))
+        };
+
+        Http http = new Http().setDoAuthentication(true)
+                .basicAuthentication(this.userName, this.password)
+                .setContentType(Http.ContentType.FORM_REQUEST)
+                .setData(partsArray)
+                .post(uriComponentsBuilder.encode().buildAndExpand(pathVariables).toString());
+
+        log.info(http.getResponse());
+        if (!http.isSuccess())
+            throw new AppworkException(http.getResponse(), ResponseCode.INTERNAL_SERVER_ERROR);
+
+        return http;
+    }
 
     //categories
     public void updateCategoryOnNode(Long nodeId, Long categoryId, Map<String, String> categoryValues) throws AppworkException, JsonProcessingException {

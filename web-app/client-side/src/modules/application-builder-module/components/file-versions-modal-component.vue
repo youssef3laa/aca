@@ -1,25 +1,25 @@
 <template>
   <v-dialog
-    v-model="dialog"
-    eager
-    width="978px"
-    @click:outside="modalClickOutside"
+      v-model="dialog"
+      eager
+      width="978px"
+      @click:outside="modalClickOutside"
   >
     <v-card>
       <v-row>
         <v-col :cols="10">
-          <v-card-title class="headline">{{ modalTitle }} </v-card-title>
+          <v-card-title class="headline">{{ modalTitle }}</v-card-title>
         </v-col>
         <v-col :cols="2">
           <span
-            style="
+              style="
               cursor: pointer;
               text-align: left;
               padding: 25px 30px;
               float: left;
             "
-            @click="modalClickOutside"
-            ><v-icon> fas fa-times</v-icon>
+              @click="modalClickOutside"
+          ><v-icon> fas fa-times</v-icon>
           </span>
         </v-col>
       </v-row>
@@ -35,11 +35,11 @@
 </template>
 
 <script>
-import VersionGridComponent from "@/modules/application-builder-module/components/VersionGridComponent";
+import VersionGridComponent from "../../application-builder-module/components/version-grid-component";
 
 export default {
   name: "file-versions-modal-component",
-  components: { VersionGridComponent },
+  components: {VersionGridComponent},
   data() {
     return {
       dialog: this.dialogState,
@@ -59,7 +59,8 @@ export default {
     },
   },
   props: ["dialogState", "nodeIdVal", "modalTitle"],
-  mounted: function () {},
+  mounted: function () {
+  },
   methods: {
     modalClickOutside() {
       this.$emit("versionsModalClosed");
