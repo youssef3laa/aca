@@ -150,13 +150,19 @@
               case "approve":
                 this.updateDirection("up")
                 // this.receiverDirection = { direction: "up" }
-                this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
+                this.receiverTypes = this.getReceiverTypeOptions(["single"], "single")
+                this.receiverType = "single"
                 break
               case "redirect":
-                this.receiverTypes = this.getReceiverTypeOptions(["single","multiple"], null)
+                this.receiverTypes = this.getReceiverTypeOptions(["single","multiple"], "single")
+                this.receiverType = "single"
                 break
               case "requestModification":
-                this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
+                this.receiverTypes = this.getReceiverTypeOptions(["single"], "single")
+                this.receiverType = "single"
+                break
+              case "reject":
+                this.receiverTypes = this.getReceiverTypeOptions(null,null)
                 break
             }
           }else if(this.d.receiverTypes.includes("single")) {
@@ -201,6 +207,8 @@
             return "request-redirection"
           case "requestModification":
             return "request-modification"
+          case "reject":
+            return "request-rejection"
         }
       },
       getReceiverTypeLabel: function(value) {

@@ -17,7 +17,7 @@ public class OutputSchema<T> {
     String subBP;
     String parentHistoryId;
     String process, processId, stepId;
-    String entityName, entityId;
+    String requestId, entityName;
     String component, config, readonlyComponent;
     String decision, comment;
     String code, assignedCN;
@@ -36,8 +36,7 @@ public class OutputSchema<T> {
                 "<stepId>"+removeNull(this.stepId)+"</stepId>"+
                 "<process>"+removeNull(this.process)+"</process>"+
                 "<subBP>"+removeNull(this.subBP)+"</subBP>"+
-                "<entityName>"+removeNull(this.entityName)+"</entityName>"+
-                "<entityId>"+removeNull(this.entityId)+"</entityId>"+
+                "<requestId>"+removeNull(this.requestId)+"</requestId>"+
                 "<parentHistoryId>"+removeNull(this.parentHistoryId)+"</parentHistoryId>"+
                 "<component>"+removeNull(this.component)+"</component>"+
                 "<config>"+removeNull(this.config)+"</config>"+
