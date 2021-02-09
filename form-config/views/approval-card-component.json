@@ -1,0 +1,12 @@
+{
+    "key": "approvalForm",
+    "inputs": [
+        {
+            "type": "ApprovalComponent",
+            "name": "approval"
+        }
+    ],
+    "model": {
+        "approval": {}
+    }
+}

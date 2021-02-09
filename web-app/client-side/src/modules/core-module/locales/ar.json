@@ -49,5 +49,8 @@
   "registerTopic": "تسجيل موضوع",
   "createAssignment": "إنشاء تكليف",
   "directionsScreen": "شاشة التوجيهات",
-  "reports": "التقارير"
+  "reports": "التقارير",
+  "view": "عرض",
+  "delete": "حذف",
+  "edit": "تعديل"
 }

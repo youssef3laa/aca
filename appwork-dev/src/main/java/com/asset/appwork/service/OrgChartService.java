@@ -302,25 +302,34 @@ public class OrgChartService {
     public Group getGroupParent(String code) throws AppworkException {
         Group group = getGroupByName(code);
         List<Group> siblings = (List<Group>) group.getUnit().getGroup();
-//        Boolean headHasUsers = !userRepository.findByGroup(siblings.stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0)).isEmpty();
-//        Boolean viceHeadHasUsers = !userRepository.findByGroup(siblings.stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0)).isEmpty();
-//        Boolean memberHeadHasUsers = !userRepository.findByGroup(siblings.stream().filter(sibling -> (sibling.getIsHeadRole() && sibling.getIsViceRole())).collect(Collectors.toList()).get(0)).isEmpty();
-        if (siblings.stream().anyMatch(Group::getIsViceRole) && (!group.getIsHeadRole() && !group.getIsViceRole()))
+        boolean headHasUsers = false;
+        boolean viceHeadHasUsers = false;
+
+        if (siblings.stream().anyMatch(Group::getIsHeadRole))
+            headHasUsers = !userRepository.findByGroup(siblings.stream().filter(Group::getIsHeadRole).collect(Collectors.toList()).get(0)).isEmpty();
+        if (siblings.stream().anyMatch(Group::getIsViceRole))
+            viceHeadHasUsers = !userRepository.findByGroup(siblings.stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0)).isEmpty();
+        if (viceHeadHasUsers && (!group.getIsHeadRole() && !group.getIsViceRole()))
             return siblings.stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0);
-        if (siblings.stream().noneMatch(Group::getIsViceRole) && (!group.getIsHeadRole()))
+
+        if (headHasUsers && ((!viceHeadHasUsers && !group.getIsHeadRole()) || (!group.getIsHeadRole() && group.getIsViceRole()))) {
             return siblings.stream().filter(Group::getIsHeadRole).collect(Collectors.toList()).get(0);
-        if (siblings.stream().anyMatch(Group::getIsHeadRole) && (!group.getIsHeadRole() && group.getIsViceRole()))
-            return siblings.stream().filter(Group::getIsHeadRole).collect(Collectors.toList()).get(0);
-        else {
-            return unitRepository.findByChild(group.getUnit())
-                    .flatMap(parentUnit -> {
-                        if (groupRepository.findByUnit(parentUnit).stream().anyMatch(Group::getIsViceRole))
-                            return Optional.of(groupRepository.findByUnit(parentUnit).stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0));
-                        return Optional.of(groupRepository.findByUnit(parentUnit).stream().filter(Group::getIsHeadRole).collect(Collectors.toList()).get(0));
-                    }).orElseThrow(
-                            () -> new AppworkException("Could not get the Parent of Group " + code, ResponseCode.INTERNAL_SERVER_ERROR)
-                    );
         }
+        return unitRepository.findByChild(group.getUnit())
+                .flatMap(parentUnit -> {
+                    try {
+                        List<Group> parentGroups = groupRepository.findByUnit(parentUnit);
+                        if (parentGroups.stream().anyMatch(Group::getIsHeadRole))
+                            return Optional.of(parentGroups.stream().filter(Group::getIsHeadRole).collect(Collectors.toList()).get(0));
+                        return Optional.of(getGroupParent(parentGroups.stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0).getName()));
+                    } catch (AppworkException e) {
+                        log.error(e.getMessage());
+                        e.printStackTrace();
+                    }
+                    return Optional.empty();
+                }).orElseThrow(
+                        () -> new AppworkException("Could not get the Parent of Group " + code, ResponseCode.INTERNAL_SERVER_ERROR)
+                );
     }
 
     public List<Group> getGroupParentsOfLoggedInUser(Account account) throws AppworkException {
@@ -394,7 +403,7 @@ public class OrgChartService {
             newGroup.setUnit(unit);
             updateGroupUnitRelation(account, newGroup, group.getName(), updateRelationProps);
         }
-        
+
         return getGroup(id);
     }
 
