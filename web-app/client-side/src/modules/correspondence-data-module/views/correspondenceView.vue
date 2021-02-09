@@ -1,105 +1,121 @@
 <template>
-  <v-container class="fill-height">
-    <div style="width: 100%;  display: flex">
-      <Charts :field="{ name: 'richTextChart', chartType: 'BarChart' }" :val="richtextChart"> </Charts>
-      <Charts :field="{ name: 'process', chartType: 'PieChart' }" :val="processHistory"> </Charts>
-      <Charts :field="{ name: 'process', chartType: 'PieChart' }" :val="processHistory"> </Charts>
-
-    </div>
-    <div style="width: 100%; display: flex">
-      <TasksLists></TasksLists>
-      <AdvancedSearch></AdvancedSearch>
-      <OrgChartBtn></OrgChartBtn>
-    </div>
-    <Inbox></Inbox>
-    <!-- <v-container>
-      <AppBuilder ref="appBuilder" :app="app1" />
-    </v-container> -->
+  <v-container>
+    <AppBuilder ref="appBuilder" :app="app" />
   </v-container>
 </template>
 
 <script>
-import correspondenceMixin from "../mixin/correspondenceMixin";
-import formPageMixin from "../../../mixins/formPageMixin";
-import TasksLists from "../../application-builder-module/components/tasks-list-component";
-import AdvancedSearch from "../../application-builder-module/components/advanced-search-component";
-import OrgChartBtn from "../../application-builder-module/components/org-chart-btn-component";
-import Charts from "../../application-builder-module/components/charts-component";
-import Inbox from "../../application-builder-module/components/inbox-component";
 
-import http from "../../core-module/services/http";
+// import formPageMixin from "../../../mixins/formPageMixin";
+import AppBuilder from "../../application-builder-module/builders/app-builder";
 
 export default {
   name: "correspondenceView",
   components: {
-    TasksLists,
-    AdvancedSearch,
-    OrgChartBtn,
-    Inbox,
-    Charts,
+    AppBuilder,
   },
-  mixins: [correspondenceMixin, formPageMixin],
-
-  methods: {
-    getTasks: function () {
-      http.get("workflow/human/tasks").then((response) => {
-        console.log(response);
-        var data = JSON.parse(response.data.data);
-        console.log(data);
-        this.$observable.fire("tasks", {
-          type: "modelUpdate",
-          model: data,
-        });
-      });
-    },
-  },
-
   data() {
     return {
-      response: [],
-      richtextChart: {
-        backgroundColor: ["#22B07D", "#22B07D", "#22B07D"],
-        requestData: {
-          table: "memoValues",
-          aggregations: [
-            {
-              function: "count",
-              column: "jsonKey",
-            },
-          ],
-          columns: ["jsonKey"],
-          groupBy: ["jsonKey"],
-        },
-      },
-      processHistory: {
-        backgroundColor: ["#22B07D", "#D91828"],
-        requestData: {
-          table: "ApprovalHistory",
-          aggregations: [
-            {
-              function: "count",
-              column: "processName",
-            },
-          ],
-          columns: ["processName"],
-          groupBy: ["processName"],
-          where: [
-            {
-              or: [
-                {
-                  type: "equal",
-                  column: "processName",
-                  value: "generalProcess",
-                },
-                {
-                  type: "equal",
-                  column: "processName",
-                  value: "process-1",
-                },
-              ],
-            },
-          ],
-        },
+      app: {
+        pages: [
+          {
+            tabs: [
+              {
+                key: "tab1",
+                id: 1,
+                name: "بيانات المكاتبة",
+                isActive: true,
+              },
+            ],
+            sections: [
+              {
+                key: "section 1",
+                tabId: 1,
+                isTab: true,
+                type: "DefaultSection",
+                display: "block",
+                isCard: true,
+                forms: [
+                  {
+                    key: "form1",
+                    inputs: [
+                      {
+                        type: "InputComponent",
+                        label: "رقم الوارد",
+                        name: "number",
+                        col: 5,
+                        readonly: false,
+                      },
+                      {
+                        type: "InputComponent",
+                        label: "اسم الموضوع",
+                        name: "name",
+                        col: 5,
+                        readonly: false,
+                      },
+                      {
+                        type: "ButtonComponent",
+                        label: "بحث الوارد",
+                        action: "search",
+                        name: "search",
+                        col: 2,
+                      },
+                      {
+                        type: "DataTableComponent",
+                        name: "taskTable",
+                        actions: ["view"],
+                        subscribe: "tasks",
+                        searchable:false,
+                        col: 12,
+                      },
+                    ],
+                    model: {
+                      number: "",
+                      name: "",
+                      search: "",
+                      taskTable: {
+                        headers: [
+                          {
+                            text: "Task",
+                            align: "start",
+                            filterable: false,
+                            value: "Activity",
+                          },
+                          {
+                            text: "Sender Name",
+                            value: "Sender.displayName",
+                          },
+                          {
+                            text: "Process Name",
+                            value:
+                              "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process",
+                          },
+                          {
+                            text: "Date",
+                            value: "DeliveryDate",
+                          },
+                          {
+                            text: "",
+                            value: "action",
+                          },
+                        ],
+                        subHeaders: [
+                          {
+                            text: "Date",
+                            value: "TaskId",
+                          },
+                        ],
+                        data: [],
+                        key: "DeliveryDate",
+                        search: "",
+                      },
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
     };
   },

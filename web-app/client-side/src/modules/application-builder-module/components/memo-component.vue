@@ -47,6 +47,7 @@ export default {
         var memoType = await this.getMemoJsonId(data.nodeId);
         this.loadForm(memoType);
         await this.fillForm(data.nodeId);
+        this.nodeId = data.nodeId;
         
     }
 
@@ -62,6 +63,7 @@ export default {
       d: this.val,
       url: "lookup/get/category/memoType",
       selected: "",
+      nodeId:null,
       richText: {},
       Memodata: [],
       bwsId: 680482,
@@ -72,6 +74,7 @@ export default {
 
   methods: {
     changeVal(event) {
+      this.nodeId = null;
       if (event.value.value) {
         this.$refs.appBuilder.setAppData({
           pages: [{ sections: [{ forms: [] }] }],
@@ -114,6 +117,7 @@ export default {
       data = {
         requestId: this.d.requestId,
         jsonId: this.selected,
+        nodeId: this.nodeId,
         values: this.richText,
       };
 

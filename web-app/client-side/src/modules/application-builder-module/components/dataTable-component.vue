@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-row>
+    <v-row v-if="searchable">
       <v-col :cols="7">
         <button style="padding: 5px; margin: 20px" @click="handlAddButton()">
           <v-icon color="info">fas fa-plus</v-icon>
@@ -118,6 +118,16 @@ export default {
       },
       options: {},
     };
+  },
+  computed:{
+    searchable(){
+      if(this.field.searchable == false){
+        return false;
+      }
+      else{
+        return true;
+      }
+    }
   },
   watch: {
     options: {

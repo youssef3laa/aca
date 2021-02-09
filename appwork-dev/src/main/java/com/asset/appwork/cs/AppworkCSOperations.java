@@ -184,9 +184,10 @@ public class AppworkCSOperations {
         Map<String, Long> pathVariables = new HashMap<>();
         pathVariables.put("id", nodeId);
 
+        String fileName = Objects.requireNonNull(file.getOriginalFilename()).length() > 0 ? file.getOriginalFilename() : file.getName();
         Part[] partsArray = new Part[]{
                 new FilePart("file",
-                        new ByteArrayPartSource(file.getOriginalFilename(),
+                        new ByteArrayPartSource(fileName,
                                 file.getBytes()))
         };
 

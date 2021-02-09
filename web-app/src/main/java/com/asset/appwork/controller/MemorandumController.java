@@ -58,7 +58,6 @@ public class MemorandumController {
             File file = docx.exportJsonToDocx(memo);
 
 
-
             HashMap<String, String> values = new HashMap<>();
             for (Map.Entry value : memo.getValues().entrySet()) {
                 String tempValue = "<![CDATA[" + value.getValue().toString() + "]]>";
@@ -67,20 +66,24 @@ public class MemorandumController {
             memo.setValues(values);
 
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
-            CreateNode createNode = new CreateNode();
 
-            createNode.setType(144);
-            createNode.setName(file.getName());
-            createNode.setFile(new MockMultipartFile("file", new FileInputStream(file)));
-            //TODO get Ids from env or get them from request
-            createNode.setParent_id(680482L);
-            createNode.setCategory_id(717725L);
-            LinkedHashMap<String, String> categoryLinkedHashMap = new LinkedHashMap<>();
-            categoryLinkedHashMap.put("717725_2", file.getName());
-            Document document = appworkCSOperations.uploadNodeAndSetCategory(createNode, new AppworkCSOperations.DocumentQuery(), categoryLinkedHashMap);
+            if (memo.getNodeId() == null) {
+                CreateNode createNode = new CreateNode();
 
-            memo.setNodeId(document.getProperties().getId());
+                createNode.setType(144);
+                createNode.setName(file.getName());
+                createNode.setFile(new MockMultipartFile("file", new FileInputStream(file)));
+                //TODO get Ids from env or get them from request
+                createNode.setParent_id(680482L);
+                createNode.setCategory_id(717725L);
+                LinkedHashMap<String, String> categoryLinkedHashMap = new LinkedHashMap<>();
+                categoryLinkedHashMap.put("717725_2", file.getName());
+                Document document = appworkCSOperations.uploadNodeAndSetCategory(createNode, new AppworkCSOperations.DocumentQuery(), categoryLinkedHashMap);
 
+                memo.setNodeId(document.getProperties().getId());
+            } else {
+                appworkCSOperations.addNodeVersion(memo.getNodeId(), new MockMultipartFile(file.getName(), new FileInputStream(file)));
+            }
             String addRecordToMemorandum = cordysService.sendRequest(account, new memorandumSOAP().createMemorandum(memo));
 
             String XMLtoJSON = SystemUtil.convertXMLtoJSON(addRecordToMemorandum);
@@ -115,15 +118,14 @@ public class MemorandumController {
     }
 
     @PostMapping("update/")
-    public ResponseEntity<AppResponse<String>> updateMemorandum (@RequestHeader("X-Auth-Token") String token,
-                                                                 @RequestBody() Memos memo){
+    public ResponseEntity<AppResponse<String>> updateMemorandum(@RequestHeader("X-Auth-Token") String token,
+                                                                @RequestBody() Memos memo) {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
             File file = docx.exportJsonToDocx(memo);
-
 
 
             HashMap<String, String> values = new HashMap<>();
@@ -157,9 +159,10 @@ public class MemorandumController {
         return respBuilder.build().getResponseEntity();
 
     }
+
     @GetMapping("/get/{nodeId}")
     public ResponseEntity<AppResponse<Memorandum>> getMemorandum(@RequestHeader("X-Auth-Token") String token,
-                                                                       @PathVariable("nodeId") String nodeId) {
+                                                                 @PathVariable("nodeId") String nodeId) {
         AppResponse.ResponseBuilder<Memorandum> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
