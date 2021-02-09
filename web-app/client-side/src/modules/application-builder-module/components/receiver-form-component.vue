@@ -335,7 +335,7 @@
 
                 let group = null
                 let code = null
-                if((this.higher ||  this.userDetails.groups[0].unit.unitTypeCode== "AGN") && this.direction == "up") {
+                if((this.higher ||  this.userDetails.groups[0].unit.unitTypeCode== "AGN") && this.direction == "up" && this.parent) {
                     group = this.parent
                     code = this.parent.groupCode
                 } else if(this.memberSelected){
