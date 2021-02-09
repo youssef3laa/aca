@@ -2,10 +2,7 @@ package com.asset.appwork.controller;
 
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.cs.AppworkCSOperations;
-import com.asset.appwork.dto.Account;
-import com.asset.appwork.dto.CreateNode;
-import com.asset.appwork.dto.Document;
-import com.asset.appwork.dto.UploadNodeAndSetCategory;
+import com.asset.appwork.dto.*;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.AttachmentSort;
@@ -350,25 +347,36 @@ public class DocumentsController {
 
     @SuppressWarnings("DuplicatedCode")
     @GetMapping("/version/list/{nodeId}")
-    public ResponseEntity<AppResponse<JsonNode>> listNodeVersions(@RequestHeader("X-Auth-Token") String token,
+    public ResponseEntity<AppResponse<Document>> listNodeVersions(@RequestHeader("X-Auth-Token") String token,
                                                                   @PathVariable("nodeId") Long nodeId,
                                                                   AppworkCSOperations.DocumentQuery documentQuery) {
 
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        AppResponse.ResponseBuilder<Document> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
             Http http = appworkCSOperations.getNodeVersions(nodeId, documentQuery);
-            respBuilder.status(SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
-            respBuilder.data(SystemUtil.convertStringToJsonNode(http.getResponse()));
-        } catch (AppworkException | IllegalAccessException | JsonProcessingException e) {
+            ObjectMapper mapper = new ObjectMapper();
+            Iterator<JsonNode> results = mapper.readTree(http.getResponse()).withArray("results").elements();
+            List<Version> versionList = new ArrayList<>();
+            while (results.hasNext()) {
+                JsonNode dataNode = results.next();
+                Version version = mapper.treeToValue(dataNode.get("data").get("versions"), Version.class);
+                versionList.add(version);
+            }
+            Document document = new Document();
+            document.setVersions(versionList);
+            respBuilder.status(ResponseCode.SUCCESS);
+            respBuilder.data(document);
+        } catch (IllegalAccessException | JsonProcessingException e) {
             e.printStackTrace();
-            ObjectNode obj = new ObjectNode(JsonNodeFactory.instance);
-            obj.put("error", e.getMessage());
-            obj.put("statusCode", ResponseCode.INTERNAL_SERVER_ERROR.getCode());
-            respBuilder.data(obj);
+            log.error(e.getMessage());
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            respBuilder.status(e.getCode());
         }
         return respBuilder.build().getResponseEntity();
     }
