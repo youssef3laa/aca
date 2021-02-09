@@ -210,6 +210,7 @@ export default {
                         name: 'test',
                         label: 'test',
                         col: 6,
+                        rule: 'required',
                         readonly: 'testReadOnly',
                         show: 'showTest',
                       },
@@ -239,7 +240,7 @@ export default {
                       notes: '',
 
                       testReadOnly: false,
-                      showTest: false,
+                      showTest: true,
                     },
                   },
                 ],
