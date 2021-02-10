@@ -53,5 +53,11 @@
   "reports": "التقارير",
   "view": "عرض",
   "delete": "حذف",
-  "edit": "تعديل"
+  "edit": "تعديل",
+  "topicName": "اسم الموضوع",
+  "senderName":"اسم المرسل",
+  "entityName":"اسم الجهة",
+  "processNumber":"رقم الوارد",
+  "date":"التاريخ"
+
 }

@@ -9,7 +9,7 @@
 import AppBuilder from "../../application-builder-module/builders/app-builder";
 
 export default {
-  name: "correspondenceView",
+  name: "linkIncoming",
   components: {
     AppBuilder,
   },
@@ -164,6 +164,7 @@ export default {
     this.$observable.subscribe("searchIncoming",()=>{
       var data = this.$refs.appBuilder.getModelData("form1"); 
       console.log(data);
+      console.log(JSON.stringify(this.app));
     })
   }
 };

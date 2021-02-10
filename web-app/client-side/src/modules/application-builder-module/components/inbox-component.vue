@@ -108,14 +108,9 @@ export default {
                             value: "action",
                           },
                         ],
-                        subHeaders: [
-                          {
-                            text: "Date",
-                            value: "TaskId",
-                          },
-                        ],
+                     
                         data: [],
-                        key: "DeliveryDate",
+                       
                         search: "",
                       },
                     },
