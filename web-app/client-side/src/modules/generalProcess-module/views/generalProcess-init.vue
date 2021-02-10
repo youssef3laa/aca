@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <AppBuilder ref="appBuilder" :app="app"/>
+    <AlertComponent ref="alertComponent"></AlertComponent>
   </v-container>
 </template>
 
@@ -12,7 +13,7 @@ export default {
   name: "generalProcess-init",
   mixins: [formPageMixin],
   components: {
-    AppBuilder,
+    AppBuilder
   },
   data() {
     return {
@@ -23,6 +24,8 @@ export default {
   async created() {
     await this.loadForm("generalProcess-init");
     this.$observable.subscribe("complete-step", this.submit);
+    console.log(this)
+    this.$refs.alertComponent._alertSuccess({type: "warning",message: "comment"})
   },
   methods: {
     submit: function () {
