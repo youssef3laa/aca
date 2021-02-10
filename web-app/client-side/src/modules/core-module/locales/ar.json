@@ -58,6 +58,25 @@
   "senderName":"اسم المرسل",
   "entityName":"اسم الجهة",
   "processNumber":"رقم الوارد",
-  "date":"التاريخ"
+  "date":"التاريخ",
 
+  "attachmentsDescription": "وصف المرفقات",
+  "confidentiality": "السرية",
+  "constraint": "القيد",
+  "correspondenceNumber": "رقم المكاتبة",
+  "incomingDate": "تاريخ الوارد",
+  "incomingFrom": "جهة الورود",
+  "incomingNumber": "رقم الوارد",
+  "incomingType": "وسيلة الورود",
+  "jobType": "نوع العمل",
+  "numberOfAttachments": "عدد المرفقات",
+  "priorityLevel": "درجة الأهمية",
+  "registrationNumber": "رقم التسجيل",
+  "subject": "الموضوع",
+  "taskType": "نوع التكليف",
+  "topicSummary": "ملخص الموضوع",
+  "transferTo": "جهة التحويل",
+  "correspondenceData": "بيانات المكاتبة",
+  "mainData": "البيانات الاساسية",
+  "attachments": "المرفقات"
 }
