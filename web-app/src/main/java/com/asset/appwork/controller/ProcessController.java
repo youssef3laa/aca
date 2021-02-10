@@ -79,6 +79,9 @@ public class ProcessController {
 
     @PostMapping("/initiateLinkedIncoming")
     public ResponseEntity<AppResponse<String>> initiateLinkedIncoming(@RequestHeader("X-Auth-Token") String token, @RequestBody Request requestJson) {
+        // create linkedIncoming entity
+        // set entityId -> create requestEntity ;
+
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);

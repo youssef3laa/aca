@@ -10,10 +10,11 @@ import AppBuilder from "../../application-builder-module/builders/app-builder";
 import historyMixin from "../../history-module/mixin/historyMixin";
 import http from "../../core-module/services/http";
 import orgChartMixin from "../../../mixins/orgChartMixin";
+import userMixin from "../../../mixins/userMixin";
 
 export default {
   name: "generalProcess-member",
-  mixins: [formPageMixin, historyMixin, orgChartMixin],
+  mixins: [formPageMixin, historyMixin, orgChartMixin, userMixin],
   components: {
     AppBuilder,
   },
@@ -49,6 +50,10 @@ export default {
             console.log(requestEntities);
             let parentDetails = await this.getParentDetails();
             console.log(parentDetails)
+            console.log(this.$user);
+            let userDetails = await this.getUserDetails();
+            console.log(userDetails);
+
           })
 
         },
