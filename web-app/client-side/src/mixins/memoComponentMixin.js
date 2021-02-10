@@ -7,48 +7,37 @@ export default {
             try {
                 var response = await http.post("/memorandum/create", data);
                 console.log(response.data);
-                
+
             }
             catch (error) {
                 console.log(error);
             }
         },
-        // async getMemoData(jsonId,requestId) {
 
-        //     try {
-        //         var response = await http.get("memorandum/get/" + jsonId + "/" + requestId);
-        //         console.log("getMemoResponse",response.data);
-        //         return response.data.data;
-        //     }
-        //     catch (error) {
-        //         console.log(error);
-        //     }
-
-        // },
-
-    },
-     async getMemoData(nodeId,version) {
+        async getMemoData(nodeId) {
 
             try {
-                var response = await http.get("memorandum/get/" + nodeId + "/" + version);
-                console.log("getMemoResponse",response.data);
+                var response = await http.get("memorandum/get/" + nodeId);
+                console.log("getMemoResponse", response.data);
                 return response.data.data;
             }
             catch (error) {
                 console.log(error);
             }
-            // try {
-            //     var response = [
-            //         { formKey: "richtext1", model: { richtext1: "Snoopy" } }];
-            //     var response2 = [
-            //         { formKey: "richtext1", model: { richtext1: "Snoopy" } },
-            //         { formKey: "richtext2", model: { richtext2: "bla" } },
-            //     ];
-
-            //     return (memo=="memo1") ?  response :  response2;
-            // }
-            // catch (error) {
-            //     console.log(error);
-            // }
+           
         },
+
+        async getMemoJsonId(nodeId) {
+
+            try {
+                var response = await http.get("memorandum/get/" + nodeId);
+                console.log("getMemoResponse", response.data);
+                return response.data.data.jsonId;
+            }
+            catch (error) {
+                console.log(error);
+            }
+           
+        },
+    }
 }

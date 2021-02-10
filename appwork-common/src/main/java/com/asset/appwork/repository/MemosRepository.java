@@ -15,6 +15,8 @@ public interface MemosRepository extends GenericRepository<Memorandum, String> {
 
     List<Memorandum> findByJsonIdAndRequestId(String jsonId, String requestId);
 
+    Memorandum findTopByNodeIdOrderByIdDesc(String nodeId);
+
     List<Memorandum> findAll();
 
     Page<Memorandum> findAll(Pageable pageable);

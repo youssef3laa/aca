@@ -46,7 +46,7 @@ export default {
       search: null,
       loading: false,
       readonly: null,
-      show: null,
+      show: true,
     }
   },
   methods: {
@@ -133,9 +133,11 @@ export default {
           this.querySelections('', newVal.url)
         }
         this.items = newVal
-        this.value = newVal.value
+        if(newVal.value != null || newVal.value != undefined) this.value = newVal.value
         console.log('val', this.val)
-        if (this.field.readonly) {
+        if(this.field.readonly == true || this.field.readonly == false){
+          this.readonly = this.field.readonly
+        }else if (this.field.readonly) {
           this.readonly = this.model[this.field.readonly]
         }
         if (this.field.show) {
