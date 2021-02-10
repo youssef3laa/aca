@@ -5,6 +5,8 @@ import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.GeneralProcessModel;
+import com.asset.appwork.model.LinkIncoming;
+import com.asset.appwork.model.RequestEntity;
 import com.asset.appwork.orgchart.ModuleRouting;
 import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.repository.ApprovalHistoryRepository;
@@ -12,6 +14,7 @@ import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.service.OrgChartService;
+import com.asset.appwork.service.RequestService;
 import com.asset.appwork.soup.ProcessSOAP;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.Date;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/process")
@@ -41,6 +45,8 @@ public class ProcessController {
     ApprovalHistoryRepository approvalHistoryRepository;
     @Autowired
     OrgChartService orgChartService;
+    @Autowired
+    RequestService requestService;
 
     @PostMapping("/initiate")
     public ResponseEntity<AppResponse<String>> initiate(@RequestHeader("X-Auth-Token") String token, @RequestBody Request requestJson) {
@@ -78,38 +84,58 @@ public class ProcessController {
 
 
     @PostMapping("/initiateLinkedIncoming")
-    public ResponseEntity<AppResponse<String>> initiateLinkedIncoming(@RequestHeader("X-Auth-Token") String token, @RequestBody Request requestJson) {
+    public ResponseEntity<AppResponse<String>> initiateLinkedIncoming(@RequestHeader("X-Auth-Token") String token,
+                                                                      @RequestBody Request requestJson) {
         // create linkedIncoming entity
         // set entityId -> create requestEntity ;
 
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-            String cordysUrl = cordysService.getCordysUrl();
-
-            //Note: Entity Creation
             String restAPIBaseUrl = SystemUtil.generateRestAPIBaseUrl(environment, "AssetGeneralACA");
             Entity entity = new Entity(account,
                     restAPIBaseUrl
-                    , requestJson.processModel.getEntityName());
-            Long entityId = entity.create(requestJson.generalProcessEntity);
+                    , "ACA_Entity_linkIncoming");
+            LinkIncoming linkIncoming = new LinkIncoming();
 
-            //Note: Get Next Step
-//            requestJson.processModel.setEntityId(entityId.toString());
+            linkIncoming.setSourceIncomingId(String.valueOf(requestJson.getProcessModel().getExtraData().get("sourceIncomingId")));
+            linkIncoming.setTargetIncomingId(String.valueOf(requestJson.getProcessModel().getExtraData().get("targetIncomingId")));
+            Long linkIncomingEntityId = entity.create(linkIncoming);
 
-            String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
-            String config = SystemUtil.readFile(filePath);
 
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository, orgChartService);
-            String response = moduleRouting.goToNext(requestJson.processModel);
-            respBuilder.data(response);
+            String generatedRequestNumber = requestService.generateRequestNumber(account);
+            RequestEntity requestEntity = new RequestEntity();
+            requestEntity.setEntityId(String.valueOf(linkIncomingEntityId));
+            requestEntity.setEntityName("ACA_Entity_linkIncoming");
+            requestEntity.setRequestNumber(generatedRequestNumber);
+            requestEntity.setSubject(String.valueOf(requestJson.getProcessModel().getExtraData().get("subject")));
+            requestEntity.setProcess("linkIncoming");
+            requestEntity.setDate(new Date());
+            requestEntity.setInitiator(String.valueOf(requestJson.getProcessModel().getExtraData().get("initiatorId")));
+            requestEntity.setStatus("created");
+            Long requestEntityId = entity.create(requestEntity);
+            entity = new Entity(account,
+                    restAPIBaseUrl
+                    , "ACA_Entity_linkIncoming");
+
+            linkIncoming = new LinkIncoming();
+            linkIncoming.setRequestEntityId(String.valueOf(requestEntityId));
+            entity.update(linkIncomingEntityId, linkIncoming);
+
+//            String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
+//            String config = SystemUtil.readFile(filePath);
+//
+//            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository, orgChartService);
+//            String response = moduleRouting.goToNext(requestJson.processModel);
+//            respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
-        } catch (IOException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+//        }
 
         return respBuilder.build().getResponseEntity();
     }

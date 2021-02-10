@@ -62,6 +62,29 @@ export default {
               type: "modelUpdate",
               model: requestEntities.data
             });
+
+            this.$observable.subscribe("linkingTable_view", async function () {
+              try {
+                let obj = {
+
+                  "sourceIncomingId": "1",
+                  "targetIncomingId": "2",
+                  "subject": "test subject linking incoming",
+                  "initiatorId": ""
+
+
+                }
+                let response = await http.post("/process/initiateLinkedIncoming");
+
+                console.log(response, obj);
+
+
+              } catch (e) {
+                console.log(e);
+              }
+
+
+            })
           },
             fillForm: async function () {
                 this.$refs.appBuilder.disableSection("section1")

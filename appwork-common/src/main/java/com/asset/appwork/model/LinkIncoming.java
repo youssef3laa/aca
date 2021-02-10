@@ -1,6 +1,7 @@
 package com.asset.appwork.model;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -8,7 +9,8 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "O9AssetGeneralACAACA_Entity_linkIncoming")
+@Table(name = "O2AssetGeneralACAACA_Entity_linkIncoming")
+@ToString(exclude = "Id")
 public class LinkIncoming {
 
     @Id
