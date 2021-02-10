@@ -1,0 +1,83 @@
+{
+  "processName": "linkIncoming",
+  "steps": {
+    "headOfGroupStep": {
+      "component": "linkIncoming-approve",
+      "config": "linkIncoming-approve",
+      "router": {
+        "fields": [
+          "comment"
+        ],
+        "decisions": [
+          "approve",
+          "reject",
+          "requestModification"
+        ],
+        "receiverTypes": [
+          "single"
+        ]
+      },
+      "nextStep": {
+        "approve": "headOfAdministrationStep",
+        "requestModification": "memberStep"
+      }
+    },
+    "headOfAdministrationStep": {
+      "component": "linkIncoming-approve",
+      "config": "linkIncoming-approve",
+      "router": {
+        "fields": [
+          "comment"
+        ],
+        "decisions": [
+          "approve",
+          "reject",
+          "requestModification"
+        ],
+        "receiverTypes": [
+          "single"
+        ]
+      },
+      "nextStep": {
+        "approve": "headOfSectorStep",
+        "requestModification": "memberStep"
+      }
+    },
+    "headOfSectorStep": {
+      "component": "linkIncoming-approve",
+      "config": "linkIncoming-approve",
+      "router": {
+        "fields": [
+          "comment"
+        ],
+        "decisions": [
+          "approve",
+          "reject",
+          "requestModification"
+        ],
+        "receiverTypes": [
+          "single"
+        ]
+      },
+      "nextStep": {
+        "approve": "end",
+        "requestModification": "memberStep"
+      }
+    },
+    "memberStep": {
+      "component": "linkIncoming-approve",
+      "config": "linkIncoming-approve",
+      "router": {
+        "fields": [
+          "comment"
+        ],
+        "receiverTypes": [
+          "single"
+        ]
+      },
+      "nextStep": {
+        "comment": "headOfGroupStep"
+      }
+    }
+  }
+}
