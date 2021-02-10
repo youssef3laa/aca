@@ -5,34 +5,49 @@
 </template>
 
 <script>
-    import formPageMixin from "../../../mixins/formPageMixin";
-    import AppBuilder from "../../application-builder-module/builders/app-builder";
-    import historyMixin from "../../history-module/mixin/historyMixin";
+import formPageMixin from "../../../mixins/formPageMixin";
+import AppBuilder from "../../application-builder-module/builders/app-builder";
+import historyMixin from "../../history-module/mixin/historyMixin";
+import http from "../../core-module/services/http";
 
-    export default {
-        name: "generalProcess-member",
-        mixins: [formPageMixin, historyMixin],
-        components: {
-            AppBuilder,
-        },
-        data() {
-            return {
-                taskId: "",
-                taskData: {},
-                inputSchema: {},
+export default {
+  name: "generalProcess-member",
+  mixins: [formPageMixin, historyMixin],
+  components: {
+    AppBuilder,
+  },
+  data() {
+    return {
+      taskId: "",
+      taskData: {},
+      inputSchema: {},
                 app: {},
                 model: {},
             };
         },
         async created() {
-            this.taskId = this.$route.params.taskId;
-            this.claimTask(this.taskId);
+          this.taskId = this.$route.params.taskId;
+          this.claimTask(this.taskId);
 
-            this.taskData = await this.getTaskData(this.taskId);
-            this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
-            this.loadForm(this.inputSchema.config, this.fillForm);
+          this.taskData = await this.getTaskData(this.taskId);
+          this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
+          this.loadForm(this.inputSchema.config, this.fillForm);
 
-            this.$observable.subscribe("complete-step", this.submit);
+          this.$observable.subscribe("complete-step", this.submit);
+          this.$observable.subscribe("searchIncoming", async (data) => {
+            console.log("searchIncomingSubscribed", data);
+
+            let requestEntities = await http.get("/request/read/forLinkIncoming", {
+              params: {
+                "process": "generalProcess",
+                "requestDate": new Date().toISOString().split('T')[0],
+                "subject": data.model.requestSubject,
+                "requestNumber": data.model.requestNumber
+              }
+            });
+            console.log(requestEntities);
+          })
+
         },
         methods: {
             fillForm: async function () {

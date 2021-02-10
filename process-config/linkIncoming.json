@@ -5,6 +5,7 @@
       "component": "linkIncoming-approve",
       "config": "linkIncoming-approve",
       "router": {
+        "direction": "up",
         "fields": [
           "comment"
         ],
@@ -26,6 +27,7 @@
       "component": "linkIncoming-approve",
       "config": "linkIncoming-approve",
       "router": {
+        "direction": "up",
         "fields": [
           "comment"
         ],
@@ -47,6 +49,7 @@
       "component": "linkIncoming-approve",
       "config": "linkIncoming-approve",
       "router": {
+        "direction": "up",
         "fields": [
           "comment"
         ],
@@ -68,6 +71,7 @@
       "component": "linkIncoming-approve",
       "config": "linkIncoming-approve",
       "router": {
+        "direction": "up",
         "fields": [
           "comment"
         ],
