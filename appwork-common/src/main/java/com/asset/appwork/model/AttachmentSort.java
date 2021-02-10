@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "O9AssetGeneralACAACA_Entity_attachmentSort")
+@Table(name = "AssetGeneralACAACA_Entity_attachmentSort")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
 public class AttachmentSort {

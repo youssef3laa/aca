@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Entity(name = "Position")
-@Table(name = "O9OpenTextEntityIdentityComponentsPosition")
+@Table(name = "OpenTextEntityIdentityComponentsPosition")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Position {
     @Id

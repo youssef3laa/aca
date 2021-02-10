@@ -11,7 +11,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity(name = "Assignment")
-@Table(name = "O9OpenTextEntityIdentityComponentsAssignment")
+@Table(name = "OpenTextEntityIdentityComponentsAssignment")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Assignment {
     @Id

@@ -1,68 +1,41 @@
 <template>
     <v-container>
+      <span>samo 3aleko</span>
         <AppBuilder ref="appBuilder" :app="app"/>
     </v-container>
 </template>
 
 <script>
-import formPageMixin from "../../../mixins/formPageMixin";
-import AppBuilder from "../../application-builder-module/builders/app-builder";
-import historyMixin from "../../history-module/mixin/historyMixin";
-import http from "../../core-module/services/http";
-import orgChartMixin from "../../../mixins/orgChartMixin";
-import userMixin from "../../../mixins/userMixin";
+    import formPageMixin from "../../../mixins/formPageMixin";
+    import AppBuilder from "../../application-builder-module/builders/app-builder";
+    import historyMixin from "../../history-module/mixin/historyMixin";
 
-export default {
-  name: "generalProcess-member",
-  mixins: [formPageMixin, historyMixin, orgChartMixin, userMixin],
-  components: {
-    AppBuilder,
-  },
-  data() {
-    return {
-      taskId: "",
-      taskData: {},
-      inputSchema: {},
+    export default {
+        name: "linkIncoming-approval",
+        mixins: [formPageMixin, historyMixin],
+        components: {
+            AppBuilder,
+        },
+        data() {
+            return {
+                taskId: "",
+                taskData: {},
+                inputSchema: {},
                 app: {},
                 model: {},
             };
         },
         async created() {
-          this.taskId = this.$route.params.taskId;
-          this.claimTask(this.taskId);
+            this.taskId = this.$route.params.taskId;
+            this.claimTask(this.taskId);
 
-          this.taskData = await this.getTaskData(this.taskId);
-          this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
-          this.loadForm(this.inputSchema.config, this.fillForm);
+            this.taskData = await this.getTaskData(this.taskId);
+            this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
+            this.loadForm("linkIncoming-approve", this.fillForm);
 
-          this.$observable.subscribe("complete-step", this.submit);
-          this.$observable.subscribe("searchIncoming", async (data) => {
-            await this.getRequestEntities(data);
-          });
-
+            this.$observable.subscribe("complete-step", this.submit);
         },
         methods: {
-          async getRequestEntities(data) {
-            let requestEntities = await http.get("/request/read/forLinkIncoming", {
-              params: {
-                process: "generalProcess",
-                requestDate: new Date().toISOString().split("T")[0],
-                subject: data.model.requestSubject,
-                requestNumber: data.model.requestNumber,
-              },
-            });
-            console.log(requestEntities);
-            let parentDetails = await this.getParentDetails();
-            console.log(parentDetails)
-            console.log(this.$user);
-            let userDetails = await this.getUserDetails();
-            console.log(userDetails);
-
-            this.$observable.fire("link", {
-              type: "modelUpdate",
-              model: requestEntities.data
-            });
-          },
             fillForm: async function () {
                 this.$refs.appBuilder.disableSection("section1")
                 let entityName = this.inputSchema.entityName;
@@ -95,17 +68,12 @@ export default {
                     taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
                 });
 
-                this.$refs.appBuilder.setModelData("signaturePage", {
-                    signature: {
-                        requestId: this.inputSchema.requestId
-                    }
-                });
+               
 
                 this.$refs.appBuilder.setModelData("approvalForm", {
                     approval: {
-                      "fields": ["comment"],
-                      "receiverTypes": ["single"],
-                      "direction": "up"
+                        decisions: ["approve","redirect","reject"],
+                        receiverTypes: ["single"]
                     }
                 });
             },

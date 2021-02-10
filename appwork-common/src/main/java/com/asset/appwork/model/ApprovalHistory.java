@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Entity
 @Data
-@Table(name = "O9AssetGeneralACAACA_Entity_approval_history")
+@Table(name = "AssetGeneralACAACA_Entity_approval_history")
 public class ApprovalHistory {
     @Id
     Long id;

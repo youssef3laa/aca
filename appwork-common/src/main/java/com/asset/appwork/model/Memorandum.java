@@ -13,7 +13,7 @@ import java.util.Set;
  */
 @Entity
 @Data
-@Table(name = "O9AssetGeneralACAACA_Entity_Memos")
+@Table(name = "AssetGeneralACAACA_Entity_Memos")
 public class Memorandum {
     @Id
     Long id;

@@ -1,7 +1,7 @@
-import linkIncoming from "../views/linkIncoming"
+import linkIncoming from "../views/linkIncoming-approval"
 const routes = [{
-    path:'/linking',
-    name: 'linkIncoming',
+    path:'/linkIncoming-approval/:taskId/',
+    name: 'linkIncoming-approval',
     component: linkIncoming
     }
 ]

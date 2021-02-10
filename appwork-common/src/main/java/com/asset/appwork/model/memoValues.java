@@ -9,7 +9,7 @@ import javax.persistence.*;
  */
 @Entity
 @Data
-@Table(name = "O9AssetGeneralACAACA_Entity_MemosValues")
+@Table(name = "AssetGeneralACAACA_Entity_MemosValues")
 public class memoValues {
     @Id
     Long id;

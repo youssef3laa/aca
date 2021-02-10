@@ -156,7 +156,7 @@ export default {
         });
       });
     },
-    createTasks(data) {
+    createTasks() {
       this.$refs.appBuilder.setModelData("userHistoryTable", {
         taskTable: {
           url: null,
@@ -186,7 +186,7 @@ export default {
               value: "action",
             },
           ],
-          data: data,
+          data: [],
           search: "",
         },
       });
@@ -199,12 +199,14 @@ export default {
         });
       } else if ($event == "viewReceived") {
         this.sidebarItem = "viewReceived";
-        this.createTasks(this.getTasks());
+        this.createTasks();
+        this.getTasks()
       }
     },
   },
   mounted: function () {
-    this.createTasks(this.getTasks());
+    this.createTasks();
+    this.getTasks();
   },
   created() {
     this.$observable.subscribe("taskTable_view", (item) => {
