@@ -1,8 +1,8 @@
-import Http from "@/modules/core-module/services/http";
+import Http from "../modules/core-module/services/http";
 
 export default {
     methods: {
-        setFileTypeOnFileUploaded: function ({ categories, properties }) {
+        setFileTypeOnFileUploaded: function ({categories, properties}) {
             let categoryValue;
             if (categories == undefined || categories.length == 0) {
                 //shouldn't go here...
@@ -15,7 +15,7 @@ export default {
             properties.fileTypeValue = lookupObj?.text ?? "قيمة غير معرفة";
         },
         openFileInBrave: async function ({fileId, verNum}) {
-            // this.$observable.fire('file-component-skeleton', true)
+            this.toggleFileSelected(fileId);
             let userToken;
             try {
                 userToken = await Http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
@@ -37,6 +37,8 @@ export default {
 
         },
         deleteFile: async function (file) {
+
+            let fileStatus = file.isActive;
             file = file.properties;
             if (file == undefined || file.id == undefined) return;
             try {
@@ -61,9 +63,13 @@ export default {
                     tempArr.push(attachmentSortElement);
                 }
                 this.updateMultipleAttachmentSortRecords(tempArr);
+                if (fileStatus) {
+                    this.iframeOjbect.src = "";
+                }
             } catch (e) {
                 console.error(e)
             }
+
 
         },
         listFiles: async function () {
@@ -133,7 +139,11 @@ export default {
 
             }
             this.filesUploaded.splice(0);
-            nodesResponse.forEach((val) => this.filesUploaded.push(val));
+
+            nodesResponse.forEach((val) => {
+                val.isActive = false;
+                this.filesUploaded.push(val)
+            });
         },
         updateAttachmentSortRecord: function (obj) {
             let itemToBeUpdated = this.attachmentSortList.find(val => val.fileId == obj.fileId);
@@ -212,6 +222,7 @@ export default {
         },
         openVersionsPopup: function (file) {
             console.log("openVersions popup === attachmentMixinjs");
+            console.log(file.properties);
             this.versionsDialogState = true;
             this.selectedFile.nodeId = file.properties.id
             this.selectedFile.modalTitle = file.properties.name;
@@ -234,5 +245,11 @@ export default {
             evt.dataTransfer.effectAllowed = "move";
             evt.dataTransfer.setData("itemID", file.properties.id);
         },
+        toggleFileSelected: function (nodeId) {
+            this.filesUploaded.forEach((element) => {
+                if (element.properties.id === nodeId) element.isActive = true;
+                else element.isActive = false;
+            })
+        }
     }
 }

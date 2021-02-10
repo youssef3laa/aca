@@ -13,7 +13,7 @@
         <v-container>
           <AutocompleteComponent
             :field="{ name: field.label }"
-            :val="{ list :[], url: url }"
+            :val="{ list: [], url: url }"
             @update="changeVal"
           >
           </AutocompleteComponent>
@@ -41,12 +41,29 @@ export default {
     Pane,
   },
   mixins: [memoComponentMixin, formPageMixin],
+  async mounted() {
+    this.$observable.subscribe("retrieveMemo", async (data) => {
+    try{
+        var memoType = await this.getMemoJsonId(data.nodeId);
+        this.loadForm(memoType);
+        await this.fillForm(data.nodeId);
+        this.nodeId = data.nodeId;
+        
+    }
 
+    catch(error){
+      console.log(error);
+    }
+
+      // this.loadForm(this.selected, this.fillForm("722454"));
+    });
+  },
   data() {
     return {
       d: this.val,
-      url:'lookup/get/category/memoType',
+      url: "lookup/get/category/memoType",
       selected: "",
+      nodeId:null,
       richText: {},
       Memodata: [],
       bwsId: 680482,
@@ -57,35 +74,42 @@ export default {
 
   methods: {
     changeVal(event) {
+      this.nodeId = null;
       if (event.value.value) {
-        this.$refs.appBuilder.setAppData({pages:[{sections:[{forms:[]}]}]});
-        console.log( this.$refs.appBuilder);
+        this.$refs.appBuilder.setAppData({
+          pages: [{ sections: [{ forms: [] }] }],
+        });
+        console.log(this.$refs.appBuilder);
         this.selected = event.value.value.value;
-        this.loadForm(this.selected, this.fillForm);
+        this.loadForm(this.selected);
         console.log(this.selected);
       } else {
-        this.$refs.appBuilder.setAppData({pages:[{sections:[{forms:[]}]}]});
+        this.$refs.appBuilder.setAppData({
+          pages: [{ sections: [{ forms: [] }] }],
+        });
       }
     },
 
-    async fillForm() {
-      this.Memodata = await this.getMemoData(this.selected, this.d.requestId);
-      console.log("MemoData", this.d);
-      if (this.Memodata == undefined) return;
-      this.Memodata[this.Memodata.length - 1].memoValues.forEach((element) => {
+    async fillForm(nodeId) {
+      var Memodata = await this.getMemoData(nodeId);
+      console.log("MemoData", Memodata);
+      if (Memodata == undefined) return;
+      Memodata.memoValues.forEach((element) => {
         var model = { [element.jsonKey]: element.value };
         console.log(model);
         console.log(element);
         this.$refs.appBuilder.setModelData(element.jsonKey, model);
       });
+      
     },
+    
 
     triggerSubmit() {
       var formKeys = this.$refs.appBuilder.getFormKeyByPageKey("memoPage");
-
+      this.richText = {};
       formKeys.forEach((element) => {
         var data = this.$refs.appBuilder.getModelData(element);
-        this.richText[element] = "<![CDATA[" + data[element] + "]]>";
+        this.richText[element] = data[element];
         console.log(data);
         console.log(element);
       });
@@ -93,8 +117,10 @@ export default {
       data = {
         requestId: this.d.requestId,
         jsonId: this.selected,
+        nodeId: this.nodeId,
         values: this.richText,
       };
+
       this.setMemoData(data);
     },
   },

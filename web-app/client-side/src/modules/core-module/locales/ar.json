@@ -9,6 +9,7 @@
   "request-approve": "الموافقة على الطلب",
   "request-redirection": "إعادة توجيه",
   "request-modification": "طلب إستيفاء",
+  "request-rejection": "رفض الطلب",
   "notes": "الملاحظات",
   "opinion": "الرأي",
   "express-opinion": "إبداء الرأي",
@@ -49,5 +50,14 @@
   "registerTopic": "تسجيل موضوع",
   "createAssignment": "إنشاء تكليف",
   "directionsScreen": "شاشة التوجيهات",
-  "reports": "التقارير"
+  "reports": "التقارير",
+  "view": "عرض",
+  "delete": "حذف",
+  "edit": "تعديل",
+  "topicName": "اسم الموضوع",
+  "senderName":"اسم المرسل",
+  "entityName":"اسم الجهة",
+  "processNumber":"رقم الوارد",
+  "date":"التاريخ"
+
 }

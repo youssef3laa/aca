@@ -15,13 +15,14 @@ public class memorandumSOAP {
                 "      <ns0:ACA_Entity_Memos-create xmlns:ns0=\"http://schemas/AssetGeneralACA/ACA_Entity_Memos\">\n" +
                 "        <ns0:requestId>"+memos.getRequestId()+"</ns0:requestId>\n" +
                 "        <ns0:jsonId>"+memos.getJsonId()+"</ns0:jsonId>\n" +
+                "      <ns0:nodeId>"+memos.getNodeId()+"</ns0:nodeId>"+
                 "      </ns0:ACA_Entity_Memos-create>\n" +
                 "    </CreateACA_Entity_Memos>\n" +
                 "  </SOAP:Body>\n" +
                 "</SOAP:Envelope>";
     }
 
-    public String createMemoValues(Memos memos, long id){
+    public String   createMemoValues(Memos memos, long id){
          String notes = "";
          for(String key: memos.getValues().keySet()) {
              notes += "<ns0:ACA_Entity_MemosValues-create xmlns:ns0=\"http://schemas/AssetGeneralACA/ACA_Entity_MemosValues\">\n" +

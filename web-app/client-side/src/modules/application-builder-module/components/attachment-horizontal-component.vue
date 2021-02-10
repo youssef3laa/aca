@@ -42,13 +42,16 @@
                 <v-col :cols="2" style="cursor: pointer" @click="openVersionsPopup(file)">
                     <v-icon color="#22B07D"> mdi-folder-multiple</v-icon>
                   </v-col>
-                <v-col
+                 <v-col :cols="2" style="cursor: pointer" @click="retrieveMemo(file.properties.id)">
+                    <v-icon color="#22B07D"> mdi-file-document-edit</v-icon>
+                  </v-col>
+                <!-- <v-col
                   :cols="2"
                   style="cursor: pointer"
                   @click="deleteFile(file)"
                 >
                   <v-icon color="#ea9cb3"> mdi-delete-circle-outline</v-icon>
-                </v-col>
+                </v-col> -->
               </div>
             </div>
           </draggable>
@@ -99,7 +102,10 @@ export default {
     console.log(this.bwsId);
   },
   methods: {
-
+    retrieveMemo(nodeId){
+      var data={nodeId:nodeId};
+      this.$observable.fire("retrieveMemo",data);
+    },
     versionsModalClosed() {
       this.versionsDialogState = false;
     },

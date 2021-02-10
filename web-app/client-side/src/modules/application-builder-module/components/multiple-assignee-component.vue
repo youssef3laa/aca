@@ -7,8 +7,9 @@
                                        @update="onChangeUnit"></AutoCompleteComponent>
             </v-col>
             <v-col>
-                <v-btn text color="#07689F" height="52px" @click="addUnit">
+                <v-btn text color="#07689F" style="background-color: #f2f7fa" height="52px" @click="addUnit">
                     <v-icon style="font-size: medium">fas fa-layer-group</v-icon>
+                    <span style="margin: 3px"></span>
                     <span style="font-weight: bold" v-t="'addUnit'"></span>
                 </v-btn>
             </v-col>

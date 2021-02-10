@@ -1,5 +1,12 @@
 <template>
-  <v-autocomplete
+  <validation-provider
+    v-if="show"
+    :name="field.name"
+    :rules="field.rule"
+    v-slot="{ errors }"
+    :vid="field.name"
+  >
+    <v-autocomplete
       v-model="value"
       :items="items.list"
       chips
@@ -11,22 +18,24 @@
       small-chips
       :disabled="readonly"
       v-on:change="autocompleteChange"
-      :search-input="search"
+      :search-input.sync="search"
       :loading="loading"
       allow-overflow
-  >
-    <template #label>
-      <span v-t="field.name"></span>
-    </template>
-  </v-autocomplete>
+    >
+      <template #label>
+        <span v-t="field.name"></span>
+      </template>
+    </v-autocomplete>
+    <span class="red--text">{{ errors[0] }}</span>
+  </validation-provider>
+
   <!--  multiple-->
 </template>
 
 <script>
-import http from "../../core-module/services/http";
-
+import http from '../../core-module/services/http'
 export default {
-  name: "autoCompleteComponent",
+  name: 'autoCompleteComponent',
   data() {
     return {
       //   items: ['foo', 'bar', 'fizz', 'buzz'],
@@ -36,8 +45,9 @@ export default {
       value: this.val.value,
       search: null,
       loading: false,
-      readonly: this.field.readonly
-    };
+      readonly: null,
+      show: true,
+    }
   },
   methods: {
     fetch(v, url) {
@@ -45,85 +55,110 @@ export default {
         .get(url)
         .then((response) => {
           const res = response.data.data.map((element) => {
-            let obj = {};
-            if(element["cn"]){
+            let obj = {}
+            if (element['cn']) {
               obj = {
-                name: element["name_ar"],
-                value: element["cn"],
-                text: element["name_ar"],
-                code: element["groupCode"],
-                object: element
+                name: element['name_ar'],
+                value: element['cn'],
+                text: element['name_ar'],
+                code: element['groupCode'],
+                object: element,
               }
-            }else if(element["unitCode"]){
+            } else if (element['unitCode']) {
               obj = {
-                value: element["unitCode"],
-                text: element["name_ar"],
-                object: element
+                value: element['unitCode'],
+                text: element['name_ar'],
+                object: element,
               }
-            }else{
+            } else {
               obj = {
-                value: element["key"],
-                text: element["arValue"],
-                object: element
+                value: element['key'],
+                text: element['arValue'],
+                object: element,
               }
             }
-            return obj;
-          });
+            return obj
+          })
           this.items.list = res.filter((e) => {
-            console.log(e);
-            return (e.name || "").indexOf(v || "") > -1;
-          });
-            console.log(this.items.list);
+            console.log(e)
+            return (e.name || '').indexOf(v || '') > -1
+          })
+          console.log(this.items.list)
 
-          if((v==null || v == "") && this.field.autofill && this.items.list.length == 1 ){
+          if (
+            (v == null || v == '') &&
+            this.field.autofill &&
+            this.items.list.length == 1
+          ) {
             this.value = this.items.list[0].value
             this.autocompleteChange()
           }
 
-          this.loading = false;
+          this.loading = false
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.log(err))
     },
     querySelections(v, url) {
-      this.loading = true;
+      this.loading = true
       this.fetch(v, url)
     },
-    autocompleteChange: function () {
-      const list = this.items.list;
-      if (!list) return;
-      const selectedObject = list.filter((el) => el.value === this.value)[0];
+    autocompleteChange: function() {
+      const list = this.items.list
+      if (!list) return
+      const selectedObject = list.filter((el) => el.value === this.value)[0]
       // console.log("selectedObject", selectedObject)
-      this.$emit("update", {
+      this.$emit('update', {
         name: this.field.name,
         value: {
           list: list,
           value: selectedObject,
         },
-        type: "autocompleteChange",
-      });
+        type: 'autocompleteChange',
+      })
     },
   },
   watch: {
-    field: function (newVal) {
-      if(newVal.readonly){
-        this.readonly = newVal.readonly
-      }
+    // field: function(newVal) {
+    //   if (newVal.readonly) {
+    //     this.readonly = newVal.readonly
+    //   }
+    // },
+    val: {
+      immediate: true,
+      handler(newVal, oldVal) {
+        console.log(oldVal)
+        // this.val = newVal
+        if (newVal.url) {
+          this.items.list = []
+          this.querySelections('', newVal.url)
+        }
+        this.items = newVal
+        if(newVal.value != null || newVal.value != undefined) this.value = newVal.value
+        console.log('val', this.val)
+        if(this.field.readonly == true || this.field.readonly == false){
+          this.readonly = this.field.readonly
+        }else if (this.field.readonly) {
+          this.readonly = this.model[this.field.readonly]
+        }
+        if (this.field.show) {
+          this.show = this.model[this.field.show]
+        }
+      },
     },
-    val: function (newVal, oldVal) {
-      console.log(oldVal);
-      // this.val = newVal
-      if(newVal.url){
-        this.items.list = []
-        this.querySelections("",newVal.url)
-      }
-      this.items = newVal;
-      if(newVal.value == null) newVal.value = undefined
-      this.value = newVal.value;
-      console.log("val", this.val);
-    },
-    search: function (val) {
+    // val: function(newVal, oldVal) {
+    //   console.log(oldVal)
+    //   // this.val = newVal
+    //   if (newVal.url) {
+    //     this.items.list = []
+    //     this.querySelections('', newVal.url)
+    //   }
+    //   this.items = newVal
+    //   this.value = newVal.value
+    //   console.log('val', this.val)
+    // },
+    search: function(val) {
       if (this.val.url) {
-        val && val !== this.value && this.querySelections(val, this.val.url);
+        val && val !== this.value && this.querySelections(val, this.val.url)
       }
     },
   },
@@ -133,8 +168,8 @@ export default {
     }
     // this.autocompleteChange();
   },
-  props: ["val", "field"],
-};
+  props: ['val', 'field', 'model'],
+}
 </script>
 <style>
 .v-select__slot {

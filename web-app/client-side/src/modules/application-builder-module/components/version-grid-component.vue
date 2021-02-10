@@ -92,14 +92,15 @@ export default {
       this.fileVersions = [];
       this.latestVersion = null;
       let fileVersionsResponse = await Http.get(
-        "/document/version/list/" + this.nodeId + "?order=desc"
+          "/document/version/list/" + this.nodeId + "?order=desc"
       );
-      console.log(fileVersionsResponse.data.data.results);
-      fileVersionsResponse = fileVersionsResponse.data.data.results;
-      this.latestVersion = fileVersionsResponse[0].data.versions;
+      console.log(fileVersionsResponse.data.data.versions);
+      fileVersionsResponse = fileVersionsResponse.data.data.versions;
+      fileVersionsResponse[0].modify_date = new Date(fileVersionsResponse[0].modify_date).toLocaleString();
+      this.latestVersion = fileVersionsResponse[0];
       for (let i = 1; i < fileVersionsResponse.length; ++i) {
-        let element = fileVersionsResponse[i].data.versions;
-        // element = element.modify_date.replace("T", " ");
+        let element = fileVersionsResponse[i];
+        element.modify_date = new Date(element.modify_date).toLocaleString();
         this.fileVersions.push(element);
       }
     },

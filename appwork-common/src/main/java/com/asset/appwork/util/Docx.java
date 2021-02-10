@@ -1,15 +1,11 @@
 package com.asset.appwork.util;
 
+import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.model.Memorandum;
-import com.asset.appwork.model.memoValues;
 import com.asset.appwork.repository.MemoValuesRepository;
 import com.asset.appwork.repository.MemosRepository;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.docx4j.convert.in.xhtml.XHTMLImporterImpl;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
@@ -26,9 +22,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +41,7 @@ public class Docx {
     @Autowired
     Environment env;
 
-    public File exportJsonToDocx(String requestId) throws AppworkException {
+    public File exportJsonToDocx(Memos memo) throws AppworkException {
         try {
             WordprocessingMLPackage wordPackage = WordprocessingMLPackage.createPackage();
             MainDocumentPart mainDocumentPart = wordPackage.getMainDocumentPart();
@@ -55,48 +51,41 @@ public class Docx {
             XHTMLImporterImpl XHTMLImporter = new XHTMLImporterImpl(wordPackage);
             XHTMLImporter.setHyperlinkStyle("Hyperlink");
 
-            List<Memorandum> memo = memosRepository.findByRequestId(requestId);
-            for (int i = 0; i < memo.size(); i++)
-            {
-                String jsonId = memo.get(i).getJsonId();
-                String memoId = memo.get(i).getId().toString();
-
-                JsonNode jsonNode = SystemUtil.convertStringToJsonNode(SystemUtil.readFile(System.getProperty("user.dir") + env.getProperty("memosPath") + jsonId + ".json"));
-
+            JsonNode jsonNode = null;
+            try {
+                jsonNode = SystemUtil.convertStringToJsonNode(SystemUtil.readFile(System.getProperty("user.dir") + env.getProperty("memosPath") + memo.getJsonId() + ".json"));
                 String name = jsonNode.at("/app/pages/0/sections/0/forms/0/name").asText();
                 mainDocumentPart.addStyledParagraphOfText("Title", name);
 
-                String jsonKey = jsonNode.at("/app/pages/0/sections/0/forms/0/inputs/0/name").asText();
-                List<memoValues> memoVales = memoValuesRepository.findByMemosIdAndJsonKey(memoId, jsonKey);
-                for (int j = 0; j < memoVales.size(); j++)
+                HashMap<String, String> memoValues = memo.getValues();
+                String tempValues = "";
+                for(Map.Entry<String, String> memoValue : memoValues.entrySet())
                 {
+                    tempValues += memoValue.getValue() + "\n";
+                }
+                try {
                     wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n" +
                             "\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n" +
                             "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
                             "<body>\n" +
-                            memoVales.get(j).getValue()+"\n" +
+                            tempValues + "\n" +
                             "</body>\n" +
                             "</html>", null));
+                } catch (Docx4JException e) {
+                    e.printStackTrace();
+                    log.error("Docx: " + e.getMessage());
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.error("Docx: " + e.getMessage());
             }
+
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy HH-mm-ss");
             Date date = new Date();
-            File file = new File("Memo" + requestId + " " + dateFormat.format(date) + ".docx");
+            File file = new File("Memo" + memo.getRequestId() + " " + dateFormat.format(date) + ".docx");
             wordPackage.save(file);
             return file;
 
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-            log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-            log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (InvalidFormatException e) {
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());

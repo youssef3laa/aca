@@ -20,14 +20,21 @@ public class AppBuilder {
         StringBuilder fileContent;
         try {
             fileContent = readFile(formPath);
-            Pattern pattern = Pattern.compile("(?<=\\$path\\()(.*)(?=\\))");
-            Matcher matcher = pattern.matcher(fileContent);
-            while (matcher.find()) {
-                String path = matcher.group();
-                System.out.println(path);
-                String file = readFile(rootPath + File.separator + "views" + File.separator + path + ".json").toString();
-                fileContent = fileContent.replace(matcher.start() - 6, matcher.end() + 1, file);
+            while(fileContent.indexOf("$path(") > -1){
+                int firstIndex = fileContent.indexOf("$path(")+6;
+                int lastIndex = firstIndex + fileContent.substring(firstIndex).indexOf(")");
+                String path = fileContent.substring(firstIndex,lastIndex);
+                String file = readFile(rootPath+ File.separator + "views" + File.separator + path+ ".json").toString();
+                fileContent.replace(firstIndex-6,lastIndex+1, file);
             }
+//            Pattern pattern = Pattern.compile("(?<=\\$path\\()(.*)(?=\\))");
+//            Matcher matcher = pattern.matcher(fileContent);
+//            while (matcher.find()) {
+//                String path = matcher.group();
+//                System.out.println(path);
+//                String file = readFile(rootPath + File.separator + "views" + File.separator + path + ".json").toString();
+//                fileContent = fileContent.replace(matcher.start() - 6, matcher.end() + 1, file);
+//            }
             writeFile(rootPath + File.separator + "output" + File.separator + nameOfViewFolder + ".json", fileContent.toString());
 
         } catch (IOException e) {

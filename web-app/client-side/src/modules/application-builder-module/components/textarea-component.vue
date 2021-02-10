@@ -1,17 +1,25 @@
 <template>
-   <!-- background-color="grey lighten-2" -->
-  <v-textarea
-    row
-    color="outline"
-    v-model="d"
-    @input="addInput"
-    :disabled="readonly"
-    outlined
+  <!-- background-color="grey lighten-2" -->
+  <validation-provider
+    :name="field.name"
+    :rules="field.rule"
+    v-slot="{ errors }"
+    :vid="field.name"
   >
+    <v-textarea
+      row
+      color="outline"
+      v-model="d"
+      @input="addInput"
+      :disabled="readonly"
+      outlined
+    >
       <template #label>
-          <span v-t="field.label"></span>
+        <span v-t="field.label"></span>
       </template>
-  </v-textarea>
+    </v-textarea>
+    <span class="red--text">{{ errors[0] }}</span>
+  </validation-provider>
 </template>
 <script>
 export default {

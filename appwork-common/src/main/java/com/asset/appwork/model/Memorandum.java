@@ -19,7 +19,7 @@ public class Memorandum {
     Long id;
     String requestId;
     String jsonId;
-
+    String nodeId;
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "memosId")

@@ -11,7 +11,7 @@
             </p>
           </v-alert>
           <v-card-text style="padding-top: 0px">
-            <TextareaComponent :field="{ name: 'routingNotes', label: 'notes' }"
+            <TextareaComponent :field="{ name: 'routingNotes', label: 'notes', rule:'required' }"
                                @update="onChangeComment"></TextareaComponent>
           </v-card-text>
         </v-card>
@@ -26,7 +26,7 @@
             </p>
           </v-alert>
           <v-card-text style="padding-top: 0px">
-            <TextareaComponent :field="{ name: 'routingOpinion', label: 'opinion' }"
+            <TextareaComponent :field="{ name: 'routingOpinion', label: 'opinion', rule:'required' }"
                                @update="onChangeOpinion"></TextareaComponent>
           </v-card-text>
         </v-card>
@@ -44,10 +44,10 @@
                            @update="onChangeReceiverType"
                            v-if="receiverTypes"></RadioGroupComponent>
       <v-card-text v-if="receiverTypes && receiverType=='single'">
-        <ReceiverFormComponent :field="{name: 'receiverForm'}" :val="receiverDirection" @update="onChangeReceiver"></ReceiverFormComponent>
+        <ReceiverFormComponent :key="receiverType" :field="{name: 'receiverForm'}" :val="receiverDirection" @update="onChangeReceiver"></ReceiverFormComponent>
       </v-card-text>
       <v-card-text v-else-if="receiverTypes && receiverType=='multiple'">
-        <MultipleAssigneeComponent :field="{name: 'multipleComponent'}" @update="onChangeMultipleUnits"></MultipleAssigneeComponent>
+        <MultipleAssigneeComponent :key="receiverType" :field="{name: 'multipleComponent'}" @update="onChangeMultipleUnits"></MultipleAssigneeComponent>
       </v-card-text>
     </v-card>
   </div>
@@ -140,12 +140,14 @@
         this.onValueChange()
       },
       onChangeDecision: function(event) {
+        this.receiverTypes = null
         this.decision = event.value
         if(this.d.receiverTypes){
+          this.receiverTypes = this.getReceiverTypeOptions(null,null)
           this.receiverType = null
           // this.receiverDirection = null
           this.updateDirection(null)
-          if(this.d.receiverTypes.includes("multiple")){
+          // if(this.d.receiverTypes.includes("multiple")){
             switch(this.decision){
               case "approve":
                 this.updateDirection("up")
@@ -153,16 +155,22 @@
                 this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
                 break
               case "redirect":
-                this.receiverTypes = this.getReceiverTypeOptions(["single","multiple"], null)
+                if(this.d.receiverTypes.includes("multiple")) this.receiverTypes = this.getReceiverTypeOptions(["single","multiple"], null)
+                else this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
                 break
               case "requestModification":
                 this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
                 break
+              case "reject":
+                this.receiverTypes = this.getReceiverTypeOptions(null,null)
+                break
             }
-          }else if(this.d.receiverTypes.includes("single")) {
-            if(this.decision == "approve") this.updateDirection("up")
-            this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
-          }
+          // }
+          // else if(this.d.receiverTypes.includes("single")) {
+          //   this.receiverTypes = this.getReceiverTypeOptions(null,null)
+          //   if(this.decision == "approve") this.updateDirection("up")
+          //   this.receiverTypes = this.getReceiverTypeOptions(["single"], "single")
+          // }
         }
         this.onValueChange()
       },
@@ -191,6 +199,7 @@
             value: receiverTypes[i]
           })
         }
+        if(value) this.receiverType = value
         return {options: options, value: value}
       },
       getDecisionLabel: function(value) {
@@ -201,6 +210,8 @@
             return "request-redirection"
           case "requestModification":
             return "request-modification"
+          case "reject":
+            return "request-rejection"
         }
       },
       getReceiverTypeLabel: function(value) {
