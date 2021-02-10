@@ -9,10 +9,11 @@ import formPageMixin from "../../../mixins/formPageMixin";
 import AppBuilder from "../../application-builder-module/builders/app-builder";
 import historyMixin from "../../history-module/mixin/historyMixin";
 import http from "../../core-module/services/http";
+import orgChartMixin from "../../../mixins/orgChartMixin";
 
 export default {
   name: "generalProcess-member",
-  mixins: [formPageMixin, historyMixin],
+  mixins: [formPageMixin, historyMixin, orgChartMixin],
   components: {
     AppBuilder,
   },
@@ -21,8 +22,8 @@ export default {
       taskId: "",
       taskData: {},
       inputSchema: {},
-                app: {},
-                model: {},
+      app: {},
+      model: {},
             };
         },
         async created() {
@@ -46,6 +47,8 @@ export default {
               }
             });
             console.log(requestEntities);
+            let parentDetails = await this.getParentDetails();
+            console.log(parentDetails)
           })
 
         },
@@ -90,8 +93,9 @@ export default {
 
                 this.$refs.appBuilder.setModelData("approvalForm", {
                     approval: {
-                        decisions: ["approve","redirect","reject"],
-                        receiverTypes: ["single"]
+                      "fields": ["comment"],
+                      "receiverTypes": ["single"],
+                      "direction": "up"
                     }
                 });
             },

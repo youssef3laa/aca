@@ -76,6 +76,42 @@ public class ProcessController {
         return respBuilder.build().getResponseEntity();
     }
 
+
+    @PostMapping("/initiateLinkedIncoming")
+    public ResponseEntity<AppResponse<String>> initiateLinkedIncoming(@RequestHeader("X-Auth-Token") String token, @RequestBody Request requestJson) {
+        AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            String cordysUrl = cordysService.getCordysUrl();
+
+            //Note: Entity Creation
+            String restAPIBaseUrl = SystemUtil.generateRestAPIBaseUrl(environment, "AssetGeneralACA");
+            Entity entity = new Entity(account,
+                    restAPIBaseUrl
+                    , requestJson.processModel.getEntityName());
+            Long entityId = entity.create(requestJson.generalProcessEntity);
+
+            //Note: Get Next Step
+//            requestJson.processModel.setEntityId(entityId.toString());
+
+            String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
+            String config = SystemUtil.readFile(filePath);
+
+            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository, orgChartService);
+            String response = moduleRouting.goToNext(requestJson.processModel);
+            respBuilder.data(response);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        } catch (IOException e) {
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+
+        return respBuilder.build().getResponseEntity();
+    }
+
+
     @Transactional
     @PostMapping("/complete")
     public ResponseEntity<AppResponse<String>> complete(@RequestHeader("X-Auth-Token") String token, @RequestBody OutputSchema outputSchema) {

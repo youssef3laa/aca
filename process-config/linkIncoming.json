@@ -1,6 +1,11 @@
 {
   "processName": "linkIncoming",
   "steps": {
+    "init": {
+      "nextStep": {
+        "initiate": "headOfGroupStep"
+      }
+    },
     "headOfGroupStep": {
       "component": "linkIncoming-approve",
       "config": "linkIncoming-approve",
