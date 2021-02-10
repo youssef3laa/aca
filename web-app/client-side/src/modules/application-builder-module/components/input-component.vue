@@ -38,7 +38,7 @@ export default {
       d: this.val,
       readonly: null,
       password: this.field.password,
-      show: null,
+      show: true,
     }
   },
   methods: {
@@ -63,7 +63,9 @@ export default {
       immediate: true,
       handler(newVal) {
         this.d = newVal
-        if (this.field.readonly) {
+        if(this.field.readonly == true || this.field.readonly == false){
+          this.readonly = this.field.readonly
+        }else if (this.field.readonly) {
           this.readonly = this.model[this.field.readonly]
         }
         if (this.field.show) {

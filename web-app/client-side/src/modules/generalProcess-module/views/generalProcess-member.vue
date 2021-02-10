@@ -74,7 +74,10 @@
                 });
 
                 this.$refs.appBuilder.setModelData("approvalForm", {
-                    routing: this.inputSchema.router
+                    approval: {
+                        decisions: ["approve","redirect","reject"],
+                        receiverTypes: ["single"]
+                    }
                 });
             },
             submit: function () {
