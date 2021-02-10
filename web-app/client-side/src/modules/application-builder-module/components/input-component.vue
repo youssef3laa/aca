@@ -10,7 +10,7 @@
       v-model="d"
       @input="onValueChange"
       @change="onChange"
-      :type="password ? 'password' : 'text'"
+      :type="field.inputType ? field.inputType : 'text'"
       :disabled="readonly"
       outlined
       v-if="show"
@@ -37,7 +37,7 @@ export default {
       eventName: this.field.eventName,
       d: this.val,
       readonly: null,
-      password: this.field.password,
+      // password: this.field.password,
       show: true,
     }
   },

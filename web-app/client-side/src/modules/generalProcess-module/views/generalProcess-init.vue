@@ -22,12 +22,18 @@ export default {
     };
   },
   async created() {
-    await this.loadForm("generalProcess-init");
+    await this.loadForm("generalProcess-init", this.formLoaded);
+
     this.$observable.subscribe("complete-step", this.submit);
     console.log(this)
     this.$refs.alertComponent._alertSuccess({type: "warning",message: "comment"})
   },
   methods: {
+    formLoaded: function (){
+      this.$refs.appBuilder.setModelData("form1", {
+        maxDate: new Date().toISOString().split('T')[0]
+      })
+    },
     submit: function () {
       let model = this.$refs.appBuilder.getModelData("form1");
       let model2 = this.$refs.appBuilder.getModelData("form2");

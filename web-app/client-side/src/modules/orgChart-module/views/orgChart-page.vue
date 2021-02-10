@@ -319,7 +319,7 @@ export default {
                         label: "Password",
                         name: "password",
                         col: "4",
-                        password: true,
+                        inputType: "password",
                         rule: "required",
                       },
                       {
