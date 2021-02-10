@@ -11,7 +11,7 @@
             </v-icon>
           </button>
           <span style="margin-left:15px;margin-right:15px">
-            {{section.name}}
+            {{$t(section.name)}}
           </span>
         </h1>
       </v-col>

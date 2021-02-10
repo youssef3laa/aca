@@ -9,7 +9,7 @@
         <v-expansion-panel-header>
           <v-row no-gutters>
             <v-col cols="4">
-              <span>{{ section.name }}</span>
+              <span>{{ $t(section.name) }}</span>
               <span class="line"></span>
             </v-col>
             <v-col cols="8" class="text--secondary"> </v-col>

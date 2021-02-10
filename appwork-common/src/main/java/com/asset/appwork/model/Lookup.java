@@ -13,7 +13,6 @@ public class Lookup {
     Long Id;
 
     String category;
-    @Column(name = "[key]")
     String key;
     String arValue;
     String enValue;

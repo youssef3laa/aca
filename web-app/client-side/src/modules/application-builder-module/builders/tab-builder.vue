@@ -12,7 +12,7 @@
       <v-icon right color="info">
         {{ tab.icon }}
       </v-icon>
-      {{ tab.name }}
+      {{ $t(tab.name) }}
     </button>
   </span>
 </template>
