@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Data
-@Table(name = "O9AssetGeneralACAACA_Entity_lookup")
+@Table(name = "AssetGeneralACAACA_Entity_lookup")
 public class Lookup {
     @Id
     Long Id;

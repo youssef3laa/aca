@@ -18,6 +18,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.StoredProcedureQuery;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -37,6 +39,9 @@ public class OrgChartService {
     PositionRepository positionRepository;
     @Autowired
     AssignmentRepository assignmentRepository;
+
+    @Autowired
+    EntityManager entityManager;
 
     @Autowired
     Environment env;
@@ -98,24 +103,41 @@ public class OrgChartService {
     }
 
     public List<Unit> getUnitChildrenRecursively(String parentUnitCode) {
-        return unitRepository.getUnitChildrenRecursively(parentUnitCode);
+        StoredProcedureQuery storedProcedure = entityManager.createNamedStoredProcedureQuery("Unit.getUnitChildrenRecursively");
+        storedProcedure.setParameter("unitCode_param", parentUnitCode);
+        return (List<Unit>) storedProcedure.getResultList();
+//        return unitRepository.getUnitChildrenRecursively(parentUnitCode);
     }
 
     public List<Unit> getUnitChildrenRecursivelyFilteredByUnitTypeCode(String parentUnitCode, String unitTypeCode) {
-        return unitRepository.getUnitChildrenRecursivelyFilteredByUnitTypeCode(parentUnitCode, unitTypeCode);
+        StoredProcedureQuery storedProcedure = entityManager.createNamedStoredProcedureQuery("Unit.getUnitChildrenRecursivelyFilteredByUnitTypeCode");
+        storedProcedure.setParameter("unitCode_param", parentUnitCode);
+        storedProcedure.setParameter("unitTypeCode_param", unitTypeCode);
+        return (List<Unit>) storedProcedure.getResultList();
+//        return unitRepository.getUnitChildrenRecursivelyFilteredByUnitTypeCode(parentUnitCode, unitTypeCode);
     }
 
-    public Page<Unit> getUnitChildrenRecursivelyFilteredByUnitTypeCode(String parentUnitCode, String unitTypeCode, int page, int size) {
-        return unitRepository.getUnitChildrenRecursivelyFilteredByUnitTypeCode(parentUnitCode, unitTypeCode, PageRequest.of(page, size));
-    }
+//    public Page<Unit> getUnitChildrenRecursivelyFilteredByUnitTypeCode(String parentUnitCode, String unitTypeCode, int page, int size) {
+//        StoredProcedureQuery storedProcedure = entityManager.createNamedStoredProcedureQuery("Unit.getUnitChildrenRecursivelyFilteredByUnitTypeCode");
+//        storedProcedure.setParameter("unitCode_param", parentUnitCode);
+//        storedProcedure.setParameter("unitTypeCode_param", unitTypeCode);
+//        storedProcedure.setFirstResult((page) * size);
+//        storedProcedure.setMaxResults(size);
+//        return (List<Unit>) storedProcedure.getResultList();
+////        return unitRepository.getUnitChildrenRecursivelyFilteredByUnitTypeCode(parentUnitCode, unitTypeCode, PageRequest.of(page, size));
+//    }
 
     public List<Unit> getUnitParentsRecursivelyFilteredByUnitTypeCode(String childUnitCode, String unitTypeCode) {
-        return unitRepository.getUnitParentsRecursivelyFilteredByUnitTypeCode(childUnitCode, unitTypeCode);
+        StoredProcedureQuery storedProcedure = entityManager.createNamedStoredProcedureQuery("Unit.getUnitParentsRecursivelyFilteredByUnitTypeCode");
+        storedProcedure.setParameter("unitCode_param", childUnitCode);
+        storedProcedure.setParameter("unitTypeCode_param", unitTypeCode);
+        return (List<Unit>) storedProcedure.getResultList();
+//        return unitRepository.getUnitParentsRecursivelyFilteredByUnitTypeCode(childUnitCode, unitTypeCode);
     }
 
-    public Page<Unit> getUnitParentsRecursivelyFilteredByUnitTypeCode(String childUnitCode, String unitTypeCode, int page, int size) {
-        return unitRepository.getUnitParentsRecursivelyFilteredByUnitTypeCode(childUnitCode, unitTypeCode, PageRequest.of(page, size));
-    }
+//    public Page<Unit> getUnitParentsRecursivelyFilteredByUnitTypeCode(String childUnitCode, String unitTypeCode, int page, int size) {
+//        return unitRepository.getUnitParentsRecursivelyFilteredByUnitTypeCode(childUnitCode, unitTypeCode, PageRequest.of(page, size));
+//    }
 
     public void addSubUnitToUnit(Long id, Long subUnitId) throws AppworkException {
         Unit unit = getUnit(subUnitId);
@@ -363,12 +385,16 @@ public class OrgChartService {
     }
 
     public List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode) {
-        return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode);
+        StoredProcedureQuery storedProcedure = entityManager.createNamedStoredProcedureQuery("Group.getGroupChildrenRecursivelyFilteredByUnitTypeCode");
+        storedProcedure.setParameter("groupCode_param", code);
+        storedProcedure.setParameter("unitTypeCode_param", unitTypeCode);
+        return (List<Group>) storedProcedure.getResultList();
+//        return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode);
     }
 
-    public Page<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode, int page, int size) {
-        return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, PageRequest.of(page, size));
-    }
+//    public Page<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode, int page, int size) {
+//        return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, PageRequest.of(page, size));
+//    }
 
     public Group getGroupByCn(String cn) throws AppworkException {
         Pattern pattern = Pattern.compile("cn=(.*?),cn=organizational roles");

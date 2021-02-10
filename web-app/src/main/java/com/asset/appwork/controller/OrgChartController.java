@@ -226,9 +226,10 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if (page.isPresent() && size.isPresent()) {
-                    Page<Unit> unitPage = orgChartService.getUnitChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, page.get(), size.get());
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(unitPage.getContent().toString()));
-                    respBuilder.info("totalCount", unitPage.getTotalElements());
+//                    Page<Unit> unitPage = orgChartService.getUnitChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, page.get(), size.get());
+//                    respBuilder.data(SystemUtil.convertStringToJsonNode(unitPage.getContent().toString()));
+//                    respBuilder.info("totalCount", unitPage.getTotalElements());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUnitChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode).toString()));
                 } else {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUnitChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode).toString()));
                 }
@@ -250,10 +251,10 @@ public class OrgChartController {
     @Transactional
     @GetMapping("/unit/{code}/up/all/unitTypeCode/{unitTypeCode}")
     public ResponseEntity<AppResponse<JsonNode>> readUnitParentsRecursivelyFilteredByUnitTypeCode(@RequestHeader("X-Auth-Token") String token,
-                                                                                                   @PathVariable("code") String code,
-                                                                                                   @PathVariable("unitTypeCode") String unitTypeCode,
-                                                                                                   @RequestParam(value = "page") Optional<Integer> page,
-                                                                                                   @RequestParam(value = "size") Optional<Integer> size
+                                                                                                  @PathVariable("code") String code,
+                                                                                                  @PathVariable("unitTypeCode") String unitTypeCode,
+                                                                                                  @RequestParam(value = "page") Optional<Integer> page,
+                                                                                                  @RequestParam(value = "size") Optional<Integer> size
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
@@ -261,9 +262,10 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if (page.isPresent() && size.isPresent()) {
-                    Page<Unit> unitPage = orgChartService.getUnitParentsRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, page.get(), size.get());
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(unitPage.getContent().toString()));
-                    respBuilder.info("totalCount", unitPage.getTotalElements());
+//                    Page<Unit> unitPage = orgChartService.getUnitParentsRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, page.get(), size.get());
+//                    respBuilder.data(SystemUtil.convertStringToJsonNode(unitPage.getContent().toString()));
+//                    respBuilder.info("totalCount", unitPage.getTotalElements());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUnitParentsRecursivelyFilteredByUnitTypeCode(code, unitTypeCode).toString()));
                 } else {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUnitParentsRecursivelyFilteredByUnitTypeCode(code, unitTypeCode).toString()));
                 }
@@ -696,9 +698,10 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if (page.isPresent() && size.isPresent()) {
-                    Page<Group> groupPage = orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, page.get(), size.get());
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
-                    respBuilder.info("totalCount", groupPage.getTotalElements());
+//                    Page<Group> groupPage = orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, page.get(), size.get());
+//                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+//                    respBuilder.info("totalCount", groupPage.getTotalElements());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode).toString()));
                 } else {
                     respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode).toString()));
                 }

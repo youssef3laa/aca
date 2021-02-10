@@ -36,7 +36,7 @@ public class Entity {
             try {
                 throw new AppworkException(SystemUtil.getJsonByPtrExpr(response, "/message"), ResponseCode.CREATE_ENTITY_FAILURE);
             } catch (AppworkException er) {
-                throw new AppworkException(er.getMessage(), ResponseCode.INTERNAL_SERVER_ERROR);
+                throw new AppworkException(er.getMessage(), ResponseCode.CREATE_ENTITY_FAILURE);
             }
         }
     }

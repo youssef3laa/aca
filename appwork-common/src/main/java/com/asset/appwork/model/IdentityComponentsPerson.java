@@ -12,7 +12,7 @@ import javax.persistence.Table;
 //@Table(name = "trades_#{tableNameSuffix}")
 @Entity
 @Data
-@Table(name = "O2OpenTextEntityIdentityComponentsPerson")
+@Table(name = "OpenTextEntityIdentityComponentsPerson")
 public class IdentityComponentsPerson {
     @Id
     long Id;

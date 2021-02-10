@@ -6,11 +6,43 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
 import javax.persistence.*;
+import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.HashSet;
 
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(
+                name = "Unit.getUnitChildrenRecursively",
+                procedureName = "APPWORKSDB.ACA_ORG_SP_getUnitChildrenRecursively",
+                resultClasses = Unit.class,
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "unitCode_param"),
+                        @StoredProcedureParameter(mode = ParameterMode.REF_CURSOR, type = ResultSet.class, name = "output_cursor")
+                }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "Unit.getUnitChildrenRecursivelyFilteredByUnitTypeCode",
+                procedureName = "APPWORKSDB.ACA_ORG_SP_getUnitChildrenRecursivelyFilteredByUnitTypeCode",
+                resultClasses = Unit.class,
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "unitCode_param"),
+                        @StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "unitTypeCode_param"),
+                        @StoredProcedureParameter(mode = ParameterMode.REF_CURSOR, type = ResultSet.class, name = "output_cursor")
+                }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "Unit.getUnitParentsRecursivelyFilteredByUnitTypeCode",
+                procedureName = "APPWORKSDB.ACA_ORG_SP_getUnitParentsRecursivelyFilteredByUnitTypeCode",
+                resultClasses = Unit.class,
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "unitCode_param"),
+                        @StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "unitTypeCode_param"),
+                        @StoredProcedureParameter(mode = ParameterMode.REF_CURSOR, type = ResultSet.class, name = "output_cursor")
+                }
+        ),
+})
 @Entity(name = "Unit")
-@Table(name = "O9OpenTextEntityIdentityComponentsIdentity")
+@Table(name = "OpenTextEntityIdentityComponentsIdentity")
 public class Unit extends BaseIdentity<Unit> {
     @Column(name = "UnitTypeCode")
     String unitTypeCode;
@@ -21,10 +53,10 @@ public class Unit extends BaseIdentity<Unit> {
     Collection<Group> group;
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
-            name = "O9OpenTextEntityIdentityComponentsOrganizationalUnitOrganizationalUnit",
-            joinColumns = {@JoinColumn(name = "OrganizationIdA7A9FD625B78137F")},
+            name = "OpenTextEntityIdentityComponentsOrganizationalUnitOrganizationalUnit",
+            joinColumns = {@JoinColumn(name = "OrganizationIdBDBD7DDC32F46FF3")},
             inverseJoinColumns = {@JoinColumn(name = "OrganizationalUnit_Id")},
-            uniqueConstraints = {@UniqueConstraint(columnNames = {"OrganizationIdA7A9FD625B78137F", "OrganizationalUnit_Id"})}
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"OrganizationIdBDBD7DDC32F46FF3", "OrganizationalUnit_Id"})}
     )
     @JsonIgnore
     Collection<Unit> child = new HashSet<>();
@@ -35,10 +67,10 @@ public class Unit extends BaseIdentity<Unit> {
 //    @ManyToMany(mappedBy = "child", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
-            name = "O9OpenTextEntityIdentityComponentsOrganizationalUnitOrganizationalUnit",
+            name = "OpenTextEntityIdentityComponentsOrganizationalUnitOrganizationalUnit",
             joinColumns = {@JoinColumn(name = "OrganizationalUnit_Id")},
-            inverseJoinColumns = {@JoinColumn(name = "OrganizationIdA7A9FD625B78137F")},
-            uniqueConstraints = {@UniqueConstraint(columnNames = {"OrganizationIdA7A9FD625B78137F", "OrganizationalUnit_Id"})}
+            inverseJoinColumns = {@JoinColumn(name = "OrganizationIdBDBD7DDC32F46FF3")},
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"OrganizationIdBDBD7DDC32F46FF3", "OrganizationalUnit_Id"})}
     )
 //    @JsonIgnore
 //    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")

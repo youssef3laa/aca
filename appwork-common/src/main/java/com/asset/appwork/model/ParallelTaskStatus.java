@@ -8,7 +8,7 @@ import javax.persistence.Table;
 
 @Entity
 @Data
-@Table(name = "O9AssetGeneralACAACA_Entity_parallelTaskStatus")
+@Table(name = "AssetGeneralACAACA_Entity_parallelTaskStatus")
 public class ParallelTaskStatus {
     @Id
     Long id;

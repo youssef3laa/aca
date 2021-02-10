@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.Optional;
 
 @Entity(name = "Person")
-@Table(name = "O9OpenTextEntityIdentityComponentsPerson")
+@Table(name = "OpenTextEntityIdentityComponentsPerson")
 public class Person {
     @Id
     @Column(name = "Id")
