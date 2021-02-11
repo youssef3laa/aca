@@ -80,6 +80,14 @@
   "mainData": "البيانات الاساسية",
   "attachments": "المرفقات",
 
+  "outcomingNumber": "رقم الصادر",
+  "outcomingDate": "تاريخ الصادر",
+  "outcomingType": "نوع الصادر",
+  "outcoming": "الصادر",
+  "outcomingData": "بيانات الصادر",
+  "outcomingIssue": "تسديد الصادر",
+  "outcomingIssueType": "نوع تسديد الصادر",
+  
   "caseData": "بيانات القضية",
   "caseType": "نوع القضية",
   "caseNumber": "رقم القضية",
