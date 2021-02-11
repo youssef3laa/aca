@@ -101,7 +101,6 @@ export default {
       this.$refs.appBuilder.disableSection("section1")
       let entityName = this.inputSchema.entityName;
       let entityId = this.inputSchema.entityId;
-      console.log(this.inputSchema);
 
       let entityData = await this.readEntity(entityName, entityId);
       let workTypeObj = await this.getLookupByCategoryAndKey("workType", entityData.workType);
