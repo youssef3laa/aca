@@ -122,7 +122,7 @@ public class AppworkCSOperations {
                 .get(uriComponentsBuilder.encode().buildAndExpand(pathVariables).toString());
 
         if (!http.isSuccess())
-            throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+            throw new AppworkException(http.getResponse(), ResponseCode.INTERNAL_SERVER_ERROR);
         return http;
     }
 

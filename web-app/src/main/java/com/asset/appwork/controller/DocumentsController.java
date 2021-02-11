@@ -170,6 +170,7 @@ public class DocumentsController {
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
+
         } catch (JsonProcessingException | IllegalAccessException e) {
             e.printStackTrace();
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
