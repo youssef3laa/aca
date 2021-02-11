@@ -1,6 +1,5 @@
 <template>
     <v-container>
-        <span>samo 3aleko</span>
         <AppBuilder ref="appBuilder" :app="app"/>
     </v-container>
 </template>
@@ -40,7 +39,7 @@ export default {
       this.$refs.appBuilder.disableSection("section1")
       let entityName = this.inputSchema.entityName;
       let entityId = this.inputSchema.entityId;
-
+        console.log(this.inputSchema);
       // get main entityData
       // get requestId
 
@@ -54,43 +53,45 @@ export default {
       let linkIncomingEntityData = await this.readEntity(entityName, entityId);
       console.log(linkIncomingEntityData);
 
+        let entityData = await this.readEntity("ACA_Entity_generalProcess",linkIncomingEntityData.sourceIncomingId)
+      let workTypeObj = await this.getLookupByCategoryAndKey("workType", entityData.workType);
+      let incomingMeansObj = await this.getLookupByCategoryAndKey("incomingMeans", entityData.incomingMeans);
+      console.log(entityData);
+     
+     console.log(workTypeObj);
+      console.log(incomingMeansObj);
+      
+      this.$refs.appBuilder.setModelData("form1", {
+          stepId: this.inputSchema.stepId,
+          subjectSummary: entityData.summary,
+          incomingUnit: entityData.incomingUnit,
+          workType: workTypeObj.arValue,
+          incomingMeans: incomingMeansObj.arValue,
+          writingDate: entityData.writingDate.split("Z")[0],
+      });
+      
+      this.$refs.appBuilder.setModelData("form2", {
+          receiver: entityData
+      });
+      
+      this.$refs.appBuilder.setModelData("memoPage", {
+          memoComp: {
+              requestId: linkIncomingEntityData.sourceRequestId
+          }
+      })
+      //
+      this.$refs.appBuilder.setModelData("historyTable", {
+          taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
+      });
 
-      // let workTypeObj = await this.getLookupByCategoryAndKey("workType", entityData.workType);
-      // let incomingMeansObj = await this.getLookupByCategoryAndKey("incomingMeans", entityData.incomingMeans);
       //
-      // this.$refs.appBuilder.setModelData("form1", {
-      //     stepId: this.inputSchema.stepId,
-      //     subjectSummary: entityData.summary,
-      //     incomingUnit: entityData.incomingUnit,
-      //     workType: workTypeObj.arValue,
-      //     incomingMeans: incomingMeansObj.arValue,
-      //     writingDate: entityData.writingDate.split("Z")[0],
-      // });
-      //
-      // this.$refs.appBuilder.setModelData("form2", {
-      //     receiver: entityData
-      // });
-      //
-      // this.$refs.appBuilder.setModelData("memoPage", {
-      //     memoComp: {
-      //         requestId: this.inputSchema.requestId
-      //     }
-      // })
-      //
-      // this.$refs.appBuilder.setModelData("historyTable", {
-      //     taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
-      // });
-
-      //
-      // this.$refs.appBuilder.setModelData("approvalForm", {
-      //     approval: {
-      //         decisions: ["approve", "redirect", "reject"],
-      //         receiverTypes: ["single"]
-      //     }
-      // });
+      this.$refs.appBuilder.setModelData("approvalForm", {
+            approval: this.inputSchema.router
+      });
     },
     submit: function () {
-      let approvalModel = this.$refs.appBuilder.getModelData("ApprovalForm");
+      let approvalModel = this.$refs.appBuilder.getModelData("approvalForm");
+      console.log("approval model",approvalModel);
       // if (!model._valid){
       //   //@TODO show warning
       //   return;
@@ -103,13 +104,13 @@ export default {
         process: this.inputSchema.process,
         parentHistoryId: this.inputSchema.parentHistoryId,
 
-        code: approvalModel.routing.code,
-        assignedCN: approvalModel.routing.assignedCN,
-        // decision: approvalModel.routing.decision,
-        decision: "end",
-        comment: approvalModel.routing.comment,
-        assignees: approvalModel.routing.assignees,
-        receiverType: approvalModel.routing.receiverType
+        code: approvalModel.approval.code,
+        assignedCN: approvalModel.approval.assignedCN,
+        decision: approvalModel.approval.decision,
+        // decision: "end",
+        comment: approvalModel.approval.comment,
+        assignees: approvalModel.approval.assignees,
+        receiverType: approvalModel.approval.receiverType
       };
       this.completeStep(data);
     }

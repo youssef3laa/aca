@@ -125,6 +125,9 @@ public class ProcessController {
             linkIncoming.setRequestEntityId(String.valueOf(requestEntityId));
             linkIncoming.setSourceIncomingId(String.valueOf(requestJson.getProcessModel().getExtraData().get("sourceIncomingId")));
             linkIncoming.setTargetIncomingId(String.valueOf(requestJson.getProcessModel().getExtraData().get("targetIncomingId")));
+            linkIncoming.setSourceRequestId(String.valueOf(requestJson.getProcessModel().getExtraData().get("sourceRequestId")));
+            linkIncoming.setTargetRequestId(String.valueOf(requestJson.getProcessModel().getExtraData().get("targetRequestId")));
+
             entity.update(linkIncomingEntityId, linkIncoming);
 
             String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
