@@ -66,7 +66,7 @@
                 memberSelected: null,
                 agency: {
                     field: this.getAutocompleteField('theAgency',false),
-                    val: (this.field.readonly)? this.fillAutocomplete(this.val.agency) : this.getAutocompleteVal('')
+                    val: (this.field.readonly)? this.fillAutocomplete(this.val.agency) : this.getAutocompleteVal('org/unit/COC/down/all/unitTypeCode/AGN')
                 },
                 sector: {
                     field: this.getAutocompleteField('theSector',false),
@@ -185,16 +185,16 @@
                 this.onValueChange()
             },
             handleReadOnlyReceiver: function(unitCode,unitTypeCode,headRole) {
-                if(this.direction == "all") {
-                    this.handleDirectionAll()
-                }else if(this.direction == "up"){
+                if(this.direction == "up"){
                     this.handleDirectionUp(unitCode,unitTypeCode,headRole, false)
                 }else if(this.direction =="up-with"){
                     this.handleDirectionUp(unitCode,unitTypeCode,headRole, true)
                 }else if(this.direction =="down-with"){
-                    this.handleDirectionDown(unitCode,unitTypeCode,headRole, false)
-                }else{
                     this.handleDirectionDown(unitCode,unitTypeCode,headRole, true)
+                }else if(this.direction == "down"){
+                    this.handleDirectionDown(unitCode,unitTypeCode,headRole, false)
+                } else {
+                    this.handleDirectionAll()
                 }
             },
             handleDirectionAll: function (){
@@ -237,7 +237,11 @@
                                 this.member.val = this.getAutocompleteVal('org/group/findByUnitCodes/'+unitCode)
                             }
                         }else{
-                            this.member.val = this.getAutocompleteVal('org/group/findByUnitCodes/'+unitCode)
+                            if(!sameLevel) {
+                                this.disablePrevious()
+                            }else{
+                                this.member.val = this.getAutocompleteVal('org/group/findByUnitCodes/'+unitCode)
+                            }
                         }
                         return
                     default:
@@ -326,7 +330,7 @@
             },
             fillAutocomplete: function(name) {
                 return {
-                    list: [{ text: name , value: name }],
+                    list: name? [{ text: name , value: name }]: null,
                     value: name
                 }
             },
@@ -367,8 +371,7 @@
                 this.code = code
             },
             checkCanSelectNext: function(unitCode,unitTypeCode) {
-                console.log(unitCode, unitTypeCode)
-                if(this.direction != "up"){
+                if(this.direction && (!this.direction.includes("up") || !this.direction.includes("all"))){
                     if(unitTypeCode.includes(this.userDetails.groups[0].unit.unitTypeCode)){
                         return (this.userDetails.groups[0].unit.unitCode == unitCode)
                     }
@@ -390,6 +393,16 @@
                     this.fillComponent()
                 }
 
+                if(newVal.direction){
+                    this.direction = newVal.direction
+                    this.handleReadOnlyReceiver(this.userDetails.groups[0].unit.unitCode,
+                        this.userDetails.groups[0].unit.unitTypeCode,
+                        this.userDetails.groups[0].isHeadRole)
+                }
+                if(newVal.minimumLevel){
+                    this.minimumLevel = newVal.minimumLevel
+                }
+
                 if(this.firstTime){
                     this.firstTime = false
                     this.onValueChange()
@@ -399,12 +412,12 @@
         async mounted() {
             if(!this.field.readonly){
                 this.userDetails = await this.getUserDetails()
-                this.handleReadOnlyReceiver(this.userDetails.groups[0].unit.unitCode,
+                if(this.direction){
+                    this.handleReadOnlyReceiver(this.userDetails.groups[0].unit.unitCode,
                                             this.userDetails.groups[0].unit.unitTypeCode,
                                             this.userDetails.groups[0].isHeadRole)
+                }
                 this.parent = await this.getParentDetails()
-                console.log("User", this.userDetails)
-                console.log("Parent", this.parent)
                 await this.onValueChange()
             }
         }

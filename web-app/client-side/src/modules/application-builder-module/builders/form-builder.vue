@@ -129,7 +129,7 @@ export default {
   },
   methods: {
     updateText: async function(data) {
-      console.log(data)
+      // console.log(data)
 
       if (data.name && data.value) this.forms.model[data.name] = data.value
 
@@ -139,14 +139,15 @@ export default {
       // if (this.forms.key)
       //   this.forms.model['_key'] = this.forms.key;
 
-      console.log(this.$refs['observer'].errors[data.name])
-      console.log(this.$refs['observer']['_data'].flags)
+      // console.log(this.$refs['observer'].errors[data.name])
+      // console.log(this.$refs['observer']['_data'].flags)
       // this.$refs['observer'].validateWithInfo().then((val)=> console.log(val))
-      let res = await this.$refs.observer.validate()
-      console.log(res)
+      // let res =
+              await this.$refs.observer.validate()
+      // console.log(res)
       if (data.type == 'ButtonComponent' && data.publish) {
         if (data.modalId) {
-          console.log(data.modalId)
+          // console.log(data.modalId)
           this.$observable.fire(data.publish, {
             type: 'ButtonComponent',
             action: data.action,
@@ -170,20 +171,21 @@ export default {
   },
   props: ['forms', 'model'],
   created() {
-    console.log(this.model)
+    // console.log(this.model)
     var self = this
     if (this.forms.subscribe) {
-      console.log('subscribe')
+      // console.log('subscribe')
       this.$observable.subscribe(this.forms.subscribe, function(data) {
         if (data.type == 'modelUpdate') {
           var keys = Object.keys(data.model)
-          keys.forEach((key, index) => {
-            console.log(index)
+          // keys.forEach((key, index) => {
+            // console.log(index)
+          keys.forEach((key) => {
             self.formModel[key] = data.model[key]
           })
           self.formModel.serial_num = data.model.serial_num
         }
-        console.log(data)
+        // console.log(data)
       })
     }
   },

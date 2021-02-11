@@ -39,8 +39,7 @@
                     {
                         approval: {
                             fields: ["comment"],
-                            receiverTypes: ["single"],
-                            direction: "all"
+                            receiverTypes: ["single"]
                         }
                     }
                 )
@@ -52,6 +51,9 @@
                 console.log("MainData", mainData)
                 console.log("CaseData", caseData)
                 console.log("ApprovalCard", approval)
+                if(!approval._valid){
+                    this.$refs.alertComponent._alertSuccess({type: "error",message:"pleaseFillRequiredFields"})
+                }
             },
         }
     };

@@ -1,0 +1,54 @@
+{
+    "key": "outcomingData",
+    "inputs": [
+        {
+            "type": "InputComponent",
+            "label": "outcomingNumber",
+            "name": "outcomingNumber",
+            "rule": "required",
+            "col": "4"
+        },
+        {
+            "type": "DatePickerComponent",
+            "label": "outcomingDate",
+            "name": "outcomingDate",
+            "rule": "required",
+            "col": "4"
+        },
+        {
+            "type": "AutoCompleteComponent",
+            "name": "outcomingType",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "numberOfAttachments",
+            "name": "numberOfAttachments",
+            "rule": "required",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "attachmentsDescription",
+            "name": "attachmentsDescription",
+            "rule": "required",
+            "col": "4"
+        },
+        {
+            "type": "TextareaComponent",
+            "label": "notes",
+            "name": "notes",
+            "col": "12"
+        }
+    ],
+    "model": {
+        "outcomingType": {
+            "url": "lookup/get/category/outcomingType"
+        },
+        "outcomingNumber": "",
+        "outcomingDate": "",
+        "numberOfAttachments": "",
+        "attachmentsDescription": "",
+        "notes": ""
+    }
+}
