@@ -123,6 +123,8 @@ public class ProcessController {
 
             linkIncoming = new LinkIncoming();
             linkIncoming.setRequestEntityId(String.valueOf(requestEntityId));
+            linkIncoming.setSourceIncomingId(String.valueOf(requestJson.getProcessModel().getExtraData().get("sourceIncomingId")));
+            linkIncoming.setTargetIncomingId(String.valueOf(requestJson.getProcessModel().getExtraData().get("targetIncomingId")));
             entity.update(linkIncomingEntityId, linkIncoming);
 
             String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
