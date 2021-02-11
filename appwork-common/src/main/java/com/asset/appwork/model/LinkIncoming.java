@@ -19,6 +19,8 @@ public class LinkIncoming {
     private String sourceIncomingId;
     private String targetIncomingId;
     private String requestEntityId;
+    private String sourceRequestId;
+    private String targetRequestId;
 
     public String toString() {
         return SystemUtil.writeObjectIntoString(this).replace(",\"id\":null", "");
