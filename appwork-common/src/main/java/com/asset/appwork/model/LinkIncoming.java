@@ -1,7 +1,7 @@
 package com.asset.appwork.model;
 
+import com.asset.appwork.util.SystemUtil;
 import lombok.Data;
-import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,7 +10,6 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Table(name = "AssetGeneralACAACA_Entity_linkIncoming")
-@ToString(exclude = "Id")
 public class LinkIncoming {
 
     @Id
@@ -21,4 +20,7 @@ public class LinkIncoming {
     private String targetIncomingId;
     private String requestEntityId;
 
+    public String toString() {
+        return SystemUtil.writeObjectIntoString(this).replace(",\"id\":null", "");
+    }
 }

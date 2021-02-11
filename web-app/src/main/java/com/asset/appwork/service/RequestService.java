@@ -58,11 +58,10 @@ public class RequestService {
 
 
     public List<RequestEntity> getRequestsByProcessAndDateAndSubjectAndRequestNumber(@NonNull String process,
-                                                                                     @NonNull Date requestDate,
                                                                                      String subject,
                                                                                      String requestNumber) {
 
-        return requestRepository.getRequestsByProcessAndDateAndSubjectAndRequestNumber(process, requestDate, subject, requestNumber);
+        return requestRepository.getRequestsByProcessAndDateAndSubjectAndRequestNumber(process, subject, requestNumber);
 
     }
 }

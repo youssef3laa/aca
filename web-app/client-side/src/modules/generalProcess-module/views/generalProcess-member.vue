@@ -23,58 +23,61 @@ export default {
       taskId: "",
       taskData: {},
       inputSchema: {},
-                app: {},
-                model: {},
-            };
+      app: {},
+      model: {},
+    };
+  },
+  async created() {
+    this.taskId = this.$route.params.taskId;
+    this.claimTask(this.taskId);
+
+    this.taskData = await this.getTaskData(this.taskId);
+    this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
+    this.loadForm(this.inputSchema.config, this.fillForm);
+
+    this.$observable.subscribe("complete-step", this.submit);
+    this.$observable.subscribe("searchIncoming", async (data) => {
+      await this.getRequestEntities(data);
+    });
+
+  },
+  methods: {
+    async getRequestEntities(data) {
+      let requestEntities = await http.get("/request/read/forLinkIncoming", {
+        params: {
+          process: "generalProcess",
+          requestDate: new Date().toISOString().split("T")[0],
+          subject: data.model.requestSubject,
+          requestNumber: data.model.requestNumber,
         },
-        async created() {
-          this.taskId = this.$route.params.taskId;
-          this.claimTask(this.taskId);
+      });
+      console.log(requestEntities);
+      let parentDetails = await this.getParentDetails();
+      console.log(parentDetails)
+      console.log(this.$user);
+      let userDetails = await this.getUserDetails();
+      console.log(userDetails);
 
-          this.taskData = await this.getTaskData(this.taskId);
-          this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
-          this.loadForm(this.inputSchema.config, this.fillForm);
-
-          this.$observable.subscribe("complete-step", this.submit);
-          this.$observable.subscribe("searchIncoming", async (data) => {
-            await this.getRequestEntities(data);
-          });
-
-        },
-        methods: {
-          async getRequestEntities(data) {
-            let requestEntities = await http.get("/request/read/forLinkIncoming", {
-              params: {
-                process: "generalProcess",
-                requestDate: new Date().toISOString().split("T")[0],
-                subject: data.model.requestSubject,
-                requestNumber: data.model.requestNumber,
-              },
-            });
-            console.log(requestEntities);
-            let parentDetails = await this.getParentDetails();
-            console.log(parentDetails)
-            console.log(this.$user);
-            let userDetails = await this.getUserDetails();
-            console.log(userDetails);
-
-            this.$observable.fire("link", {
-              type: "modelUpdate",
-              model: requestEntities.data
-            });
+      this.$observable.fire("link", {
+        type: "modelUpdate",
+        model: requestEntities.data
+      });
 
             this.$observable.subscribe("linkingTable_view", async function () {
               try {
+
+
                 let obj = {
-
-                  "sourceIncomingId": "1",
-                  "targetIncomingId": "2",
-                  "subject": "test subject linking incoming",
-                  "initiatorId": ""
-
-
+                  processModel: {
+                    extraData: {
+                      "sourceIncomingId": "1",
+                      "targetIncomingId": "2",
+                      "subject": "test subject linking incoming",
+                      "initiatorId": userDetails.cn
+                    }
+                  }
                 }
-                let response = await http.post("/process/initiateLinkedIncoming");
+                let response = await http.post("/process/initiateLinkedIncoming", obj);
 
                 console.log(response, obj);
 
@@ -85,75 +88,75 @@ export default {
 
 
             })
-          },
-            fillForm: async function () {
-                this.$refs.appBuilder.disableSection("section1")
-                let entityName = this.inputSchema.entityName;
-                let entityId = this.inputSchema.entityId;
+    },
+    fillForm: async function () {
+      this.$refs.appBuilder.disableSection("section1")
+      let entityName = this.inputSchema.entityName;
+      let entityId = this.inputSchema.entityId;
 
-                let entityData = await this.readEntity(entityName, entityId);
-                let workTypeObj = await this.getLookupByCategoryAndKey("workType", entityData.workType);
-                let incomingMeansObj = await this.getLookupByCategoryAndKey("incomingMeans", entityData.incomingMeans);
+      let entityData = await this.readEntity(entityName, entityId);
+      let workTypeObj = await this.getLookupByCategoryAndKey("workType", entityData.workType);
+      let incomingMeansObj = await this.getLookupByCategoryAndKey("incomingMeans", entityData.incomingMeans);
 
-                this.$refs.appBuilder.setModelData("form1", {
-                    stepId: this.inputSchema.stepId,
-                    subjectSummary: entityData.summary,
-                    incomingUnit: entityData.incomingUnit,
-                    workType: workTypeObj.arValue,
-                    incomingMeans: incomingMeansObj.arValue,
-                    writingDate: entityData.writingDate.split("Z")[0],
-                });
+      this.$refs.appBuilder.setModelData("form1", {
+        stepId: this.inputSchema.stepId,
+        subjectSummary: entityData.summary,
+        incomingUnit: entityData.incomingUnit,
+        workType: workTypeObj.arValue,
+        incomingMeans: incomingMeansObj.arValue,
+        writingDate: entityData.writingDate.split("Z")[0],
+      });
 
-                this.$refs.appBuilder.setModelData("form2", {
-                    receiver: entityData
-                });
+      this.$refs.appBuilder.setModelData("form2", {
+        receiver: entityData
+      });
 
-                this.$refs.appBuilder.setModelData("memoPage", {
-                    memoComp: {
-                        requestId: this.inputSchema.requestId
-                    }
-                })
-
-                this.$refs.appBuilder.setModelData("historyTable", {
-                    taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
-                });
-
-                this.$refs.appBuilder.setModelData("signaturePage", {
-                    signature: {
-                        requestId: this.inputSchema.requestId
-                    }
-                });
-
-                this.$refs.appBuilder.setModelData("approvalForm", {
-                    approval: {
-                      "fields": ["comment"],
-                      "receiverTypes": ["single"],
-                      "direction": "up"
-                    }
-                });
-            },
-            submit: function () {
-                let approvalModel = this.$refs.appBuilder.getModelData("ApprovalForm");
-                // if (!model._valid){
-                //   //@TODO show warning
-                //   return;
-                // }
-
-                var data = {
-                    taskId: this.taskId,
-                    stepId: this.inputSchema.stepId,
-                    process: this.inputSchema.process,
-                    parentHistoryId: this.inputSchema.parentHistoryId,
-
-                    code: approvalModel.routing.code,
-                    assignedCN: approvalModel.routing.assignedCN,
-                    decision: approvalModel.routing.decision,
-                    comment: approvalModel.routing.comment,
-                    assignees: approvalModel.routing.assignees,
-                    receiverType: approvalModel.routing.receiverType
-                };
-                this.completeStep(data);
-            }
+      this.$refs.appBuilder.setModelData("memoPage", {
+        memoComp: {
+          requestId: this.inputSchema.requestId
         }
-    };
+      })
+
+      this.$refs.appBuilder.setModelData("historyTable", {
+        taskTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)
+      });
+
+      this.$refs.appBuilder.setModelData("signaturePage", {
+        signature: {
+          requestId: this.inputSchema.requestId
+        }
+      });
+
+      this.$refs.appBuilder.setModelData("approvalForm", {
+        approval: {
+          "fields": ["comment"],
+          "receiverTypes": ["single"],
+          "direction": "up"
+        }
+      });
+    },
+    submit: function () {
+      let approvalModel = this.$refs.appBuilder.getModelData("ApprovalForm");
+      // if (!model._valid){
+      //   //@TODO show warning
+      //   return;
+      // }
+
+      var data = {
+        taskId: this.taskId,
+        stepId: this.inputSchema.stepId,
+        process: this.inputSchema.process,
+        parentHistoryId: this.inputSchema.parentHistoryId,
+
+        code: approvalModel.routing.code,
+        assignedCN: approvalModel.routing.assignedCN,
+        decision: approvalModel.routing.decision,
+        comment: approvalModel.routing.comment,
+        assignees: approvalModel.routing.assignees,
+        receiverType: approvalModel.routing.receiverType
+      };
+      this.completeStep(data);
+    }
+  }
+};
 </script>

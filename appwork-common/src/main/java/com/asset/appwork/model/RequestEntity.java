@@ -20,7 +20,7 @@ public class RequestEntity {
     String entityName;
     String entityId;
     String process;
-    @Column(name = "\"date\"")
+    @Column(name = "requestDate")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     Date date;
     String status;
@@ -28,7 +28,7 @@ public class RequestEntity {
     String subject;
     String requestNumber;
 
-    public String toString(){
-        return SystemUtil.writeObjectIntoString(this).replace(",\"id\":null","");
+    public String toString() {
+        return SystemUtil.writeObjectIntoString(this).replace(",\"id\":null", "");
     }
 }

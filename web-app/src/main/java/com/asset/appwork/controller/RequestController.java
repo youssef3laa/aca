@@ -17,7 +17,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -104,12 +103,10 @@ public class RequestController {
         try {
             Account account = tokenService.get(token);
             if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
-            responseBuilder.data(requestService.getRequestsByProcessAndDateAndSubjectAndRequestNumber(process, simpleDateFormat.parse(requestDate), subject, requestNumber));
+            responseBuilder.data(requestService.getRequestsByProcessAndDateAndSubjectAndRequestNumber(process, subject, requestNumber));
         } catch (AppworkException e) {
             log.error(e.getMessage());
             responseBuilder.status(e.getCode());
-        } catch (ParseException e) {
-            log.error(e.getMessage());
         }
 
         return responseBuilder.build().getResponseEntity();
