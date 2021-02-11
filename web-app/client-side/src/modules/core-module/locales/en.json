@@ -32,5 +32,8 @@
   "subject": "Subject",
   "taskType": "Task Type",
   "topicSummary": "Topic Summary",
-  "transferTo": "Transfer To"
+  "transferTo": "Transfer To",
+  "correspondenceData": "Correspondence Data",
+  "mainData": "Main Data",
+  "attachments": "Attachments"
 }

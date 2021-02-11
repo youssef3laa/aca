@@ -78,5 +78,13 @@
   "transferTo": "جهة التحويل",
   "correspondenceData": "بيانات المكاتبة",
   "mainData": "البيانات الاساسية",
-  "attachments": "المرفقات"
+  "attachments": "المرفقات",
+
+  "outcomingNumber": "رقم الصادر",
+  "outcomingDate": "تاريخ الصادر",
+  "outcomingType": "نوع الصادر",
+  "outcoming": "الصادر",
+  "outcomingData": "بيانات الصادر",
+  "outcomingIssue": "تسديد الصادر",
+  "outcomingIssueType": "نوع تسديد الصادر"
 }
