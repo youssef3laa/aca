@@ -9,7 +9,7 @@ public class Workflow {
                 "  <SOAP:Body>\n" +
                 "    <GetHumanTasks xmlns=\"http://schemas.cordys.com/notification/workflow/1.0\" countOnly=\"false\">\n" +
                 "      <ns0:Query xmlns:ns0=\"http://schemas.cordys.com/cql/1.0\">\n" +
-                "        <ns0:Select distinct=\"true\">\n" +
+                "        <ns0:Select distinct=\"1\">\n" +
                 "          <ns0:QueryableObject>TASK_INSTANCE</ns0:QueryableObject>\n" +
                 "          <ns0:Field>TaskId</ns0:Field>\n" +
                 "          <ns0:Field>SourceInstanceId</ns0:Field>\n" +

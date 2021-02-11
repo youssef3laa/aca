@@ -379,8 +379,12 @@
         },
         watch: {
             val: function (newVal) {
-                for(let key in newVal){
-                    this.d[key] = newVal[key]
+                if(this.d){
+                    for(let key in newVal){
+                        this.d[key] = newVal[key]
+                    }
+                }else{
+                    this.d = newVal
                 }
                 if(this.field.readonly){
                     this.fillComponent()
