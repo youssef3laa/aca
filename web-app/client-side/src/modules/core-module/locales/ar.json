@@ -78,5 +78,11 @@
   "transferTo": "جهة التحويل",
   "correspondenceData": "بيانات المكاتبة",
   "mainData": "البيانات الاساسية",
-  "attachments": "المرفقات"
+  "attachments": "المرفقات",
+
+  "caseData": "بيانات القضية",
+  "caseType": "نوع القضية",
+  "caseNumber": "رقم القضية",
+  "caseDate": "تاريخ القضية",
+  "caseName": "اسم القضية"
 }
