@@ -63,9 +63,10 @@ export default {
         model: requestEntities.data
       });
 
-      this.$observable.subscribe("linkingTable_view", async function () {
+      this.$observable.subscribe("linkingTable_view", async (item) => {
         try {
-          console.log("linkingTable_view");
+          item = item.item;
+          console.log("linkingTable_view", item);
           let obj = {
             "processModel": {
               "process": "linkIncoming",
@@ -74,16 +75,19 @@ export default {
               "decision": "initiate",
               "assignedCN": parentDetails.cn,
               "extraData": {
-                "sourceIncomingId": "1",
-                "targetIncomingId": "2",
-                "subject": "test subject linking incoming",
+                "sourceIncomingId": this.inputSchema.entityId,
+                "targetIncomingId": item.entityId,
+                "targetRequestId": item.id,
+                "sourceRequestId": this.inputSchema.requestId,
+                "subject": "طلب ربط وارد: " + item.subject,
                 "initiatorId": userDetails.cn
               }
             }
           }
-          let response = await http.post("/process/initiateLinkedIncoming", obj);
-
-          console.log(response, obj);
+          console.log(obj);
+          // let response = await http.post("/process/initiateLinkedIncoming", obj);
+          //
+          // console.log(response, obj);
 
 
         } catch (e) {
