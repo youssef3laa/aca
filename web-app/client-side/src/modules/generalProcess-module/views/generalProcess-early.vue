@@ -75,7 +75,6 @@
                 console.log(model2)
                 let data = {
                     taskId: this.taskId,
-                    entityId: this.inputSchema.entityId,
                     stepId: this.inputSchema.stepId,
                     process: this.inputSchema.process,
                     parentHistoryId: this.inputSchema.parentHistoryId,

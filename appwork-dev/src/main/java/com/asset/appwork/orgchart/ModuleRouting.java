@@ -171,7 +171,7 @@ public class ModuleRouting {
                     nextStep = handleParallelTasks(outputSchema, routingConfig, currentStepId[0], parallelString);
                     break;
                 case commentString:
-                    nextStep = getIdFromNextSteps(routingConfig, currentStepId[0], commentString);
+                    nextStep = handleCommentCase(routingConfig, currentStepId[0], codeSelected[0]);
                     break;
                 case rejectString:
                     nextStep = breakString;
@@ -234,6 +234,14 @@ public class ModuleRouting {
         String step = getIdFromNextSteps(routingConfig, currentStepId, codeSelected);
         if (step.isEmpty()) {
             return getIdFromNextSteps(routingConfig, currentStepId, approveString);
+        }
+        return step;
+    }
+
+    private String handleCommentCase(RoutingConfig routingConfig, String currentStepId, String codeSelected){
+        String step = getIdFromNextSteps(routingConfig, currentStepId, codeSelected);
+        if (step.isEmpty()) {
+            return getIdFromNextSteps(routingConfig, currentStepId, commentString);
         }
         return step;
     }

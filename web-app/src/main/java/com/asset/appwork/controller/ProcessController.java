@@ -25,6 +25,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.Column;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.Date;
@@ -62,8 +63,8 @@ public class ProcessController {
                     , requestJson.processModel.getEntityName());
             Long entityId = entity.create(requestJson.generalProcessEntity);
 
-            //Note: Get Next Step
-//            requestJson.processModel.setEntityId(entityId.toString());
+            requestService.updateRequest(requestJson.getProcessModel(), account.getUsername(), entityId.toString(),
+                    "new-incoming", "created");
 
             String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
             String config = SystemUtil.readFile(filePath);

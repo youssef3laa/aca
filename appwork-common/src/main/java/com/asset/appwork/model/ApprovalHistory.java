@@ -3,10 +3,7 @@ package com.asset.appwork.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -20,6 +17,7 @@ public class ApprovalHistory {
     Long id;
 
     String decision;
+    @Column(name = "\"comment\"")
     String comment;
     String userCN;
     String entityId;

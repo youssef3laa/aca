@@ -19,14 +19,15 @@ export default {
     return {
       app: {},
       model: {},
+      requestId: null
     };
   },
   async created() {
     await this.loadForm("generalProcess-init", this.formLoaded);
-
+    this.requestId = await this.createRequest();
     this.$observable.subscribe("complete-step", this.submit);
     console.log(this)
-    this.$refs.alertComponent._alertSuccess({type: "warning",message: "comment"})
+    // this.$refs.alertComponent._alertSuccess({type: "warning",message: "comment"})
   },
   methods: {
     formLoaded: function (){
@@ -56,6 +57,7 @@ export default {
           office: (model2.receiver.office)? model2.receiver.office.name_ar: null,
         },
         processModel: {
+          requestId: this.requestId,
           process: "generalProcess",
           stepId: "init",
           entityName: "ACA_Entity_generalProcess",

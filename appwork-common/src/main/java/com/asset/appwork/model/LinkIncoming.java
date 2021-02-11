@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "O2AssetGeneralACAACA_Entity_linkIncoming")
+@Table(name = "AssetGeneralACAACA_Entity_linkIncoming")
 @ToString(exclude = "Id")
 public class LinkIncoming {
 

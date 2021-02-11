@@ -141,15 +141,13 @@ export default {
 
                 var data = {
                     taskId: this.taskId,
-                    entityId: this.inputSchema.entityId,
                     stepId: this.inputSchema.stepId,
                     process: this.inputSchema.process,
                     parentHistoryId: this.inputSchema.parentHistoryId,
 
                     code: approvalModel.routing.code,
                     assignedCN: approvalModel.routing.assignedCN,
-                    // decision: approvalModel.routing.decision,
-                    decision: "end",
+                    decision: approvalModel.routing.decision,
                     comment: approvalModel.routing.comment,
                     assignees: approvalModel.routing.assignees,
                     receiverType: approvalModel.routing.receiverType

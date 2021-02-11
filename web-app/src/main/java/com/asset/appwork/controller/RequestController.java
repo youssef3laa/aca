@@ -6,6 +6,7 @@ import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.RequestEntity;
 import com.asset.appwork.platform.rest.Entity;
+import com.asset.appwork.repository.RequestRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.service.RequestService;
@@ -18,7 +19,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/request")
@@ -34,10 +37,12 @@ public class RequestController {
     Environment environment;
     @Autowired
     RequestService requestService;
+    @Autowired
+    RequestRepository requestRepository;
 
     @GetMapping("/create/temp")
-    public ResponseEntity<AppResponse<Long>> initiate(@RequestHeader("X-Auth-Token") String token) {
-        AppResponse.ResponseBuilder<Long> respBuilder = AppResponse.builder();
+    public ResponseEntity<AppResponse<RequestEntity>> createTempRequest(@RequestHeader("X-Auth-Token") String token) {
+        AppResponse.ResponseBuilder<RequestEntity> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
 
@@ -47,10 +52,16 @@ public class RequestController {
             RequestEntity request = new RequestEntity();
             request.setRequestNumber(requestService.generateRequestNumber(account));
             request.setStatus("created");
+            request.setDate(new Date());
 
             Long requestId = entity.create(request);
+            Optional<RequestEntity> requestOptional = requestRepository.findById(requestId);
 
-            respBuilder.data(requestId);
+            if(requestOptional.isPresent()){
+                respBuilder.data(requestOptional.get());
+            }else{
+                throw new AppworkException(ResponseCode.NO_DATA_SAVED);
+            }
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
