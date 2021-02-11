@@ -7,7 +7,7 @@
       }
     },
     "headOfGroupStep": {
-      "component": "linkIncoming-approve",
+      "component": "linkIncoming-approval",
       "config": "linkIncoming-approve",
       "router": {
         "direction": "up",
@@ -29,7 +29,7 @@
       }
     },
     "headOfAdministrationStep": {
-      "component": "linkIncoming-approve",
+      "component": "linkIncoming-approval",
       "config": "linkIncoming-approve",
       "router": {
         "direction": "up",
@@ -51,7 +51,7 @@
       }
     },
     "headOfSectorStep": {
-      "component": "linkIncoming-approve",
+      "component": "linkIncoming-approval",
       "config": "linkIncoming-approve",
       "router": {
         "direction": "up",
@@ -73,7 +73,7 @@
       }
     },
     "memberStep": {
-      "component": "linkIncoming-approve",
+      "component": "linkIncoming-approval",
       "config": "linkIncoming-approve",
       "router": {
         "direction": "up",

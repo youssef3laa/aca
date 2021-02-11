@@ -63,31 +63,35 @@ export default {
         model: requestEntities.data
       });
 
-            this.$observable.subscribe("linkingTable_view", async function () {
-              try {
-
-
-                let obj = {
-                  processModel: {
-                    extraData: {
-                      "sourceIncomingId": "1",
-                      "targetIncomingId": "2",
-                      "subject": "test subject linking incoming",
-                      "initiatorId": userDetails.cn
-                    }
-                  }
-                }
-                let response = await http.post("/process/initiateLinkedIncoming", obj);
-
-                console.log(response, obj);
-
-
-              } catch (e) {
-                console.log(e);
+      this.$observable.subscribe("linkingTable_view", async function () {
+        try {
+          console.log("linkingTable_view");
+          let obj = {
+            "processModel": {
+              "process": "linkIncoming",
+              "stepId": "init",
+              "entityName": "ACA_Entity_linkIncoming",
+              "decision": "initiate",
+              "assignedCN": parentDetails.cn,
+              "extraData": {
+                "sourceIncomingId": "1",
+                "targetIncomingId": "2",
+                "subject": "test subject linking incoming",
+                "initiatorId": userDetails.cn
               }
+            }
+          }
+          let response = await http.post("/process/initiateLinkedIncoming", obj);
+
+          console.log(response, obj);
 
 
-            })
+        } catch (e) {
+          console.log(e);
+        }
+
+
+      })
     },
     fillForm: async function () {
       this.$refs.appBuilder.disableSection("section1")

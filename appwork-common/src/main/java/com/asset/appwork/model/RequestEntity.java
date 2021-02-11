@@ -1,7 +1,9 @@
 package com.asset.appwork.model;
 
 import com.asset.appwork.util.SystemUtil;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -20,7 +22,10 @@ public class RequestEntity {
     String entityName;
     String entityId;
     String process;
+
     @Column(name = "requestDate")
+    @JsonAlias("requestDate")
+    @JsonProperty("requestDate")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     Date date;
     String status;

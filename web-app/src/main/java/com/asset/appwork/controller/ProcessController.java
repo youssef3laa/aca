@@ -25,7 +25,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.Column;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.Date;
@@ -89,7 +88,7 @@ public class ProcessController {
                                                                       @RequestBody Request requestJson) {
         // create linkedIncoming entity
         // set entityId -> create requestEntity ;
-
+        String cordysUrl = cordysService.getCordysUrl();
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
@@ -114,6 +113,9 @@ public class ProcessController {
             requestEntity.setDate(new Date());
             requestEntity.setInitiator(String.valueOf(requestJson.getProcessModel().getExtraData().get("initiatorId")));
             requestEntity.setStatus("created");
+            entity = new Entity(account,
+                    restAPIBaseUrl
+                    , "ACA_Entity_request");
             Long requestEntityId = entity.create(requestEntity);
             entity = new Entity(account,
                     restAPIBaseUrl
@@ -123,20 +125,20 @@ public class ProcessController {
             linkIncoming.setRequestEntityId(String.valueOf(requestEntityId));
             entity.update(linkIncomingEntityId, linkIncoming);
 
-//            String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
-//            String config = SystemUtil.readFile(filePath);
-//
-//            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository, orgChartService);
-//            String response = moduleRouting.goToNext(requestJson.processModel);
-//            respBuilder.data(response);
+            String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
+            String config = SystemUtil.readFile(filePath);
+
+            requestJson.processModel.setRequestId(String.valueOf(requestEntityId));
+            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository, orgChartService);
+            String response = moduleRouting.goToNext(requestJson.processModel);
+            respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
+        } catch (IOException e) {
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-//        }
 
         return respBuilder.build().getResponseEntity();
     }
