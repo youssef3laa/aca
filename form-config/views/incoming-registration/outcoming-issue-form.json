@@ -1,0 +1,15 @@
+{
+    "key": "outcomingIssue",
+    "inputs": [
+        {
+            "type": "AutoCompleteComponent",
+            "name": "outcomingIssueType",
+            "col": "4"
+        }
+    ],
+    "model": {
+        "outcomingIssueType": {
+            "url": "lookup/get/category/outcomingIssueType"
+        }
+    }
+}

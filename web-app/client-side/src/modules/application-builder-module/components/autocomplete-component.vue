@@ -80,13 +80,14 @@ export default {
             return obj
           })
           this.items.list = res.filter((e) => {
-            console.log(e)
+            // console.log(e)
             return (e.name || '').indexOf(v || '') > -1
           })
-          console.log(this.items.list)
+          // console.log(this.items.list)
 
           if(this.val.default){
             this.value = this.val.default
+            this.autocompleteChange()
           }
           else if (
             (v == null || v == '') &&
@@ -118,7 +119,7 @@ export default {
         },
         type: 'autocompleteChange',
       })
-    },
+    }
   },
   watch: {
     // field: function(newVal) {
@@ -128,8 +129,8 @@ export default {
     // },
     val: {
       immediate: true,
-      handler(newVal, oldVal) {
-        console.log(oldVal)
+      handler(newVal) {
+        // console.log(oldVal)
         // this.val = newVal
         if (newVal.url) {
           this.items.list = []
@@ -137,7 +138,7 @@ export default {
         }
         this.items = newVal
         if(newVal.value != null || newVal.value != undefined) this.value = newVal.value
-        console.log('val', this.val)
+        // console.log('val', this.val)
         if(this.field.readonly == true || this.field.readonly == false){
           this.readonly = this.field.readonly
         }else if (this.field.readonly) {

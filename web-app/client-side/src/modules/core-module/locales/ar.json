@@ -87,10 +87,12 @@
   "outcomingData": "بيانات الصادر",
   "outcomingIssue": "تسديد الصادر",
   "outcomingIssueType": "نوع تسديد الصادر",
-  
+
   "caseData": "بيانات القضية",
   "caseType": "نوع القضية",
   "caseNumber": "رقم القضية",
   "caseDate": "تاريخ القضية",
-  "caseName": "اسم القضية"
+  "caseName": "اسم القضية",
+
+  "pleaseFillRequiredFields": "الرجاء إدخال جميع البيانات المطلوبة"
 }

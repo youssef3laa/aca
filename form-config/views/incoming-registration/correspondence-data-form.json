@@ -1,0 +1,136 @@
+{
+    "key": "mainData",
+    "inputs": [
+        {
+            "type": "InputComponent",
+            "label": "subject",
+            "name": "subject",
+            "rule": "required",
+            "col": "4"
+        },
+        {
+            "type": "AutoCompleteComponent",
+            "name": "confidentiality",
+            "col": "4"
+        },
+        {
+            "type": "AutoCompleteComponent",
+            "name": "priorityLevel",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "incomingNumber",
+            "name": "incomingNumber",
+            "readonly": true,
+            "col": "4"
+        },
+        {
+            "type": "DatePickerComponent",
+            "label": "incomingDate",
+            "name": "incomingDate",
+            "rule": "required",
+            "max": "maxDate",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "incomingFrom",
+            "name": "incomingFrom",
+            "rule": "required",
+            "col": "4"
+        },
+        {
+            "type": "AutoCompleteComponent",
+            "name": "incomingType",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "registrationNumber",
+            "name": "registrationNumber",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "transferTo",
+            "name": "transferTo",
+            "rule": "required",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "correspondenceNumber",
+            "name": "correspondenceNumber",
+            "col": "4"
+        },
+        {
+            "type": "AutoCompleteComponent",
+            "name": "jobType",
+            "rule": "required",
+            "col": "4"
+        },
+        {
+            "type": "AutoCompleteComponent",
+            "name": "taskType",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "numberOfAttachments",
+            "name": "numberOfAttachments",
+            "inputType": "number",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "attachmentsDescription",
+            "name": "attachmentsDescription",
+            "readonly": false,
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "constraint",
+            "name": "constraint",
+            "readonly": false,
+            "col": "4"
+        },
+        {
+            "type": "TextareaComponent",
+            "label": "topicSummary",
+            "name": "topicSummary",
+            "col": "12"
+        }
+    ],
+    "model": {
+        "confidentiality": {
+            "url": "lookup/get/category/confidentialityType",
+            "default": "2"
+        },
+        "priorityLevel": {
+            "url": "lookup/get/category/priority"
+        },
+        "incomingType": {
+            "url": "lookup/get/category/incomingType"
+        },
+        "jobType": {
+            "url": "lookup/get/category/jobType"
+        },
+        "taskType": {
+            "url": "lookup/get/category/taskType"
+        },
+        "subject": "",
+        "incomingNumber": "",
+        "incomingDate": "",
+        "incomingFrom": "",
+        "registrationNumber": "",
+        "transferTo": "",
+        "correspondenceNumber": "",
+        "numberOfAttachments": "",
+        "attachmentsDescription": "",
+        "constraint": "",
+        "topicSummary": "",
+        "maxDate": null
+    }
+}
