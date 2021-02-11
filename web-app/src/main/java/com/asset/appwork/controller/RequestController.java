@@ -40,6 +40,27 @@ public class RequestController {
     @Autowired
     RequestRepository requestRepository;
 
+    @GetMapping("/read/{requestId}")
+    public ResponseEntity<AppResponse<RequestEntity>> getRequestById(@RequestHeader("X-Auth-Token") String token,
+                                                                     @PathVariable Long requestId){
+        AppResponse.ResponseBuilder<RequestEntity> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            Optional<RequestEntity> requestEntity = requestRepository.findById(requestId);
+            if(requestEntity.isPresent()){
+                respBuilder.data(requestEntity.get());
+            }else{
+                throw new AppworkException(ResponseCode.NOT_FOUND);
+            }
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+
+        return respBuilder.build().getResponseEntity();
+    }
+
+
     @GetMapping("/create/temp")
     public ResponseEntity<AppResponse<RequestEntity>> createTempRequest(@RequestHeader("X-Auth-Token") String token) {
         AppResponse.ResponseBuilder<RequestEntity> respBuilder = AppResponse.builder();

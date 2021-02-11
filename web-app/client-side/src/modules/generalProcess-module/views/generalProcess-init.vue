@@ -57,7 +57,7 @@ export default {
           office: (model2.receiver.office)? model2.receiver.office.name_ar: null,
         },
         processModel: {
-          requestId: this.requestId,
+          requestId: this.requestId.id,
           process: "generalProcess",
           stepId: "init",
           entityName: "ACA_Entity_generalProcess",

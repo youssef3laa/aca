@@ -19,18 +19,21 @@ export default {
     return {
       app: {},
       model: {},
+      request: undefined
     };
   },
   async created() {
+    this.request = await this.getRequest()
     this.loadForm("incoming-registration-init", this.formLoaded);
     this.$observable.subscribe("complete-step", this.submit);
   },
   methods: {
     formLoaded: function(){
       this.$refs.appBuilder.setModelData("mainData",
-      {
-        maxDate: new Date().toISOString().split("T")[0]
-      }
+    {
+          incomingNumber: this.request.requestNumber,
+          maxDate: new Date().toISOString().split("T")[0],
+        }
       )
     },
     submit: function () {

@@ -85,7 +85,10 @@ export default {
           })
           console.log(this.items.list)
 
-          if (
+          if(this.val.default){
+            this.value = this.val.default
+          }
+          else if (
             (v == null || v == '') &&
             this.field.autofill &&
             this.items.list.length == 1

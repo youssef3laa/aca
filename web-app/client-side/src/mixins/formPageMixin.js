@@ -31,15 +31,17 @@ export default {
                 console.error(error);
             }
         },
-        createRequest: async function(){
+        getRequest: async function(){
             if(localStorage.getItem("requestId")){
-                return localStorage.getItem("requestId")
+                let response = await http.get('/request/read/'+ localStorage.getItem("requestId"))
+                console.log("Request Response: ", response)
+                return response.data.data
             }else{
                 try{
-                    let response = await http.get('/request/create/temp');
-                    console.log("Request Response: ", response);
+                    let response = await http.get('/request/create/temp')
+                    console.log("Request Response: ", response)
                     localStorage.setItem("requestId",response.data.data.id)
-                    return response.data.data.id;
+                    return response.data.data.id
                 } catch (error) {
                     console.error(error);
                 }
