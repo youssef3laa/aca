@@ -14,8 +14,8 @@ export default {
             let lookupObj = this.fileTypes.find((element) => element.value == categoryValue);
             properties.fileTypeValue = lookupObj?.text ?? "قيمة غير معرفة";
         },
-        openFileInBrave: async function ({fileId, verNum}) {
-            this.toggleFileSelected(fileId);
+        openFileInBrave: async function ({fileId, verNum}, contextObj) {
+            this.toggleFileSelected(fileId, contextObj);
             let userToken;
             try {
                 userToken = await Http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
@@ -245,10 +245,12 @@ export default {
             evt.dataTransfer.effectAllowed = "move";
             evt.dataTransfer.setData("itemID", file.properties.id);
         },
-        toggleFileSelected: function (nodeId) {
-            this.filesUploaded.forEach((element) => {
-                if (element.properties.id === nodeId) element.isActive = true;
-                else element.isActive = false;
+        // should be encapsulated and take all values from parameters
+        toggleFileSelected: function (nodeId, contextObj) {
+            let filesArray = this.filesUploaded;
+            if (filesArray === undefined) filesArray = contextObj.filesUploaded;
+            filesArray.forEach((element) => {
+                element.isActive = element.properties.id === nodeId;
             })
         }
     }

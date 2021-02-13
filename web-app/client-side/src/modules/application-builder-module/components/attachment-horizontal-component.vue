@@ -135,7 +135,7 @@ export default {
     },
     openHorizontalFile: function (file) {
       // console.log(file.properties.id);
-      this.$emit("attachmentHorizontalChange",file)
+      this.$emit("attachmentHorizontalChange", {file, contextObj: this})
     },
 
   },

@@ -58,8 +58,8 @@ export default {
   },
   methods:{
     attachmentHorizontalChange: async function (obj) {
-      await this.openFileInBrave(obj);
-      console.log("Horizontal SRC Change", this.iframeOjbect)
+      await this.openFileInBrave(obj.file, obj.contextObj);
+        console.log("Horizontal SRC Change", this.iframeOjbect)
     }
   },
   mounted() {
