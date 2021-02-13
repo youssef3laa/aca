@@ -23,7 +23,12 @@ public class AppBuilder {
             while(fileContent.indexOf("$path(") > -1){
                 int firstIndex = fileContent.indexOf("$path(")+6;
                 int lastIndex = firstIndex + fileContent.substring(firstIndex).indexOf(")");
-                String path = fileContent.substring(firstIndex,lastIndex);
+                String[] paths = fileContent.substring(firstIndex,lastIndex).split("\\|");
+                String path = "";
+                if(paths.length > 0){
+                    path = paths[0];
+                    for(int i =1 ; i < paths.length ; i++) path += File.separator + paths[i];
+                }
                 String file = readFile(rootPath+ File.separator + "views" + File.separator + path+ ".json").toString();
                 fileContent.replace(firstIndex-6,lastIndex+1, file);
             }

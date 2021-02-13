@@ -11,7 +11,7 @@
             </p>
           </v-alert>
           <v-card-text style="padding-top: 0px">
-            <TextareaComponent :field="{ name: 'routingNotes', label: 'notes', rule:'required' }"
+            <TextareaComponent :field="{ name: 'routingNotes', label: 'notes' }"
                                @update="onChangeComment"></TextareaComponent>
           </v-card-text>
         </v-card>
@@ -132,7 +132,6 @@
       },
       onChangeReceiver: async function(event) {
         this.assignees = null
-        console.log("ReceiverForm", event)
         this.receiver = event
         this.assignee = event.value.assignedCN
         this.code = event.value.code
@@ -145,32 +144,25 @@
         if(this.d.receiverTypes){
           this.receiverTypes = this.getReceiverTypeOptions(null,null)
           this.receiverType = null
-          // this.receiverDirection = null
           this.updateDirection(null)
-          // if(this.d.receiverTypes.includes("multiple")){
             switch(this.decision){
               case "approve":
                 this.updateDirection("up")
-                // this.receiverDirection = { direction: "up" }
                 this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
                 break
               case "redirect":
+                this.updateDirection("down")
                 if(this.d.receiverTypes.includes("multiple")) this.receiverTypes = this.getReceiverTypeOptions(["single","multiple"], null)
                 else this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
                 break
               case "requestModification":
+                this.updateDirection("down")
                 this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
                 break
               case "reject":
                 this.receiverTypes = this.getReceiverTypeOptions(null,null)
                 break
             }
-          // }
-          // else if(this.d.receiverTypes.includes("single")) {
-          //   this.receiverTypes = this.getReceiverTypeOptions(null,null)
-          //   if(this.decision == "approve") this.updateDirection("up")
-          //   this.receiverTypes = this.getReceiverTypeOptions(["single"], "single")
-          // }
         }
         this.onValueChange()
       },
@@ -272,6 +264,12 @@
     },
     async created() {
       this.decisions = this.getDecisionOptions(this.val.decisions)
+      if(this.val.direction){
+        this.direction = this.val.direction
+      }
+      if(this.val.minimumLevel){
+        this.minimumLevel = this.val.minimumLevel
+      }
       if(this.val.decisions){
         this.receiverTypes = null
       }else if(this.val.receiverTypes instanceof Array && this.val.receiverTypes.length == 1){
