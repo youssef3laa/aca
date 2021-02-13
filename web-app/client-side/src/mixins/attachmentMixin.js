@@ -11,8 +11,12 @@ export default {
             }
             categoryValue = categories[0][this.categoryId + "_2"];
 
-            let lookupObj = this.fileTypes.find((element) => element.value == categoryValue);
-            properties.fileTypeValue = lookupObj?.text ?? "قيمة غير معرفة";
+            if (categoryValue == -100) properties.fileTypeValue = this.$t('memoRandumFileType');
+            else {
+                let lookupObj = this.fileTypes.find((element) => element.value == categoryValue);
+                properties.fileTypeValue = lookupObj?.text ?? "قيمة غير معرفة";
+            }
+
         },
         openFileInBrave: async function ({fileId, verNum}, contextObj) {
             this.toggleFileSelected(fileId, contextObj);

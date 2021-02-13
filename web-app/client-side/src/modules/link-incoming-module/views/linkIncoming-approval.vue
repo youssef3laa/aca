@@ -9,7 +9,7 @@ import formPageMixin from "../../../mixins/formPageMixin";
 import AppBuilder from "../../application-builder-module/builders/app-builder";
 import historyMixin from "../../history-module/mixin/historyMixin";
 import linkingMixin from "../mixin/linkingMixin";
-// import router from "../../../router";
+import router from "../../../router";
 
 export default {
   name: "linkIncoming-approval",
@@ -30,13 +30,11 @@ export default {
   async created() {
     this.$observable.subscribe("linkingTable_view", (item) => {
       try {
-
-
-              console.log(item)
-        // router.push({
-        //   name: page,
-        //   params: { taskId: taskId },
-        // });
+        console.log(item)
+        router.push({
+          name: "linkIncoming-parent",
+          params: {entityId: this.inputSchema.entityId}
+        });
       } catch (e) {
         console.error(e);
       }
@@ -51,7 +49,7 @@ export default {
     this.$observable.subscribe("complete-step", this.submit);
   },
   methods: {
-    fillForm: async function() {
+    fillForm: async function () {
       this.$refs.appBuilder.disableSection("section1");
       let entityName = this.inputSchema.entityName;
       let entityId = this.inputSchema.entityId;
@@ -69,27 +67,22 @@ export default {
       console.log(linkIncomingEntityData);
 
       let entityData = await this.readEntity(
-        "ACA_Entity_generalProcess",
-        linkIncomingEntityData.sourceIncomingId
+          "ACA_Entity_generalProcess",
+          linkIncomingEntityData.sourceIncomingId
       );
       let parentEntityData = await this.getRequestData(
-        linkIncomingEntityData.targetRequestId
+          linkIncomingEntityData.sourceRequestId
       );
       console.log(parentEntityData);
 
       let workTypeObj = await this.getLookupByCategoryAndKey(
-        "workType",
-        entityData.workType
+          "workType",
+          entityData.workType
       );
       let incomingMeansObj = await this.getLookupByCategoryAndKey(
-        "incomingMeans",
-        entityData.incomingMeans
+          "incomingMeans",
+          entityData.incomingMeans
       );
-      console.log(entityData);
-
-      console.log(workTypeObj);
-      console.log(incomingMeansObj);
-
       this.$refs.appBuilder.setModelData("form1", {
         stepId: this.inputSchema.stepId,
         subjectSummary: entityData.summary,
@@ -102,24 +95,15 @@ export default {
       this.$refs.appBuilder.setModelData("form2", {
         receiver: entityData,
       });
-
-      this.$refs.appBuilder.setModelData("memoPage", {
-        memoComp: {
-          requestId: linkIncomingEntityData.sourceRequestId,
-        },
-      });
-      //
       this.$refs.appBuilder.setModelData("historyTable", {
         taskTable: this.createHistoryTableModel(
-          this.inputSchema.process,
-          this.inputSchema.entityId
+            this.inputSchema.process,
+            this.inputSchema.entityId
         ),
       });
-
-      //
       let data = [];
       data.push(parentEntityData);
-      let model = { data };
+      let model = {data};
       this.$observable.fire("linkParent", {
         type: "modelUpdate",
         model: model,
@@ -128,14 +112,14 @@ export default {
         approval: this.inputSchema.router,
       });
     },
-    submit: function() {
+    submit: function () {
       let approvalModel = this.$refs.appBuilder.getModelData("approvalForm");
       console.log("approval model", approvalModel);
-      if (!approvalModel._valid) {
-        //@TODO show warning
-        console.log("not valid");
-        return;
-      }
+      // if (!approvalModel._valid) {
+      //   //@TODO show warning
+      //   console.log("not valid");
+      //   return;
+      // }
 
       var data = {
         taskId: this.taskId,

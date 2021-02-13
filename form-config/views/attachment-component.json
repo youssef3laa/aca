@@ -2,9 +2,10 @@
     "key": "AttachmentComponent",
     "inputs": [
         {
-            "type": "AttachmentComponent",
-            "name": "attachment",
-            "col": 12
+          "readOnly": true,
+          "type": "AttachmentComponent",
+          "name": "attachment",
+          "col": 12
         }
     ],
     "model": {}

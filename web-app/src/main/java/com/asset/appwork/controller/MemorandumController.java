@@ -28,7 +28,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -81,6 +80,11 @@ public class MemorandumController {
                 Document document = appworkCSOperations.uploadNodeAndSetCategory(createNode, new AppworkCSOperations.DocumentQuery(), categoryLinkedHashMap);
 
                 memo.setNodeId(document.getProperties().getId());
+
+                categoryLinkedHashMap.clear();
+                // set special fileType for mozakret el 3ard
+                categoryLinkedHashMap.put("686057_2", String.valueOf(-100));
+                appworkCSOperations.updateCategoryOnNode(document.getProperties().getId(), 686057L, categoryLinkedHashMap);
             } else {
                 appworkCSOperations.addNodeVersion(memo.getNodeId(), new MockMultipartFile(file.getName(), new FileInputStream(file)));
             }

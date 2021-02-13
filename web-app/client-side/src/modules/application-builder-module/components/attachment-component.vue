@@ -1,159 +1,149 @@
 <template>
-  <span>
-    <splitpanes class="default-theme" dir="ltr">
-      <pane dir="rtl" style="background: white">
-        <IframeComponent :val="iframeOjbect"> </IframeComponent>
-      </pane>
-      <pane dir="rtl" style="background: white">
-        <div>
-          <v-container
-              id="inputFileContainer"
-              class="input-file-prim"
-              title="Click to grap a file from your PC!"
-          >
-            <input id="fileInput" multiple style="display: none" type="file"/>
+    <span>
+        <splitpanes class="default-theme"
+                    dir="ltr">
+            <pane dir="rtl"
+                  style="background: white">
+                <IframeComponent :val="iframeOjbect"> </IframeComponent>
+            </pane>
+            <pane dir="rtl"
+                  style="background: white">
+                <v-container v-if="!readOnly"
+                             id="inputFileContainer"
+                             class="input-file-prim"
+                             title="Click to grap a file from your PC!">
+                    <input id="fileInput"
+                           multiple
+                           style="display: none"
+                           type="file"/>
 
-            <v-row align="center" justify="center">
-              <v-icon
-                  color="outline"
-                  style="margin: 10px 10px 0 0; padding: 5px 10px"
-              >mdi-cloud-upload
-              </v-icon>
-            </v-row>
-            <v-row align="center" justify="center">
-              <span style="margin: 10px 10px 0 0; padding: 5px 10px"
-              >قم بتحميل الملفات أو <a color="outline">اضغط هنا</a>
-              </span>
-            </v-row>
-          </v-container>
-          <br/>
-          <span>
-            <span>الملفات المعلقة</span>
-            <v-container>
-              <v-alert
-                  border="left"
-                  color="outline"
-                  colored-border
-                  dense
-                  icon="mdi-information-outline"
-                  text
-              >
-                {{ $t("pleaseChooseFileTypeToCompleteFileUpload") }}
-              </v-alert>
+                    <v-row align="center"
+                           justify="center">
+                        <v-icon color="outline"
+                                style="margin: 10px 10px 0 0; padding: 5px 10px">mdi-cloud-upload
+                        </v-icon>
+                    </v-row>
+                    <v-row align="center"
+                           justify="center">
+                        <span style="margin: 10px 10px 0 0; padding: 5px 10px">قم بتحميل الملفات أو <a
+                            color="outline">اضغط هنا</a>
+                        </span>
+                    </v-row>
+                </v-container>
+                <br/>
+                <span v-if="!readOnly">
+                    <span>الملفات المعلقة</span>
+                    <v-container>
+                        <v-alert border="left"
+                                 color="outline"
+                                 colored-border
+                                 dense
+                                 icon="mdi-information-outline"
+                                 text>
+                            {{ $t("pleaseChooseFileTypeToCompleteFileUpload") }}
+                        </v-alert>
 
-              <v-row v-for="(file, index) in files" :key="index">
-                <v-col cols="5">
-                  <v-text-field
-                      v-model="file.file.name"
-                      color="outline"
-                      hide-details
-                      outlined
-                      readonly
-                      v-bind:label="$t('nameOfTheFile')"
-                  >
-                    <v-icon
-                        slot="append"
-                        color="red"
-                        @click="file.removeFile({ file, index })"
-                    >mdi-close-circle-outline</v-icon
-                    >
-                  </v-text-field>
-                </v-col>
+                        <v-row v-for="(file, index) in files"
+                               :key="index">
+                            <v-col cols="5">
+                                <v-text-field v-model="file.file.name"
+                                              color="outline"
+                                              hide-details
+                                              outlined
+                                              readonly
+                                              v-bind:label="$t('nameOfTheFile')">
+                                    <v-icon slot="append"
+                                            color="red"
+                                            @click="file.removeFile({ file, index })">mdi-close-circle-outline</v-icon>
+                                </v-text-field>
+                            </v-col>
 
-                <v-col cols="5">
-                  <v-autocomplete
-                      v-model="file.fileTypeSelected"
-                      :items="fileTypes"
-                      clearable
-                      color="outline"
-                      hide-details
-                      hide-no-data
-                      open-on-clear
-                      outlined
-                      small-chips
-                      v-bind:label="$t('typeOfTheFile')"
-                  >
-                  </v-autocomplete>
-                </v-col>
+                            <v-col cols="5">
+                                <v-autocomplete v-model="file.fileTypeSelected"
+                                                :items="fileTypes"
+                                                clearable
+                                                color="outline"
+                                                hide-details
+                                                hide-no-data
+                                                open-on-clear
+                                                outlined
+                                                small-chips
+                                                v-bind:label="$t('typeOfTheFile')">
+                                </v-autocomplete>
+                            </v-col>
 
-                <v-col cols="2">
-                  <v-btn
-                      style="height: 100%"
-                      @click="uploadFile({ file, index })"
-                  >
-                    <v-icon>mdi-plus</v-icon>
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-container>
-            <span>الملفات</span>
-          </span>
-          <v-container>
-            <draggable
-                :animation="150"
-                :swapThreshold="0.5"
-                class="row"
-                tag="div"
-                @end="onEnd($event)"
-            >
-              <div
-                  v-for="(file, index) in filesUploaded"
-                  :key="index"
-                  class="col-6"
-                  @dragstart="startDrag($event, file)"
-                  @dragover.prevent
-                  @dragenter.prevent
-              >
-                <div class="card" max-height="100%" min-height="100%" v-bind:class="{ 'selected-card': file.isActive }">
-                  <div class="row pa-1" style="height: 100px">
-                    <v-col :cols="2" style="align-self: center">
-                      <v-icon size="60"> mdi-file-pdf-outline</v-icon>
-                    </v-col>
-                    <v-col
-                        :cols="6"
-                        class="card-name"
-                        style="cursor: pointer; align-self: center"
-                        @click="openFileInBrave({ fileId: file.properties.id });"
-                    >
-                      {{ file.properties.name }} <br/>
-                      {{ file.properties.fileTypeValue }}
-                    </v-col>
-                    <v-col
-                        :cols="2"
-                        style="cursor: pointer; align-self: center"
-                        @click="openVersionsPopup(file)"
-                    >
-                      <v-icon color="#22B07D" size="25">
-                        mdi-folder-multiple</v-icon
-                      >
-                    </v-col>
-                    <v-col
-                        :cols="2"
-                        style="cursor: pointer; align-self: center"
-                        @click="deleteFile(file)"
-                    >
-                      <v-icon color="#ea9cb3" size="25">
-                        mdi-delete-circle-outline</v-icon
-                      >
-                    </v-col>
-                  </div>
-                </div>
-              </div>
-            </draggable>
-          </v-container>
-        </div>
-      </pane>
-    </splitpanes>
+                            <v-col cols="2">
+                                <v-btn style="height: 100%"
+                                       @click="uploadFile({ file, index })">
+                                    <v-icon>mdi-plus</v-icon>
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </span>
+                <span>
+                    <span>الملفات</span>
+                    <v-container>
+                        <draggable :animation="150"
+                                   :swapThreshold="0.5"
+                                   class="row"
+                                   tag="div"
+                                   @end="onEnd($event)">
+                            <div v-for="(file, index) in filesUploaded"
+                                 :key="index"
+                                 class="col-6"
+                                 @dragstart="startDrag($event, file)"
+                                 @dragover.prevent
+                                 @dragenter.prevent>
+                                <div class="card"
+                                     max-height="100%"
+                                     min-height="100%"
+                                     v-bind:class="{ 'selected-card': file.isActive }">
+                                    <div class="row pa-1"
+                                         style="height: 100px">
+                                        <v-col :cols="2"
+                                               style="align-self: center">
+                                            <v-icon size="60"> mdi-file-pdf-outline</v-icon>
+                                        </v-col>
+                                        <v-col :cols="6"
+                                               class="card-name"
+                                               style="cursor: pointer; align-self: center"
+                                               @click="openFileInBrave({ fileId: file.properties.id });">
+                                            {{ file.properties.name }} <br/>
+                                            {{ file.properties.fileTypeValue }}
+                                        </v-col>
+                                        <v-col :cols="readOnly? 4 : 2"
+                                               style="cursor: pointer; align-self: center"
+                                               @click="openVersionsPopup(file)">
+                                            <v-icon color="#22B07D"
+                                                    size="25">
+                                                mdi-folder-multiple</v-icon>
+                                        </v-col>
+                                        <v-col v-if="!readOnly"
+                                               :cols="2"
+                                               style="cursor: pointer; align-self: center"
+                                               @click="deleteFile(file)">
+                                            <v-icon color="#ea9cb3"
+                                                    size="25">
+                                                mdi-delete-circle-outline</v-icon>
+                                        </v-col>
+                                    </div>
+                                </div>
+                            </div>
+                        </draggable>
+                    </v-container>
+                </span>
 
-    <FileVersionsModalComponent
-        :dialogState="versionsDialogState"
-        :modalTitle="selectedFile.modalTitle"
-        :nodeIdVal="selectedFile.nodeId"
-        @openVersionInBrava="openVersionInBrava"
-        @versionsModalClosed="versionsModalClosed"
-    >
-    </FileVersionsModalComponent>
-  </span>
+            </pane>
+        </splitpanes>
+
+        <FileVersionsModalComponent :dialogState="versionsDialogState"
+                                    :modalTitle="selectedFile.modalTitle"
+                                    :nodeIdVal="selectedFile.nodeId"
+                                    @openVersionInBrava="openVersionInBrava"
+                                    @versionsModalClosed="versionsModalClosed">
+        </FileVersionsModalComponent>
+    </span>
 </template>
 
 <script>
@@ -179,6 +169,7 @@ export default {
   mixins: [attachmentMixin, formPageMixin],
   data() {
     return {
+      readOnly: this.field.readOnly,
       iframeOjbect: {src: ""},
       bwsId: "",
       categoryId: "",
@@ -260,15 +251,6 @@ export default {
       this.openFileInBrave(obj);
     },
   },
-
-  // watch: {
-  //   'iframeOjbect.src': {
-  //     handler: function () {
-  //
-  //
-  //     }
-  //   }
-  // }
 };
 </script>
 
