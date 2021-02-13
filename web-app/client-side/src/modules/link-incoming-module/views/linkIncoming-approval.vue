@@ -91,11 +91,12 @@ export default {
     },
     submit: function () {
       let approvalModel = this.$refs.appBuilder.getModelData("approvalForm");
-      console.log("approval model",approvalModel);
-      // if (!model._valid){
-      //   //@TODO show warning
-      //   return;
-      // }
+      console.log("approval model", approvalModel);
+      if (!approvalModel._valid) {
+        //@TODO show warning
+        console.log("not valid");
+        return;
+      }
 
       var data = {
         taskId: this.taskId,

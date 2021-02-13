@@ -13,7 +13,8 @@ public interface RequestRepository extends GenericRepository<RequestEntity, Long
     Long countDistinctByDateAfter(Date date);
 
 
-    // get by specific request status and get older date only
+    //
+    // get by specific request status and get older date  from source incoming only
     //    @Query("select r from RequestEntity r where r.process = :process and r.date < :requestDate and(r.subject like %:subject% or r.requestNumber like %:requestNumber%)")
     @Query("select r from RequestEntity r where r.process = :process and(r.subject like %:subject% and r.requestNumber like %:requestNumber%)")
     List<RequestEntity> getRequestsByProcessAndDateAndSubjectAndRequestNumber(@Param("process") String process,
