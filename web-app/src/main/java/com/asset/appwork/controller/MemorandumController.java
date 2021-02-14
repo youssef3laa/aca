@@ -96,6 +96,7 @@ public class MemorandumController {
 
             String addRecordToMemorandumValues = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memo, id));
             respBuilder.data(addRecordToMemorandumValues);
+            file.delete();
 
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
@@ -146,6 +147,7 @@ public class MemorandumController {
 
             String addRecordToMemorandumValues = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memo, id));
             respBuilder.data(addRecordToMemorandumValues);
+            file.delete();
 
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
