@@ -47,6 +47,7 @@
                 )
             },
             submit: function () {
+
                 let mainData = this.$refs.appBuilder.getModelData("mainData")
                 mainData.confidentiality = mainData.confidentiality.value.value
                 mainData.incomingType = mainData.incomingType.value.value
@@ -76,7 +77,7 @@
 
                 this.initiateCaseProcess(data)
 
-                console.log("Data", data)
+                // console.log("Data", data)
                 // if(!approval._valid){
                 //     this.$refs.alertComponent._alertSuccess({type: "error",message:"pleaseFillRequiredFields"})
                 // }

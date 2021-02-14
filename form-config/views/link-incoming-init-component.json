@@ -1,0 +1,77 @@
+{
+    "key": "linkIncoming",
+    "inputs": [
+        {
+            "type": "InputComponent",
+            "label": "رقم الوارد",
+            "name": "requestNumber",
+            "col": 5,
+            "readonly": false
+        },
+        {
+            "type": "InputComponent",
+            "label": "اسم الموضوع",
+            "name": "requestSubject",
+            "col": 5,
+            "readonly": false
+        },
+        {
+            "type": "ButtonComponent",
+            "label": "بحث الوارد",
+            "action": "search",
+            "publish": "searchIncoming",
+            "name": "search",
+            "col": 2
+        },
+        {
+            "type": "DataTableComponent",
+            "name": "linkingTable",
+            "actions": [
+                "view"
+            ],
+            "subscribe": "link",
+            "searchable": false,
+            "col": 12
+        }
+
+    ],
+    "model": {
+        "requestNumber": "",
+        "requestSubject": "",
+        "search": "",
+        "linkingTable": {
+            "headers": [
+                {
+                    "text": "اسم الموضوع",
+                    "align": "start",
+                    "value": "subject"
+                },
+                {
+                    "text": "اسم المرسل",
+                    "value": "initiator"
+                },
+                {
+                    "text": "اسم الجهة",
+                    "value": "unitName"
+                },
+                {
+                    "text": "رقم الوارد",
+                    "value": "requestNumber"
+                },
+                {
+                    "text": "التاريخ",
+                    "value": "requestDate"
+                },
+                {
+                    "text": "",
+                    "value": "action"
+                }
+            ],
+            "data": [],
+            "url": "",
+            "search": ""
+        },
+
+        "_valid": true
+    }
+}

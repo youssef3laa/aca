@@ -1,0 +1,50 @@
+{
+    "key": "linkingTableForm",
+    "inputs": [
+        {
+            "type": "DataTableComponent",
+            "name": "linkingTable",
+            "actions": [
+                "view"
+            ],
+            "subscribe": "linkParent",
+            "searchable": false,
+            "col": 12
+        }
+    ],
+    "model": {
+        "linkingTable": {
+            "headers": [
+                {
+                    "text": "اسم الموضوع",
+                    "align": "start",
+                    "value": "subject"
+                },
+                {
+                    "text": "اسم المرسل",
+                    "value": "initiator"
+                },
+                {
+                    "text": "اسم الجهة",
+                    "value": "unitName"
+                },
+                {
+                    "text": "رقم الوارد",
+                    "value": "requestNumber"
+                },
+                {
+                    "text": "التاريخ",
+                    "value": "requestDate"
+                },
+                {
+                    "text": "",
+                    "value": "action"
+                }
+            ],
+            "data": [],
+            "url": "",
+            "search": ""
+        },
+        "_valid": true
+    }
+}

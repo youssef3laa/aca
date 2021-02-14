@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <validation-observer ref="observer">
+    <validation-observer :ref="forms.key">
       <v-row>
         <!-- <div v-for="(field, key) in forms" :key="key"> -->
         <v-col
@@ -136,16 +136,16 @@ export default {
       if (data.name && data.value) this.forms.model[data.name] = data.value
 
       if (this.forms.model)
-        this.forms.model['_valid'] = !this.$refs['observer']['_data'].flags
+        this.forms.model['_valid'] = !this.$refs[this.forms.key]['_data'].flags
           .invalid
       // if (this.forms.key)
       //   this.forms.model['_key'] = this.forms.key;
 
-      // console.log(this.$refs['observer'].errors[data.name])
-      // console.log(this.$refs['observer']['_data'].flags)
-      // this.$refs['observer'].validateWithInfo().then((val)=> console.log(val))
+      // console.log(this.$refs[this.forms.key].errors[data.name])
+      // console.log(this.$refs[this.forms.key]['_data'].flags)
+      // this.$refs[this.forms.key].validateWithInfo().then((val)=> console.log(val))
       // let res =
-              await this.$refs.observer.validate()
+      //         await this.$refs.observer.validate()
       // console.log(res)
       if (data.type == 'ButtonComponent' && data.publish) {
         if (data.modalId) {
@@ -159,13 +159,13 @@ export default {
         } else {
           this.$observable.fire(data.publish, {
             model: this.forms.model,
-            valid: !this.$refs['observer'].flags.invalid,
+            valid: !this.$refs[this.forms.key].flags.invalid,
           })
         }
       } else if (this.forms.publish) {
         this.$observable.fire(this.forms.publish, {
           model: this.forms.model,
-          valid: !this.$refs['observer'].flags.invalid,
+          valid: !this.$refs[this.forms.key].flags.invalid,
         })
       }
     },
@@ -190,6 +190,10 @@ export default {
         // console.log(data)
       })
     }
+    this.$observable.subscribe("validateModel", async (key)=>{
+      if(this.$refs[key])
+        this.forms.model['_valid'] =  await this.$refs[key].validate()
+    })
   },
 }
 </script>

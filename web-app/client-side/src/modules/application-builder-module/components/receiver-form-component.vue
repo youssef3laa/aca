@@ -224,7 +224,7 @@
                         if(sameLevel)
                             this.office.val = this.getAutocompleteVal('org/unit/COC/down/all/unitTypeCode/ADM,OFC')
                         else {
-                            this.disablePrevious("GRP",headRole)
+                            this.disablePrevious("GRP")
                             this.group.val = this.getAutocompleteVal('org/unit/' + unitCode + '/down/all/unitTypeCode/GRP')
                         }
                         return
@@ -336,7 +336,7 @@
                 return {
                     name: name,
                     readonly: readonlyValue,
-                    rule: (readonlyValue)? null:"required",
+                    // rule: (readonlyValue)? null:"required",
                     autofill: true
                 }
             },

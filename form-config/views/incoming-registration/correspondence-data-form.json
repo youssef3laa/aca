@@ -120,17 +120,6 @@
         "taskType": {
             "url": "lookup/get/category/taskType"
         },
-        "subject": "",
-        "incomingNumber": "",
-        "incomingDate": "",
-        "incomingFrom": "",
-        "registrationNumber": "",
-        "transferTo": "",
-        "correspondenceNumber": "",
-        "numberOfAttachments": "",
-        "attachmentsDescription": "",
-        "constraint": "",
-        "topicSummary": "",
         "maxDate": null
     }
 }

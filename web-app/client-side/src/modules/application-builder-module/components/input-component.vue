@@ -65,10 +65,10 @@ export default {
         this.d = newVal
         if(this.field.readonly == true || this.field.readonly == false){
           this.readonly = this.field.readonly
-        }else if (this.field.readonly) {
+        }else if (typeof this.field.readonly == "undefined") {
           this.readonly = this.model[this.field.readonly]
         }
-        if (this.field.show) {
+        if (typeof this.field.show != "undefined"  && typeof this.model[this.field.show] != "undefined") {
           this.show = this.model[this.field.show]
         }
       },
