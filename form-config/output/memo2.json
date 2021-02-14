@@ -13,7 +13,7 @@
                   "isCard": true,
                   "forms": [
                      {  "type": "collapse",
-                        "name": "النص الأول",
+                        "name": "الأول النص",
                         "key": "richtext1",
                         "inputs": [
                            {
@@ -28,7 +28,7 @@
                      },
                      {  
                         "type": "collapse",
-                        "name": "النص الثاني",
+                        "name": "الثاني النص",
                         "key": "richtext2",
                         "inputs": [
                            {
