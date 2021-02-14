@@ -29,11 +29,15 @@ export default {
   },
   mounted() {
     this.loadForm("parent-incoming-view", this.fillForm);
-
   },
   methods: {
     fillForm: async function () {
       this.$refs.appBuilder.disableSection("section1");
+      this.$refs.appBuilder.setModelData("AttachmentComponent", {
+        attachment: {
+          readonly: true
+        }
+      });
       this.entityInformation.entityId = this.$route.params.entityId;
       this.entityInformation.entityName = "ACA_Entity_linkIncoming";
       let linkIncomingEntityData = await this.readEntity(this.entityInformation.entityName, this.entityInformation.entityId);

@@ -169,7 +169,7 @@ export default {
   mixins: [attachmentMixin, formPageMixin],
   data() {
     return {
-      readOnly: this.field.readOnly,
+      readOnly: this.val.readonly,
       iframeOjbect: {src: ""},
       bwsId: "",
       categoryId: "",
@@ -250,7 +250,17 @@ export default {
     openVersionInBrava(obj) {
       this.openFileInBrave(obj);
     },
+
   },
+  watch: {
+    'val.readonly': {
+      handler: function (newVal, oldVal) {
+        this.readOnly = newVal;
+        console.log(newVal, oldVal)
+      }
+    }
+
+  }
 };
 </script>
 
