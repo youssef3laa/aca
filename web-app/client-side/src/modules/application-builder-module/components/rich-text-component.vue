@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="direction: ltr">
     <validation-provider
       :name="field.name"
       :rules="field.rule"

@@ -1,0 +1,119 @@
+{
+    "key": "mainData",
+    "inputs": [
+        {
+            "type": "InputComponent",
+            "label": "subject",
+            "name": "subject",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "confidentiality",
+            "name": "confidentiality",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "priorityLevel",
+            "name": "priorityLevel",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "incomingNumber",
+            "name": "incomingNumber",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "incomingDate",
+            "name": "incomingDate",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "incomingFrom",
+            "name": "incomingFrom",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "incomingType",
+            "name": "incomingType",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "registrationNumber",
+            "name": "registrationNumber",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "transferTo",
+            "name": "transferTo",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "correspondenceNumber",
+            "name": "correspondenceNumber",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "jobType",
+            "name": "jobType",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "taskType",
+            "name": "taskType",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "numberOfAttachments",
+            "name": "numberOfAttachments",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "attachmentsDescription",
+            "name": "attachmentsDescription",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "constraint",
+            "name": "constraint",
+            "col": "4"
+        },
+        {
+            "type": "TextareaComponent",
+            "label": "topicSummary",
+            "name": "topicSummary",
+            "col": "12"
+        }
+    ],
+    "model": {
+        "confidentiality": "",
+        "priorityLevel": "",
+        "incomingType": "",
+        "jobType": "",
+        "taskType": "",
+        "subject": "",
+        "incomingNumber": "",
+        "incomingDate": "",
+        "incomingFrom": "",
+        "registrationNumber": "",
+        "transferTo": "",
+        "correspondenceNumber": "",
+        "numberOfAttachments": "",
+        "attachmentsDescription": "",
+        "constraint": "",
+        "topicSummary": ""
+    }
+}

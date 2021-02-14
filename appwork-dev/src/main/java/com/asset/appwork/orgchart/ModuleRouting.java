@@ -12,7 +12,6 @@ import com.asset.appwork.platform.soap.Workflow;
 import com.asset.appwork.platform.util.CordysUtil;
 import com.asset.appwork.repository.ApprovalHistoryRepository;
 import com.asset.appwork.schema.OutputSchema;
-import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.util.ReflectionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
@@ -37,14 +36,12 @@ public class ModuleRouting {
     Account account;
     String cordysUrl;
     ApprovalHistoryRepository approvalHistoryRepository;
-    OrgChartService orgChartService;
 
-    public ModuleRouting(Account account, String cordysUrl, String config, ApprovalHistoryRepository approvalHistoryRepository, OrgChartService orgChartService) {
+    public ModuleRouting(Account account, String cordysUrl, String config, ApprovalHistoryRepository approvalHistoryRepository) {
         this.config = config;
         this.account = account;
         this.cordysUrl = cordysUrl;
         this.approvalHistoryRepository = approvalHistoryRepository;
-        this.orgChartService = orgChartService;
     }
 
     @Data

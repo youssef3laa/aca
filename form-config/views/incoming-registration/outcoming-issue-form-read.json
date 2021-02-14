@@ -1,0 +1,41 @@
+{
+    "key": "outcomingIssueForm",
+    "publish": "outcomingIssueChange",
+    "inputs": [
+        {
+            "type": "InputComponent",
+            "label": "outcomingIssueType",
+            "name": "outcomingIssueType",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "recipientName",
+            "name": "recipientName",
+            "show": "send",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "job",
+            "name": "job",
+            "show": "send",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "receivingAdministration",
+            "name": "receivingAdministration",
+            "show": "delivery",
+            "col": "4"
+        }
+    ],
+    "model": {
+        "outcomingIssueType": "",
+        "receivingAdministration": "",
+        "recipientName": "",
+        "job": "",
+        "send": true,
+        "delivery": true
+    }
+}

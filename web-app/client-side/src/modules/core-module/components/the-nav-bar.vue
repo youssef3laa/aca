@@ -104,7 +104,7 @@ export default {
             {
               title: "createNewImport",
               icon: "far fa-edit",
-              route: "generalProcess-init",
+              route: "incomingRegistration-init",
             },
             { title: "registerTopic", icon: "far fa-edit", route:"" },
             { title:  "createAssignment", icon: "far fa-edit", route: "" },
@@ -123,6 +123,7 @@ export default {
   methods: {
     routeTo(name) {
       if(name == "LoginView") {
+      this.drawer = false
       localStorage.removeItem("user");}
 
       router.push({ name: name }).catch(function () {

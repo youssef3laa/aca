@@ -45,6 +45,7 @@ public class RequestController {
         AppResponse.ResponseBuilder<RequestEntity> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
             Optional<RequestEntity> requestEntity = requestRepository.findById(requestId);
             if(requestEntity.isPresent()){
                 respBuilder.data(requestEntity.get());
@@ -65,7 +66,7 @@ public class RequestController {
         AppResponse.ResponseBuilder<RequestEntity> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
-
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
             String restAPIBaseUrl = SystemUtil.generateRestAPIBaseUrl(environment, "AssetGeneralACA");
             Entity entity = new Entity(account, restAPIBaseUrl, "ACA_Entity_request");
 

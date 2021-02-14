@@ -1,15 +1,44 @@
 {
-    "key": "outcomingIssue",
+    "key": "outcomingIssueForm",
+    "publish": "outcomingIssueChange",
     "inputs": [
         {
             "type": "AutoCompleteComponent",
             "name": "outcomingIssueType",
+            "rule": "required",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "recipientName",
+            "name": "recipientName",
+            "show": "send",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "job",
+            "name": "job",
+            "show": "send",
+            "col": "4"
+        },
+        {
+            "type": "AutoCompleteComponent",
+            "name": "receivingAdministration",
+            "show": "delivery",
             "col": "4"
         }
     ],
     "model": {
         "outcomingIssueType": {
             "url": "lookup/get/category/outcomingIssueType"
-        }
+        },
+        "receivingAdministration": {
+            "url": "org/unit/COC/down/all/unitTypeCode/ADM"
+        },
+        "recipientName": "",
+        "job": "",
+        "send": true,
+        "delivery": true
     }
 }

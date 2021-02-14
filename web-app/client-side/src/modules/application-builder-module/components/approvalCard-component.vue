@@ -26,7 +26,7 @@
             </p>
           </v-alert>
           <v-card-text style="padding-top: 0px">
-            <TextareaComponent :field="{ name: 'routingOpinion', label: 'opinion', rule:'required' }"
+            <TextareaComponent :field="{ name: 'routingOpinion', label: 'opinion' }"
                                @update="onChangeOpinion"></TextareaComponent>
           </v-card-text>
         </v-card>
@@ -146,6 +146,16 @@
           this.receiverType = null
           this.updateDirection(null)
             switch(this.decision){
+              case "president":
+                this.assignee = "cn=HTCA,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com"
+                this.code = "ADM"
+                this.assignedRole = null
+                break
+              case "vice":
+                this.assignee = "cn=HTVA,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com"
+                this.code = "ADM"
+                this.assignedRole = null
+                break
               case "approve":
                 this.updateDirection("up")
                 this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
@@ -196,6 +206,10 @@
       },
       getDecisionLabel: function(value) {
         switch (value) {
+          case "president":
+            return "request-president-approval"
+          case "vice":
+            return "request-vice-approval"
           case "approve":
             return "request-approve"
           case "redirect":
@@ -219,10 +233,8 @@
           direction: (this.d.decisions)? direction:this.direction,
           minimumLevel: this.minimumLevel
         }
-      }
-    },
-    watch: {
-      val: function (newVal) {
+      },
+      handleNewVal: function(newVal){
         if(newVal.direction){
           this.direction = newVal.direction
         }
@@ -247,37 +259,28 @@
             this.receiverTypes = this.getReceiverTypeOptions(newVal.receiverTypes)
           }
         }
+      }
+    },
+    watch: {
+      val: function (newVal) {
+        this.handleNewVal(newVal)
 
-        if(this.firstTime){
-          if(newVal.fields || newVal.decisions || newVal.receiverTypes){
-            this.d = newVal
-          }
-          this.updateDirection()
-          this.firstTime=false
-          this.onValueChange()
-        }else{
+        if(this.d){
           for(let key in newVal){
             this.d[key] = newVal[key]
           }
+        }else{
+          this.d = newVal
+        }
+
+        if(this.firstTime){
+          this.firstTime=false
+          this.onValueChange()
         }
       }
     },
     async created() {
-      this.decisions = this.getDecisionOptions(this.val.decisions)
-      if(this.val.direction){
-        this.direction = this.val.direction
-      }
-      if(this.val.minimumLevel){
-        this.minimumLevel = this.val.minimumLevel
-      }
-      if(this.val.decisions){
-        this.receiverTypes = null
-      }else if(this.val.receiverTypes instanceof Array && this.val.receiverTypes.length == 1){
-        this.receiverTypes = this.getReceiverTypeOptions(this.val.receiverTypes ,this.val.receiverTypes[0])
-        this.receiverType = this.val.receiverTypes[0]
-      }else{
-        this.receiverTypes = this.getReceiverTypeOptions(this.val.receiverTypes)
-      }
+      this.handleNewVal(this.val)
 
       this.userDetails = await this.getUserDetails()
       this.displayName = this.userDetails.displayName

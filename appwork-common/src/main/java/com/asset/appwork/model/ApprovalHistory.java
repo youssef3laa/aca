@@ -24,8 +24,13 @@ public class ApprovalHistory {
     String processName;
     String stepId;
     String parent;
+    String readonlyComponent;
+    String requestId;
+    String requestNumber;
     @Transient
     String displayName;
+    @Transient
+    String unitName;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd , hh:mm:ss a")
     Date approvalDate;

@@ -68,7 +68,7 @@ public class ProcessController {
             String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
             String config = SystemUtil.readFile(filePath);
 
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository, orgChartService);
+            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
             String response = moduleRouting.goToNext(requestJson.processModel);
             respBuilder.data(response);
         } catch (AppworkException e) {
@@ -134,7 +134,7 @@ public class ProcessController {
             String config = SystemUtil.readFile(filePath);
 
             requestJson.processModel.setRequestId(String.valueOf(requestEntityId));
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository, orgChartService);
+            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
             String response = moduleRouting.goToNext(requestJson.processModel);
             respBuilder.data(response);
         } catch (AppworkException e) {
@@ -160,7 +160,7 @@ public class ProcessController {
             String filePath = outputSchema.getProcessFilePath(environment.getProperty("process.config"));
             String config = SystemUtil.readFile(filePath);
 
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository, orgChartService);
+            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
             String response = moduleRouting.goToNext(outputSchema);
             respBuilder.data(response);
         } catch (AppworkException e) {

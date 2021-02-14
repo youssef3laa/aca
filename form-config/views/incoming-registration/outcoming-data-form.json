@@ -5,33 +5,34 @@
             "type": "InputComponent",
             "label": "outcomingNumber",
             "name": "outcomingNumber",
-            "rule": "required",
+            "readonly": true,
             "col": "4"
         },
         {
-            "type": "DatePickerComponent",
+            "type": "InputComponent",
             "label": "outcomingDate",
             "name": "outcomingDate",
+            "readonly": true,
             "rule": "required",
             "col": "4"
         },
         {
             "type": "AutoCompleteComponent",
             "name": "outcomingType",
+            "rule": "required",
             "col": "4"
         },
         {
             "type": "InputComponent",
             "label": "numberOfAttachments",
             "name": "numberOfAttachments",
-            "rule": "required",
+            "inputType": "number",
             "col": "4"
         },
         {
             "type": "InputComponent",
             "label": "attachmentsDescription",
             "name": "attachmentsDescription",
-            "rule": "required",
             "col": "4"
         },
         {

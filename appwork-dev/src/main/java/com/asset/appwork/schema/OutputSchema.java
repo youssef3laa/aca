@@ -19,7 +19,7 @@ public class OutputSchema<T> {
     String process, processId, stepId;
     String requestId, entityName;
     String component, config, readonlyComponent;
-    String decision, comment;
+    String decision, comment, opinion;
     String code, assignedCN;
     String receiverType;
     Router router = new Router();
@@ -43,6 +43,7 @@ public class OutputSchema<T> {
                 "<readonlyComponent>"+removeNull(this.readonlyComponent)+"</readonlyComponent>"+
                 "<decision>"+removeNull(this.decision)+"</decision>"+
                 "<comment>"+removeNull(this.comment)+"</comment>"+
+                "<opinion>"+removeNull(this.opinion)+"</opinion>"+
                 "<breakProcess>"+removeNull(this.breakProcess)+"</breakProcess>"+
                 "<addApproval>"+removeNull(this.addApproval)+"</addApproval>"+
                 "<router>"+getObjectXML(this.router)+"</router>"+
