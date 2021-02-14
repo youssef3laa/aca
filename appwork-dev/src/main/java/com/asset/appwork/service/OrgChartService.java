@@ -16,6 +16,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -34,9 +35,11 @@ public class OrgChartService {
     @Autowired
     GroupRepository groupRepository;
     @Autowired
+    PositionRepository positionRepository;
+    @Autowired
     UserRepository userRepository;
     @Autowired
-    PositionRepository positionRepository;
+    PersonRepository personRepository;
     @Autowired
     AssignmentRepository assignmentRepository;
 
@@ -46,10 +49,18 @@ public class OrgChartService {
     @Autowired
     Environment env;
 
-    public Unit createUnit(Account account, String props) throws AppworkException {
-        return getUnit(new Entity(account,
+    public Unit createUnit(Account account, String props) throws AppworkException, JsonProcessingException {
+        Unit createdUnit = getUnit(new Entity(account,
                 SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
                 "OrganizationalUnit").create(Unit.fromString(props).toPlatformString()));
+
+        Group group = new Group();
+        group.setName("U" + createdUnit.getName());
+//        group.setGroupCode(group.getName());
+//        group.setIsHeadRole(false);
+//        group.setIsViceRole(false);
+        createGroup(account, group.toString());
+        return createdUnit;
     }
 
     public Unit getUnit(Long id) throws AppworkException {
@@ -70,7 +81,7 @@ public class OrgChartService {
         return getUnit(id);
     }
 
-    public void deleteUnit(Long id) throws AppworkException {
+    public void deleteUnit(Account account, Long id) throws AppworkException {
         // TODO: Find solution to the Transaction Exception Roll back overriding AppworkException
         try {
             Unit unit = getUnit(id);
@@ -81,13 +92,14 @@ public class OrgChartService {
             unitRepository.save(unit);
             children.forEach(child -> {
                 try {
-                    addSubUnitToUnit(parent.get(0).getId(), child.getId());
+                    addSubUnitToUnit(account, parent.get(0).getId(), child.getId());
                 } catch (AppworkException e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
                 }
             });
 
+            deleteGroup(account, getGroupByName("U" + unit.getName(), true).getId());
             unitRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
             throw new AppworkException("No Unit of Id " + id.toString() + " exists", ResponseCode.DELETE_ENTITY_FAILURE);
@@ -99,7 +111,7 @@ public class OrgChartService {
     }
 
     public Page<Unit> getAllUnits(int page, int size) {
-        return unitRepository.findAllByUnitCodeNotNull(PageRequest.of(page, size));
+        return unitRepository.findAllByUnitCodeNotNull(PageRequest.of(page, size, Sort.by("id")));
     }
 
     public List<Unit> getUnitChildrenRecursively(String parentUnitCode) {
@@ -124,7 +136,7 @@ public class OrgChartService {
 //        storedProcedure.setFirstResult((page) * size);
 //        storedProcedure.setMaxResults(size);
 //        return (List<Unit>) storedProcedure.getResultList();
-////        return unitRepository.getUnitChildrenRecursivelyFilteredByUnitTypeCode(parentUnitCode, unitTypeCode, PageRequest.of(page, size));
+////        return unitRepository.getUnitChildrenRecursivelyFilteredByUnitTypeCode(parentUnitCode, unitTypeCode, PageRequest.of(page, size, Sort.by("id));
 //    }
 
     public List<Unit> getUnitParentsRecursivelyFilteredByUnitTypeCode(String childUnitCode, String unitTypeCode) {
@@ -136,20 +148,35 @@ public class OrgChartService {
     }
 
 //    public Page<Unit> getUnitParentsRecursivelyFilteredByUnitTypeCode(String childUnitCode, String unitTypeCode, int page, int size) {
-//        return unitRepository.getUnitParentsRecursivelyFilteredByUnitTypeCode(childUnitCode, unitTypeCode, PageRequest.of(page, size));
+//        return unitRepository.getUnitParentsRecursivelyFilteredByUnitTypeCode(childUnitCode, unitTypeCode, PageRequest.of(page, size, Sort.by("id));
 //    }
 
-    public void addSubUnitToUnit(Long id, Long subUnitId) throws AppworkException {
+    public void addSubUnitToUnit(Account account, Long id, Long subUnitId) throws AppworkException {
         Unit unit = getUnit(subUnitId);
+        List<Unit> oldParent = (List<Unit>) unit.getParent();
         unit.setParent(new ArrayList<>(List.of(getUnit(id))));
         unitRepository.save(unit);
+
+        if (oldParent.size() > 0)
+            removeSubGroupsFromGroup(account, "U" + oldParent.get(0).getName());
+
+        Group relatedGroup = getGroupByName("U" + ((List<Unit>) unit.getParent()).get(0).getName(), true);
+        List<Group> groups = (List<Group>) ((List<Unit>) unit.getParent()).get(0).getGroup();
+        groups.forEach(group -> {
+            try {
+                addSubGroupToGroup(account, relatedGroup.getId(), group.getId());
+            } catch (AppworkException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+            }
+        });
     }
 
-    public void addSubUnitToUnit(String parentUnitCode, String subUnitCode) throws AppworkException {
+    public void addSubUnitToUnit(Account account, String parentUnitCode, String subUnitCode) throws AppworkException {
         Long id = getUnitByName(parentUnitCode).getId();
         Long subUnitId = getUnitByName(subUnitCode).getId();
 
-        addSubUnitToUnit(id, subUnitId);
+        addSubUnitToUnit(account, id, subUnitId);
     }
 
     public Position createPosition(Account account, Long unitId, String props) throws AppworkException {
@@ -195,7 +222,7 @@ public class OrgChartService {
     }
 
     public Page<Position> getAllPositions(int page, int size) {
-        return positionRepository.findAllByNameNotNull(PageRequest.of(page, size));
+        return positionRepository.findAllByNameNotNull(PageRequest.of(page, size, Sort.by("id")));
     }
 
     public Assignment createAssignment(Account account, Long unitId, Long positionId, String props) throws AppworkException {
@@ -209,6 +236,10 @@ public class OrgChartService {
         return assignmentRepository.findById(id).orElseThrow(
                 () -> new AppworkException("Could not get Assignment Entity of id " + id, ResponseCode.READ_ENTITY_FAILURE)
         );
+    }
+
+    public List<Assignment> getAssignmentByPerson(Person person) throws AppworkException {
+        return assignmentRepository.findByPerson(person);
     }
 
     public Assignment updateAssignment(Account account, Long id, String props) throws AppworkException {
@@ -246,7 +277,7 @@ public class OrgChartService {
     // TODO: Double Check Result
     public Page<Unit> getUnitChildren(String code, int page, int size) {
         return unitRepository.findByNameAndUnitCodeNotNull(code)
-                .map(unit -> unitRepository.findByParent(unit, PageRequest.of(page, size))).orElse(Page.empty());
+                .map(unit -> unitRepository.findByParent(unit, PageRequest.of(page, size, Sort.by("id")))).orElse(Page.empty());
     }
 
     public Group createGroup(Account account, String props) throws AppworkException, JsonProcessingException {
@@ -289,12 +320,21 @@ public class OrgChartService {
         );
     }
 
+    public Group getGroupByName(String name, Boolean groupCodeCouldBeNull) throws AppworkException {
+        if (groupCodeCouldBeNull) {
+            return groupRepository.findByName(name).orElseThrow(
+                    () -> new AppworkException("Could not get Group Entity of name " + name, ResponseCode.READ_ENTITY_FAILURE)
+            );
+        }
+        return getGroupByName(name);
+    }
+
     public List<Group> getGroupsByNames(String names) throws AppworkException {
         return groupRepository.findByNameInAndGroupCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")));
     }
 
     public Page<Group> getGroupsByNames(String names, int page, int size) throws AppworkException {
-        return groupRepository.findByNameInAndGroupCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")), PageRequest.of(page, size));
+        return groupRepository.findByNameInAndGroupCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")), PageRequest.of(page, size, Sort.by("id")));
     }
 
     public List<Group> getGroupsByUnitNames(String names) {
@@ -302,7 +342,7 @@ public class OrgChartService {
     }
 
     public Page<Group> getGroupsByUnitNames(String names, int page, int size) {
-        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByNameInAndUnitCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")))), PageRequest.of(page, size));
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByNameInAndUnitCodeNotNull(Arrays.asList(names.trim().split("\\s*,\\s*")))), PageRequest.of(page, size, Sort.by("id")));
     }
 
     public List<Group> getGroupsByUnitTypeCode(String code) {
@@ -310,7 +350,7 @@ public class OrgChartService {
     }
 
     public Page<Group> getGroupsByUnitTypeCode(String code, int page, int size) {
-        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCode(code)), PageRequest.of(page, size));
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCode(code)), PageRequest.of(page, size, Sort.by("id")));
     }
 
     public List<Group> getGroupsByUnitTypeCodes(String codes) {
@@ -318,7 +358,7 @@ public class OrgChartService {
     }
 
     public Page<Group> getGroupsByUnitTypeCodes(String codes, int page, int size) {
-        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCodeIn(Arrays.asList(codes.trim().split("\\s*,\\s*")))), PageRequest.of(page, size));
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCodeIn(Arrays.asList(codes.trim().split("\\s*,\\s*")))), PageRequest.of(page, size, Sort.by("id")));
     }
 
     public Group getGroupParent(String code) throws AppworkException {
@@ -373,7 +413,7 @@ public class OrgChartService {
     }
 
     public Page<Group> getGroupChildren(String code, int page, int size) throws AppworkException {
-        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByParent(getGroupByName(code).getUnit())), PageRequest.of(page, size));
+        return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByParent(getGroupByName(code).getUnit())), PageRequest.of(page, size, Sort.by("id")));
     }
 
     public List<Group> getAllGroups() {
@@ -381,7 +421,7 @@ public class OrgChartService {
     }
 
     public Page<Group> getAllGroups(int page, int size) {
-        return groupRepository.findAllByGroupCodeNotNull(PageRequest.of(page, size));
+        return groupRepository.findAllByGroupCodeNotNull(PageRequest.of(page, size, Sort.by("id")));
     }
 
     public List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode) {
@@ -393,7 +433,7 @@ public class OrgChartService {
     }
 
 //    public Page<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode, int page, int size) {
-//        return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, PageRequest.of(page, size));
+//        return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, PageRequest.of(page, size, Sort.by("id));
 //    }
 
     public Group getGroupByCn(String cn) throws AppworkException {
@@ -437,6 +477,9 @@ public class OrgChartService {
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group")
                 .addRelation(id, "Unit", props);
         Group group = getGroup(id);
+
+        addSubGroupToGroup(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), id);
+
         Position position;
 
         try {
@@ -459,8 +502,10 @@ public class OrgChartService {
     public void updateGroupUnitRelation(Account account, Group group, String oldGroupCode, String props) throws AppworkException {
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group")
                 .addRelation(group.getId(), "Unit", props);
-        Position position;
 
+        addSubGroupToGroup(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), group.getId());
+
+        Position position;
         try {
             position = getPositionByName(oldGroupCode);
             position.setName(group.getName());
@@ -484,8 +529,45 @@ public class OrgChartService {
     }
 
     public void deleteGroup(Account account, Long id) throws AppworkException {
+        Group group = getGroup(id);
+        positionRepository.deleteByName(group.getName());
         new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
-                .deleteGroupByGroupName(getGroup(id).getName());
+                .deleteGroupByGroupName(group.getName());
+    }
+
+    public void addSubGroupToGroup(Account account, Long id, Long subGroupId) throws AppworkException {
+        Group parentGroup = getGroupByName("U" + getUnit(id).getName(), true);
+        Group childGroup = getGroup(subGroupId);
+
+        String props = new Member.StringList(
+                Collections.singletonList(childGroup.getName() + "@" + env.getProperty("otds.partition"))
+        ).toString();
+
+        new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
+                .assignMembersToGroup(parentGroup.getName(), props);
+
+    }
+
+    public void addSubGroupToGroup(Account account, String code, String subGroupCode) throws AppworkException {
+        addSubGroupToGroup(account, getGroupByName(code).getId(), getGroupByName(subGroupCode).getId());
+    }
+
+    public void removeSubGroupsFromGroup(Account account, Long groupId) throws AppworkException {
+        String props = new Member.StringList(
+                Collections.emptyList()
+        ).toString();
+
+        new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
+                .setMembersToGroup(getGroup(groupId).getName(), props);
+    }
+
+    public void removeSubGroupsFromGroup(Account account, String groupCode) throws AppworkException {
+        String props = new Member.StringList(
+                Collections.emptyList()
+        ).toString();
+
+        new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
+                .setMembersToGroup(groupCode, props);
     }
 
     public User createUser(Account account, String props) throws AppworkException, JsonProcessingException {
@@ -544,7 +626,8 @@ public class OrgChartService {
     }
 
     public Page<User> getAllUsers(int page, int size) throws AppworkException {
-        return userRepository.findAllByUserIdNotNull(PageRequest.of(page, size));
+//        entityManager.unwrap(Session.class).clear();
+        return userRepository.findAllByUserIdNotNull(PageRequest.of(page, size, Sort.by("id")));
     }
 
     public User updateUser(Account account, Long id, String props) throws AppworkException, JsonProcessingException {
@@ -563,11 +646,21 @@ public class OrgChartService {
     }
 
     public void deleteUser(Account account, Long id) throws AppworkException {
+        User user = getUser(id);
+        Person person = user.getPerson();
+        getAssignmentByPerson(person).forEach(assignment -> {
+            try {
+                deleteAssignment(assignment.getId());
+            } catch (AppworkException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        user.setPerson(null);
+        userRepository.save(user); // (Not needed)
+        deletePerson(person.getId());
         new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
-                .deleteUserByUserId(getUser(id).getUserId());
-
-        //TODO: Remove this after consolidation is fixed
-        userRepository.deleteById(id);
+                .deleteUserByUserId(user.getUserId());
     }
 
     public void assignUserToGroup(Account account, String userId, String groupCode) throws JsonProcessingException, AppworkException {
@@ -586,5 +679,9 @@ public class OrgChartService {
         assignment = createAssignment(account, position.getUnit().getId(), position.getId(), assignment.toPlatformString());
 
         addAssignmentToPersonRelation(account, assignment.getId(), new Member.TargetId(user.getPerson().getId()).toString());
+    }
+
+    void deletePerson(Long id) {
+        personRepository.deleteById(id);
     }
 }

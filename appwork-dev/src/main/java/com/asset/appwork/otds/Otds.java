@@ -105,6 +105,16 @@ public final class Otds {
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
+    public <T> String setMembersToGroup(String roleName, T data) {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .setData(data.toString())
+                .put(this.apiBaseUrl + String.format(API.GROUPS_ASSIGN_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+
+        return http.getResponse();
+    }
+
+    @SneakyThrows(UnsupportedEncodingException.class)
     public <T> String unAssignMembersFromGroup(String roleName, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
@@ -115,11 +125,11 @@ public final class Otds {
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public <T> String assignGroupsToGroup(String roleName, T data) {
+    public <T> String getGroupsInGroup(String roleName, T data) {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
-                .post(this.apiBaseUrl + String.format(API.GROUPS_ASSIGN_GROUPS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
+                .post(this.apiBaseUrl + String.format(API.GROUPS_GET_GROUPS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
         return http.getResponse();
     }
@@ -217,7 +227,7 @@ public final class Otds {
         LOGIN("/authentication/credentials"),
         CONSOLIDATION_CONSOLIDATE("/consolidation"),
         GROUPS_ASSIGN_MEMBERS("/groups/%s/members"),
-        GROUPS_ASSIGN_GROUPS("/groups/%s/groups"),
+        GROUPS_GET_GROUPS("/groups/%s/groups"),
         GROUPS_CREATE("/groups"),
         GROUPS_DELETE("/groups/%s"),
         GROUPS_GET("/groups/%s"),
