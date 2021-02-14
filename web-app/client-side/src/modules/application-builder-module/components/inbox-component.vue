@@ -166,7 +166,7 @@ export default {
               align: "start",
               filterable: false,
               value:
-                "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process",
+                "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.subject",
             },
             {
               text: "المنشئ",
@@ -179,7 +179,7 @@ export default {
             {
               text: "رقم الطلب",
               value:
-                "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestId",
+                "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestNumber",
             },
             {
               text: "",

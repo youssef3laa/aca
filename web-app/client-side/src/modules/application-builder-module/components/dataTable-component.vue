@@ -128,8 +128,7 @@
 
           <v-list>
             <v-list-item-group>
-            <v-list-item v-for="(i, index) in field.actions" :key="index">
-              <span v-on:click="handleAction(item, i)">
+            <v-list-item v-for="(i, index) in field.actions" :key="index" v-on:click="handleAction(item, i)">
                 <span v-if="i == 'edit'">
                   <v-list-item-title style="color: black; font-weight: bold; font-size: small">
                       <v-icon style="color: black; font-size: small">far fa-edit</v-icon>
@@ -161,7 +160,6 @@
                       {{ $t(i.name) }}
                     </v-list-item-title>
                 </span>
-              </span>
             </v-list-item>
             </v-list-item-group>
           </v-list>

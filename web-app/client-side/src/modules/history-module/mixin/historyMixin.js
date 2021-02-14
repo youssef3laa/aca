@@ -25,18 +25,21 @@ export default {
                 url: "history/"+ processName + "/" + entityId,
                 headers: [
                     {
-                        text: "القرار",
+                        text: "decision",
                         align: "start",
                         value: "decision",
                     },
                     {
-                        text: "الاسم",
-                        align: "start",
+                        text: "name",
                         value: "displayName",
+                    },
+                    {
+                        text: "theEntity",
+                        value: "unitName",
                     },
 
                     {
-                        text: "التاريخ",
+                        text: "date",
                         value: "approvalDate",
                     },
                 ],

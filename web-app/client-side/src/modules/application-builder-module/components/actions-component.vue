@@ -36,9 +36,9 @@ export default {
   props: ['actions'],
   data() {
     return {
-      cancelText: 'إلغاء',
-      saveText: 'حفظ',
-      sendText: 'إرسال',
+      cancelText: 'cancel',
+      saveText: 'save',
+      sendText: 'send',
     }
   },
   methods: {

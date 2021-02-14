@@ -78,10 +78,33 @@ export default {
           this.date = new Date(this.max).toISOString().split('T')[0]
         }
       }
-      if (this.field.readonly) {
+      if (this.field.min) {
         this.min = this.model[this.field.min]
+        if(this.min > this.date){
+          this.date = new Date(this.min).toISOString().split('T')[0]
+        }
+      }
+      if (this.field.readonly) {
+        this.readonly = this.model[this.field.readonly]
       }
     },
   },
+  created() {
+    if (this.field.max) {
+      this.max = this.model[this.field.max]
+      if(this.max < this.date){
+        this.date = new Date(this.max).toISOString().split('T')[0]
+      }
+    }
+    if (this.field.min) {
+      this.min = this.model[this.field.min]
+      if(this.min > this.date){
+        this.date = new Date(this.min).toISOString().split('T')[0]
+      }
+    }
+    if (this.field.readonly) {
+      this.readonly = this.model[this.field.readonly]
+    }
+  }
 }
 </script>

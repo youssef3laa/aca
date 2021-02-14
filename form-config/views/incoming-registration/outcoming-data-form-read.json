@@ -1,0 +1,52 @@
+{
+    "key": "outcomingData",
+    "inputs": [
+        {
+            "type": "InputComponent",
+            "label": "outcomingNumber",
+            "name": "outcomingNumber",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "outcomingDate",
+            "name": "outcomingDate",
+            "rule": "required",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "outcomingType",
+            "name": "outcomingType",
+            "rule": "required",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "numberOfAttachments",
+            "name": "numberOfAttachments",
+            "inputType": "number",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "attachmentsDescription",
+            "name": "attachmentsDescription",
+            "col": "4"
+        },
+        {
+            "type": "TextareaComponent",
+            "label": "notes",
+            "name": "notes",
+            "col": "12"
+        }
+    ],
+    "model": {
+        "outcomingType": "",
+        "outcomingNumber": "",
+        "outcomingDate": "",
+        "numberOfAttachments": "",
+        "attachmentsDescription": "",
+        "notes": ""
+    }
+}

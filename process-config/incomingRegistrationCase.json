@@ -1,0 +1,275 @@
+{
+    "processName": "incomingRegistrationCase",
+    "steps": {
+        "init": {
+            "nextStep": {
+                "AGN": "headOfAgencyComment",
+                "SCT": "headOfSectorComment",
+                "ADM": "headOfOfficeComment",
+                "OFC": "headOfOfficeComment",
+                "GRP": "headOfGroupComment",
+                "initiate": "memberMemoCreate"
+            }
+        },
+        "headOfAgencyComment": {
+            "component": "incomingCaseRegistration-comment",
+            "config": "incoming-case-registration-comment",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "direction": "down",
+                "minimumLevel": "sector",
+                "fields": ["comment"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "comment": "headOfSectorComment"
+            }
+        },
+        "headOfSectorComment": {
+            "component": "incomingCaseRegistration-comment",
+            "config": "incoming-case-registration-comment",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "direction": "down",
+                "minimumLevel": "office",
+                "fields": ["comment"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "comment": "headOfOfficeComment"
+            }
+        },
+        "headOfOfficeComment": {
+            "component": "incomingCaseRegistration-comment",
+            "config": "incoming-case-registration-comment",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "direction": "down",
+                "fields": ["comment"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "GRP": "headOfGroupComment",
+                "comment": "memberMemoCreate"
+            }
+        },
+        "headOfGroupComment": {
+            "component": "incomingCaseRegistration-comment",
+            "config": "incoming-case-registration-comment",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "direction": "down",
+                "fields": ["comment"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "comment": "memberMemoCreate"
+            }
+        },
+        "memberMemoCreate": {
+            "component": "incomingCaseRegistration-memoCreate",
+            "config": "incoming-case-registration-memo-create",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "direction": "up",
+                "fields": ["comment"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "memorandumCreate": "headOfGroupApproval"
+            }
+        },
+        "headOfGroupApproval": {
+            "component": "incomingCaseRegistration-approval",
+            "config": "incoming-case-registration-approval",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": ["comment", "opinion"],
+                "decisions": ["approve","requestModification","reject"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "approve": "headOfOfficeApproval",
+                "requestModification": "memberMemoCreate",
+                "reject": "end"
+            }
+        },
+        "headOfOfficeApproval": {
+            "component": "incomingCaseRegistration-approval",
+            "config": "incoming-case-registration-approval",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": ["comment", "opinion"],
+                "decisions": ["approve","requestModification","reject"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "approve": "headOfSectorApproval",
+                "requestModification": "memberMemoCreate",
+                "reject": "end"
+            }
+        },
+        "headOfSectorApproval": {
+            "component": "incomingCaseRegistration-approval",
+            "config": "incoming-case-registration-approval",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": ["comment", "opinion"],
+                "decisions": ["approve","redirect","requestModification","reject"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "approve": "headOfAgencyApproval",
+                "redirect": "headOfSectorComment",
+                "requestModification": "memberMemoCreate",
+                "reject": "end"
+            }
+        },
+        "headOfAgencyApproval": {
+            "component": "incomingCaseRegistration-approval",
+            "config": "incoming-case-registration-approval",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": ["comment", "opinion"],
+                "decisions": ["vice","approve","requestModification","reject"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "vice": "headOfADMVice",
+                "approve": "outcomingCreation",
+                "requestModification": "memberMemoCreate",
+                "reject": "end"
+            }
+        },
+        "headOfADMVice": {
+            "component": "incomingCaseRegistration-approval",
+            "config": "incoming-case-registration-approval",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": ["comment", "opinion"],
+                "decisions": ["approve","requestModification","reject"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "approve": "headOfSECVice",
+                "requestModification": "memberMemoCreate",
+                "reject": "end"
+            }
+        },
+        "headOfSECVice": {
+            "component": "incomingCaseRegistration-approval",
+            "config": "incoming-case-registration-approval",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": ["comment", "opinion"],
+                "decisions": ["approve","requestModification","reject"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "approve": "vicePresident",
+                "requestModification": "memberMemoCreate",
+                "reject": "end"
+            }
+        },
+        "vicePresident": {
+            "component": "incomingCaseRegistration-signature",
+            "config": "incoming-case-registration-signature",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": ["comment", "opinion"]
+            },
+            "nextStep": {
+                "comment": "viceSecretary"
+            }
+        },
+        "viceSecretary": {
+            "component": "incomingCaseRegistration-signature",
+            "config": "incoming-case-registration-signature",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": ["comment", "opinion"],
+                "decisions": ["president","approve","requestModification","reject"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "president": "headOfADMPresident",
+                "approve": "outcomingCreation",
+                "requestModification": "memberMemoCreate",
+                "reject": "end"
+            }
+        },
+        "headOfADMPresident": {
+            "component": "incomingCaseRegistration-signature",
+            "config": "incoming-case-registration-signature",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": ["comment", "opinion"],
+                "decisions": ["approve","requestModification","reject"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "approve": "headOfSECPresident",
+                "requestModification": "memberMemoCreate",
+                "reject": "end"
+            }
+        },
+        "headOfSECPresident": {
+            "component": "incomingCaseRegistration-signature",
+            "config": "incoming-case-registration-signature",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": ["comment", "opinion"],
+                "decisions": ["approve","requestModification","reject"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "approve": "president",
+                "requestModification": "memberMemoCreate",
+                "reject": "end"
+            }
+        },
+        "president": {
+            "component": "incomingCaseRegistration-signature",
+            "config": "incoming-case-registration-signature",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": ["comment", "opinion"]
+            },
+            "nextStep": {
+                "comment": "presidentSecretary"
+            }
+        },
+        "presidentSecretary": {
+            "component": "incomingCaseRegistration-signature",
+            "config": "incoming-case-registration-signature",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": ["comment", "opinion"],
+                "decisions": ["approve","requestModification","reject"],
+                "receiverTypes": ["single"]
+            },
+            "nextStep": {
+                "approve": "outcomingCreation",
+                "requestModification": "memberMemoCreate",
+                "reject": "end"
+            }
+        },
+        "outcomingCreation": {
+            "component": "incomingCaseRegistration-outcoming",
+            "config": "incoming-case-registration-outcoming",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "nextStep": {
+                "send": "performanceCorrection"
+            }
+        },
+        "performanceCorrection": {
+            "component": "incomingCaseRegistration-performance",
+            "config": "incoming-case-registration-performance",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "nextStep": {
+                "save": "end",
+                "tempSave": "memberMemoCreate"
+            }
+        }
+    }
+}

@@ -52,7 +52,7 @@ public class RequestService {
             long count = requestRepository.countDistinctByDateAfter(date) + 1;
             return sdf.format(date) + "-" + user.getId() + "-" + count;
         } catch (ParseException e) {
-            throw new AppworkException(ResponseCode.BAD_REQUEST);
+            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         }
     }
 

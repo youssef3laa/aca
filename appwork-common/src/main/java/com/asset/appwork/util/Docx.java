@@ -63,6 +63,7 @@ public class Docx {
                 {
                     tempValues += memoValue.getValue() + "\n";
                 }
+                tempValues = tempValues.replaceAll("<br>","<br></br>");
                 try {
                     wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n" +
                             "\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n" +

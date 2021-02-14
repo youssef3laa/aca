@@ -122,11 +122,13 @@ export default {
     }
   },
   watch: {
-    // field: function(newVal) {
-    //   if (newVal.readonly) {
-    //     this.readonly = newVal.readonly
-    //   }
-    // },
+    field: function(newVal) {
+      if(newVal.readonly == true || newVal.readonly == false){
+        this.readonly = newVal.readonly
+      }else if (newVal.readonly) {
+        this.readonly = this.model[newVal.readonly]
+      }
+    },
     val: {
       immediate: true,
       handler(newVal) {

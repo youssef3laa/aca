@@ -41,10 +41,18 @@ export default {
                     let response = await http.get('/request/create/temp')
                     console.log("Request Response: ", response)
                     localStorage.setItem("requestId",response.data.data.id)
-                    return response.data.data.id
+                    return response.data.data
                 } catch (error) {
                     console.error(error);
                 }
+            }
+        },
+        readRequest: async function(requestId) {
+            try{
+                let response = await http.get('/request/read/'+requestId);
+                return response.data.data;
+            } catch (error) {
+                console.error(error);
             }
         },
         readEntity: async function(entityName, entityId) {

@@ -88,6 +88,7 @@ import ProcessRoutingComponent from '../components/process-routing-component'
 import ReceiverFormComponent from '../components/receiver-form-component'
 import VersionGridComponent from '../components/version-grid-component'
 import ProcessStatusControl from '../components/process-status-control'
+import SaveProcessComponent from '../components/save-process-component'
 
 export default {
   name: 'FormBuilder',
@@ -118,7 +119,8 @@ export default {
     ProcessRoutingComponent,
     ReceiverFormComponent,
     VersionGridComponent,
-    ProcessStatusControl
+    ProcessStatusControl,
+    SaveProcessComponent
   },
   data() {
     return {
