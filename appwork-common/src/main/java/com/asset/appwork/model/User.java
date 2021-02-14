@@ -15,7 +15,7 @@ public class User extends BaseIdentity<User> {
     @Column(name = "UserId")
     String userId;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(
             name = "toPerson_Id",
             referencedColumnName = "Id"
