@@ -4,7 +4,7 @@ import { required, max } from 'vee-validate/dist/rules';
 import { localize } from 'vee-validate';
 
 extend('required', {
-  ...required,
+  ...required
 })
 
 extend('max', {

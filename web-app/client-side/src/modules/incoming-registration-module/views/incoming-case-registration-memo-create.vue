@@ -34,7 +34,7 @@
                 this.$refs.appBuilder.disableSection("mainData");
                 this.$refs.appBuilder.disableSection("caseData");
                 this.$refs.appBuilder.setModelData("approvalForm", {approval: this.inputSchema.router})
-                this.$refs.appBuilder.setModelData("historyTable", {historyTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)})
+                this.$refs.appBuilder.setModelData("historyTable", {historyTable: this.createHistoryTableModel(this.inputSchema.requestId)})
                 this.$refs.appBuilder.setModelData("memorandumForm", {memorandum: {requestId: this.inputSchema.requestId}})
 
                 let incomingRegistration = await this.readIncomingRegistration(this.inputSchema.entityId)

@@ -11,6 +11,14 @@ export default {
                 console.error(error);
             }
         },
+        async getHistoryByRequestId(requestId) {
+            try {
+                var response = await http.get("/history/" + requestId);
+                return response.data.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
         async setHistory(data) {
             console.log(data);
             try {
@@ -20,9 +28,9 @@ export default {
                 console.error(err);
             }
         },
-        createHistoryTableModel(processName, entityId) {
+        createHistoryTableModel(requestId) {
             return {
-                url: "history/"+ processName + "/" + entityId,
+                url: "history/"+ requestId,
                 headers: [
                     {
                         text: "decision",
