@@ -1,7 +1,6 @@
 <template>
   <div>
-    <splitpanes horizontal class="default-theme" style="height: 600px">
-      <pane class="bg-white" size="31">
+ 
         <!-- <InputFileComponent></InputFileComponent> -->
         <v-expansion-panels v-model="panel"
                             multiple dir="rtl">
@@ -24,18 +23,15 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
-      </pane>
-      <pane>
+
         <IframeComponent :val="iframeOjbect"></IframeComponent>
-      </pane
-      ></splitpanes>
+
   </div>
 </template>
 
 <script>
 import IframeComponent from "./iframe-component.vue";
-import {Pane, Splitpanes} from "splitpanes";
-import "splitpanes/dist/splitpanes.css";
+
 // import InputFileComponent from "./input-file-component"
 import AttachmentComponent from "./attachment-horizontal-component";
 import attachmentMixin from "../../../mixins/attachmentMixin";
@@ -45,8 +41,7 @@ export default {
   mixins:[attachmentMixin],
   components: {
     IframeComponent,
-    Splitpanes,
-    Pane,
+
     AttachmentComponent,
     // InputFileComponent
   },
