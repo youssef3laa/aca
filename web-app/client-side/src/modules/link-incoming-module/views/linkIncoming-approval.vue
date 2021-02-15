@@ -10,13 +10,13 @@ import AppBuilder from "../../application-builder-module/builders/app-builder";
 import historyMixin from "../../history-module/mixin/historyMixin";
 import linkingMixin from "../mixin/linkingMixin";
 import router from "../../../router";
+import incomingRegistrationMixin from "../../incoming-registration-module/mixins/incomig-registration-mixin";
 
 export default {
   name: "linkIncoming-approval",
-  mixins: [formPageMixin, historyMixin, linkingMixin],
+  mixins: [formPageMixin, historyMixin, incomingRegistrationMixin, linkingMixin],
   components: {
     AppBuilder,
-    // router,
   },
   data() {
     return {
@@ -45,71 +45,29 @@ export default {
     this.taskData = await this.getTaskData(this.taskId);
     this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
     this.loadForm(this.inputSchema.config, this.fillForm);
-
     this.$observable.subscribe("complete-step", this.submit);
   },
   methods: {
     fillForm: async function () {
-      this.$refs.appBuilder.disableSection("section1");
+      this.$refs.appBuilder.disableSection("coresspondenceDataSection");
       let entityName = this.inputSchema.entityName;
       let entityId = this.inputSchema.entityId;
-      console.log(this.inputSchema);
-      // get main entityData
-      // get requestId
-
-      // sourceLinkIncoming (entityId)
-      // targetLinkIncoming (entityId)
-      // requestId
-      // sourceRequestId
-      // targetRequestId
 
       let linkIncomingEntityData = await this.readEntity(entityName, entityId);
-      console.log(linkIncomingEntityData);
 
-      let entityData = await this.readEntity(
-          "ACA_Entity_generalProcess",
-          linkIncomingEntityData.sourceIncomingId
-      );
-      let parentEntityData = await this.getRequestData(
-          linkIncomingEntityData.sourceRequestId
-      );
-      console.log(parentEntityData);
+      let incomingRegistration = await this.readIncomingRegistration(linkIncomingEntityData.sourceIncomingId)
+      this.$refs.appBuilder.setModelData("mainData", incomingRegistration)
 
-      let workTypeObj = await this.getLookupByCategoryAndKey(
-          "workType",
-          entityData.workType
-      );
-      let incomingMeansObj = await this.getLookupByCategoryAndKey(
-          "incomingMeans",
-          entityData.incomingMeans
-      );
-      this.$refs.appBuilder.setModelData("form1", {
-        stepId: this.inputSchema.stepId,
-        subjectSummary: entityData.summary,
-        incomingUnit: entityData.incomingUnit,
-        workType: workTypeObj.arValue,
-        incomingMeans: incomingMeansObj.arValue,
-        writingDate: entityData.writingDate.split("Z")[0],
-      });
+      this.$refs.appBuilder.setModelData("historyTable", {historyTable: this.createHistoryTableModel(this.inputSchema.requestId),})
+      this.$refs.appBuilder.setModelData("approvalForm", {approval: this.inputSchema.router})
 
-      this.$refs.appBuilder.setModelData("form2", {
-        receiver: entityData,
-      });
-      this.$refs.appBuilder.setModelData("historyTable", {
-        taskTable: this.createHistoryTableModel(
-            this.inputSchema.process,
-            this.inputSchema.entityId
-        ),
-      });
+      let parentEntityData = await this.getRequestData(linkIncomingEntityData.targetRequestId)
       let data = [];
       data.push(parentEntityData);
       let model = {data};
       this.$observable.fire("linkParent", {
         type: "modelUpdate",
         model: model,
-      });
-      this.$refs.appBuilder.setModelData("approvalForm", {
-        approval: this.inputSchema.router,
       });
     },
     submit: function () {

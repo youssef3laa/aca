@@ -52,7 +52,7 @@
                 this.$refs.appBuilder.disableSection("caseData");
                 this.$refs.appBuilder.disableSection("outcomingData");
                 this.$refs.appBuilder.disableSection("outcomingIssueForm");
-                this.$refs.appBuilder.setModelData("historyTable", {historyTable: this.createHistoryTableModel(this.inputSchema.process, this.inputSchema.entityId)})
+                this.$refs.appBuilder.setModelData("historyTable", {historyTable: this.createHistoryTableModel(this.inputSchema.requestId)})
                 this.$refs.appBuilder.setModelData("opinionsTable", {opinionsTable: this.createOpinionTableModel(this.inputSchema.requestId)})
                 this.$refs.appBuilder.setModelData("memorandumForm", {memorandum: {requestId: this.inputSchema.requestId}})
                 this.$refs.appBuilder.setModelData("signatureForm", {signature: {requestId: this.inputSchema.requestId}})

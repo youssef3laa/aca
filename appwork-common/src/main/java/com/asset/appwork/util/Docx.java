@@ -22,11 +22,10 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Bassel on 19/01/2021.
@@ -44,7 +43,6 @@ public class Docx {
     public File exportJsonToDocx(Memos memo) throws AppworkException {
         try {
             WordprocessingMLPackage wordPackage = WordprocessingMLPackage.createPackage();
-            MainDocumentPart mainDocumentPart = wordPackage.getMainDocumentPart();
             NumberingDefinitionsPart ndp = new NumberingDefinitionsPart();
             wordPackage.getMainDocumentPart().addTargetPart(ndp);
             ndp.unmarshalDefaultNumbering();
@@ -55,26 +53,40 @@ public class Docx {
             try {
                 jsonNode = SystemUtil.convertStringToJsonNode(SystemUtil.readFile(System.getProperty("user.dir") + env.getProperty("memosPath") + memo.getJsonId() + ".json"));
                 String name = jsonNode.at("/app/pages/0/sections/0/forms/0/name").asText();
-                mainDocumentPart.addStyledParagraphOfText("Title", name);
+                String name2 = jsonNode.at("/app/pages/0/sections/0/forms/1/name").asText();
 
                 HashMap<String, String> memoValues = memo.getValues();
-                String tempValues = "";
-                for(Map.Entry<String, String> memoValue : memoValues.entrySet())
-                {
-                    tempValues += memoValue.getValue() + "\n";
-                }
-                tempValues = tempValues.replaceAll("<br>","<br></br>");
-                try {
+                Object[] memoValuesObjectArray = memoValues.values().toArray();
+                String[] memoValuesStringArray = Arrays.copyOf(memoValuesObjectArray, memoValuesObjectArray.length, String[].class);
+                String value = memoValuesStringArray[0];
+                value = value.replaceAll("<br>", "<br></br>");
+                String value2 = "";
+
+                if (!name2.isEmpty()) {
+                    value2 = memoValuesStringArray[1];
+                    value2 = value2.replaceAll("<br>", "<br></br>");
+
                     wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n" +
                             "\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n" +
                             "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
                             "<body>\n" +
-                            tempValues + "\n" +
+                            "<p style = 'font-size: 50px; font-weight: bold; text-align:right;'>" + name + "</p>" + "\n" + "<hr></hr>" +
+                            "<p style = 'text-align:right;'>" + value + "</p>" + "\n" +
+                            "<p style = 'font-size: 50px; font-weight: bold; text-align:right;'>" + name2 + "</p>" + "\n" + "<hr></hr>" +
+                            "<p style = 'text-align:right;'>" + value2 + "</p>" + "\n" +
                             "</body>\n" +
                             "</html>", null));
-                } catch (Docx4JException e) {
-                    e.printStackTrace();
-                    log.error("Docx: " + e.getMessage());
+                }
+                else
+                {
+                    wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n" +
+                            "\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n" +
+                            "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
+                            "<body>\n" +
+                            "<p style = 'font-size: 50px; font-weight: bold; text-align:right;'>" + name + "</p>" + "\n" + "<hr></hr>" +
+                            "<p style = 'text-align:right;'>" + value + "</p>" + "\n" +
+                            "</body>\n" +
+                            "</html>", null));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -83,7 +95,12 @@ public class Docx {
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy HH-mm-ss");
             Date date = new Date();
-            File file = new File("Memo" + memo.getRequestId() + " " + dateFormat.format(date) + ".docx");
+
+            if (!Files.isDirectory(Paths.get("Temp"))) {
+                File theDir = new File("Temp");
+                theDir.mkdirs();
+            }
+            File file = new File("Temp" + File.separator + "Memo" + memo.getRequestId() + " " + dateFormat.format(date) + ".docx");
             wordPackage.save(file);
             return file;
 

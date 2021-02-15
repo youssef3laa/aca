@@ -19,6 +19,7 @@ public class Memorandum {
     Long id;
     String requestId;
     String jsonId;
+    @Column(unique = true)
     String nodeId;
 
     @OneToMany(fetch = FetchType.EAGER)

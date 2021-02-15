@@ -45,10 +45,11 @@ export default {
     this.$observable.subscribe("retrieveMemo", async (data) => {
     try{
         var memoType = await this.getMemoJsonId(data.nodeId);
+        console.log(memoType);
         this.loadForm(memoType);
         await this.fillForm(data.nodeId);
+        console.log(data);
         this.nodeId = data.nodeId;
-        
     }
 
     catch(error){
@@ -63,9 +64,9 @@ export default {
       d: this.val,
       url: "lookup/get/category/memoType",
       selected: "",
-      nodeId:null,
+      nodeId:"",
       richText: {},
-      Memodata: [],
+      memoData: [],
       bwsId: 680482,
       app: {},
     };
@@ -91,10 +92,11 @@ export default {
     },
 
     async fillForm(nodeId) {
-      var Memodata = await this.getMemoData(nodeId);
-      console.log("MemoData", Memodata);
-      if (Memodata == undefined) return;
-      Memodata.memoValues.forEach((element) => {
+      var memoData = await this.getMemoData(nodeId);
+      console.log("MemoData", memoData);
+      this.selected = memoData.jsonId;
+      if (memoData == undefined) return;
+      memoData.memoValues.forEach((element) => {
         var model = { [element.jsonKey]: element.value };
         console.log(model);
         console.log(element);
