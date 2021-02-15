@@ -120,5 +120,6 @@
   "cancel": "إلغاء",
   "save": "حفظ",
   "temporarySave": "حفظ مؤقت",
-  "createLink": "إنشاء دورة عمل ربط وارد"
+  "createLink": "إنشاء دورة عمل ربط وارد",
+  "comments":"ملاحظات"
 }
