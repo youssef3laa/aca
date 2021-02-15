@@ -14,6 +14,7 @@ import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.service.OrgChartService;
+import com.asset.appwork.service.ProcessService;
 import com.asset.appwork.service.RequestService;
 import com.asset.appwork.soup.ProcessSOAP;
 import com.asset.appwork.util.SystemUtil;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -47,6 +49,8 @@ public class ProcessController {
     OrgChartService orgChartService;
     @Autowired
     RequestService requestService;
+    @Autowired
+    ProcessService processService;
 
     @PostMapping("/initiate")
     public ResponseEntity<AppResponse<String>> initiate(@RequestHeader("X-Auth-Token") String token, @RequestBody Request requestJson) {
@@ -174,24 +178,27 @@ public class ProcessController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @PostMapping("{processId}/pause")
-    public ResponseEntity<AppResponse<String>> pauseProcess(@RequestHeader("X-Auth-Token") String token, @PathVariable("processId") String processInstanceId) {
+    @PostMapping("/pause")
+    public ResponseEntity<AppResponse<String>> pauseProcess(@RequestHeader("X-Auth-Token") String token, @RequestBody OutputSchema outputSchema) {
         AppResponse.ResponseBuilder<String> responseBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) {
                 throw new AppworkException(ResponseCode.UNAUTHORIZED);
             }
-            String pauseProcessResponse = cordysService.sendRequest(account, new ProcessSOAP().pauseProcessMsg(processInstanceId));
-            log.info("sent pause process to process: " + processInstanceId + "\n and the response is :\n" + pauseProcessResponse);
-//            responseBuilder.status(2)
+            processService.pauseProcess(account, outputSchema);
+            responseBuilder.status(ResponseCode.SUCCESS);
+
         } catch (AppworkException e) {
             e.printStackTrace();
             log.error(e.getMessage());
             responseBuilder.status(e.getCode());
-        } catch (JsonProcessingException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
-            log.error(e.getMessage());
+            responseBuilder.status(ResponseCode.BAD_REQUEST);
+        } catch (IOException e) {
+            e.printStackTrace();
+            responseBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         return responseBuilder.build().getResponseEntity();

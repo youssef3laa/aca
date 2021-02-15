@@ -10,6 +10,7 @@
   "request-president-approval": "طلب موافقة رئيس الهيئة",
   "request-vice-approval": "طلب موافقة نائب رئيس الهيئة",
   "request-approve": "الموافقة على الطلب",
+  "processHasBeenSavedTemporarily": "تم حفظ الطلب مؤقتََا",
   "request-redirection": "إعادة توجيه",
   "request-modification": "طلب إستيفاء",
   "memoRandumFileType": "مذكرة العرض",

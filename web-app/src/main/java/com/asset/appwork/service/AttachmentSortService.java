@@ -36,8 +36,6 @@ public class AttachmentSortService {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-
-//            String url = SystemUtil.generateRestAPIBaseUrl(env, solution) + "/entities/" + entityName;
             JsonNode jsonNode = mapper.createObjectNode().set("Properties", mapper.valueToTree(attachmentSort));
             String dataJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
             Http http = new Http().setDoAuthentication(true)
@@ -73,7 +71,6 @@ public class AttachmentSortService {
     public AttachmentSort updateAttachmentSort(AttachmentSort attachmentSort) throws AppworkException {
         Optional<AttachmentSort> attachmentSortFoundOptional = attachmentSortRepository.findById(attachmentSort.getId());
         if (attachmentSortFoundOptional.isEmpty()) throw new AppworkException(ResponseCode.NOT_FOUND);
-//        AttachmentSort attachmentSortFound = attachmentSortFoundOptional.get();
         return attachmentSortRepository.save(attachmentSort);
     }
 
