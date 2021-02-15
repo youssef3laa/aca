@@ -3,8 +3,9 @@
     <validation-observer :ref="forms.key">
       <v-row>
         <!-- <div v-for="(field, key) in forms" :key="key"> -->
+        <!--v-if="field.show && field.show != false"-->
         <v-col
-          v-for="(field, key) in forms.inputs"
+          v-for="(field, key) in showField"
           :key="key"
           :cols="field.col"
           :md="field.col"
@@ -54,7 +55,6 @@
             v-on:update="updateText"
           ></component>
         </v-col>
-
         <!-- </div> -->
       </v-row>
     </validation-observer>
@@ -175,29 +175,39 @@ export default {
     saveValue: function() {},
   },
   props: ['forms', 'model'],
+  watch: {
+    model: function (newVal) {
+      this.formModel = newVal;
+    }
+  },
   created() {
     // console.log(this.model)
-    var self = this
-    if (this.forms.subscribe) {
-      // console.log('subscribe')
-      this.$observable.subscribe(this.forms.subscribe, function(data) {
-        if (data.type == 'modelUpdate') {
-          var keys = Object.keys(data.model)
-          // keys.forEach((key, index) => {
-            // console.log(index)
-          keys.forEach((key) => {
-            self.formModel[key] = data.model[key]
-          })
-          self.formModel.serial_num = data.model.serial_num
-        }
-        // console.log(data)
-      })
-    }
-    this.$observable.subscribe("validateModel", async (key)=>{
-      if(this.$refs[key])
-        this.forms.model['_valid'] =  await this.$refs[key].validate()
-    })
+    // var self = this
+    // if (this.forms.subscribe) {
+    //   // console.log('subscribe')
+    //   this.$observable.subscribe(this.forms.subscribe, function(data) {
+    //     if (data.type == 'modelUpdate') {
+    //       var keys = Object.keys(data.model)
+    //       // keys.forEach((key, index) => {
+    //         // console.log(index)
+    //       keys.forEach((key) => {
+    //         self.formModel[key] = data.model[key]
+    //       })
+    //       self.formModel.serial_num = data.model.serial_num
+    //     }
+    //     // console.log(data)
+    //   })
+    // }
+    // this.$observable.subscribe("validateModel", async (key)=>{
+    //   if(this.$refs[key])
+    //     this.forms.model['_valid'] =  await this.$refs[key].validate()
+    // })
   },
+  computed: {
+    showField: function () {
+      return this.forms.inputs.filter(i => ((i.show && i.show != false) || i.show == undefined))
+    }
+  }
 }
 </script>
 

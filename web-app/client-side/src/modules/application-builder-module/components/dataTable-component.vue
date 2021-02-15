@@ -1,18 +1,18 @@
 <template>
   <div>
     <v-row v-if="searchable">
-      <v-col :cols="7">
+      <v-col v-if="field.add == true" :cols="7">
         <button style="padding: 5px; margin: 20px" @click="handlAddButton()">
           <v-icon color="info">fas fa-plus</v-icon>
           <span> إضافة </span>
         </button>
       </v-col>
-      <v-col :cols="1">
+      <v-col v-if="field.filter == true"  :cols="1">
         <button style="padding: 5px; margin: 20px">
           <v-icon>fas fa-filter</v-icon>
         </button>
       </v-col>
-      <v-col :cols="4">
+      <v-col v-if="field.search == true"  :cols="4">
         <v-text-field
           v-model="search"
           append-icon="mdi-magnify"
@@ -186,15 +186,16 @@ export default {
   },
   computed:{
     searchable(){
-      if(this.field.searchable == false){
+        if(this.field.add == true || this.field.filter == true || this.field.search == true ){
+            return true;
+        }
         return false;
-      }
-      else{
-        return true;
-      }
     }
   },
   watch: {
+      search: function(){
+          this.getDataFromApi({ page: 1, itemsPerPage: 10 })
+      },
     options: {
       handler(event) {
         this.getDataFromApi(event);
@@ -247,6 +248,7 @@ export default {
       let params = this.d.params;
       params.page = page;
       params.size = limit;
+      if(this.field.search == true) params.search = this.search;
       const URL = this.d.url + "?" + new URLSearchParams(params).toString();
       http
         .get(URL)

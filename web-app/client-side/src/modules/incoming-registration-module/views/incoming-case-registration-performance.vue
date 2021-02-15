@@ -64,6 +64,9 @@
                 let outcomingData = await this.readOutcoming(incomingRegistration.outcomingId)
                 this.$refs.appBuilder.setModelData("outcomingData", outcomingData)
                 this.$refs.appBuilder.setModelData("outcomingIssueForm", outcomingData)
+                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "recipientName",{show: (outcomingData.recipientName)? true: false})
+                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "job",{show: (outcomingData.job)? true: false})
+                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "receivingAdministration",{show: (outcomingData.receivingAdministration)? true: false})
 
             },
             submit: function(){
