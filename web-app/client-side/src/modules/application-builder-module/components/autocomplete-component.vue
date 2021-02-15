@@ -46,7 +46,7 @@ export default {
       search: null,
       loading: false,
       readonly: null,
-      show: null,
+      show: true,
     }
   },
   methods: {

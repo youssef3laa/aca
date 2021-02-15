@@ -38,7 +38,7 @@ export default {
       d: this.val,
       readonly: null,
       password: this.field.password,
-      show: null,
+      show: true,
     }
   },
   methods: {

@@ -86,6 +86,7 @@ export default {
   },
   created: function() {
     this.syncUser()
+    console.log(this);
   },
 }
 </script>

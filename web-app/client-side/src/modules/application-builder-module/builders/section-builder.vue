@@ -1,11 +1,7 @@
 <template>
-  <v-card
-    v-if="sec.isCard"
-    v-bind:style="{ background: sec.background }"
-    
-    flat
-  >
+  <v-card v-if="sec.isCard" v-bind:style="{ background: sec.background }" flat>
     <span>
+
       <component
         :is="sec.type"
         :formData="formData"
@@ -16,7 +12,7 @@
     </span>
   </v-card>
   <span v-else>
-    <component :is="sec.type" :section="sec"></component>
+    <component :is="sec.type" :section="sec" :formData="sec.forms"></component>
   </span>
 </template>
 
@@ -27,6 +23,7 @@ import Resizable from '../builders/components/resizable-section-component'
 import TitleComponet from '../builders/components/title-component'
 import ModalSection from '../builders/components/modal-section-component'
 import ActionsSection from '../builders/components/actions-section-component'
+import TabsSection from '../builders/components/tabs-section-component'
 // import TabBuilder from './tab-builder'
 // import FormBuilder from './form-builder'
 // import { Splitpanes, Pane } from 'splitpanes'
@@ -41,6 +38,7 @@ export default {
     TitleComponet,
     ModalSection,
     ActionsSection,
+    TabsSection,
     // TabBuilder,
     // FormBuilder,
     // Splitpanes,
@@ -76,6 +74,9 @@ export default {
       // this.val = newVal
       this.sec = newVal
     },
+  },
+  mounted() {
+    console.log(this.section)
   },
   props: ['section'],
 }
