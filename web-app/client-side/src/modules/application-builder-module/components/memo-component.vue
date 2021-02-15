@@ -17,7 +17,9 @@
             @update="changeVal"
           >
           </AutocompleteComponent>
-          <AppBuilder style="overflow: hidden" ref="appBuilder" :app="app" />
+          <div style="max-height: 600px; overflow-y: auto">
+            <AppBuilder style="overflow-y: hidden" ref="appBuilder" :app="app" />
+          </div>
         </v-container>
       </pane>
     </splitpanes>
