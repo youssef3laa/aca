@@ -160,16 +160,9 @@ public class OrgChartService {
         if (oldParent.size() > 0)
             removeSubGroupsFromGroup(account, "U" + oldParent.get(0).getName());
 
-        Group relatedGroup = getGroupByName("U" + ((List<Unit>) unit.getParent()).get(0).getName(), true);
-        List<Group> groups = (List<Group>) ((List<Unit>) unit.getParent()).get(0).getGroup();
-        groups.forEach(group -> {
-            try {
-                addSubGroupToGroup(account, relatedGroup.getId(), group.getId());
-            } catch (AppworkException e) {
-                log.error(e.getMessage());
-                e.printStackTrace();
-            }
-        });
+        Group parentUnitGroup = getGroupByName("U" + ((List<Unit>) unit.getParent()).get(0).getName(), true);
+        Group childUnitGroup = getGroupByName("U" + unit.getName(), true);
+        addSubGroupToGroup(account, parentUnitGroup.getId(), childUnitGroup.getId());
     }
 
     public void addSubUnitToUnit(Account account, String parentUnitCode, String subUnitCode) throws AppworkException {
@@ -308,7 +301,7 @@ public class OrgChartService {
         return getGroup(platformGroupPostUpdate.getId());
     }
 
-    public Group getGroup(Long id) throws AppworkException {
+        public Group getGroup(Long id) throws AppworkException {
         return groupRepository.findById(id).orElseThrow(
                 () -> new AppworkException("Could not get Group Entity of id " + id, ResponseCode.READ_ENTITY_FAILURE)
         );
@@ -478,7 +471,7 @@ public class OrgChartService {
                 .addRelation(id, "Unit", props);
         Group group = getGroup(id);
 
-        addSubGroupToGroup(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), id);
+        addSubGroupToUnitGroup(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), id);
 
         Position position;
 
@@ -503,7 +496,7 @@ public class OrgChartService {
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group")
                 .addRelation(group.getId(), "Unit", props);
 
-        addSubGroupToGroup(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), group.getId());
+        addSubGroupToUnitGroup(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), group.getId());
 
         Position position;
         try {
@@ -536,11 +529,11 @@ public class OrgChartService {
     }
 
     public void addSubGroupToGroup(Account account, Long id, Long subGroupId) throws AppworkException {
-        Group parentGroup = getGroupByName("U" + getUnit(id).getName(), true);
+        Group parentGroup = getGroupByName(getUnit(id).getName(), true);
         Group childGroup = getGroup(subGroupId);
 
         String props = new Member.StringList(
-                Collections.singletonList(childGroup.getName() + "@" + env.getProperty("otds.partition"))
+                Collections.singletonList(SystemUtil.generateOtdsRoleUserCN(env, childGroup.getName()))
         ).toString();
 
         new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
@@ -550,6 +543,14 @@ public class OrgChartService {
 
     public void addSubGroupToGroup(Account account, String code, String subGroupCode) throws AppworkException {
         addSubGroupToGroup(account, getGroupByName(code).getId(), getGroupByName(subGroupCode).getId());
+    }
+
+    public void addSubGroupToUnitGroup(Account account, String unitCode, String subGroupCode) throws AppworkException {
+        addSubGroupToGroup(account, getGroupByName("U" + unitCode, true).getId(), getGroupByName(subGroupCode, true).getId());
+    }
+
+    public void addSubGroupToUnitGroup(Account account, Long unitId, Long subGroupId) throws AppworkException {
+        addSubGroupToGroup(account, getGroupByName("U" + getUnit(unitId).getName(), true).getId(), subGroupId);
     }
 
     public void removeSubGroupsFromGroup(Account account, Long groupId) throws AppworkException {
@@ -656,11 +657,19 @@ public class OrgChartService {
                 e.printStackTrace();
             }
         });
-        user.setPerson(null);
-        userRepository.save(user); // (Not needed)
-        deletePerson(person.getId());
+//        user.setPerson(null);
+//        userRepository.save(user); // (Not needed)
+//        deletePerson(person.getId());
         new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
                 .deleteUserByUserId(user.getUserId());
+
+        // TODO: Remove this after investigating why consolidation does not delete the item
+//        try {
+//            userRepository.deleteById(user.getId());
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//            e.printStackTrace();
+//        }
     }
 
     public void assignUserToGroup(Account account, String userId, String groupCode) throws JsonProcessingException, AppworkException {
