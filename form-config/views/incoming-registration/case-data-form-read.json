@@ -1,0 +1,35 @@
+{
+    "key": "caseData",
+    "inputs": [
+        {
+            "type": "InputComponent",
+            "label": "caseType",
+            "name": "caseType",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "caseNumber",
+            "name": "caseNumber",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "caseDate",
+            "name": "caseDate",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "caseName",
+            "name": "caseName",
+            "col": "4"
+        }
+    ],
+    "model": {
+        "caseType": "",
+        "caseNumber": "",
+        "caseDate": "",
+        "caseName": ""
+    }
+}

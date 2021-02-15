@@ -108,14 +108,9 @@ export default {
                             value: "action",
                           },
                         ],
-                        subHeaders: [
-                          {
-                            text: "Date",
-                            value: "TaskId",
-                          },
-                        ],
+                     
                         data: [],
-                        key: "DeliveryDate",
+                       
                         search: "",
                       },
                     },
@@ -161,7 +156,7 @@ export default {
         });
       });
     },
-    createTasks(data) {
+    createTasks() {
       this.$refs.appBuilder.setModelData("userHistoryTable", {
         taskTable: {
           url: null,
@@ -171,7 +166,7 @@ export default {
               align: "start",
               filterable: false,
               value:
-                "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process",
+                "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.subject",
             },
             {
               text: "المنشئ",
@@ -184,14 +179,14 @@ export default {
             {
               text: "رقم الطلب",
               value:
-                "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestId",
+                "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestNumber",
             },
             {
               text: "",
               value: "action",
             },
           ],
-          data: data,
+          data: [],
           search: "",
         },
       });
@@ -204,12 +199,14 @@ export default {
         });
       } else if ($event == "viewReceived") {
         this.sidebarItem = "viewReceived";
-        this.createTasks(this.getTasks());
+        this.createTasks();
+        this.getTasks()
       }
     },
   },
   mounted: function () {
-    this.createTasks(this.getTasks());
+    this.createTasks();
+    this.getTasks();
   },
   created() {
     this.$observable.subscribe("taskTable_view", (item) => {

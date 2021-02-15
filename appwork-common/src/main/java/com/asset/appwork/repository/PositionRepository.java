@@ -20,4 +20,6 @@ public interface PositionRepository extends GenericRepository<Position, Long> {
 
     List<Position> findAllByNameNotNull();
     Page<Position> findAllByNameNotNull(Pageable pageable);
+
+    void deleteByName(String name);
 }

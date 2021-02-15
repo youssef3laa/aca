@@ -12,7 +12,6 @@ import com.asset.appwork.platform.soap.Workflow;
 import com.asset.appwork.platform.util.CordysUtil;
 import com.asset.appwork.repository.ApprovalHistoryRepository;
 import com.asset.appwork.schema.OutputSchema;
-import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.util.ReflectionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
@@ -37,14 +36,12 @@ public class ModuleRouting {
     Account account;
     String cordysUrl;
     ApprovalHistoryRepository approvalHistoryRepository;
-    OrgChartService orgChartService;
 
-    public ModuleRouting(Account account, String cordysUrl, String config, ApprovalHistoryRepository approvalHistoryRepository, OrgChartService orgChartService) {
+    public ModuleRouting(Account account, String cordysUrl, String config, ApprovalHistoryRepository approvalHistoryRepository) {
         this.config = config;
         this.account = account;
         this.cordysUrl = cordysUrl;
         this.approvalHistoryRepository = approvalHistoryRepository;
-        this.orgChartService = orgChartService;
     }
 
     @Data
@@ -79,6 +76,15 @@ public class ModuleRouting {
             return initiateProcess(outputSchema);
         else
             return completeWorkflow(outputSchema);
+    }
+
+    public <T> String calculateOutputSchema(T outputSchema) throws AppworkException {
+        calculateNextStep(outputSchema);
+        String[] xml = {""};
+        ReflectionUtil.of(outputSchema).ifPresent("getXMLWithNameSpace", (s) -> {
+            xml[0] = (String) s;
+        });
+        return xml[0];
     }
 
     private <T> String initiateProcess(T outputSchema) throws AppworkException {
@@ -171,7 +177,7 @@ public class ModuleRouting {
                     nextStep = handleParallelTasks(outputSchema, routingConfig, currentStepId[0], parallelString);
                     break;
                 case commentString:
-                    nextStep = getIdFromNextSteps(routingConfig, currentStepId[0], commentString);
+                    nextStep = handleCommentCase(routingConfig, currentStepId[0], codeSelected[0]);
                     break;
                 case rejectString:
                     nextStep = breakString;
@@ -234,6 +240,14 @@ public class ModuleRouting {
         String step = getIdFromNextSteps(routingConfig, currentStepId, codeSelected);
         if (step.isEmpty()) {
             return getIdFromNextSteps(routingConfig, currentStepId, approveString);
+        }
+        return step;
+    }
+
+    private String handleCommentCase(RoutingConfig routingConfig, String currentStepId, String codeSelected){
+        String step = getIdFromNextSteps(routingConfig, currentStepId, codeSelected);
+        if (step.isEmpty()) {
+            return getIdFromNextSteps(routingConfig, currentStepId, commentString);
         }
         return step;
     }

@@ -47,6 +47,7 @@ export default {
     val: function(newVal, oldVal) {
       console.log(oldVal)
       this.d = newVal
+      this.readonly = this.field.readonly
     },
   },
 }

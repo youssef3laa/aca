@@ -15,5 +15,25 @@
   "logged-in-success": "Login Success",
   "CANNOT_CONNECT_TO_SERVER": "Cannot connect to the server",
   "chooseFileToOpenOrShow": "Choose a file to view or view its data",
-  "INVALID_CREDENTIALS": "Username or Password is wrong"
+  "INVALID_CREDENTIALS": "Username or Password is wrong",
+
+  "attachmentsDescription": "Attachments Description",
+  "confidentiality": "Confidentiality",
+  "constraint": "Constraint",
+  "correspondenceNumber": "Correspondence Number",
+  "incomingDate": "Incoming Date",
+  "incomingFrom": "Incoming From",
+  "incomingNumber": "Incoming Number",
+  "incomingType": "Incoming Type",
+  "jobType": "Job Type",
+  "numberOfAttachments": "Number Of Attachments",
+  "priorityLevel": "Priority Level",
+  "registrationNumber": "Registration Number",
+  "subject": "Subject",
+  "taskType": "Task Type",
+  "topicSummary": "Topic Summary",
+  "transferTo": "Transfer To",
+  "correspondenceData": "Correspondence Data",
+  "mainData": "Main Data",
+  "attachments": "Attachments"
 }

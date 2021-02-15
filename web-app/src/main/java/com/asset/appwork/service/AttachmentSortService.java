@@ -37,7 +37,7 @@ public class AttachmentSortService {
                     .setContentType(Http.ContentType.JSON_REQUEST)
                     .setData(dataJson)
                     .setHeader("SAMLArt", account.getSAMLart())
-                    .post("http://appworks-aca:8080/home/aca/app/entityRestService/api/AssetGeneralACA/entities/ACA_Entity_attachmentSort");
+                    .post("http://psuite.example.com:81/home/aca/app/entityRestService/api/AssetGeneralACA/entities/ACA_Entity_attachmentSort");
 
             if (!http.isSuccess())
                 throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
@@ -56,7 +56,7 @@ public class AttachmentSortService {
         Http http = new Http().setDoAuthentication(true)
                 .setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("SAMLArt", account.getSAMLart())
-                .delete("http://appworks-aca:8080/home/aca/app/entityRestService/api/AssetGeneralACA/entities/ACA_Entity_attachmentSort/items/" + id);
+                .delete("http://psuite.example.com:81/home/aca/app/entityRestService/api/AssetGeneralACA/entities/ACA_Entity_attachmentSort/items/" + id);
         System.out.println(account.getSAMLart());
         if (!http.isSuccess())
             throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));

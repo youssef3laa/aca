@@ -13,11 +13,13 @@
         <v-container>
           <AutocompleteComponent
             :field="{ name: field.label }"
-            :val="{ list: [], url: url }"
+            :val="{ value:selected, list: [], url: url }"
             @update="changeVal"
           >
           </AutocompleteComponent>
-          <AppBuilder style="overflow: hidden" ref="appBuilder" :app="app" />
+          <div style="max-height: 600px; overflow-y: auto">
+            <AppBuilder style="overflow-y: hidden" ref="appBuilder" :app="app" />
+          </div>
         </v-container>
       </pane>
     </splitpanes>
@@ -41,10 +43,25 @@ export default {
     Pane,
   },
   mixins: [memoComponentMixin, formPageMixin],
-  mounted() {
-    this.$observable.subscribe("retrieveMemo", (data) => {
-      this.selected = data.jsonId;
-      this.loadForm(this.selected, this.fillForm);
+  async mounted() {
+    this.$observable.subscribe("retrieveMemo", async (data) => {
+    try{
+        var memoType = await this.getMemoJsonId(data.nodeId);
+        console.log(memoType);
+                this.$refs.appBuilder.setAppData({
+          pages: [{ sections: [{ forms: [] }] }],
+        });
+        this.loadForm(memoType);
+        await this.fillForm(data.nodeId);
+        console.log(data);
+        this.nodeId = data.nodeId;
+    }
+
+    catch(error){
+      console.log(error);
+    }
+
+      // this.loadForm(this.selected, this.fillForm("722454"));
     });
   },
   data() {
@@ -52,8 +69,9 @@ export default {
       d: this.val,
       url: "lookup/get/category/memoType",
       selected: "",
+      nodeId:"",
       richText: {},
-      Memodata: [],
+      memoData: [],
       bwsId: 680482,
       app: {},
     };
@@ -62,6 +80,7 @@ export default {
 
   methods: {
     changeVal(event) {
+      this.nodeId = null;
       if (event.value.value) {
         this.$refs.appBuilder.setAppData({
           pages: [{ sections: [{ forms: [] }] }],
@@ -77,24 +96,29 @@ export default {
       }
     },
 
-    async fillForm() {
-      this.Memodata = await this.getMemoData(this.selected, this.d.requestId);
-      console.log("MemoData", this.d);
-      if (this.Memodata == undefined) return;
-      this.Memodata[this.Memodata.length - 1].memoValues.forEach((element) => {
+    async fillForm(nodeId) {
+      
+      var memoData = await this.getMemoData(nodeId);
+      console.log("MemoData", memoData);
+      this.selected = memoData.jsonId;
+      if (memoData == undefined) return;
+      memoData.memoValues.forEach((element) => {
         var model = { [element.jsonKey]: element.value };
         console.log(model);
         console.log(element);
         this.$refs.appBuilder.setModelData(element.jsonKey, model);
+        console.log("appbuilder",this.$refs.appBuilder)
       });
+      
     },
+    
 
-    triggerSubmit() {
+    async triggerSubmit() {
       var formKeys = this.$refs.appBuilder.getFormKeyByPageKey("memoPage");
       this.richText = {};
       formKeys.forEach((element) => {
         var data = this.$refs.appBuilder.getModelData(element);
-        this.richText[element] =   data[element] ;
+        this.richText[element] = data[element];
         console.log(data);
         console.log(element);
       });
@@ -102,10 +126,12 @@ export default {
       data = {
         requestId: this.d.requestId,
         jsonId: this.selected,
+        nodeId: this.nodeId,
         values: this.richText,
       };
 
-      this.setMemoData(data);
+      await this.setMemoData(data);
+      this.$observable.fire("refreshHorizontalAttachmentFiles");
     },
   },
   watch: {

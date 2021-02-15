@@ -11,11 +11,15 @@ export default {
             }
             categoryValue = categories[0][this.categoryId + "_2"];
 
-            let lookupObj = this.fileTypes.find((element) => element.value == categoryValue);
-            properties.fileTypeValue = lookupObj?.text ?? "قيمة غير معرفة";
+            if (categoryValue == -100) properties.fileTypeValue = this.$t('memoRandumFileType');
+            else {
+                let lookupObj = this.fileTypes.find((element) => element.value == categoryValue);
+                properties.fileTypeValue = lookupObj?.text ?? "قيمة غير معرفة";
+            }
+
         },
-        openFileInBrave: async function ({fileId, verNum}) {
-            this.toggleFileSelected(fileId);
+        openFileInBrave: async function ({fileId, verNum}, contextObj) {
+            this.toggleFileSelected(fileId, contextObj);
             let userToken;
             try {
                 userToken = await Http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {
@@ -222,6 +226,7 @@ export default {
         },
         openVersionsPopup: function (file) {
             console.log("openVersions popup === attachmentMixinjs");
+            console.log(file.properties);
             this.versionsDialogState = true;
             this.selectedFile.nodeId = file.properties.id
             this.selectedFile.modalTitle = file.properties.name;
@@ -244,10 +249,12 @@ export default {
             evt.dataTransfer.effectAllowed = "move";
             evt.dataTransfer.setData("itemID", file.properties.id);
         },
-        toggleFileSelected: function (nodeId) {
-            this.filesUploaded.forEach((element) => {
-                if (element.properties.id === nodeId) element.isActive = true;
-                else element.isActive = false;
+        // should be encapsulated and take all values from parameters
+        toggleFileSelected: function (nodeId, contextObj) {
+            let filesArray = this.filesUploaded;
+            if (filesArray === undefined) filesArray = contextObj.filesUploaded;
+            filesArray.forEach((element) => {
+                element.isActive = element.properties.id === nodeId;
             })
         }
     }

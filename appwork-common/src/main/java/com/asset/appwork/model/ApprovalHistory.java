@@ -3,10 +3,7 @@ package com.asset.appwork.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -14,20 +11,26 @@ import java.util.Date;
  */
 @Entity
 @Data
-@Table(name = "O9AssetGeneralACAACA_Entity_approval_history")
+@Table(name = "AssetGeneralACAACA_Entity_approval_history")
 public class ApprovalHistory {
     @Id
     Long id;
 
     String decision;
+    @Column(name = "\"comment\"")
     String comment;
     String userCN;
     String entityId;
     String processName;
     String stepId;
     String parent;
+    String readonlyComponent;
+    String requestId;
+    String requestNumber;
     @Transient
     String displayName;
+    @Transient
+    String unitName;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd , hh:mm:ss a")
     Date approvalDate;

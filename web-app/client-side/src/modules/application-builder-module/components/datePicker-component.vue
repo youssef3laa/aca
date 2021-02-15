@@ -32,6 +32,8 @@
         datePickerChanged()
         menu = false
       "
+      :max="max"
+      :min="min"
     ></v-date-picker>
   </v-menu>
 </template>
@@ -43,10 +45,12 @@ export default {
     return {
       date: new Date().toISOString().split('T')[0],
       menu: false,
+      max: null,
+      min: null
     }
   },
 
-  props: ['val', 'field'],
+  props: ['val', 'field', 'model'],
   methods: {
     datePickerChanged: function() {
       console.log('datePickerChanged')
@@ -68,7 +72,39 @@ export default {
   watch: {
     val: function(newVal) {
       this.date = newVal
+      if (this.field.max) {
+        this.max = this.model[this.field.max]
+        if(this.max < this.date){
+          this.date = new Date(this.max).toISOString().split('T')[0]
+        }
+      }
+      if (this.field.min) {
+        this.min = this.model[this.field.min]
+        if(this.min > this.date){
+          this.date = new Date(this.min).toISOString().split('T')[0]
+        }
+      }
+      if (this.field.readonly) {
+        this.readonly = this.model[this.field.readonly]
+      }
     },
   },
+  created() {
+    if (this.field.max) {
+      this.max = this.model[this.field.max]
+      if(this.max < this.date){
+        this.date = new Date(this.max).toISOString().split('T')[0]
+      }
+    }
+    if (this.field.min) {
+      this.min = this.model[this.field.min]
+      if(this.min > this.date){
+        this.date = new Date(this.min).toISOString().split('T')[0]
+      }
+    }
+    if (this.field.readonly) {
+      this.readonly = this.model[this.field.readonly]
+    }
+  }
 }
 </script>

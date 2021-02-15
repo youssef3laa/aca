@@ -1,0 +1,13 @@
+{
+    "key": "signatureForm",
+    "inputs": [
+        {
+            "type": "SignatureComponent",
+            "name": "signature",
+            "col": 12
+        }
+    ],
+    "model": {
+        "signature": {}
+    }
+}

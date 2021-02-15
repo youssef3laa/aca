@@ -31,6 +31,30 @@ export default {
                 console.error(error);
             }
         },
+        getRequest: async function(){
+            if(localStorage.getItem("requestId")){
+                let response = await http.get('/request/read/'+ localStorage.getItem("requestId"))
+                console.log("Request Response: ", response)
+                return response.data.data
+            }else{
+                try{
+                    let response = await http.get('/request/create/temp')
+                    console.log("Request Response: ", response)
+                    localStorage.setItem("requestId",response.data.data.id)
+                    return response.data.data
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        },
+        readRequest: async function(requestId) {
+            try{
+                let response = await http.get('/request/read/'+requestId);
+                return response.data.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
         readEntity: async function(entityName, entityId) {
             try{
                 let response = await http.get('/entity/read?entityName='+ entityName +'&entityId='+entityId);
@@ -72,6 +96,7 @@ export default {
             http.post("/process/initiate", data)
                 .then((response) => {
                     console.log(response);
+                    localStorage.removeItem("requestId")
                     // alert("Initiate Complete!");
                     router.push({name: 'HomePage'})
                 })

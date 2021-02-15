@@ -80,12 +80,16 @@ export default {
             return obj
           })
           this.items.list = res.filter((e) => {
-            console.log(e)
+            // console.log(e)
             return (e.name || '').indexOf(v || '') > -1
           })
-          console.log(this.items.list)
+          // console.log(this.items.list)
 
-          if (
+          if(this.val.default){
+            this.value = this.val.default
+            this.autocompleteChange()
+          }
+          else if (
             (v == null || v == '') &&
             this.field.autofill &&
             this.items.list.length == 1
@@ -115,27 +119,31 @@ export default {
         },
         type: 'autocompleteChange',
       })
-    },
+    }
   },
   watch: {
-    // field: function(newVal) {
-    //   if (newVal.readonly) {
-    //     this.readonly = newVal.readonly
-    //   }
-    // },
+    field: function(newVal) {
+      if(newVal.readonly == true || newVal.readonly == false){
+        this.readonly = newVal.readonly
+      }else if (newVal.readonly) {
+        this.readonly = this.model[newVal.readonly]
+      }
+    },
     val: {
       immediate: true,
-      handler(newVal, oldVal) {
-        console.log(oldVal)
+      handler(newVal) {
+        // console.log(oldVal)
         // this.val = newVal
         if (newVal.url) {
           this.items.list = []
           this.querySelections('', newVal.url)
         }
         this.items = newVal
-        this.value = newVal.value
-        console.log('val', this.val)
-        if (this.field.readonly) {
+        if(newVal.value != null || newVal.value != undefined) this.value = newVal.value
+        // console.log('val', this.val)
+        if(this.field.readonly == true || this.field.readonly == false){
+          this.readonly = this.field.readonly
+        }else if (this.field.readonly) {
           this.readonly = this.model[this.field.readonly]
         }
         if (this.field.show) {

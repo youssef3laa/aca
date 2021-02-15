@@ -10,12 +10,12 @@ import java.util.Collection;
 import java.util.HashSet;
 
 @Entity(name = "User")
-@Table(name = "O9OpenTextEntityIdentityComponentsIdentity")
+@Table(name = "OpenTextEntityIdentityComponentsIdentity")
 public class User extends BaseIdentity<User> {
     @Column(name = "UserId")
     String userId;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(
             name = "toPerson_Id",
             referencedColumnName = "Id"
@@ -25,9 +25,9 @@ public class User extends BaseIdentity<User> {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
-            name = "O9OpenTextEntityIdentityComponentsGroupIdentity",
+            name = "OpenTextEntityIdentityComponentsGroupIdentity",
             joinColumns = {@JoinColumn(name = "Identity_Id")},
-            inverseJoinColumns = {@JoinColumn(name = "GroupId9C84CA727C3E880E")}
+            inverseJoinColumns = {@JoinColumn(name = "GroupId92C16D4AB16D563D")}
     )
     @JsonProperty("groups")
     Collection<Group> group = new HashSet<>();
@@ -74,6 +74,6 @@ public class User extends BaseIdentity<User> {
     }
 
     public String getCN() {
-        return "cn=" + this.name + ",cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local";
+        return "cn=" + this.name + ",cn=organizational users,o=aca,cn=cordys,cn=defaultInst,o=example.com";
     }
 }

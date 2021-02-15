@@ -13,12 +13,13 @@ import java.util.Set;
  */
 @Entity
 @Data
-@Table(name = "O9AssetGeneralACAACA_Entity_Memos")
+@Table(name = "AssetGeneralACAACA_Entity_Memos")
 public class Memorandum {
     @Id
     Long id;
     String requestId;
     String jsonId;
+    @Column(unique = true)
     String nodeId;
 
     @OneToMany(fetch = FetchType.EAGER)

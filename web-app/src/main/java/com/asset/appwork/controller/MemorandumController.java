@@ -9,7 +9,9 @@ import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.Memorandum;
+import com.asset.appwork.model.memoValues;
 import com.asset.appwork.platform.soap.memorandumSOAP;
+import com.asset.appwork.repository.MemoValuesRepository;
 import com.asset.appwork.repository.MemosRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
@@ -46,6 +48,8 @@ public class MemorandumController {
     @Autowired
     MemosRepository memosRepository;
     @Autowired
+    MemoValuesRepository memoValuesRepository;
+    @Autowired
     Docx docx;
 
     @PostMapping("/create")
@@ -55,40 +59,66 @@ public class MemorandumController {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
+
             File file = docx.exportJsonToDocx(memo);
 
-
-
-            HashMap<String, String> values = new HashMap<>();
-            for (Map.Entry value : memo.getValues().entrySet()) {
-                String tempValue = "<![CDATA[" + value.getValue().toString() + "]]>";
-                values.put(value.getKey().toString(), tempValue);
-            }
-            memo.setValues(values);
-
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
-            CreateNode createNode = new CreateNode();
 
-            createNode.setType(144);
-            createNode.setName(file.getName());
-            createNode.setFile(new MockMultipartFile("file", new FileInputStream(file)));
-            //TODO get Ids from env or get them from request
-            createNode.setParent_id(680482L);
-            createNode.setCategory_id(717725L);
-            LinkedHashMap<String, String> categoryLinkedHashMap = new LinkedHashMap<>();
-            categoryLinkedHashMap.put("717725_2", file.getName());
-            Document document = appworkCSOperations.uploadNodeAndSetCategory(createNode, new AppworkCSOperations.DocumentQuery(), categoryLinkedHashMap);
+            if (memo.getNodeId() == null) {
 
-            memo.setNodeId(document.getProperties().getId());
+                HashMap<String, String> values = new HashMap<>();
+                for (Map.Entry value : memo.getValues().entrySet()) {
+                    String tempValue = "<![CDATA[" + value.getValue().toString() + "]]>";
+                    values.put(value.getKey().toString(), tempValue);
+                }
+                memo.setValues(values);
 
-            String addRecordToMemorandum = cordysService.sendRequest(account, new memorandumSOAP().createMemorandum(memo));
+                CreateNode createNode = new CreateNode();
 
-            String XMLtoJSON = SystemUtil.convertXMLtoJSON(addRecordToMemorandum);
-            ObjectMapper objectMapper = new ObjectMapper();
-            long id = objectMapper.readTree(XMLtoJSON).get("Body").get("CreateACA_Entity_MemosResponse").get("ACA_Entity_Memos").get("ACA_Entity_Memos-id").get("Id").asLong();
+                createNode.setType(144);
+                createNode.setName(file.getName());
+                createNode.setFile(new MockMultipartFile("file", new FileInputStream(file)));
+                //TODO get Ids from env or get them from request
+                createNode.setParent_id(680482L);
+                createNode.setCategory_id(717725L);
+                LinkedHashMap<String, String> categoryLinkedHashMap = new LinkedHashMap<>();
+                categoryLinkedHashMap.put("717725_2", file.getName());
+                Document document = appworkCSOperations.uploadNodeAndSetCategory(createNode, new AppworkCSOperations.DocumentQuery(), categoryLinkedHashMap);
 
-            String addRecordToMemorandumValues = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memo, id));
-            respBuilder.data(addRecordToMemorandumValues);
+                memo.setNodeId(document.getProperties().getId().toString());
+
+                categoryLinkedHashMap.clear();
+                // set special fileType for mozakret el 3ard
+                categoryLinkedHashMap.put("686057_2", String.valueOf(-100));
+                appworkCSOperations.updateCategoryOnNode(document.getProperties().getId(), 686057L, categoryLinkedHashMap);
+                String addRecordToMemorandum = cordysService.sendRequest(account, new memorandumSOAP().createMemorandum(memo));
+                String XMLtoJSON = SystemUtil.convertXMLtoJSON(addRecordToMemorandum);
+                ObjectMapper objectMapper = new ObjectMapper();
+                long id = objectMapper.readTree(XMLtoJSON).get("Body").get("CreateACA_Entity_MemosResponse").get("ACA_Entity_Memos").get("ACA_Entity_Memos-id").get("Id").asLong();
+
+                String addRecordToMemorandumValues = cordysService.sendRequest(account, new memorandumSOAP().createMemoValues(memo, id));
+                respBuilder.data(addRecordToMemorandumValues);
+
+
+            } else {
+                appworkCSOperations.addNodeVersion(Long.parseLong(memo.getNodeId()), new MockMultipartFile(file.getName(), new FileInputStream(file)));
+
+                Memorandum memorandum = memosRepository.findByNodeId(memo.getNodeId());
+                List<memoValues> values =  memorandum.getMemoValues();
+
+                values.forEach((val)->{
+                    for (Map.Entry value : memo.getValues().entrySet()) {
+                        if( val.getJsonKey().equals(value.getKey().toString())){
+                            val.setValue(value.getValue().toString());
+                            return;
+                        }
+                    }
+                });
+                memoValuesRepository.saveAll(values);
+                respBuilder.status(ResponseCode.SUCCESS);
+            }
+
+            file.delete();
 
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
@@ -114,17 +144,16 @@ public class MemorandumController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @GetMapping("/get/{jsonId}/{requestId}")
-    public ResponseEntity<AppResponse<List<Memorandum>>> getMemorandum(@RequestHeader("X-Auth-Token") String token,
-                                                                       @PathVariable("jsonId") String jsonId,
-                                                                       @PathVariable("requestId") String requestId) {
-        AppResponse.ResponseBuilder<List<Memorandum>> respBuilder = AppResponse.builder();
+    @GetMapping("/get/{nodeId}")
+    public ResponseEntity<AppResponse<Memorandum>> getMemorandum(@RequestHeader("X-Auth-Token") String token,
+                                                                 @PathVariable("nodeId") String nodeId) {
+        AppResponse.ResponseBuilder<Memorandum> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            List<Memorandum> s = memosRepository.findByJsonIdAndRequestId(jsonId, requestId);
-            if (s.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
+            Memorandum s = memosRepository.findByNodeId(nodeId);
+            if (s == null) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
             respBuilder.data(s);
 
         } catch (AppworkException e) {
@@ -138,4 +167,6 @@ public class MemorandumController {
         }
         return respBuilder.build().getResponseEntity();
     }
+
+
 }

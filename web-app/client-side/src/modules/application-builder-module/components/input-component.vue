@@ -10,7 +10,7 @@
       v-model="d"
       @input="onValueChange"
       @change="onChange"
-      :type="password ? 'password' : 'text'"
+      :type="field.inputType ? field.inputType : 'text'"
       :disabled="readonly"
       outlined
       v-if="show"
@@ -37,7 +37,7 @@ export default {
       eventName: this.field.eventName,
       d: this.val,
       readonly: null,
-      password: this.field.password,
+      // password: this.field.password,
       show: true,
     }
   },
@@ -63,10 +63,12 @@ export default {
       immediate: true,
       handler(newVal) {
         this.d = newVal
-        if (this.field.readonly) {
+        if(this.field.readonly == true || this.field.readonly == false){
+          this.readonly = this.field.readonly
+        }else if (typeof this.field.readonly == "undefined") {
           this.readonly = this.model[this.field.readonly]
         }
-        if (this.field.show) {
+        if (typeof this.field.show != "undefined"  && typeof this.model[this.field.show] != "undefined") {
           this.show = this.model[this.field.show]
         }
       },

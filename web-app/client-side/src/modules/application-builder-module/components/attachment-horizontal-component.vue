@@ -42,7 +42,7 @@
                 <v-col :cols="2" style="cursor: pointer" @click="openVersionsPopup(file)">
                     <v-icon color="#22B07D"> mdi-folder-multiple</v-icon>
                   </v-col>
-                 <v-col :cols="2" style="cursor: pointer" @click="retrieveMemo('memo2','294913')">
+                 <v-col :cols="2" style="cursor: pointer" @click="retrieveMemo(file.properties.id)">
                     <v-icon color="#22B07D"> mdi-file-document-edit</v-icon>
                   </v-col>
                 <!-- <v-col
@@ -102,8 +102,8 @@ export default {
     console.log(this.bwsId);
   },
   methods: {
-    retrieveMemo(jsonId, requestId){
-      var data={jsonId:jsonId, requestId:requestId};
+    retrieveMemo(nodeId){
+      var data={nodeId:nodeId};
       this.$observable.fire("retrieveMemo",data);
     },
     versionsModalClosed() {
@@ -135,7 +135,7 @@ export default {
     },
     openHorizontalFile: function (file) {
       // console.log(file.properties.id);
-      this.$emit("attachmentHorizontalChange",file)
+      this.$emit("attachmentHorizontalChange", {file, contextObj: this})
     },
 
   },
@@ -151,6 +151,9 @@ export default {
     });
 
     await this.listFiles();
+
+    this.$observable.subscribe("refreshHorizontalAttachmentFiles", this.listFiles);
+
   },
 };
 </script>

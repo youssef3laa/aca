@@ -11,6 +11,14 @@ export default {
                 console.error(error);
             }
         },
+        async getHistoryByRequestId(requestId) {
+            try {
+                var response = await http.get("/history/" + requestId);
+                return response.data.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
         async setHistory(data) {
             console.log(data);
             try {
@@ -20,23 +28,26 @@ export default {
                 console.error(err);
             }
         },
-        createHistoryTableModel(processName, entityId) {
+        createHistoryTableModel(requestId) {
             return {
-                url: "history/"+ processName + "/" + entityId,
+                url: "history/"+ requestId,
                 headers: [
                     {
-                        text: "القرار",
+                        text: "decision",
                         align: "start",
                         value: "decision",
                     },
                     {
-                        text: "الاسم",
-                        align: "start",
+                        text: "name",
                         value: "displayName",
+                    },
+                    {
+                        text: "theEntity",
+                        value: "unitName",
                     },
 
                     {
-                        text: "التاريخ",
+                        text: "date",
                         value: "approvalDate",
                     },
                 ],

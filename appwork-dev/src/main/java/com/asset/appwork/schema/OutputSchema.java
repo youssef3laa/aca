@@ -17,9 +17,9 @@ public class OutputSchema<T> {
     String subBP;
     String parentHistoryId;
     String process, processId, stepId;
-    String entityName, entityId;
+    String requestId, entityName;
     String component, config, readonlyComponent;
-    String decision, comment;
+    String decision, comment, opinion;
     String code, assignedCN;
     String receiverType;
     Router router = new Router();
@@ -36,14 +36,14 @@ public class OutputSchema<T> {
                 "<stepId>"+removeNull(this.stepId)+"</stepId>"+
                 "<process>"+removeNull(this.process)+"</process>"+
                 "<subBP>"+removeNull(this.subBP)+"</subBP>"+
-                "<entityName>"+removeNull(this.entityName)+"</entityName>"+
-                "<entityId>"+removeNull(this.entityId)+"</entityId>"+
+                "<requestId>"+removeNull(this.requestId)+"</requestId>"+
                 "<parentHistoryId>"+removeNull(this.parentHistoryId)+"</parentHistoryId>"+
                 "<component>"+removeNull(this.component)+"</component>"+
                 "<config>"+removeNull(this.config)+"</config>"+
                 "<readonlyComponent>"+removeNull(this.readonlyComponent)+"</readonlyComponent>"+
                 "<decision>"+removeNull(this.decision)+"</decision>"+
                 "<comment>"+removeNull(this.comment)+"</comment>"+
+                "<opinion>"+removeNull(this.opinion)+"</opinion>"+
                 "<breakProcess>"+removeNull(this.breakProcess)+"</breakProcess>"+
                 "<addApproval>"+removeNull(this.addApproval)+"</addApproval>"+
                 "<router>"+getObjectXML(this.router)+"</router>"+

@@ -45,8 +45,8 @@ h1 {
   }
   .red--text {
     color: #900 !important;
-    position: absolute;
-    top: 80px;
+    position: relative;
+    bottom: 25px;
   }
   .v-expansion-panel::before {
     box-shadow: none;
@@ -86,7 +86,7 @@ export default {
   },
   created: function() {
     this.syncUser()
-    console.log(this);
+    console.log("App This", this)
   },
 }
 </script>

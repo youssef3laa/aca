@@ -1,0 +1,92 @@
+{
+  "processName": "linkIncoming",
+  "steps": {
+    "init": {
+      "nextStep": {
+        "initiate": "headOfGroupStep"
+      }
+    },
+    "headOfGroupStep": {
+      "component": "linkIncoming-approval",
+      "config": "linkIncoming-approve",
+      "router": {
+        "direction": "up",
+        "fields": [
+          "comment"
+        ],
+        "decisions": [
+          "approve",
+          "reject",
+          "requestModification"
+        ],
+        "receiverTypes": [
+          "single"
+        ]
+      },
+      "nextStep": {
+        "approve": "headOfAdministrationStep",
+        "requestModification": "memberStep"
+      }
+    },
+    "headOfAdministrationStep": {
+      "component": "linkIncoming-approval",
+      "config": "linkIncoming-approve",
+      "router": {
+        "direction": "up",
+        "fields": [
+          "comment"
+        ],
+        "decisions": [
+          "approve",
+          "reject",
+          "requestModification"
+        ],
+        "receiverTypes": [
+          "single"
+        ]
+      },
+      "nextStep": {
+        "approve": "headOfSectorStep",
+        "requestModification": "memberStep"
+      }
+    },
+    "headOfSectorStep": {
+      "component": "linkIncoming-approval",
+      "config": "linkIncoming-approve",
+      "router": {
+        "direction": "up",
+        "fields": [
+          "comment"
+        ],
+        "decisions": [
+          "approve",
+          "reject",
+          "requestModification"
+        ],
+        "receiverTypes": [
+          "single"
+        ]
+      },
+      "nextStep": {
+        "approve": "end",
+        "requestModification": "memberStep"
+      }
+    },
+    "memberStep": {
+      "component": "linkIncoming-approval",
+      "config": "linkIncoming-approve",
+      "router": {
+        "direction": "up",
+        "fields": [
+          "comment"
+        ],
+        "receiverTypes": [
+          "single"
+        ]
+      },
+      "nextStep": {
+        "comment": "headOfGroupStep"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+    "key": "saveProcessForm",
+    "inputs": [
+        {
+            "type": "SaveProcessComponent",
+            "name": "approval"
+        }
+    ],
+    "model": {
+        "approval": {}
+    }
+}

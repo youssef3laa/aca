@@ -246,7 +246,7 @@ public class SystemUtil {
     }
 
     public static String generatePlatformRoleCN(Environment env, String roleName) {
-        return String.format("cn=%s,cn=organizational roles,o=%s,cn=cordys,cn=defaultInst,o=appworks-aca.local", roleName, env.getProperty("appwork.organization"));
+        return String.format("cn=%s,cn=organizational roles,o=%s,cn=cordys,cn=defaultInst,o=example.com", roleName, env.getProperty("appwork.organization"));
     }
 
     public static String generateRestAPIBaseUrl(Environment env, String solution) {

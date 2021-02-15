@@ -6,9 +6,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
 import javax.persistence.*;
+import java.sql.ResultSet;
 
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(
+                name = "Group.getGroupChildrenRecursivelyFilteredByUnitTypeCode",
+                procedureName = "APPWORKSDB.ACA_ORG_SP_getGroupChildrenRecursivelyFilteredByUnitTypeCode",
+                resultClasses = Group.class,
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "groupCode_param"),
+                        @StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "unitTypeCode_param"),
+                        @StoredProcedureParameter(mode = ParameterMode.REF_CURSOR, type = ResultSet.class, name = "output_cursor")
+                }
+        ),
+})
 @Entity(name = "Group")
-@Table(name = "O9OpenTextEntityIdentityComponentsIdentity")
+@Table(name = "OpenTextEntityIdentityComponentsIdentity")
 public class Group extends BaseIdentity<Group> {
     @Column(name = "GroupCode")
     String groupCode;
@@ -73,6 +86,6 @@ public class Group extends BaseIdentity<Group> {
     }
 
     public String getCn() {
-        return "cn=" + this.name + ",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=appworks-aca.local";
+        return "cn=" + this.name + ",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
     }
 }

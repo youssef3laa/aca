@@ -64,6 +64,34 @@ public class ApprovalHistoryController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @GetMapping("/{requestId}")
+    public ResponseEntity<AppResponse<List<ApprovalHistory>>> readHistory(@RequestHeader("X-Auth-Token") String token,
+                                                                          @PathVariable("requestId") String requestId,
+                                                                          @RequestParam(value = "page", required = false, defaultValue = "0") Integer pageNumber,
+                                                                          @RequestParam(value = "size", required = false, defaultValue = ""+1+"" ) Integer pageSize) {
+        AppResponse.ResponseBuilder<List<ApprovalHistory>> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+
+            Page<ApprovalHistory> histories = historyRepository.findByRequestIdOrderByApprovalDateDesc(requestId, PageRequest.of(pageNumber, pageSize));
+            if(histories.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
+
+            respBuilder.info("totalCount", histories.getTotalElements());
+            respBuilder.data(approvalHistoryService.addDisplayNameToApprovals(histories.getContent()));
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
     @GetMapping("/{processName}/{entityId}")
     public ResponseEntity<AppResponse<List<ApprovalHistory>>> readHistory(@RequestHeader("X-Auth-Token") String token,
                                                              @PathVariable("entityId") String entityId,
