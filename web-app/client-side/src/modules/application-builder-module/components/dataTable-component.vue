@@ -1,18 +1,18 @@
 <template>
   <div>
     <v-row v-if="searchable">
-      <v-col :cols="7">
+      <v-col v-if="field.add == true" :cols="7">
         <button style="padding: 5px; margin: 20px" @click="handlAddButton()">
           <v-icon color="info">fas fa-plus</v-icon>
           <span> إضافة </span>
         </button>
       </v-col>
-      <v-col :cols="1">
+      <v-col v-if="field.filter == true"  :cols="1">
         <button style="padding: 5px; margin: 20px">
           <v-icon>fas fa-filter</v-icon>
         </button>
       </v-col>
-      <v-col :cols="4">
+      <v-col v-if="field.search == true"  :cols="4">
         <v-text-field
           v-model="search"
           append-icon="mdi-magnify"
@@ -36,7 +36,6 @@
       :item-key="d.key"
       class="elevation-1"
     >
-    
       <template v-slot:item.action="{ item }">
         <!-- <v-btn
           color="primary"
@@ -47,60 +46,91 @@
 
         <v-menu offset-y left allow-overflow max-width="300">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn elevation="0" v-bind="attrs" v-on="on" style="min-height: 24px" width="24px">
+            <v-btn
+              elevation="0"
+              v-bind="attrs"
+              v-on="on"
+              style="min-height: 24px"
+              width="24px"
+            >
               <v-icon style="font-size: medium"> fas fa-ellipsis-h </v-icon>
             </v-btn>
           </template>
-
           <v-list>
             <v-list-item-group>
-            <v-list-item v-for="(i, index) in field.actions" :key="index">
-              <span v-on:click="handleAction(item, i)">
+              <v-list-item
+                v-for="(i, index) in field.actions"
+                :key="index"
+                v-on:click="handleAction(item, i)"
+              >
                 <span v-if="i == 'edit'">
-                  <v-list-item-title style="color: black; font-weight: bold; font-size: small">
-                      <v-icon style="color: black; font-size: small">far fa-edit</v-icon>
-                      <span style="margin: 3px"></span>
-                      {{ $t(i) }}
-                    </v-list-item-title>
+                  <v-list-item-title
+                    style="color: black; font-weight: bold; font-size: small"
+                  >
+                    <v-icon style="color: black; font-size: small"
+                      >far fa-edit</v-icon
+                    >
+                    <span style="margin: 3px"></span>
+                    {{ $t(i) }}
+                  </v-list-item-title>
                 </span>
 
                 <span v-else-if="i == 'delete'">
-                  <v-list-item-title style="color: black; font-weight: bold; font-size: small">
-                      <v-icon style="color: black; font-size: small">far fa-trash-alt</v-icon>
-                      <span style="margin: 3px"></span>
-                      {{ $t(i) }}
-                    </v-list-item-title>
+                  <v-list-item-title
+                    style="color: black; font-weight: bold; font-size: small"
+                  >
+                    <v-icon style="color: black; font-size: small"
+                      >far fa-trash-alt</v-icon
+                    >
+                    <span style="margin: 3px"></span>
+                    {{ $t(i) }}
+                  </v-list-item-title>
                 </span>
 
                 <span v-else-if="i == 'view'">
-                    <v-list-item-title style="color: black; font-weight: bold; font-size: small">
-                      <v-icon style="color: black; font-size: small">fas fa-expand-arrows-alt</v-icon>
-                      <span style="margin: 3px"></span>
-                      {{ $t(i) }}
-                    </v-list-item-title>
+                  <v-list-item-title
+                    style="color: black; font-weight: bold; font-size: small"
+                  >
+                    <v-icon style="color: black; font-size: small"
+                      >fas fa-expand-arrows-alt</v-icon
+                    >
+                    <span style="margin: 3px"></span>
+                    {{ $t(i) }}
+                  </v-list-item-title>
                 </span>
 
                 <span v-else>
-                  <v-list-item-title style="color: black; font-weight: bold; font-size: small">
-                      <v-icon style="color: black; font-size: small">{{i.icon}}</v-icon>
-                      <span style="margin: 3px"></span>
-                      {{ $t(i.name) }}
-                    </v-list-item-title>
+                  <v-list-item-title
+                    style="color: black; font-weight: bold; font-size: small"
+                  >
+                    <v-icon style="color: black; font-size: small">{{
+                      i.icon
+                    }}</v-icon>
+                    <span style="margin: 3px"></span>
+                    {{ $t(i.name) }}
+                  </v-list-item-title>
                 </span>
-              </span>
-            </v-list-item>
+              </v-list-item>
             </v-list-item-group>
           </v-list>
         </v-menu>
       </template>
-      <template  v-slot:expanded-item="{headers,item}">
-        <span v-for="(subHeader,i) in d.subHeaders" :key="i">
-        <td :colspan="headers.length"> {{subHeader.text}}:{{item[subHeader.value]}}</td>
-        </span>
+      <template v-slot:expanded-item="{ headers, item }">
+        <!-- <span v-for="(subHeader,i) in d.subHeaders" :key="i"> -->
+        <td
+          v-for="(subHeader, i) in d.subHeaders"
+          :key="i"
+          :colspan="headers.length"
+          style="margin:10px"
+        >
+          <div class="top-bot-margins" style="color:#9E9E9E">{{ $t(subHeader.text) }}</div>
+          <div class="top-bot-margins" >{{ item[subHeader.value] }} </div>
+        </td>
+        <!-- </span> -->
       </template>
     </v-data-table>
-        <v-data-table
-       v-else
+    <v-data-table
+      v-else
       :headers="d.headers"
       :items="d.data"
       :options.sync="options"
@@ -110,7 +140,6 @@
       :search="search"
       class="elevation-1"
     >
-    
       <template v-slot:item.action="{ item }">
         <!-- <v-btn
           color="primary"
@@ -121,46 +150,72 @@
 
         <v-menu offset-y left allow-overflow max-width="300">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn elevation="0" v-bind="attrs" v-on="on" style="min-height: 24px" width="24px">
+            <v-btn
+              elevation="0"
+              v-bind="attrs"
+              v-on="on"
+              style="min-height: 24px"
+              width="24px"
+            >
               <v-icon style="font-size: medium"> fas fa-ellipsis-h </v-icon>
             </v-btn>
           </template>
 
           <v-list>
             <v-list-item-group>
-            <v-list-item v-for="(i, index) in field.actions" :key="index" v-on:click="handleAction(item, i)">
+              <v-list-item
+                v-for="(i, index) in field.actions"
+                :key="index"
+                v-on:click="handleAction(item, i)"
+              >
                 <span v-if="i == 'edit'">
-                  <v-list-item-title style="color: black; font-weight: bold; font-size: small">
-                      <v-icon style="color: black; font-size: small">far fa-edit</v-icon>
-                      <span style="margin: 3px"></span>
-                      {{ $t(i) }}
-                    </v-list-item-title>
+                  <v-list-item-title
+                    style="color: black; font-weight: bold; font-size: small"
+                  >
+                    <v-icon style="color: black; font-size: small"
+                      >far fa-edit</v-icon
+                    >
+                    <span style="margin: 3px"></span>
+                    {{ $t(i) }}
+                  </v-list-item-title>
                 </span>
 
                 <span v-else-if="i == 'delete'">
-                  <v-list-item-title style="color: black; font-weight: bold; font-size: small">
-                      <v-icon style="color: black; font-size: small">far fa-trash-alt</v-icon>
-                      <span style="margin: 3px"></span>
-                      {{ $t(i) }}
-                    </v-list-item-title>
+                  <v-list-item-title
+                    style="color: black; font-weight: bold; font-size: small"
+                  >
+                    <v-icon style="color: black; font-size: small"
+                      >far fa-trash-alt</v-icon
+                    >
+                    <span style="margin: 3px"></span>
+                    {{ $t(i) }}
+                  </v-list-item-title>
                 </span>
 
                 <span v-else-if="i == 'view'">
-                    <v-list-item-title style="color: black; font-weight: bold; font-size: small">
-                      <v-icon style="color: black; font-size: small">fas fa-expand-arrows-alt</v-icon>
-                      <span style="margin: 3px"></span>
-                      {{ $t(i) }}
-                    </v-list-item-title>
+                  <v-list-item-title
+                    style="color: black; font-weight: bold; font-size: small"
+                  >
+                    <v-icon style="color: black; font-size: small"
+                      >fas fa-expand-arrows-alt</v-icon
+                    >
+                    <span style="margin: 3px"></span>
+                    {{ $t(i) }}
+                  </v-list-item-title>
                 </span>
 
                 <span v-else>
-                  <v-list-item-title style="color: black; font-weight: bold; font-size: small">
-                      <v-icon style="color: black; font-size: small">{{i.icon}}</v-icon>
-                      <span style="margin: 3px"></span>
-                      {{ $t(i.name) }}
-                    </v-list-item-title>
+                  <v-list-item-title
+                    style="color: black; font-weight: bold; font-size: small"
+                  >
+                    <v-icon style="color: black; font-size: small">{{
+                      i.icon
+                    }}</v-icon>
+                    <span style="margin: 3px"></span>
+                    {{ $t(i.name) }}
+                  </v-list-item-title>
                 </span>
-            </v-list-item>
+              </v-list-item>
             </v-list-item-group>
           </v-list>
         </v-menu>
@@ -176,7 +231,7 @@ export default {
   data() {
     return {
       search: "",
-      expanded:[],
+      expanded: [],
       totalItems: this.val.data.length,
       d: this.val,
       loading: true,
@@ -189,30 +244,31 @@ export default {
   },
   computed:{
     searchable(){
-      if(this.field.searchable == false){
+        if(this.field.add == true || this.field.filter == true || this.field.search == true ){
+            return true;
+        }
         return false;
-      }
-      else{
-        return true;
-      }
     }
   },
   watch: {
+      search: function(){
+          this.getDataFromApi({ page: 1, itemsPerPage: 10 })
+      },
     options: {
       handler(event) {
         this.getDataFromApi(event);
       },
       deep: true,
     },
-    val: function (newVal) {
+    val: function(newVal) {
       for (var key in newVal) {
         this.d[key] = newVal[key];
       }
-      if(this.d.data){
-        this.translateData()
+      if (this.d.data) {
+        this.translateData();
       }
-      if(this.d.headers){
-        this.translateHeaders()
+      if (this.d.headers) {
+        this.translateHeaders();
       }
       if (this.d.url) {
         this.getDataFromApi({ page: 1, itemsPerPage: 10 });
@@ -250,18 +306,18 @@ export default {
       let params = this.d.params;
       params.page = page;
       params.size = limit;
+      if(this.field.search == true) params.search = this.search;
       const URL = this.d.url + "?" + new URLSearchParams(params).toString();
       http
         .get(URL)
         .then((response) => {
-
-          if(response.data.data) {
-            this.totalItems = response.data.metaInfo.totalCount
-            this.d.data = response.data.data
-            this.translateData()
-          }else{
-            this.totalItems = 0
-            this.d.data = []
+          if (response.data.data) {
+            this.totalItems = response.data.metaInfo.totalCount;
+            this.d.data = response.data.data;
+            this.translateData();
+          } else {
+            this.totalItems = 0;
+            this.d.data = [];
           }
           this.loading = false;
         })
@@ -272,37 +328,37 @@ export default {
     translateData: function() {
       for (var key in this.d.data) {
         for (var i = 0; i < this.d.headers.length; i++) {
-          this.translateProperty(this.d.data[key], this.d.headers[i].value)
+          this.translateProperty(this.d.data[key], this.d.headers[i].value);
         }
       }
     },
     translateHeaders: function() {
       for (var key in this.d.headers) {
-          this.d.headers[key].text = this.$t(this.d.headers[key].text)
+        this.d.headers[key].text = this.$t(this.d.headers[key].text);
       }
     },
-    translateProperty: function (obj, prop) {
-      var parts = prop.split('.');
+    translateProperty: function(obj, prop) {
+      var parts = prop.split(".");
 
       if (Array.isArray(parts)) {
         var last = parts.pop(),
-                l = parts.length,
-                i = 1,
-                current = parts[0];
+          l = parts.length,
+          i = 1,
+          current = parts[0];
 
-        while(current && (obj = obj[current]) && i < l) {
+        while (current && (obj = obj[current]) && i < l) {
           current = parts[i];
           i++;
         }
 
-        if(obj) {
-          obj[last] = this.$t(obj[last])
+        if (obj) {
+          obj[last] = this.$t(obj[last]);
           // return obj[last];
         }
       } else {
-        throw 'parts is not valid array';
+        throw "parts is not valid array";
       }
-    }
+    },
   },
   created() {
     if (this.field.subscribe) {
@@ -315,17 +371,17 @@ export default {
             this.d[key] = data.model[key];
           });
         }
-        if(this.d.data){
-          this.translateData()
+        if (this.d.data) {
+          this.translateData();
         }
-        console.log(data)
-      })
+        console.log(data);
+      });
     }
   },
   mounted() {
-    console.log(this.d)
-    if(this.d.headers){
-      this.translateHeaders()
+    console.log(this.d);
+    if (this.d.headers) {
+      this.translateHeaders();
     }
   },
   props: ["val", "field"],
@@ -340,6 +396,11 @@ export default {
   height: 20px !important;
   min-width: 0 !important;
 }
+.top-bot-margins{
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
 /* .dropDown-menu {
   background: #96969f !important;
 } */

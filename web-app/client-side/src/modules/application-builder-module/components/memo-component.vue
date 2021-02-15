@@ -13,7 +13,7 @@
         <v-container>
           <AutocompleteComponent
             :field="{ name: field.label }"
-            :val="{ list: [], url: url }"
+            :val="{ value:selected, list: [], url: url }"
             @update="changeVal"
           >
           </AutocompleteComponent>
@@ -48,6 +48,9 @@ export default {
     try{
         var memoType = await this.getMemoJsonId(data.nodeId);
         console.log(memoType);
+                this.$refs.appBuilder.setAppData({
+          pages: [{ sections: [{ forms: [] }] }],
+        });
         this.loadForm(memoType);
         await this.fillForm(data.nodeId);
         console.log(data);
@@ -94,6 +97,7 @@ export default {
     },
 
     async fillForm(nodeId) {
+      
       var memoData = await this.getMemoData(nodeId);
       console.log("MemoData", memoData);
       this.selected = memoData.jsonId;
@@ -103,12 +107,13 @@ export default {
         console.log(model);
         console.log(element);
         this.$refs.appBuilder.setModelData(element.jsonKey, model);
+        console.log("appbuilder",this.$refs.appBuilder)
       });
       
     },
     
 
-    triggerSubmit() {
+    async triggerSubmit() {
       var formKeys = this.$refs.appBuilder.getFormKeyByPageKey("memoPage");
       this.richText = {};
       formKeys.forEach((element) => {
@@ -125,7 +130,8 @@ export default {
         values: this.richText,
       };
 
-      this.setMemoData(data);
+      await this.setMemoData(data);
+      this.$observable.fire("refreshHorizontalAttachmentFiles");
     },
   },
   watch: {

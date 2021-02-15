@@ -14,27 +14,27 @@ import outcomingMixin from "../mixins/outcoming-mixin";
 import opinionsMixin from "../../../mixins/opinionsMixin";
 import http from "../../core-module/services/http";
 
-export default {
-  name: "incoming-case-registration-outcoming",
-  mixins: [formPageMixin, historyMixin, incomingRegistrationMixin, opinionsMixin, outcomingMixin],
-  components: {AppBuilder},
-  data() {
-    return {
-      taskId: this.$route.params.taskId,
-      inputSchema: {},
-      app: {},
-      issueType: ""
-    }
-  },
-  async created() {
-    this.claimTask(this.taskId)
-    let taskData = await this.getTaskData(this.taskId)
-    this.inputSchema = taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment
-    this.loadForm(this.inputSchema.config, this.formLoaded)
-    this.$observable.subscribe("complete-step", this.submit)
-    // this.$observable.subscribe("outcomingIssueChange", (data) => {
-    //     if(data.model.outcomingIssueType.value){
-    //         let send = false
+    export default {
+        name: "incoming-case-registration-outcoming",
+        mixins: [formPageMixin, historyMixin, incomingRegistrationMixin, opinionsMixin, outcomingMixin],
+        components: {AppBuilder},
+        data() {
+            return {
+                taskId: this.$route.params.taskId,
+                inputSchema: {},
+                app: {},
+                issueType: ""
+            }
+        },
+        async created(){
+            this.claimTask(this.taskId)
+            let taskData = await this.getTaskData(this.taskId)
+            this.inputSchema = taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment
+            this.loadForm(this.inputSchema.config, this.formLoaded)
+            this.$observable.subscribe("complete-step", this.submit)
+            // this.$observable.subscribe("outcomingIssueChange", (data) => {
+            //     if(data.model.outcomingIssueType.value){
+            //         let send = false
             //         let delivery = false
             //         if(data.model.outcomingIssueType.value == "1" && this.issueType != "delivery"){
             //             this.issueType = "delivery"
@@ -58,13 +58,16 @@ export default {
                 this.$refs.appBuilder.setModelData("memorandumForm", {memorandum: {requestId: this.inputSchema.requestId}})
                 this.$refs.appBuilder.setModelData("signatureForm", {signature: {requestId: this.inputSchema.requestId}})
 
-              let incomingRegistration = await this.readIncomingRegistration(this.inputSchema.entityId)
-              this.$refs.appBuilder.setModelData("mainData", incomingRegistration)
-              let incomingCase = await this.readIncomingCase(incomingRegistration.jobEntityId)
-              this.$refs.appBuilder.setModelData("caseData", incomingCase)
-              let outcomingData = await this.readOutcoming(incomingRegistration.outcomingId)
-              this.$refs.appBuilder.setModelData("outcomingData", outcomingData)
-              this.$refs.appBuilder.setModelData("outcomingIssueForm", outcomingData)
+                let incomingRegistration = await this.readIncomingRegistration(this.inputSchema.entityId)
+                this.$refs.appBuilder.setModelData("mainData", incomingRegistration)
+                let incomingCase = await this.readIncomingCase(incomingRegistration.jobEntityId)
+                this.$refs.appBuilder.setModelData("caseData", incomingCase)
+                let outcomingData = await this.readOutcoming(incomingRegistration.outcomingId)
+                this.$refs.appBuilder.setModelData("outcomingData", outcomingData)
+                this.$refs.appBuilder.setModelData("outcomingIssueForm", outcomingData)
+                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "recipientName",{show: (outcomingData.recipientName)? true: false})
+                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "job",{show: (outcomingData.job)? true: false})
+                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "receivingAdministration",{show: (outcomingData.receivingAdministration)? true: false})
 
             },
           submit: async function () {

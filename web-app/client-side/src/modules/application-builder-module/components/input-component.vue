@@ -13,7 +13,6 @@
       :type="field.inputType ? field.inputType : 'text'"
       :disabled="readonly"
       outlined
-      v-if="show"
       color="outline"
     >
       <template #label>
@@ -59,6 +58,9 @@ export default {
   },
   props: ['val', 'field', 'model'],
   watch: {
+    model: function(newVal) {
+      console.log("inputModel", newVal)
+    },
     val: {
       immediate: true,
       handler(newVal) {

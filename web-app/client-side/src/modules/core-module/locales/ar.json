@@ -120,5 +120,7 @@
   "send": "إرسال",
   "cancel": "إلغاء",
   "save": "حفظ",
-  "temporarySave": "حفظ مؤقت"
+  "temporarySave": "حفظ مؤقت",
+  "createLink": "إنشاء دورة عمل ربط وارد",
+  "comments":"ملاحظات"
 }

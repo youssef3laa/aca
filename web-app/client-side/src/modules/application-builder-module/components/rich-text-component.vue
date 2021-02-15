@@ -10,7 +10,7 @@
         :label="field.name"
         v-model="content"
         :error="errors"
-        :val="val"
+        :val="content"
         :field="field"
         @input="updateValue"
       ></richtextValidateComponent>
@@ -56,7 +56,7 @@ export default {
   watch: {
     val: function(newVal, oldVal) {
       console.log(oldVal)
-      this.val = newVal
+      this.content = newVal
     },
   },
   $_veeValidate: {
