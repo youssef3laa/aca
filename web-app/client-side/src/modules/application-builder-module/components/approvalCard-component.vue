@@ -161,7 +161,7 @@
                 this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
                 break
               case "redirect":
-                this.updateDirection("down")
+                this.updateDirection("down-with")
                 if(this.d.receiverTypes.includes("multiple")) this.receiverTypes = this.getReceiverTypeOptions(["single","multiple"], null)
                 else this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
                 break

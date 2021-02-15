@@ -266,7 +266,11 @@
                         this.agency.val = this.getAutocompleteVal('org/unit/'+unitCode+'/up/all/unitTypeCode/AGN')
                         return
                     case "GRP":
-                        if(!sameLevel) this.disableNext("ADM",headRole)
+                        if(headRole){
+                            if(!sameLevel) this.disableNext("ADM",headRole)
+                        }else{
+                            if(!sameLevel) this.disableNext("GRP",true)
+                        }
                         this.agency.val = this.getAutocompleteVal('org/unit/'+unitCode+'/up/all/unitTypeCode/AGN')
                         return
                     default:

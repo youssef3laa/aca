@@ -9,7 +9,9 @@
           :cols="field.col"
           :md="field.col"
         >
-          <v-expansion-panels v-if="forms.type == 'collapse'">
+          <v-expansion-panels v-if="forms.type == 'collapse'"
+                              v-model="panel"
+                              multiple>
             <v-expansion-panel>
               <v-expansion-panel-header>
                 <v-row no-gutters>
@@ -127,6 +129,7 @@ export default {
       formModel: this.model,
       content: '',
       test: null,
+      panel: [0]
     }
   },
   methods: {

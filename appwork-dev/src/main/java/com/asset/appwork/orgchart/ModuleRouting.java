@@ -78,6 +78,15 @@ public class ModuleRouting {
             return completeWorkflow(outputSchema);
     }
 
+    public <T> String calculateOutputSchema(T outputSchema) throws AppworkException {
+        calculateNextStep(outputSchema);
+        String[] xml = {""};
+        ReflectionUtil.of(outputSchema).ifPresent("getXMLWithNameSpace", (s) -> {
+            xml[0] = (String) s;
+        });
+        return xml[0];
+    }
+
     private <T> String initiateProcess(T outputSchema) throws AppworkException {
         String response;
         try {
