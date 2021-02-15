@@ -13,6 +13,9 @@ import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -267,6 +270,18 @@ public class SystemUtil {
 
         }
         return fileContent.toString();
+    }
+
+    public static Pageable createPageable(Integer page, Integer size){
+        return PageRequest.of(page, size);
+    }
+
+    public static Pageable createPageable(Integer page, Integer size, String sortBy, String direction){
+        if(direction.toLowerCase().equals("desc")){
+            return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,sortBy));
+        }else{
+            return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC,sortBy));
+        }
     }
 
     public static class FixedUntypedObjectDeserializer extends UntypedObjectDeserializer {

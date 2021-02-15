@@ -854,6 +854,28 @@ public class OrgChartController {
     }
 
     @Transactional
+    @PutMapping("/unit/{unitCode}/subGroup/{subGroupCode}")
+    public ResponseEntity<AppResponse<JsonNode>> addSubGroupToUnitGroup(@RequestHeader("X-Auth-Token") String token,
+                                                                        @PathVariable("unitCode") String unitCode,
+                                                                        @PathVariable("subGroupCode") String subGroupCode
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            orgChartService.addSubGroupToUnitGroup(account, unitCode, subGroupCode);
+            respBuilder.info("infoMessage", "Sub Group added Successfully");
+            respBuilder.status(ResponseCode.SUCCESS);
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
     @DeleteMapping("/group/delete/{id}")
     public ResponseEntity<AppResponse<JsonNode>> deleteGroup(@RequestHeader("X-Auth-Token") String token,
                                                              @PathVariable("id") Long id

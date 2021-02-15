@@ -91,6 +91,27 @@ export default {
         form.model[property] = obj[property]
       }
     },
+    setFieldData: function (key,name,obj) {
+      if (!this.positions[key]) this.findKey(key)
+      let form = this.appData.pages[this.positions[key][0]].sections[
+              this.positions[key][1]
+              ].forms[this.positions[key][2]]
+      // eslint-disable-next-line no-prototype-builtins
+      if (form.hasOwnProperty('resizable'))
+        form = form.resizable.forms[this.positions[key][3]]
+
+      let input = undefined;
+      for (let index in form.inputs) {
+        if(form.inputs[index].name == name){
+          input = form.inputs[index]
+          break
+        }
+      }
+      if(!input) return;
+      for (let property in obj) {
+        input[property] = obj[property]
+      }
+    },
     appendForm: function (key, obj) {
       if (!this.positions[key]) this.findKey(key);
       this.appData.pages[this.positions[key][0]].sections[

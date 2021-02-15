@@ -32,20 +32,22 @@
             this.inputSchema = taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment
             this.loadForm(this.inputSchema.config, this.formLoaded)
             this.$observable.subscribe("complete-step", this.submit)
-            // this.$observable.subscribe("outcomingIssueChange", (data) => {
-            //     if(data.model.outcomingIssueType.value){
-            //         let send = false
-            //         let delivery = false
-            //         if(data.model.outcomingIssueType.value == "1" && this.issueType != "delivery"){
-            //             this.issueType = "delivery"
-            //             delivery = true
-            //         }else if(data.model.outcomingIssueType.value == "2" && this.issueType != "send"){
-            //             this.issueType = "send"
-            //             send = true
-            //         }
-            //         this.$refs.appBuilder.setModelData("outcomingIssueForm", {send: send, delivery: delivery})
-            //     }
-            // })
+            this.$observable.subscribe("outcomingIssueChange", (data) => {
+                if(data.model.outcomingIssueType.value){
+                    let send = false
+                    let delivery = false
+                    if(data.model.outcomingIssueType.value.value == "1"){
+                        this.issueType = "delivery"
+                        delivery = true
+                    }else if(data.model.outcomingIssueType.value.value == "2"){
+                        this.issueType = "send"
+                        send = true
+                    }
+                    this.$refs.appBuilder.setFieldData("outcomingIssueForm", "recipientName",{show: send})
+                    this.$refs.appBuilder.setFieldData("outcomingIssueForm", "job",{show: send})
+                    this.$refs.appBuilder.setFieldData("outcomingIssueForm", "receivingAdministration",{show: delivery})
+                }
+            })
         },
         methods: {
             formLoaded: async function(){
@@ -71,8 +73,14 @@
                 let outcomingData = this.$refs.appBuilder.getModelData("outcomingData");
                 outcomingData.outcomingType = outcomingData.outcomingType.value.value
                 let outcomingIssueData = this.$refs.appBuilder.getModelData("outcomingIssueForm");
-                outcomingIssueData.outcomingIssueType = outcomingIssueData.outcomingIssueType.value.value
-                outcomingIssueData.receivingAdministration = (outcomingIssueData.receivingAdministration.value)?outcomingIssueData.receivingAdministration.value.text: null
+                outcomingIssueData.outcomingIssueType = (outcomingIssueData.outcomingIssueType.value)?outcomingIssueData.outcomingIssueType.value.value:null
+                if(this.issueType == "delivery"){
+                    outcomingIssueData.receivingAdministration = (outcomingIssueData.receivingAdministration.value)?outcomingIssueData.receivingAdministration.value.text: null
+                    outcomingIssueData.recipientName = null
+                    outcomingIssueData.job = null
+                }else{
+                    outcomingIssueData.receivingAdministration = null
+                }
 
                 let outcoming = {id: this.outcoming.id,incomingIds: this.inputSchema.requestNumber}
                 for(let key in outcomingData){
@@ -88,7 +96,7 @@
                     process: this.inputSchema.process,
                     parentHistoryId: this.inputSchema.parentHistoryId,
 
-                    assignedCN: "cn=HCOC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com",
+                    assignedCN: "cn=HVCC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com",
                     decision: "send"
                 }
 

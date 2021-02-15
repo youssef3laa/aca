@@ -12,20 +12,20 @@
             "type": "InputComponent",
             "label": "recipientName",
             "name": "recipientName",
-            "show": "send",
+            "show": false,
             "col": "4"
         },
         {
             "type": "InputComponent",
             "label": "job",
             "name": "job",
-            "show": "send",
+            "show": false,
             "col": "4"
         },
         {
             "type": "AutoCompleteComponent",
             "name": "receivingAdministration",
-            "show": "delivery",
+            "show": false,
             "col": "4"
         }
     ],
@@ -37,8 +37,6 @@
             "url": "org/unit/COC/down/all/unitTypeCode/ADM"
         },
         "recipientName": "",
-        "job": "",
-        "send": true,
-        "delivery": true
+        "job": ""
     }
 }
