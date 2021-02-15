@@ -37,7 +37,7 @@ export default {
   watch: {
     val: function (newVal, oldVal) {
       console.log(oldVal);
-      this.val = newVal;
+      this.content = newVal;
     },
   },
   created() {

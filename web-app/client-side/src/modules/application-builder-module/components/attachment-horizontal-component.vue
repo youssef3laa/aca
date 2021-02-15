@@ -151,6 +151,9 @@ export default {
     });
 
     await this.listFiles();
+
+    this.$observable.subscribe("refreshHorizontalAttachmentFiles", this.listFiles);
+
   },
 };
 </script>
