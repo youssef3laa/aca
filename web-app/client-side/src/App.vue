@@ -67,6 +67,10 @@ h1 {
   background: white;
   border-radius: 10px;
 }
+
+.v-data-table > .v-data-table__wrapper tbody tr.v-data-table__expanded__content {
+  box-shadow: unset !important;
+}
 </style>
 <script>
 import TheNavbar from './modules/core-module/components/the-nav-bar'

@@ -6,13 +6,13 @@
 </template>
 
 <script>
-import AppBuilder from "../../application-builder-module/builders/app-builder";
-import formPageMixin from "../../../mixins/formPageMixin";
-import historyMixin from "../../history-module/mixin/historyMixin";
-import incomingRegistrationMixin from "../mixins/incomig-registration-mixin";
-import outcomingMixin from "../mixins/outcoming-mixin";
-import opinionsMixin from "../../../mixins/opinionsMixin";
-import http from "../../core-module/services/http";
+    import AppBuilder from "../../application-builder-module/builders/app-builder";
+    import formPageMixin from "../../../mixins/formPageMixin";
+    import historyMixin from "../../history-module/mixin/historyMixin";
+    import incomingRegistrationMixin from "../mixins/incomig-registration-mixin";
+    import outcomingMixin from "../mixins/outcoming-mixin";
+    import opinionsMixin from "../../../mixins/opinionsMixin";
+    import http from "../../core-module/services/http";
 
     export default {
         name: "incoming-case-registration-outcoming",
@@ -26,29 +26,15 @@ import http from "../../core-module/services/http";
                 issueType: ""
             }
         },
-        async created(){
+        async created() {
             this.claimTask(this.taskId)
             let taskData = await this.getTaskData(this.taskId)
             this.inputSchema = taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment
             this.loadForm(this.inputSchema.config, this.formLoaded)
             this.$observable.subscribe("complete-step", this.submit)
-            // this.$observable.subscribe("outcomingIssueChange", (data) => {
-            //     if(data.model.outcomingIssueType.value){
-            //         let send = false
-            //         let delivery = false
-            //         if(data.model.outcomingIssueType.value == "1" && this.issueType != "delivery"){
-            //             this.issueType = "delivery"
-            //             delivery = true
-            //         }else if(data.model.outcomingIssueType.value == "2" && this.issueType != "send"){
-            //             this.issueType = "send"
-            //             send = true
-            //         }
-            //         this.$refs.appBuilder.setModelData("outcomingIssueForm", {send: send, delivery: delivery})
-            //     }
-            // })
         },
         methods: {
-            formLoaded: async function(){
+            formLoaded: async function () {
                 this.$refs.appBuilder.disableSection("mainData");
                 this.$refs.appBuilder.disableSection("caseData");
                 this.$refs.appBuilder.disableSection("outcomingData");
@@ -65,40 +51,39 @@ import http from "../../core-module/services/http";
                 let outcomingData = await this.readOutcoming(incomingRegistration.outcomingId)
                 this.$refs.appBuilder.setModelData("outcomingData", outcomingData)
                 this.$refs.appBuilder.setModelData("outcomingIssueForm", outcomingData)
-                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "recipientName",{show: (outcomingData.recipientName)? true: false})
-                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "job",{show: (outcomingData.job)? true: false})
-                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "receivingAdministration",{show: (outcomingData.receivingAdministration)? true: false})
-
+                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "recipientName", {show: !!(outcomingData.recipientName)})
+                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "job", {show: !!(outcomingData.job)})
+                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "receivingAdministration", {show: !!(outcomingData.receivingAdministration)})
             },
-          submit: async function () {
-            let approvalForm = this.$refs.appBuilder.getModelData("saveProcessForm");
+            submit: async function () {
+                let approvalForm = this.$refs.appBuilder.getModelData("saveProcessForm");
 
-            let dataObj = {
-              requestId: this.inputSchema.requestId,
-              taskId: this.taskId,
-              stepId: this.inputSchema.stepId,
-              process: this.inputSchema.process,
-              parentHistoryId: this.inputSchema.parentHistoryId,
-              assignedCN: "",
-              decision: approvalForm.approval.decision
-            }
-            console.log("SaveProcess", approvalForm)
-            try {
-              if (approvalForm.approval.decision === "tempSave") {
-                dataObj.extraData = {
-                  pauseDate: new Date().toISOString(),
-                  resumeDate: approvalForm.approval.displayDate
+                let dataObj = {
+                    requestId: this.inputSchema.requestId,
+                    taskId: this.taskId,
+                    stepId: this.inputSchema.stepId,
+                    process: this.inputSchema.process,
+                    parentHistoryId: this.inputSchema.parentHistoryId,
+                    assignedCN: "",
+                    decision: approvalForm.approval.decision
                 }
-                let processPauseResponse = await http.post("/process/pause", dataObj);
-                this.$refs.alertComponent._alertSuccess({message: "processHasBeenSavedTemporarily"})
-                console.log(processPauseResponse)
-              } else if (approvalForm.approval.decision === "save") {
-                this.completeStep(dataObj);
-              }
-            } catch (e) {
-              console.error(e);
+                console.log("SaveProcess", approvalForm)
+                try {
+                    if (approvalForm.approval.decision === "tempSave") {
+                        dataObj.extraData = {
+                            pauseDate: new Date().toISOString(),
+                            resumeDate: approvalForm.approval.displayDate
+                        }
+                        let processPauseResponse = await http.post("/process/pause", dataObj);
+                        this.$refs.alertComponent._alertSuccess({message: "processHasBeenSavedTemporarily"})
+                        console.log(processPauseResponse)
+                    } else if (approvalForm.approval.decision === "save") {
+                        this.completeStep(dataObj);
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
             }
-          }
         }
     }
 </script>
