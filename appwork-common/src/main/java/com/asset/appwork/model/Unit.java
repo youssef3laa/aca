@@ -43,6 +43,7 @@ import java.util.HashSet;
 })
 @Entity(name = "Unit")
 @Table(name = "OpenTextEntityIdentityComponentsIdentity")
+//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id", scope = Unit.class)
 public class Unit extends BaseIdentity<Unit> {
     @Column(name = "UnitTypeCode")
     String unitTypeCode;

@@ -26,9 +26,9 @@ public class RequestService {
     @Autowired
     OrgChartService orgChartService;
 
-    public void updateRequest(OutputSchema outputSchema, String username, String entityId, String subject, String status) throws AppworkException{
+    public void updateRequest(OutputSchema outputSchema, String username, String entityId, String subject, String status) throws AppworkException {
         Optional<RequestEntity> request = requestRepository.findById(Long.parseLong(outputSchema.getRequestId()));
-        if(request.isPresent()){
+        if (request.isPresent()) {
             request.get().setDate(new Date());
             request.get().setInitiator(username);
             request.get().setEntityName(outputSchema.getEntityName());
@@ -39,7 +39,7 @@ public class RequestService {
 
             requestRepository.save(request.get());
         } else {
-          throw new AppworkException(ResponseCode.UPDATE_ENTITY_FAILURE);
+            throw new AppworkException(ResponseCode.UPDATE_ENTITY_FAILURE);
         }
     }
 
@@ -60,8 +60,12 @@ public class RequestService {
     public List<RequestEntity> getRequestsByProcessAndDateAndSubjectAndRequestNumber(@NonNull String process,
                                                                                      String subject,
                                                                                      String requestNumber) {
-
         return requestRepository.getRequestsByProcessAndDateAndSubjectAndRequestNumber(process, subject, requestNumber);
+    }
 
+    public RequestEntity getRequestEntityById(Long requestId) throws AppworkException {
+        Optional<RequestEntity> optionalRequestEntity = requestRepository.findById(requestId);
+        if (optionalRequestEntity.isEmpty()) throw new AppworkException(ResponseCode.NOT_EXIST);
+        return optionalRequestEntity.get();
     }
 }

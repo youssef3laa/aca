@@ -55,7 +55,7 @@
                     model: requestEntities.data
                 });
 
-                this.$observable.subscribe("linkingTable_view", async (item) => {
+                this.$observable.subscribe("linkingTable_createLink", async (item) => {
                     try {
                         item = item.item;
                         console.log("linkingTable_view", item);

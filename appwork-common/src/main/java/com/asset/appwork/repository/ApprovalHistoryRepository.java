@@ -12,11 +12,11 @@ import org.springframework.stereotype.Repository;
 public interface ApprovalHistoryRepository extends GenericRepository<ApprovalHistory, Long> {
 
 //    List<ApprovalHistory> findByProcessNameAndEntityId(String processName, String entityId);
-    Page<ApprovalHistory> findByRequestIdOrderByApprovalDateDesc(String requestId, Pageable pageable);
+Page<ApprovalHistory> findByRequestIdOrderByApprovalDateAsc(String requestId, Pageable pageable);
 
-    Page<ApprovalHistory> findByProcessNameAndEntityIdOrderByApprovalDateDesc(String processName, String entityId, Pageable pageable);
+    Page<ApprovalHistory> findByProcessNameAndEntityIdOrderByApprovalDateAsc(String processName, String entityId, Pageable pageable);
 
 //    Optional<ApprovalHistory> findTop1ByProcessNameAndEntityIdOrderByIdDesc(String processName, String entityId);
 
-    Page<ApprovalHistory> findByUserCNOrderByApprovalDateDesc(String userCN,Pageable pageable);
+    Page<ApprovalHistory> findByUserCNOrderByApprovalDateAsc(String userCN, Pageable pageable);
 }

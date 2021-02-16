@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +20,12 @@ import java.util.Optional;
 @Service
 public class AttachmentSortService {
 
+
     @Autowired
     AttachmentSortRepository attachmentSortRepository;
+
+    @Autowired
+    Environment env;
 
     public List<AttachmentSort> getAttachmentSort(String requestEntityId, String bwsId) {
 
@@ -37,10 +42,10 @@ public class AttachmentSortService {
                     .setContentType(Http.ContentType.JSON_REQUEST)
                     .setData(dataJson)
                     .setHeader("SAMLArt", account.getSAMLart())
-                    .post("http://psuite.example.com:81/home/aca/app/entityRestService/api/AssetGeneralACA/entities/ACA_Entity_attachmentSort");
+                    .post(getBaseURL());
 
             if (!http.isSuccess())
-                throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+                throw new AppworkException(http.getResponse(), ResponseCode.INTERNAL_SERVER_ERROR);
 
             String id = mapper.readTree(http.getResponse()).get("Identity").get("Id").textValue();
             attachmentSort.setId(Long.valueOf(id));
@@ -56,7 +61,7 @@ public class AttachmentSortService {
         Http http = new Http().setDoAuthentication(true)
                 .setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("SAMLArt", account.getSAMLart())
-                .delete("http://psuite.example.com:81/home/aca/app/entityRestService/api/AssetGeneralACA/entities/ACA_Entity_attachmentSort/items/" + id);
+                .delete(getBaseURL() + "/items/" + id);
         System.out.println(account.getSAMLart());
         if (!http.isSuccess())
             throw new AppworkException(http.getResponse(), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
@@ -66,7 +71,12 @@ public class AttachmentSortService {
     public AttachmentSort updateAttachmentSort(AttachmentSort attachmentSort) throws AppworkException {
         Optional<AttachmentSort> attachmentSortFoundOptional = attachmentSortRepository.findById(attachmentSort.getId());
         if (attachmentSortFoundOptional.isEmpty()) throw new AppworkException(ResponseCode.NOT_FOUND);
-//        AttachmentSort attachmentSortFound = attachmentSortFoundOptional.get();
         return attachmentSortRepository.save(attachmentSort);
+    }
+
+    public String getBaseURL() {
+        String solution = "AssetGeneralACA";
+        String entityName = "ACA_Entity_attachmentSort";
+        return SystemUtil.generateRestAPIBaseUrl(env, solution) + "/entities/" + entityName;
     }
 }

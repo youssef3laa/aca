@@ -6,12 +6,13 @@
 </template>
 
 <script>
-    import AppBuilder from "../../application-builder-module/builders/app-builder";
-    import formPageMixin from "../../../mixins/formPageMixin";
-    import historyMixin from "../../history-module/mixin/historyMixin";
-    import incomingRegistrationMixin from "../mixins/incomig-registration-mixin";
-    import outcomingMixin from "../mixins/outcoming-mixin";
-    import opinionsMixin from "../../../mixins/opinionsMixin";
+import AppBuilder from "../../application-builder-module/builders/app-builder";
+import formPageMixin from "../../../mixins/formPageMixin";
+import historyMixin from "../../history-module/mixin/historyMixin";
+import incomingRegistrationMixin from "../mixins/incomig-registration-mixin";
+import outcomingMixin from "../mixins/outcoming-mixin";
+import opinionsMixin from "../../../mixins/opinionsMixin";
+import http from "../../core-module/services/http";
 
     export default {
         name: "incoming-case-registration-outcoming",
@@ -64,23 +65,40 @@
                 let outcomingData = await this.readOutcoming(incomingRegistration.outcomingId)
                 this.$refs.appBuilder.setModelData("outcomingData", outcomingData)
                 this.$refs.appBuilder.setModelData("outcomingIssueForm", outcomingData)
+                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "recipientName",{show: (outcomingData.recipientName)? true: false})
+                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "job",{show: (outcomingData.job)? true: false})
+                this.$refs.appBuilder.setFieldData("outcomingIssueForm", "receivingAdministration",{show: (outcomingData.receivingAdministration)? true: false})
 
             },
-            submit: function(){
-                let approvalForm = this.$refs.appBuilder.getModelData("saveProcessForm");
+          submit: async function () {
+            let approvalForm = this.$refs.appBuilder.getModelData("saveProcessForm");
 
-                console.log("SaveProcess", approvalForm)
-
-                this.completeStep({
-                    taskId: this.taskId,
-                    stepId: this.inputSchema.stepId,
-                    process: this.inputSchema.process,
-                    parentHistoryId: this.inputSchema.parentHistoryId,
-
-                    assignedCN: "",
-                    decision: approvalForm.approval.decision
-                })
+            let dataObj = {
+              requestId: this.inputSchema.requestId,
+              taskId: this.taskId,
+              stepId: this.inputSchema.stepId,
+              process: this.inputSchema.process,
+              parentHistoryId: this.inputSchema.parentHistoryId,
+              assignedCN: "",
+              decision: approvalForm.approval.decision
             }
+            console.log("SaveProcess", approvalForm)
+            try {
+              if (approvalForm.approval.decision === "tempSave") {
+                dataObj.extraData = {
+                  pauseDate: new Date().toISOString(),
+                  resumeDate: approvalForm.approval.displayDate
+                }
+                let processPauseResponse = await http.post("/process/pause", dataObj);
+                this.$refs.alertComponent._alertSuccess({message: "processHasBeenSavedTemporarily"})
+                console.log(processPauseResponse)
+              } else if (approvalForm.approval.decision === "save") {
+                this.completeStep(dataObj);
+              }
+            } catch (e) {
+              console.error(e);
+            }
+          }
         }
     }
 </script>

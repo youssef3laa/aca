@@ -1,5 +1,4 @@
 <template>
-    <div>
     <v-card outlined>
         <RadioGroupComponent :field="{ name: 'decision', title: 'decision' }"
                              :val="decisions"
@@ -15,34 +14,33 @@
             </v-row>
         </v-card-text>
     </v-card>
-    </div>
 </template>
 
 <script>
-    import RadioGroupComponent from '../components/radio-group-component'
-    import DatePickerComponent from '../components/datePicker-component'
+import RadioGroupComponent from '../components/radio-group-component'
+import DatePickerComponent from '../components/datePicker-component'
 
-    export default {
-        name: "SaveProcessComponent",
-        props: ["val","field"],
-        components: {
-            RadioGroupComponent,
-            DatePickerComponent
-        },
-        data() {
-            return {
-                d: this.val,
-                decisions : {
-                    options: [{name: "save", value: "save"}, {name: "temporarySave", value: "tempSave"}],
-                    value: "save"
-                },
-                datePicker: {
-                    field: {
-                        label: "displayDate",
-                        name: "displayDate",
-                        rule: "required",
-                        min: "minDate",
-                        col: "4"
+export default {
+  name: "SaveProcessComponent",
+  props: ["val", "field"],
+  components: {
+    RadioGroupComponent,
+    DatePickerComponent
+  },
+  data() {
+    return {
+      d: this.val,
+      decisions: {
+        options: [{name: "save", value: "save"}, {name: "temporarySave", value: "tempSave"}],
+        value: "save"
+      },
+      datePicker: {
+        field: {
+          label: "displayDate",
+          name: "displayDate",
+          rule: "required",
+          min: "minDate",
+          col: "4"
                     },
                     val: {},
                     model: {

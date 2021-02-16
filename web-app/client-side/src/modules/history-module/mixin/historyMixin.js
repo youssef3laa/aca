@@ -51,6 +51,13 @@ export default {
                         value: "approvalDate",
                     },
                 ],
+                subHeaders:[{
+                    text:"comments",
+                    value:"comment"
+                },
+
+            ],
+                key:"approvalDate",
                 data: []
             }
         },

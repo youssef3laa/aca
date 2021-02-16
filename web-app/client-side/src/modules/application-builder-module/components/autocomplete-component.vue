@@ -1,6 +1,5 @@
 <template>
   <validation-provider
-    v-if="show"
     :name="field.name"
     :rules="field.rule"
     v-slot="{ errors }"
