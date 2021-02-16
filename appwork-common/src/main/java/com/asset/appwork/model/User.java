@@ -10,7 +10,8 @@ import java.util.Collection;
 import java.util.HashSet;
 
 @Entity(name = "User")
-@Table(name = "OpenTextEntityIdentityComponentsIdentity")
+@DiscriminatorValue("User")
+//@Table(name = "OpenTextEntityIdentityComponentsIdentity")
 public class User extends BaseIdentity<User> {
     @Column(name = "UserId")
     String userId;

@@ -24,7 +24,6 @@
     </v-row>
 
     <v-data-table
-      v-if="d.key"
       :headers="d.headers"
       :items="d.data"
       :options.sync="options"
@@ -32,7 +31,7 @@
       :loading="loading"
       :footer-props="footerProps"
       :search="search"
-      show-expand
+      :show-expand="!!d.key"
       :item-key="d.key"
       class="elevation-1"
     >
@@ -129,98 +128,7 @@
         <!-- </span> -->
       </template>
     </v-data-table>
-    <v-data-table
-      v-else
-      :headers="d.headers"
-      :items="d.data"
-      :options.sync="options"
-      :server-items-length="d.url ? totalItems : -1"
-      :loading="loading"
-      :footer-props="footerProps"
-      :search="search"
-      class="elevation-1"
-    >
-      <template v-slot:item.action="{ item }">
-        <!-- <v-btn
-          color="primary"
-          dark
-        >
-          {{item.name_ar}}
-        </v-btn> -->
 
-        <v-menu offset-y left allow-overflow max-width="300">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              elevation="0"
-              v-bind="attrs"
-              v-on="on"
-              style="min-height: 24px"
-              width="24px"
-            >
-              <v-icon style="font-size: medium"> fas fa-ellipsis-h </v-icon>
-            </v-btn>
-          </template>
-
-          <v-list>
-            <v-list-item-group>
-              <v-list-item
-                v-for="(i, index) in field.actions"
-                :key="index"
-                v-on:click="handleAction(item, i)"
-              >
-                <span v-if="i == 'edit'">
-                  <v-list-item-title
-                    style="color: black; font-weight: bold; font-size: small"
-                  >
-                    <v-icon style="color: black; font-size: small"
-                      >far fa-edit</v-icon
-                    >
-                    <span style="margin: 3px"></span>
-                    {{ $t(i) }}
-                  </v-list-item-title>
-                </span>
-
-                <span v-else-if="i == 'delete'">
-                  <v-list-item-title
-                    style="color: black; font-weight: bold; font-size: small"
-                  >
-                    <v-icon style="color: black; font-size: small"
-                      >far fa-trash-alt</v-icon
-                    >
-                    <span style="margin: 3px"></span>
-                    {{ $t(i) }}
-                  </v-list-item-title>
-                </span>
-
-                <span v-else-if="i == 'view'">
-                  <v-list-item-title
-                    style="color: black; font-weight: bold; font-size: small"
-                  >
-                    <v-icon style="color: black; font-size: small"
-                      >fas fa-expand-arrows-alt</v-icon
-                    >
-                    <span style="margin: 3px"></span>
-                    {{ $t(i) }}
-                  </v-list-item-title>
-                </span>
-
-                <span v-else>
-                  <v-list-item-title
-                    style="color: black; font-weight: bold; font-size: small"
-                  >
-                    <v-icon style="color: black; font-size: small">{{
-                      i.icon
-                    }}</v-icon>
-                    <span style="margin: 3px"></span>
-                    {{ $t(i.name) }}
-                  </v-list-item-title>
-                </span>
-              </v-list-item>
-            </v-list-item-group>
-          </v-list>
-        </v-menu>
-      </template>
-    </v-data-table>
   </div>
 </template>
 <script>

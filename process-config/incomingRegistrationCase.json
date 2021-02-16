@@ -17,12 +17,15 @@
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
                 "direction": "down",
-                "minimumLevel": "sector",
                 "fields": ["comment"],
                 "receiverTypes": ["single"]
             },
             "nextStep": {
-                "comment": "headOfSectorComment"
+                "SCT": "headOfSectorComment",
+                "ADM": "headOfOfficeComment",
+                "OFC": "headOfOfficeComment",
+                "GRP": "headOfGroupComment",
+                "comment": "memberMemoCreate"
             }
         },
         "headOfSectorComment": {
@@ -31,12 +34,14 @@
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
                 "direction": "down",
-                "minimumLevel": "office",
                 "fields": ["comment"],
                 "receiverTypes": ["single"]
             },
             "nextStep": {
-                "comment": "headOfOfficeComment"
+                "ADM": "headOfOfficeComment",
+                "OFC": "headOfOfficeComment",
+                "GRP": "headOfGroupComment",
+                "comment": "memberMemoCreate"
             }
         },
         "headOfOfficeComment": {
