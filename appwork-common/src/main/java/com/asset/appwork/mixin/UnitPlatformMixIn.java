@@ -18,12 +18,12 @@ public abstract class UnitPlatformMixIn {
     @JsonAlias({"description", "Description"})
     @JsonProperty("Description")
     String description;
-    @JsonAlias({"name_en", "Name_en"})
+    @JsonAlias({"nameEn", "Name_en"})
     @JsonProperty("Name_en")
-    String name_en;
-    @JsonAlias({"name_ar", "Name_ar"})
+    String nameEn;
+    @JsonAlias({"nameAr", "Name_ar"})
     @JsonProperty("Name_ar")
-    String name_ar;
+    String nameAr;
     @JsonAlias({"displayName", "IdentityDisplayName"})
     @JsonProperty("IdentityDisplayName")
     String displayName;

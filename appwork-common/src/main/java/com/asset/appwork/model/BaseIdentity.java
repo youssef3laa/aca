@@ -22,9 +22,9 @@ public abstract class BaseIdentity<T extends BaseIdentity> {
     @Column(name = "Description")
     String description;
     @Column(name = "Name_en")
-    String name_en;
+    String nameEn;
     @Column(name = "Name_ar")
-    String name_ar;
+    String nameAr;
     @Column(name = "IdentityDisplayName")
     String displayName;
 
@@ -57,20 +57,20 @@ public abstract class BaseIdentity<T extends BaseIdentity> {
         this.description = description;
     }
 
-    public String getName_en() {
-        return name_en;
+    public String getNameEn() {
+        return nameEn;
     }
 
-    public void setName_en(String name_en) {
-        this.name_en = name_en;
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
     }
 
-    public String getName_ar() {
-        return name_ar;
+    public String getNameAr() {
+        return nameAr;
     }
 
-    public void setName_ar(String name_ar) {
-        this.name_ar = name_ar;
+    public void setNameAr(String nameAr) {
+        this.nameAr = nameAr;
     }
 
     public String getDisplayName() {

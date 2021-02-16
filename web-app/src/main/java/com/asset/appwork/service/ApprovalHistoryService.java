@@ -26,15 +26,15 @@ public class ApprovalHistoryService {
                         User user = orgChartService.getUserByUserId(approvalHistory.getUserCN().split(",")[0].replace("cn=",""));
                         Optional<Group> group = user.getGroup().stream().findFirst();
                         if(group.isPresent()){
-                            approvalHistory.setDisplayName(group.get().getName_ar());
-                            approvalHistory.setUnitName(group.get().getUnit().getName_ar());
+                            approvalHistory.setDisplayName(group.get().getNameAr());
+                            approvalHistory.setUnitName(group.get().getUnit().getNameAr());
                         }else{
                             throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
                         }
                 }else{
                         Group group = orgChartService.getGroupByCn(approvalHistory.getUserCN());
-                        approvalHistory.setDisplayName(group.getName_ar());
-                        approvalHistory.setUnitName(group.getUnit().getName_ar());
+                        approvalHistory.setDisplayName(group.getNameAr());
+                        approvalHistory.setUnitName(group.getUnit().getNameAr());
                 }
             }catch (AppworkException e){
                 throw new RuntimeException(e);
