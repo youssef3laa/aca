@@ -2,7 +2,6 @@ package com.asset.appwork.service;
 
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.model.ApprovalHistory;
 import com.asset.appwork.model.Group;
 import com.asset.appwork.model.Opinion;
 import com.asset.appwork.model.User;
@@ -38,15 +37,15 @@ public class OpinionService {
                     User user = orgChartService.getUserByUserId(opinion.getUserCN().split(",")[0].replace("cn=",""));
                     Optional<Group> group = user.getGroup().stream().findFirst();
                     if(group.isPresent()){
-                        opinion.setDisplayName(group.get().getName_ar());
-                        opinion.setUnitName(group.get().getUnit().getName_ar());
+                        opinion.setDisplayName(group.get().getNameAr());
+                        opinion.setUnitName(group.get().getUnit().getNameAr());
                     }else{
                         throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
                     }
                 }else{
                     Group group = orgChartService.getGroupByCn(opinion.getUserCN());
-                    opinion.setDisplayName(group.getName_ar());
-                    opinion.setUnitName(group.getUnit().getName_ar());
+                    opinion.setDisplayName(group.getNameAr());
+                    opinion.setUnitName(group.getUnit().getNameAr());
                 }
             }catch (AppworkException e){
                 throw new RuntimeException(e);
