@@ -13,6 +13,14 @@ export default {
                 })
                 .catch((error) => console.error(error));
         },
+        loadView: async function (viewPath){
+            try{
+                let response = await http.get('/user/view?' + new URLSearchParams({key: viewPath}));
+                return response.data.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
         claimTask: function (taskId) {
             http.post('/workflow/task/claim', taskId)
                 .then((response) => {

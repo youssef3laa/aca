@@ -11,7 +11,7 @@ import javax.persistence.*;
 public class Lookup {
     @Id
     Long Id;
-
+    String stringKey;
     String category;
     String key;
     String arValue;
