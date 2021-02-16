@@ -33,7 +33,7 @@ export default {
     selectedTab: function(tab) {
       this.selected = tab
 
-      this.$observable.fire(this.key,  tab.id)
+      this.$observable.fire(this.tabkey, tab.id)
 
       if (tab.publish) {
         if (!(tab.publish instanceof Array)) tab.publish = [tab.publish]
@@ -42,7 +42,7 @@ export default {
         }
       }
       console.log('Tab Selected', tab)
-      
+
       // if (this.page) {
       //   for (let i = 0; i < this.page.sections.sec.length; i++) {
       //     const section = this.page.sections.sec[i]
@@ -69,9 +69,12 @@ export default {
     },
   },
   mounted() {
+    console.log(this.tabs)
     for (let i = 0; this.tabs && i < this.tabs.length; i++) {
       if (this.tabs[i].isActive) {
         this.selected = this.tabs[i]
+        this.selectedTab(this.tabs[i])
+        // this.$observable.fire(this.tabkey, this.tabs[i].id)
       }
     }
 

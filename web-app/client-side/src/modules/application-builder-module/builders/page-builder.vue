@@ -8,10 +8,8 @@
         v-on:modelChange="dataChange"
         :section="section"
         v-bind:style="[
-          section.isTab && section.tabId == tabId
-            ? { display: 'block' }
-            : { display: 'none' },
-          section.isTab && section.visibility == 'hidden'
+          section.tabId == tabId ? { display: 'block' } : { display: 'none' },
+          section.visibility == 'hidden'
             ? { visibility: 'hidden' }
             : { visibility: 'visible' },
         ]"
@@ -38,7 +36,7 @@ export default {
   },
   props: ['page', 'tabkey'],
   mounted() {
-    this.$observable.subscribe(this.key, (tabId) => {
+    this.$observable.subscribe(this.tabkey, (tabId) => {
       console.log(tabId)
       this.tabId = tabId
     })

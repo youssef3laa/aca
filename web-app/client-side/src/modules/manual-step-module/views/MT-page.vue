@@ -152,13 +152,14 @@ export default {
             {
               key: 'tab1',
               id: '1',
-              isActive: true,
+              isActive: false,
               name: 'البيانات الأساسية',
               icon: 'far fa-file-alt',
             },
             {
               key: 'tab2',
               id: '2',
+              isActive: true,
               name: 'المرفقات',
               icon: 'fas fa-paperclip',
             },
@@ -201,7 +202,7 @@ export default {
                     key: 'sectionTab',
                     tabId: '1',
                     isTab: true,
-                    type: 'TabsSection',
+                    type: 'DefaultSection',
                     display: 'block',
                     // isCard: true,
                     forms: [
