@@ -4,13 +4,29 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.hibernate.annotations.DiscriminatorFormula;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import java.util.Optional;
 
-@MappedSuperclass
+//@MappedSuperclass
+@Entity
+@Table(name = "OpenTextEntityIdentityComponentsIdentity")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorFormula(
+        "CASE WHEN unitTypeCode IS NOT NULL " +
+                "THEN 'Unit' " +
+                "ELSE ( " +
+                "   CASE WHEN groupCode IS NOT NULL " +
+                "   then 'Group' " +
+                "   ELSE ( " +
+                "       CASE WHEN userId IS NOT NULL " +
+                "       then 'User' " +
+                "       ELSE 'Unknown' " +
+                "       END ) " +
+                "   END ) " +
+                "END "
+)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class BaseIdentity<T extends BaseIdentity> {

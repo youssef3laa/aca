@@ -4,6 +4,7 @@ import com.asset.appwork.model.Group;
 import com.asset.appwork.model.Unit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,11 +17,11 @@ public interface GroupRepository extends GenericRepository<Group, Long> {
 
     Optional<Group> findByName(String name);
 
-    Optional<Group> findByNameAndGroupCodeNotNull(String name);
+//    Optional<Group> findByName(String name);
 
-    List<Group> findByNameInAndGroupCodeNotNull(List<String> names);
+    List<Group> findByNameIn(List<String> names);
 
-    Page<Group> findByNameInAndGroupCodeNotNull(List<String> names, Pageable pageable);
+    Page<Group> findByNameIn(List<String> names, Pageable pageable);
 
     List<Group> findByUnit(Unit unit);
 
@@ -30,9 +31,17 @@ public interface GroupRepository extends GenericRepository<Group, Long> {
 
     Page<Group> findByUnitIn(Set<Unit> units, Pageable pageable);
 
-    List<Group> findAllByGroupCodeNotNull();
+//    List<Group> findAll();
+//
+//    Page<Group> findAll(Pageable pageable);
 
-    Page<Group> findAllByGroupCodeNotNull(Pageable pageable);
+    @Query("SELECT G FROM Group G WHERE G.name LIKE %:searchString% OR G.nameAr LIKE %:searchString% " +
+            "OR G.nameEn LIKE %:searchString% OR G.groupCode LIKE %:searchString%")
+    List<Group> findAllSearchable(String searchString);
+
+    @Query("SELECT G FROM Group G WHERE G.name LIKE %:searchString% OR G.nameAr LIKE %:searchString% " +
+            "OR G.nameEn LIKE %:searchString% OR G.groupCode LIKE %:searchString%")
+    Page<Group> findAllSearchable(String searchString, Pageable pageable);
 
 //    @Query(value = "{call APPWORKSDB.ACA_ORG_SP_getGroupChildrenRecursivelyFilteredByUnitTypeCode(:groupCode_param, :unitTypeCode_param)}", nativeQuery = true)
 //    List<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(@Param("groupCode_param") String groupCode,
