@@ -67,14 +67,14 @@ export default {
                       {
                         type: "InputComponent",
                         label: "Arabic name",
-                        name: "name_ar",
+                        name: "nameAr",
                         col: "4",
                         rule: "required",
                       },
                       {
                         type: "InputComponent",
                         label: "English name",
-                        name: "name_en",
+                        name: "nameEn",
                         col: "4",
                         rule: "required",
                       },
@@ -101,8 +101,8 @@ export default {
                       },
                     ],
                     model: {
-                      name_ar: "",
-                      name_en: "",
+                      nameAr: "",
+                      nameEn: "",
                       unitTypeCode: "",
                       unitCode: "",
                       parentCode: ""
@@ -123,14 +123,14 @@ export default {
                       {
                         type: "InputComponent",
                         label: "Arabic name",
-                        name: "name_ar",
+                        name: "nameAr",
                         col: "4",
                         rule: "required",
                       },
                       {
                         type: "InputComponent",
                         label: "English name",
-                        name: "name_en",
+                        name: "nameEn",
                         col: "4",
                         rule: "required",
                       },
@@ -159,8 +159,8 @@ export default {
                     model: {
                       id: "",
                       name: "",
-                      name_ar: "",
-                      name_en: "",
+                      nameAr: "",
+                      nameEn: "",
                       unitTypeCode: "",
                       unitCode: "",
                       parentCode: "",
@@ -182,14 +182,14 @@ export default {
                       {
                         type: "InputComponent",
                         label: "Arabic name",
-                        name: "name_ar",
+                        name: "nameAr",
                         col: "4",
                         rule: "required",
                       },
                       {
                         type: "InputComponent",
                         label: "English name",
-                        name: "name_en",
+                        name: "nameEn",
                         col: "4",
                         rule: "required",
                       },
@@ -226,8 +226,8 @@ export default {
                       "id": "",
                       "name": "",
                       "description": "",
-                      "name_en": "",
-                      "name_ar": "",
+                      "nameEn": "",
+                      "nameAr": "",
                       "groupCode": "",
                       "isHeadRole": "",
                       "isViceRole": "",
@@ -242,14 +242,14 @@ export default {
                       {
                         type: "InputComponent",
                         label: "Arabic name",
-                        name: "name_ar",
+                        name: "nameAr",
                         col: "4",
                         rule: "required",
                       },
                       {
                         type: "InputComponent",
                         label: "English name",
-                        name: "name_en",
+                        name: "nameEn",
                         col: "4",
                         rule: "required",
                       },
@@ -286,8 +286,8 @@ export default {
                       "id": "",
                       "name": "",
                       "description": "",
-                      "name_en": "",
-                      "name_ar": "",
+                      "nameEn": "",
+                      "nameAr": "",
                       "groupCode": "",
                       "isHeadRole": "",
                       "isViceRole": "",
@@ -421,11 +421,11 @@ export default {
                           },
                           {
                             text: "Name ar",
-                            value: "name_ar",
+                            value: "nameAr",
                           },
                           {
                             text: "Name en",
-                            value: "name_en",
+                            value: "nameEn",
                           },
                           {
                             text: "Unit type code",
@@ -478,11 +478,11 @@ export default {
                           },
                           {
                             text: "Name ar",
-                            value: "name_ar",
+                            value: "nameAr",
                           },
                           {
                             text: "Name en",
-                            value: "name_en",
+                            value: "nameEn",
                           },
                           {
                             text: "Role code",
@@ -610,8 +610,8 @@ export default {
 
         item = {
           "name": item.name,
-          "name_ar": item.name_ar,
-          "name_en": item.name_en,
+          "nameAr": item.nameAr,
+          "nameEn": item.nameEn,
           "unitTypeCode": item.unitTypeCode,
           "unitCode": item.unitCode,
         }
@@ -653,8 +653,8 @@ export default {
         let unitCode = item.unitCode;
         item = {
           "name": item.groupCode,
-          "name_en": item.name_en,
-          "name_ar": item.name_ar,
+          "nameEn": item.nameEn,
+          "nameAr": item.nameAr,
           "groupCode": item.groupCode,
           // "isHeadRole": item.isHeadRole,
           // "isViceRole": item.isViceRole,
@@ -679,8 +679,8 @@ export default {
         // let unitCode = item.unitCode;
         item = {
           "name": item.groupCode,
-          "name_en": item.name_en,
-          "name_ar": item.name_ar,
+          "nameEn": item.nameEn,
+          "nameAr": item.nameAr,
           "groupCode": item.groupCode,
           // "isHeadRole": item.isHeadRole,
           // "isViceRole": item.isViceRole,
@@ -848,11 +848,11 @@ export default {
                               font-size:20px;
                               font-weight:bold;
                               text-align: center;
-                         ">${item.name_ar} </div>
+                         ">${item.nameAr} </div>
                  <div style="margin-top:3px;
                               font-size:16px;
                               text-align: center;
-                         ">${item.name_en} </div>
+                         ">${item.nameEn} </div>
 
                  <div style="margin-top:3px;
                               font-size:14px;
