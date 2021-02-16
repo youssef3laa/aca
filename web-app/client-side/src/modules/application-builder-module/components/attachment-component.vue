@@ -169,7 +169,7 @@ export default {
   mixins: [attachmentMixin, formPageMixin],
   data() {
     return {
-      readOnly: this.val.readonly,
+      readOnly: (this.field.readonly)? this.field.readonly:this.val.readonly,
       iframeOjbect: {src: ""},
       bwsId: "",
       categoryId: "",
@@ -253,6 +253,12 @@ export default {
 
   },
   watch: {
+    'field.readonly': {
+      handler: function (newVal) {
+        this.readOnly = newVal;
+        console.log(newVal)
+      }
+    },
     'val.readonly': {
       handler: function (newVal, oldVal) {
         this.readOnly = newVal;
