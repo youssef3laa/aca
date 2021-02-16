@@ -4,6 +4,7 @@ import com.asset.appwork.model.Group;
 import com.asset.appwork.model.Unit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,15 +14,23 @@ import java.util.Optional;
 public interface UnitRepository extends GenericRepository<Unit, Long> {
     Optional<Unit> findById(Long id);
 
-    List<Unit> findAllByUnitCodeNotNull();
+//    List<Unit> findAll();
+//
+//    Page<Unit> findAll(Pageable pageable);
 
-    Page<Unit> findAllByUnitCodeNotNull(Pageable pageable);
+    @Query("SELECT U FROM Unit U WHERE U.name LIKE %:searchString% OR U.nameAr LIKE %:searchString% " +
+            "OR U.nameEn LIKE %:searchString% OR U.unitTypeCode LIKE %:searchString% OR U.unitCode LIKE %:searchString%")
+    List<Unit> findAllSearchable(String searchString);
 
-    Optional<Unit> findByNameAndUnitCodeNotNull(String name);
+    @Query("SELECT U FROM Unit U WHERE U.name LIKE %:searchString% OR U.nameAr LIKE %:searchString% " +
+            "OR U.nameEn LIKE %:searchString% OR U.unitTypeCode LIKE %:searchString% OR U.unitCode LIKE %:searchString%")
+    Page<Unit> findAllSearchable(String searchString, Pageable pageable);
 
-    List<Unit> findByNameInAndUnitCodeNotNull(List<String> names);
+    Optional<Unit> findByName(String name);
 
-    Page<Unit> findByNameInAndUnitCodeNotNull(List<String> names, Pageable pageable);
+    List<Unit> findByNameIn(List<String> names);
+
+    Page<Unit> findByNameIn(List<String> names, Pageable pageable);
 
     List<Unit> findByUnitTypeCode(String code);
 

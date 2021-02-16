@@ -1,6 +1,6 @@
 <template>
   <v-container>
-      <signatureDraw :requestId="d.requestId"></signatureDraw>
+      <signatureDraw :readonly="field.readonly" :requestId="d.requestId"></signatureDraw>
   </v-container>
 </template>
 

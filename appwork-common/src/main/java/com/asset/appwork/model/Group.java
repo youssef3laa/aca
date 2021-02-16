@@ -21,7 +21,8 @@ import java.sql.ResultSet;
         ),
 })
 @Entity(name = "Group")
-@Table(name = "OpenTextEntityIdentityComponentsIdentity")
+@DiscriminatorValue("Group")
+//@Table(name = "OpenTextEntityIdentityComponentsIdentity")
 public class Group extends BaseIdentity<Group> {
     @Column(name = "GroupCode")
     String groupCode;

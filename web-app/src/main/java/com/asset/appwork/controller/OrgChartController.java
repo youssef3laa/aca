@@ -139,7 +139,8 @@ public class OrgChartController {
     @GetMapping("/unit/read/list")
     public ResponseEntity<AppResponse<JsonNode>> readUnitList(@RequestHeader("X-Auth-Token") String token,
                                                               @RequestParam(value = "page") Optional<Integer> page,
-                                                              @RequestParam(value = "size") Optional<Integer> size
+                                                              @RequestParam(value = "size") Optional<Integer> size,
+                                                              @RequestParam(value = "search") Optional<String> search
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
@@ -147,11 +148,11 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if (page.isPresent() && size.isPresent()) {
-                    Page<Unit> unitPage = orgChartService.getAllUnits(page.get(), size.get());
+                    Page<Unit> unitPage = orgChartService.getAllUnits(search.orElse(""), page.get(), size.get());
                     respBuilder.data(SystemUtil.convertStringToJsonNode(unitPage.getContent().toString()));
                     respBuilder.info("totalCount", unitPage.getTotalElements());
                 } else {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUnits().toString()));
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUnits(search.orElse("")).toString()));
                 }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
@@ -900,7 +901,8 @@ public class OrgChartController {
     @GetMapping("/group/read/list")
     public ResponseEntity<AppResponse<JsonNode>> readGroupList(@RequestHeader("X-Auth-Token") String token,
                                                                @RequestParam(value = "page") Optional<Integer> page,
-                                                               @RequestParam(value = "size") Optional<Integer> size
+                                                               @RequestParam(value = "size") Optional<Integer> size,
+                                                               @RequestParam(value = "search") Optional<String> search
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
@@ -908,11 +910,11 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if (page.isPresent() && size.isPresent()) {
-                    Page<Group> groupPage = orgChartService.getAllGroups(page.get(), size.get());
+                    Page<Group> groupPage = orgChartService.getAllGroups(search.orElse(""), page.get(), size.get());
                     respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
                     respBuilder.info("totalCount", groupPage.getTotalElements());
                 } else {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllGroups().toString()));
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllGroups(search.orElse("")).toString()));
                 }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
@@ -1062,7 +1064,8 @@ public class OrgChartController {
     @GetMapping("/user/read/list")
     public ResponseEntity<AppResponse<JsonNode>> getAllUsers(@RequestHeader("X-Auth-Token") String token,
                                                              @RequestParam(value = "page") Optional<Integer> page,
-                                                             @RequestParam(value = "size") Optional<Integer> size
+                                                             @RequestParam(value = "size") Optional<Integer> size,
+                                                             @RequestParam(value = "search") Optional<String> search
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
@@ -1070,11 +1073,11 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if (page.isPresent() && size.isPresent()) {
-                    Page<User> userPage = orgChartService.getAllUsers(page.get(), size.get());
+                    Page<User> userPage = orgChartService.getAllUsers(search.orElse(""), page.get(), size.get());
                     respBuilder.data(SystemUtil.convertStringToJsonNode(userPage.getContent().toString()));
                     respBuilder.info("totalCount", userPage.getTotalElements());
                 } else {
-                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUsers().toString()));
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getAllUsers(search.orElse("")).toString()));
                 }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());

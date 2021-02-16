@@ -4,8 +4,8 @@
       <div class="org-icon-wrapper">
         <i class="fas fa-sitemap"></i>
       </div>
-      <span>الهيكلي<br>المخطط</span>
-    </div>
+      <span>{{$t('orgChart')}}</span>
+  </div>
 
 </template>
 
