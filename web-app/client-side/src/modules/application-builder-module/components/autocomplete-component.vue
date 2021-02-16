@@ -57,16 +57,16 @@ export default {
             let obj = {}
             if (element['cn']) {
               obj = {
-                name: element['name_ar'],
+                name: element['nameAr'],
                 value: element['cn'],
-                text: element['name_ar'],
+                text: element['nameAr'],
                 code: element['groupCode'],
                 object: element,
               }
             } else if (element['unitCode']) {
               obj = {
                 value: element['unitCode'],
-                text: element['name_ar'],
+                text: element['nameAr'],
                 object: element,
               }
             } else {
