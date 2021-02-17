@@ -3,11 +3,11 @@
     <span class="radio-group-component-title-class" :style="{color: color}" v-t="title"></span>
     <v-radio v-for="(type, index) in d.options"
              :key="index"
-             :value="type.value"
-             :color="(selected == type.value)? color: 'black'"
+             :value="type.name"
+             :color="(selected == type.name)? color: 'black'"
              class="radio-group-component-radio-class">
       <template #label>
-        <span v-t="type.name" :style="{color: (selected == type.value)? color:'black'}"></span>
+        <span v-t="type.label" :style="{color: (selected == type.name)? color:'black'}"></span>
       </template>
     </v-radio>
   </v-radio-group>

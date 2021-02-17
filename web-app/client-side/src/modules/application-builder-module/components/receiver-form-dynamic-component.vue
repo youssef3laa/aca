@@ -46,34 +46,21 @@
             handleReceiverFormOutput: async function () {
                 this.assignedCN = null
                 this.code = null
+                this.role = null
 
-                let group = null
-                let code = null
-                if((this.higher ||  this.userDetails.groups[0].unit.unitTypeCode== "AGN") && this.direction == "up") {
-                    group = this.parent
-                    code = this.parent.groupCode
-                } else if(this.memberSelected){
-                    group = this.memberSelected
-                    code = group.groupCode
-                }else if(this.groupSelected){
-                    group = await this.getHeadRoleByUnitCode(this.groupSelected.unitCode)
-                    code = this.groupSelected.unitTypeCode
-                }else if(this.officeSelected){
-                    group = await this.getHeadRoleByUnitCode(this.officeSelected.unitCode)
-                    code = this.officeSelected.unitTypeCode
-                }else if(this.sectorSelected){
-                    group = await this.getHeadRoleByUnitCode(this.sectorSelected.unitCode)
-                    code = this.sectorSelected.unitTypeCode
-                }else if(this.agencySelected){
-                    group = await this.getHeadRoleByUnitCode(this.agencySelected.unitCode)
-                    code = this.agencySelected.unitTypeCode
+                let valuesLast = this.values.length - 1
+                if(valuesLast < 0) return
+                if(this.values[valuesLast].unitCode) {
+                    this.code = this.values[valuesLast].unitTypeCode
+                    this.assignedRole = await this.getHeadRoleByUnitCode(this.values[valuesLast].unitCode)
+                    this.assignedCN = this.assignedRole.cn
+                } else if(this.values[valuesLast].groupCode) {
+                    this.code = this.values[valuesLast].groupCode
+                    this.assignedRole = this.values[valuesLast]
+                    this.assignedCN = this.assignedRole.cn
                 }
-                this.assignedRole = group
-                this.assignedCN = (group)? group.cn:null
-                this.code = code
             },
             onChange: async function(event, input, index){
-                // if(this.field.readonly || this.agency.field.readonly) return
                 console.log("Event", event)
                 console.log("Input", input)
                 console.log("Index", index)
@@ -85,7 +72,7 @@
                 } else{
                     this.emptyNext(index)
                 }
-                // this.onValueChange()
+                this.onValueChange()
             },
             checkCanSelectNext: function(type,code) {
                 if(type == "unit"){
@@ -105,26 +92,19 @@
                     }else{
                         inputs[i].val = this.getAutocompleteVal(null)
                     }
-                    inputs[i].field = this.getAutocompleteField(inputs[i].name,false)
+                    inputs[i].field = this.getAutocompleteField(inputs[i].name)
                 }
                 return inputs
             },
-            getAutocompleteField: function(name, readonly) {
+            getAutocompleteField: function(name) {
                 return {
                     name: name,
-                    readonly: (this.field.readonly) ? true : readonly,
                     autofill: true
                 }
             },
             getAutocompleteVal: function(url) {
                 return {
                     url : url
-                }
-            },
-            fillAutocomplete: function(name) {
-                return {
-                    list: [{ text: name , value: name }],
-                    value: name
                 }
             },
             fillNextInput: function(index, code) {
@@ -156,33 +136,22 @@
         },
         watch: {
             val: function (newVal) {
-                for(let key in newVal){
-                    this.d[key] = newVal[key]
-                }
-                if(this.field.readonly){
-                    this.fillComponent()
+                if(newVal.inputs){
+                    this.inputs = this.initializeInputs(newVal.inputs)
+                    this.onValueChange()
                 }
 
-                if(this.firstTime){
-                    this.firstTime = false
-                    if(newVal.inputs){
-                        this.inputs = this.initializeInputs(newVal.inputs)
-                    }
-                    this.onValueChange()
+                for(let key in newVal){
+                    this.d[key] = newVal[key]
                 }
             }
         },
         async mounted() {
-            if(!this.field.readonly){
-                this.userDetails = await this.getUserDetails()
-                if(this.val.inputs){
-                    this.inputs = this.initializeInputs(this.val.inputs)
-                }
-                // this.handleReadOnlyReceiver(this.userDetails.groups[0].unit.unitCode,
-                //     this.userDetails.groups[0].unit.unitTypeCode,
-                //     this.userDetails.groups[0].isHeadRole)
-                await this.onValueChange()
+            this.userDetails = await this.getUserDetails()
+            if(this.val.inputs){
+                this.inputs = this.initializeInputs(this.val.inputs)
             }
+            this.onValueChange()
         }
     }
 </script>

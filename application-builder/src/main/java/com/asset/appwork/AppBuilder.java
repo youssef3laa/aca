@@ -1,8 +1,6 @@
 package com.asset.appwork;
 
 import java.io.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class AppBuilder {
     static String rootPath;
@@ -24,10 +22,10 @@ public class AppBuilder {
                 int firstIndex = fileContent.indexOf("$path(")+6;
                 int lastIndex = firstIndex + fileContent.substring(firstIndex).indexOf(")");
                 String[] paths = fileContent.substring(firstIndex,lastIndex).split("\\|");
-                String path = "";
+                StringBuilder path = new StringBuilder();
                 if(paths.length > 0){
-                    path = paths[0];
-                    for(int i =1 ; i < paths.length ; i++) path += File.separator + paths[i];
+                    path = new StringBuilder(paths[0]);
+                    for(int i =1 ; i < paths.length ; i++) path.append(File.separator).append(paths[i]);
                 }
                 String file = readFile(rootPath+ File.separator + "views" + File.separator + path+ ".json").toString();
                 fileContent.replace(firstIndex-6,lastIndex+1, file);
@@ -47,7 +45,6 @@ public class AppBuilder {
         }
 
     }
-
 
     private StringBuilder readFile(String rootPath) throws IOException {
         StringBuilder fileContent = new StringBuilder();

@@ -11,7 +11,7 @@
                         </p>
                     </v-alert>
                     <v-card-text style="padding-top: 0px">
-                        <TextareaComponent :field="{ name: 'fields', label: field.label }"
+                        <TextareaComponent :field="{ name: field.name, label: field.name }"
                                            @update="onChangeField($event,field)"></TextareaComponent>
                     </v-card-text>
                 </v-card>
@@ -29,7 +29,7 @@
                                  @update="onChangeReceiverType"
                                  v-if="receiverTypes"></RadioGroupComponent>
             <v-card-text v-if="receiverTypes && receiverType=='single'">
-                <ReceiverFormComponent :field="{name: 'receiverForm'}" :val="receiverDirection" @update="onChangeReceiver"></ReceiverFormComponent>
+                <ReceiverFormDynamicComponent :field="{name: 'receiverForm'}" :val="receiverInputs" @update="onChangeReceiver"></ReceiverFormDynamicComponent>
             </v-card-text>
             <v-card-text v-else-if="receiverTypes && receiverType=='multiple'">
                 <MultipleAssigneeComponent :field="{name: 'multipleComponent'}" @update="onChangeMultipleUnits"></MultipleAssigneeComponent>
@@ -40,146 +40,125 @@
 
 <script>
     import TextareaComponent from "./textarea-component"
-    import ReceiverFormComponent from "./receiver-form-component"
     import RadioGroupComponent from "./radio-group-component";
     import userMixin from "../../../mixins/userMixin";
     import MultipleAssigneeComponent from "./multiple-assignee-component";
     import orgChartMixin from "../../../mixins/orgChartMixin";
+    import ReceiverFormDynamicComponent from "./receiver-form-dynamic-component";
 
     export default {
-        components: {MultipleAssigneeComponent, RadioGroupComponent, ReceiverFormComponent, TextareaComponent},
+        components: {
+            ReceiverFormDynamicComponent,
+            MultipleAssigneeComponent, RadioGroupComponent, TextareaComponent},
         props: ["val","field"],
         mixins: [userMixin,orgChartMixin],
         data() {
             return{
                 d: this.val,
+                inputs: {},
                 firstTime: true,
-                displayName: null,
                 userDetails: null,
+                displayName: null,
                 parent: null,
-                fields: {},
-                decision: "comment",
-                receiver: null,
-                assignedRole: null,
-                assignee: null,
-                assignees: null,
-                code: null,
-                receiverType: null,
+
+                decision: "send",
                 decisions: null,
+
+                receiverType: null,
                 receiverTypes: null,
-                receiverDirection: null
+                receiverInputs: null,
+
+                receiver: {}
             }
         },
         methods: {
             onValueChange: function() {
-                if(!this.assignedCN && this.parent && this.decision == "comment") {
-                    this.assignedCN = this.parent.cn
-                    this.code = this.parent.groupCode
-                    this.assignedRole = this.parent
-                }
+                // if(!this.assignedCN && this.parent && this.decision == "comment") {
+                //     this.assignedCN = this.parent.cn
+                //     this.code = this.parent.groupCode
+                //     this.assignedRole = this.parent
+                // }
+                if(this.receiverType) this.receiver.type = this.receiverType
+                console.log("Approval Card", {
+                    decision: this.decision,
+                    inputs: this.inputs,
+                    selected: this.receiver
+                })
                 this.$emit('update', {
                     name: this.field.name,
                     value: {
                         decision: this.decision,
-                        comments: this.fields,
-                        receiverType: (this.receiverType)? this.receiverType:'single',
-                        code: this.code,
-                        role: this.assignedRole,
-                        assignedCN: this.assignee,
-                        assignees: this.assignees
+                        inputs: this.inputs,
+                        selected: this.receiver
                     }
                 })
             },
             onChangeField: function(event, field) {
-                this.fields[field.name] = event.value
+                this.inputs[field.name] = event.value
                 console.log("Fields",this.fields)
                 this.onValueChange()
             },
             onChangeMultipleUnits: function(event){
-                this.assignees = event.value.assignees
+                if(event.value.assignees) this.receiver.assignees = event.value.assignees
                 if(event.value.nextAssignee){
-                    this.assignee = event.value.nextAssignee.cn
-                    this.code = event.value.nextAssignee.code
-                    this.assignedRole = event.value.nextAssignee.role
-                }else{
-                    this.assignee = null
-                    this.code = null
-                    this.assignedRole = null
+                    this.receiver.assignedCN = event.value.nextAssignee.cn
+                    this.receiver.code = event.value.nextAssignee.code
+                    this.receiver.role = event.value.nextAssignee.role
                 }
                 this.onValueChange()
             },
             onChangeReceiver: async function(event) {
-                this.assignees = null
                 console.log("ReceiverForm", event)
-                this.receiver = event
-                this.assignee = event.value.assignedCN
-                this.code = event.value.code
-                this.assignedRole = event.value.role
+                this.receiver = event.value
                 this.onValueChange()
             },
             onChangeDecision: function(event) {
+                this.receiver = {}
+                this.receiverTypes = undefined
+                this.receiverInputs = undefined
                 this.decision = event.value
-                if(this.d.receiverTypes){
-                    this.receiverType = null
-                    // this.receiverDirection = null
-                    this.updateDirection(null)
-                    if(this.d.receiverTypes.includes("multiple")){
-                        switch(this.decision){
-                            case "approve":
-                                this.updateDirection("up")
-                                // this.receiverDirection = { direction: "up" }
-                                this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
-                                break
-                            case "redirect":
-                                this.receiverTypes = this.getReceiverTypeOptions(["single","multiple"], null)
-                                break
-                            case "requestModification":
-                                this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
-                                break
-                        }
-                    }else if(this.d.receiverTypes.includes("single")) {
-                        if(this.decision == "approve") this.updateDirection("up")
-                        this.receiverTypes = this.getReceiverTypeOptions(["single"], null)
+                for(let key in this.d.decisions){
+                    if(this.d["decisions"][key].name == this.decision){
+                        this.receiverTypes = this.getReceiverTypeOptions(this.d["decisions"][key].types)
+                        this.receiverInputs = {inputs:this.d["decisions"][key].inputs}
+                        break
                     }
                 }
                 this.onValueChange()
             },
             onChangeReceiverType: function(event) {
+                this.receiver = {}
                 this.receiverType = event.value
                 this.onValueChange()
             },
-            getDecisionOptions: function(decisions, value) {
+            getDecisionOptions: function(decisions) {
                 if(!decisions) return null
+                if(!(decisions instanceof Array)) decisions = [decisions]
                 let options = [];
                 for(let i in decisions){
                     options.push({
-                        name: this.getDecisionLabel(decisions[i]),
-                        value: decisions[i]
+                        name: decisions[i].name,
+                        label: decisions[i].label
                     })
                 }
                 if(options.length == 0) return null
-                return {options: options, value: value}
+                return {options: options}
             },
-            getReceiverTypeOptions: function(receiverTypes, value) {
-                if(!receiverTypes) return null
+            getReceiverTypeOptions: function(receiverTypes) {
+                if(!receiverTypes) {
+                    this.receiverType = null
+                    return null
+                }
+                if(!(receiverTypes instanceof Array)) receiverTypes = [receiverTypes]
                 let options = [];
                 for(let i in receiverTypes){
                     options.push({
-                        name: this.getReceiverTypeLabel(receiverTypes[i]),
-                        value: receiverTypes[i]
+                        name: receiverTypes[i],
+                        label: this.getReceiverTypeLabel(receiverTypes[i])
                     })
                 }
-                return {options: options, value: value}
-            },
-            getDecisionLabel: function(value) {
-                switch (value) {
-                    case "approve":
-                        return "request-approve"
-                    case "redirect":
-                        return "request-redirection"
-                    case "requestModification":
-                        return "request-modification"
-                }
+                this.receiverType = receiverTypes[0]
+                return {options: options, value: receiverTypes[0]}
             },
             getReceiverTypeLabel: function(value) {
                 switch (value) {
@@ -188,27 +167,20 @@
                     case "multiple":
                         return "multiple-units"
                 }
-            },
-            updateDirection: function(direction) {
-                this.receiverDirection = {
-                    direction: (this.d.decisions)? direction:this.d.direction,
-                    minimumLevel: this.d.minimumLevel
-                }
             }
         },
         watch: {
             val: function (newVal) {
                 if(newVal.fields){
                     if(!(newVal.fields instanceof Array)) newVal.fields = [newVal.fields]
-                    this.fields = {}
+                    this.inputs = {}
                 }
                 if(newVal.decisions){
-                    if(!(newVal.decisions instanceof Array)) newVal.decisions = [newVal.decisions]
                     this.decisions = this.getDecisionOptions(newVal.decisions)
                 }
-                if(newVal.receiverTypes){
-                    if(!(newVal.receiverTypes instanceof Array)) newVal.receiverTypes = [newVal.receiverTypes]
-                    this.receiverTypes = (newVal.decisions)? null:this.getReceiverTypeOptions(newVal.receiverTypes)
+                if(newVal.receiver){
+                    this.receiverTypes = (newVal.decisions)? null:this.getReceiverTypeOptions(newVal.receiver.types)
+                    this.receiverInputs = (newVal.decisions)? null:{inputs:newVal.receiver.inputs}
                 }
 
                 if(this.firstTime){
@@ -226,7 +198,10 @@
         },
         async created() {
             this.decisions = this.getDecisionOptions(this.val.decisions)
-            this.receiverTypes = (this.val.decisions)? null:this.getReceiverTypeOptions(this.val.receiverTypes)
+            if(this.val.receiver){
+                this.receiverTypes = (this.val.decisions)? null:this.getReceiverTypeOptions(this.val.receiver.types)
+                this.receiverInputs = (this.val.decisions)? null:{inputs:this.val.receiver.inputs}
+            }
 
             this.userDetails = await this.getUserDetails()
             this.displayName = this.userDetails.displayName

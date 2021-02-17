@@ -4,7 +4,7 @@
       <div class="search-icon-wrapper">
         <i class="fas fa-search"></i>
       </div>
-      <span>بحث<br>متقدم</span>
+      <span>{{$t('advancedSearch')}}</span>
     </div>
 
 </template>

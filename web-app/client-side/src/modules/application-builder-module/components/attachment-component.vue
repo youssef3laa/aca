@@ -169,7 +169,8 @@ export default {
   mixins: [attachmentMixin, formPageMixin],
   data() {
     return {
-      readOnly: this.val.readonly,
+      valid: this.filesUploaded > 0,
+      readOnly: (this.field.readonly)? this.field.readonly:this.val.readonly,
       iframeOjbect: {src: ""},
       bwsId: "",
       categoryId: "",
@@ -239,26 +240,33 @@ export default {
     });
     await this.listFiles();
 
-    this.$observable.subscribe("refreshAttachmentFiles", this.listFiles);
-  },
-  methods: {
-    versionsModalClosed() {
-      this.versionsDialogState = false;
-      this.selectedFile.nodeId = "";
-      this.selectedFile.modalTitle = "";
+        this.$observable.subscribe("refreshAttachmentFiles", this.listFiles);
+        this.$observable.subscribe("attachmentValidationAsk", function () {
+            this.$observable.fire("attachmentValidationAnswer", this.valid);
+        });
     },
-    openVersionInBrava(obj) {
-      this.openFileInBrave(obj);
-    },
+    methods: {
+        versionsModalClosed() {
+            this.versionsDialogState = false;
+            this.selectedFile.nodeId = "";
+            this.selectedFile.modalTitle = "";
+        },
+        openVersionInBrava(obj) {
+            this.openFileInBrave(obj);
+        },
 
-  },
-  watch: {
-    'val.readonly': {
-      handler: function (newVal, oldVal) {
-        this.readOnly = newVal;
-        console.log(newVal, oldVal)
-      }
-    }
+    },
+    watch: {
+        'val.readonly': {
+            handler: function (newVal) {
+                this.readOnly = newVal;
+            }
+        },
+        filesUploaded: {
+            handler: function (newVal) {
+                this.valid = newVal.length > 0;
+            }
+        }
 
   }
 };

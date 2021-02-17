@@ -3,7 +3,9 @@ package com.asset.appwork.model;
 import com.asset.appwork.util.SystemUtil;
 import lombok.Data;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Data
@@ -11,7 +13,7 @@ import javax.persistence.*;
 public class Lookup {
     @Id
     Long Id;
-
+    String stringKey;
     String category;
     String key;
     String arValue;

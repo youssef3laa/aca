@@ -50,10 +50,9 @@ public class UserController {
 
         String rootStr = environment.getProperty("form.config");
 
-        try (FileReader fileReader = new FileReader(new File(rootStr +File.separator+ "output"+File.separator + key + ".json"))) {
+        try (FileReader fileReader = new FileReader(rootStr +File.separator+ "output"+File.separator + key + ".json")) {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode outputData = mapper.readTree(fileReader);
-            // mesh same3
             System.out.println(outputData);
             return responseBuilder.data(outputData).status(ResponseCode.SUCCESS).build().getResponseEntity();
         } catch (IOException e) {
@@ -62,6 +61,30 @@ public class UserController {
         return responseBuilder.build().getResponseEntity();
     }
 
+    @GetMapping("/view")
+    public ResponseEntity<AppResponse<JsonNode>> getView(@RequestParam("key") String key) {
+        AppResponse.ResponseBuilder<JsonNode> responseBuilder = AppResponse.builder();
+
+        String rootStr = environment.getProperty("form.config");
+
+        String[] paths = key.split("\\|");
+        String path = "";
+        if(paths.length > 0){
+            path = paths[0];
+            for(int i =1 ; i < paths.length ; i++) path += File.separator + paths[i];
+        }
+
+        try (FileReader fileReader = new FileReader(new File(rootStr +File.separator+ "views" + File.separator + path + ".json"))) {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode outputData = mapper.readTree(fileReader);
+
+            System.out.println(outputData);
+            return responseBuilder.data(outputData).status(ResponseCode.SUCCESS).build().getResponseEntity();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return responseBuilder.build().getResponseEntity();
+    }
     @PostMapping("/login")
     public ResponseEntity<AppResponse<String>> login(@RequestBody Account account) {
 

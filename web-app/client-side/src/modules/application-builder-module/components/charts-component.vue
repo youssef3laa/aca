@@ -78,11 +78,19 @@ export default {
       // }
     };
   },
-
+  methods: {
+    getLabels: function(){
+      let labels = this.val.labels;
+      for(let key in labels){
+        labels[key] = this.$t(labels[key])
+      }
+      return labels;
+    }
+  },
   computed: {
     chartdata() {
       return {
-        labels: this.val.labels,
+        labels: this.getLabels(),
         datasets: [
           {
             label: this.field.name,

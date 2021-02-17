@@ -27,6 +27,7 @@
             this.request = await this.getRequest()
             this.loadForm("incoming-registration-init", this.formLoaded)
             this.$observable.subscribe("complete-step", this.submit)
+            this.$observable.subscribe("jobTypeChange", this.jobTypeChange)
         },
         methods: {
             formLoaded: function () {
@@ -45,6 +46,13 @@
                         }
                     }
                 )
+            },
+            jobTypeChange: async function(jobType){
+                console.log(jobType);
+                let view = await this.loadView("incoming-registration\\"+ jobType.object.stringKey )
+                console.log(view)
+                this.$refs.appBuilder.clearSectionForms("caseDataSection")
+                this.$refs.appBuilder.appendForm("caseDataSection",view)
             },
             submit: function () {
 

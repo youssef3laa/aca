@@ -118,6 +118,10 @@ export default {
           this.positions[key][1]].forms = [...this.appData.pages[this.positions[key][0]].sections[
           this.positions[key][1]].forms, obj];
     },
+    clearSectionForms: function(key) {
+      if (!this.positions[key]) this.findKey(key);
+      this.appData.pages[this.positions[key][0]].sections[this.positions[key][1]].forms = [];
+    },
     appendSection: function (key, obj) {
       if (!this.positions[key]) this.findKey(key);
       this.appData.pages[this.positions[key][0]].sections.push(obj);
@@ -150,7 +154,18 @@ export default {
 
         }
       }
+    },
 
+    disableAllSections: function () {
+      for (let i = 0; i < this.appData.pages.length; i++) {
+        const page = this.appData.pages[i]
+        if (page.sections) {
+          for (let j = 0; j < page.sections.length; j++) {
+            const section = page.sections[j]
+            this.disableSection(section.key)
+          }
+        }
+      }
     },
 
     getFormKeyByPageKey: function (pageKey) {

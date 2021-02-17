@@ -17,12 +17,12 @@ export default {
                     {
                         text: "date",
                         value: "opinionDate",
-                    },
-                    {
-                        text: "opinion",
-                        value: "opinion"
                     }
                 ],
+                subHeaders:[{
+                    text:"opinion",
+                    value:"opinion"
+                }],
                 data: []
             }
         }

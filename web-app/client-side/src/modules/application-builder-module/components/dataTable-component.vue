@@ -114,16 +114,18 @@
           </v-list>
         </v-menu>
       </template>
-      <template v-slot:expanded-item="{ headers, item }">
+      <template v-slot:expanded-item="{ item }">
         <!-- <span v-for="(subHeader,i) in d.subHeaders" :key="i"> -->
         <td
-          v-for="(subHeader, i) in d.subHeaders"
-          :key="i"
-          :colspan="headers.length"
+        
+          :colspan="12"
           style="margin:10px"
         >
+          <div  v-for="(subHeader, i) in d.subHeaders"
+          :key="i">
           <div class="top-bot-margins" style="color:#9E9E9E">{{ $t(subHeader.text) }}</div>
           <div class="top-bot-margins" >{{ item[subHeader.value] }} </div>
+        </div>
         </td>
         <!-- </span> -->
       </template>

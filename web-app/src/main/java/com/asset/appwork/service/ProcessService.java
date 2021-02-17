@@ -29,6 +29,8 @@ public class ProcessService {
     @Autowired
     Environment environment;
     @Autowired
+    ModuleRouting moduleRouting;
+    @Autowired
     ApprovalHistoryRepository approvalHistoryRepository;
     @Autowired
     OrgChartService orgChartService;
@@ -39,12 +41,12 @@ public class ProcessService {
         RequestEntity requestEntity = requestService.getRequestEntityById(Long.valueOf(outputSchema.getRequestId()));
 
         //calc outputSchema
-        String cordysUrl = cordysService.getCordysUrl();
+//        String cordysUrl = cordysService.getCordysUrl();
 
-        String filePath = outputSchema.getProcessFilePath(environment.getProperty("process.config"));
-        String config = SystemUtil.readFile(filePath);
+//        String filePath = outputSchema.getProcessFilePath(environment.getProperty("process.config"));
+//        String config = SystemUtil.readFile(filePath);
 
-        ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
+//        ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
 
         // create entity
         Entity processTempSaveEntity =
@@ -54,7 +56,7 @@ public class ProcessService {
         processTempSave.setTaskId(outputSchema.getTaskId());
         processTempSave.setPauseDate(new SimpleDateFormat("yyyy-MM-dd").parse((String) outputSchema.getExtraData().get("pauseDate")));
         processTempSave.setResumeDate(new SimpleDateFormat("yyyy-MM-dd").parse((String) outputSchema.getExtraData().get("resumeDate")));
-        processTempSave.setOutputSchema(moduleRouting.calculateOutputSchema(outputSchema));
+        processTempSave.setOutputSchema(moduleRouting.calculateOutputSchema(outputSchema, account));
         processTempSave.setProcessInstanceId(requestEntity.getProcessInstanceId());
         processTempSave.setStatus("paused");
         processTempSaveEntity.create(processTempSave);

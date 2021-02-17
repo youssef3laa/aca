@@ -32,9 +32,9 @@
 </template>
 
 <script>
-import http from '../../core-module/services/http'
+import http from "../../core-module/services/http";
 export default {
-  name: 'autoCompleteComponent',
+  name: "autoCompleteComponent",
   data() {
     return {
       //   items: ['foo', 'bar', 'fizz', 'buzz'],
@@ -46,7 +46,7 @@ export default {
       loading: false,
       readonly: null,
       show: true,
-    }
+    };
   },
   methods: {
     fetch(v, url) {
@@ -54,78 +54,83 @@ export default {
         .get(url)
         .then((response) => {
           const res = response.data.data.map((element) => {
-            let obj = {}
-            if (element['cn']) {
+            let obj = {};
+            if (element["cn"]) {
               obj = {
                 name: element['nameAr'],
                 value: element['cn'],
                 text: element['nameAr'],
                 code: element['groupCode'],
                 object: element,
-              }
-            } else if (element['unitCode']) {
+              };
+            } else if (element["unitCode"]) {
               obj = {
                 value: element['unitCode'],
                 text: element['nameAr'],
                 object: element,
-              }
+              };
             } else {
               obj = {
-                value: element['key'],
-                text: element['arValue'],
+                value: element["key"],
+                text: element["arValue"],
                 object: element,
-              }
+              };
             }
-            return obj
-          })
+            return obj;
+          });
           this.items.list = res.filter((e) => {
             // console.log(e)
-            return (e.name || '').indexOf(v || '') > -1
-          })
+            return (e.name || "").indexOf(v || "") > -1;
+          });
           // console.log(this.items.list)
 
-          if(this.val.default){
-            this.value = this.val.default
-            this.autocompleteChange()
-          }
-          else if (
-            (v == null || v == '') &&
+          if (this.val.default) {
+            this.value = this.val.default;
+            this.autocompleteChange();
+          } else if (
+            (v == null || v == "") &&
             this.field.autofill &&
             this.items.list.length == 1
           ) {
-            this.value = this.items.list[0].value
-            this.autocompleteChange()
+            this.value = this.items.list[0].value;
+            this.autocompleteChange();
           }
 
+          this.loading = false;
+        })
+        .catch((err) => {
+          console.log(err)
           this.loading = false
         })
-        .catch((err) => console.log(err))
     },
     querySelections(v, url) {
-      this.loading = true
-      this.fetch(v, url)
+      this.loading = true;
+      this.fetch(v, url);
     },
     autocompleteChange: function() {
-      const list = this.items.list
-      if (!list) return
-      const selectedObject = list.filter((el) => el.value === this.value)[0]
+      const list = this.items.list;
+      if (!list) return;
+      const selectedObject = list.filter((el) => el.value === this.value)[0];
       // console.log("selectedObject", selectedObject)
-      this.$emit('update', {
+      if (this.field.publish) {
+        this.$observable.fire(this.field.publish, selectedObject);
+      }
+      this.$emit("update", {
         name: this.field.name,
         value: {
           list: list,
           value: selectedObject,
         },
-        type: 'autocompleteChange',
-      })
-    }
+        type: "autocompleteChange",
+      });
+    },
   },
   watch: {
     field: function(newVal) {
-      if(newVal.readonly == true || newVal.readonly == false){
-        this.readonly = newVal.readonly
-      }else if (newVal.readonly) {
-        this.readonly = this.model[newVal.readonly]
+      if (newVal.readonly == true || newVal.readonly == false) {
+        this.readonly = newVal.readonly;
+      } else if (newVal.readonly) {
+        this.readonly = this.model[newVal.readonly];
       }
     },
     val: {
@@ -134,19 +139,20 @@ export default {
         // console.log(oldVal)
         // this.val = newVal
         if (newVal.url) {
-          this.items.list = []
-          this.querySelections('', newVal.url)
+          this.items.list = [];
+          this.querySelections("", newVal.url);
         }
-        this.items = newVal
-        if(newVal.value != null || newVal.value != undefined) this.value = newVal.value
+        this.items = newVal;
+        if (newVal.value != null || newVal.value != undefined)
+          this.value = newVal.value;
         // console.log('val', this.val)
-        if(this.field.readonly == true || this.field.readonly == false){
-          this.readonly = this.field.readonly
-        }else if (this.field.readonly) {
-          this.readonly = this.model[this.field.readonly]
+        if (this.field.readonly == true || this.field.readonly == false) {
+          this.readonly = this.field.readonly;
+        } else if (this.field.readonly) {
+          this.readonly = this.model[this.field.readonly];
         }
         if (this.field.show) {
-          this.show = this.model[this.field.show]
+          this.show = this.model[this.field.show];
         }
       },
     },
@@ -163,18 +169,18 @@ export default {
     // },
     search: function(val) {
       if (this.val.url) {
-        val && val !== this.value && this.querySelections(val, this.val.url)
+        val && val !== this.value && this.querySelections(val, this.val.url);
       }
     },
   },
   mounted() {
     if (this.val.url) {
-      this.querySelections(null, this.val.url)
+      this.querySelections(null, this.val.url);
     }
     // this.autocompleteChange();
   },
-  props: ['val', 'field', 'model'],
-}
+  props: ["val", "field", "model"],
+};
 </script>
 <style>
 .v-select__slot {
