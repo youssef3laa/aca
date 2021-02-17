@@ -19,7 +19,6 @@ public class Lookup {
     String arValue;
     String enValue;
     Long parentId;
-    String stringKey;
 
     public String toString(){
         return SystemUtil.writeObjectIntoString(this).replace(",\"id\":null","");

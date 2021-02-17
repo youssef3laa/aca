@@ -39,7 +39,7 @@
   </v-menu>
 </template>
 <script>
-import { DateTime } from 'luxon'
+import {DateTime} from 'luxon'
 
 export default {
   data() {
@@ -72,7 +72,7 @@ export default {
   },
   watch: {
     val: function(newVal) {
-      if(newVal == "") this.date = new Date().toISOString().split('T')[0]
+      if(newVal == ""||newVal==undefined||newVal==null) this.date = new Date().toISOString().split('T')[0]
       else this.date = newVal
       if (this.field.max) {
         this.max = this.model[this.field.max]

@@ -25,7 +25,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -75,8 +74,8 @@ public class IncomingRegistrationController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @Transactional
-    @PostMapping("/case/initiate")
+//    @Transactional
+    @PostMapping("/initiate")
     public ResponseEntity<AppResponse<String>> initiate(@RequestHeader("X-Auth-Token") String token, @RequestBody Request request) {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {

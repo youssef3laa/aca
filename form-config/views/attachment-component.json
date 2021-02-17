@@ -9,7 +9,8 @@
   ],
   "model": {
     "attachment": {
-      "readonly": false
+      "readonly": false,
+      "validity":false
     }
   }
 }

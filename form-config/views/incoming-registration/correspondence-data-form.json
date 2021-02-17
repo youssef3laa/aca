@@ -19,13 +19,6 @@
             "col": "4"
         },
         {
-            "type": "InputComponent",
-            "label": "incomingNumber",
-            "name": "incomingNumber",
-            "readonly": true,
-            "col": "4"
-        },
-        {
             "type": "DatePickerComponent",
             "label": "incomingDate",
             "name": "incomingDate",
@@ -49,13 +42,6 @@
             "type": "InputComponent",
             "label": "registrationNumber",
             "name": "registrationNumber",
-            "col": "4"
-        },
-        {
-            "type": "InputComponent",
-            "label": "transferTo",
-            "name": "transferTo",
-            "rule": "required",
             "col": "4"
         },
         {

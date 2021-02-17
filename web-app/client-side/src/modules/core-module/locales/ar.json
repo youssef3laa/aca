@@ -11,6 +11,7 @@
   "linkIncoming": "ربط الوارد",
   "request-president-approval": "طلب موافقة رئيس الهيئة",
   "request-vice-approval": "طلب موافقة نائب رئيس الهيئة",
+  "pleaseAddAtLeastOneAttachment": "الرجاء إرفاق ملف واحد على الأفل",
   "request-approve": "الموافقة على الطلب",
   "processHasBeenSavedTemporarily": "تم حفظ الطلب مؤقتََا",
   "request-redirection": "إعادة توجيه",

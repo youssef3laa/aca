@@ -240,10 +240,10 @@ export default {
     });
     await this.listFiles();
 
-        this.$observable.subscribe("refreshAttachmentFiles", this.listFiles);
-        this.$observable.subscribe("attachmentValidationAsk", function () {
-            this.$observable.fire("attachmentValidationAnswer", this.valid);
-        });
+        // this.$observable.subscribe("refreshAttachmentFiles", this.listFiles);
+        // this.$observable.subscribe("attachmentValidationAsk", function () {
+        //     this.$observable.fire("attachmentValidationAnswer", this.valid);
+        // });
     },
     methods: {
         versionsModalClosed() {
@@ -266,7 +266,17 @@ export default {
             handler: function (newVal) {
                 this.valid = newVal.length > 0;
             }
-        }
+        },
+        valid: {
+            handler: function (newVal) {
+                this.$emit('update', {
+                    name: this.field.name,
+                    key: "validity",
+                    value: newVal
+                })
+            }
+        },
+
 
   }
 };
