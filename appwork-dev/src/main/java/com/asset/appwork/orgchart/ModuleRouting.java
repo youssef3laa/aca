@@ -6,22 +6,42 @@ import com.asset.appwork.dto.Router;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.ApprovalHistory;
+import com.asset.appwork.model.Group;
+import com.asset.appwork.model.RequestEntity;
 import com.asset.appwork.model.User;
 import com.asset.appwork.platform.soap.Process;
 import com.asset.appwork.platform.soap.Workflow;
 import com.asset.appwork.platform.util.CordysUtil;
 import com.asset.appwork.repository.ApprovalHistoryRepository;
+import com.asset.appwork.repository.RequestRepository;
 import com.asset.appwork.schema.OutputSchema;
+import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.util.ReflectionUtil;
+import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 
 @Slf4j
+@Service
 public class ModuleRouting {
+
+    @Autowired
+    OrgChartService orgChartService;
+    @Autowired
+    RequestRepository requestRepository;
+    @Autowired
+    ApprovalHistoryRepository approvalHistoryRepository;
+    @Autowired
+    Environment environment;
+
     private final String breakString = "end";
     private final String rejectString = "reject";
     private final String approveString = "approve";
@@ -31,18 +51,6 @@ public class ModuleRouting {
     private final String parallelString = "parallel";
     private final String requestModificationString = "requestModification";
     private final String multipleResponsibleString = "responsible";
-
-    String config;
-    Account account;
-    String cordysUrl;
-    ApprovalHistoryRepository approvalHistoryRepository;
-
-    public ModuleRouting(Account account, String cordysUrl, String config, ApprovalHistoryRepository approvalHistoryRepository) {
-        this.config = config;
-        this.account = account;
-        this.cordysUrl = cordysUrl;
-        this.approvalHistoryRepository = approvalHistoryRepository;
-    }
 
     @Data
     static class RoutingConfig {
@@ -60,26 +68,28 @@ public class ModuleRouting {
         HashMap<String, T> extraData = new HashMap<>();
     }
 
-    private RoutingConfig generateRoutingConfig() throws JsonProcessingException {
+    private <T> RoutingConfig generateRoutingConfig(T outputSchema) throws IOException {
+        String filePath = ((OutputSchema)outputSchema).getProcessFilePath(environment.getProperty("process.config"));
+        String config = SystemUtil.readFile(filePath);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(config);
         return objectMapper.convertValue(jsonNode, RoutingConfig.class);
     }
 
-    public <T> String goToNext(T outputSchema) throws AppworkException {
+    public <T> String goToNext(T outputSchema, Account account, String cordysUrl) throws AppworkException {
         String[] currentStepId = {""};
         ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s) -> {
             currentStepId[0] = (String) s;
         });
-        calculateNextStep(outputSchema);
+        calculateNextStep(outputSchema, account);
         if (currentStepId[0].equals("init"))
-            return initiateProcess(outputSchema);
+            return initiateProcess(outputSchema, account, cordysUrl);
         else
-            return completeWorkflow(outputSchema);
+            return completeWorkflow(outputSchema, account, cordysUrl);
     }
 
-    public <T> String calculateOutputSchema(T outputSchema) throws AppworkException {
-        calculateNextStep(outputSchema);
+    public <T> String calculateOutputSchema(T outputSchema, Account account) throws AppworkException {
+        calculateNextStep(outputSchema, account);
         String[] xml = {""};
         ReflectionUtil.of(outputSchema).ifPresent("getXMLWithNameSpace", (s) -> {
             xml[0] = (String) s;
@@ -87,7 +97,7 @@ public class ModuleRouting {
         return xml[0];
     }
 
-    private <T> String initiateProcess(T outputSchema) throws AppworkException {
+    private <T> String initiateProcess(T outputSchema, Account account, String cordysUrl) throws AppworkException {
         String response;
         try {
             String[] params = {""};
@@ -105,7 +115,7 @@ public class ModuleRouting {
         return response;
     }
 
-    private <T> String completeWorkflow(T outputSchema) throws AppworkException {
+    private <T> String completeWorkflow(T outputSchema, Account account, String cordysUrl) throws AppworkException {
         String response;
         try {
             String[] data = {""};
@@ -126,13 +136,13 @@ public class ModuleRouting {
         return response;
     }
 
-    private <T> void calculateNextStep(T outputSchema) throws AppworkException {
+    private <T> void calculateNextStep(T outputSchema,Account account) throws AppworkException {
         //TODO: Create Setter function in reflection class
         try {
             String nextStep = "", nextComponent = "", nextConfig = "", nextReadonlyCompnent = "", nextSubBP = "";
             Router nextRouter = new Router();
 
-            RoutingConfig routingConfig = generateRoutingConfig();
+            RoutingConfig routingConfig = generateRoutingConfig(outputSchema);
 
             String[] currentStepId = {""}, codeSelected = {""}, decision = {""}, parentHistoryId = {""} , receiverType = {""};
 
@@ -215,7 +225,13 @@ public class ModuleRouting {
             updateOutputSchemaExtraData(outputSchema, routingConfig, currentStepId[0]);
             updateOutputSchema(outputSchema, nextStep,
                     nextComponent, nextConfig, nextReadonlyCompnent, nextSubBP, nextRouter);
+
+            addUserToRequest(outputSchema, account);
         } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            log.error("ModuleRouting: "+ e.getMessage());
+            throw new AppworkException(e.getMessage(),ResponseCode.MODULE_ROUTING_FAILURE);
+        }catch (IOException e) {
             e.printStackTrace();
             log.error("ModuleRouting: "+ e.getMessage());
             throw new AppworkException(e.getMessage(),ResponseCode.MODULE_ROUTING_FAILURE);
@@ -354,6 +370,40 @@ public class ModuleRouting {
         }
 
         return "";
+    }
+
+    private <T> void addUserToRequest(T outputSchema,Account account) throws AppworkException{
+        String[] requestId = {""};
+        ReflectionUtil.of(outputSchema).ifPresent("getRequestId", (s) -> {
+            requestId[0] = (String)s;
+        });
+
+        if(!requestId[0].isEmpty()){
+            Optional<RequestEntity> request = requestRepository.findById(Long.parseLong(requestId[0]));
+            if(request.isPresent()){
+                String users = "";
+                String roles = "";
+                if(request.get().getWorkingUsers().isEmpty()){
+                    users += ";";
+                    roles += ";";
+                }else{
+                    users = request.get().getWorkingUsers();
+                    roles = request.get().getWorkingRoles();
+                }
+                User userData = orgChartService.getLoggedInUser(account);
+                Optional<Group> groupData = userData.getGroup().stream().findFirst();
+
+                users += userData.getUserId() + ";";
+                if(groupData.isPresent()){
+                    roles += groupData.get().getGroupCode() + ";";
+                }
+
+                request.get().setWorkingUsers(users);
+                request.get().setWorkingRoles(roles);
+
+                requestRepository.save(request.get());
+            }
+        }
     }
 }
 
