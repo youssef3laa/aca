@@ -150,6 +150,8 @@ export default {
         for(let key in data.data){
           data.data[key].DeliveryDate = new Date(data.data[key].DeliveryDate).toLocaleString()
         }
+        console.log(data)
+
         this.$observable.fire("tasks", {
           type: "modelUpdate",
           model: data,
