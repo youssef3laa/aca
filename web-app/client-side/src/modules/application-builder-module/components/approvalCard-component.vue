@@ -185,8 +185,8 @@
         let options = [];
         for(let i in decisions){
           options.push({
-            name: this.getDecisionLabel(decisions[i]),
-            value: decisions[i]
+            name: decisions[i],
+            label: this.getDecisionLabel(decisions[i])
           })
         }
         if(options.length == 0) return null
@@ -197,8 +197,8 @@
         let options = [];
         for(let i in receiverTypes){
           options.push({
-            name: this.getReceiverTypeLabel(receiverTypes[i]),
-            value: receiverTypes[i]
+            name: receiverTypes[i],
+            label: this.getReceiverTypeLabel(receiverTypes[i]),
           })
         }
         if(value) this.receiverType = value
