@@ -86,17 +86,17 @@ public class IncomingRegistrationController {
             User user = orgChartService.getLoggedInUser(account);
             Optional<Group> group = user.getGroup().stream().findFirst();
             String userCN = user.getCN();
-            if(!group.isEmpty()){
+            if(group.isPresent()){
                 userCN = group.get().getCn();
             }
 
             String cordysUrl = cordysService.getCordysUrl();
 
             String restAPIBaseUrl = SystemUtil.generateRestAPIBaseUrl(environment, "AssetGeneralACA");
-            Entity entity = new Entity(account, restAPIBaseUrl, request.incomingCase.table);
+            Entity entity = new Entity(account, restAPIBaseUrl, IncomingCase.table);
             Long caseId = entity.create(request.getIncomingCase());
 
-            entity = new Entity(account, restAPIBaseUrl, request.incomingRegistration.table);
+            entity = new Entity(account, restAPIBaseUrl, IncomingRegistration.table);
             request.incomingRegistration.setJobEntityId(caseId.toString());
             Long incomingId = entity.create(request.incomingRegistration);
 
@@ -110,9 +110,11 @@ public class IncomingRegistrationController {
             respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
+            log.error(e.getMessage());
             respBuilder.status(e.getCode());
         } catch (IOException e) {
             e.printStackTrace();
+            log.error(e.getMessage());
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 

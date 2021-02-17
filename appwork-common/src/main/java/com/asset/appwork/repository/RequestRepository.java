@@ -5,14 +5,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 
 @Repository
 public interface RequestRepository extends GenericRepository<RequestEntity, Long> {
-    Long countDistinctByDateAfter(Date date);
 
-
+    @Query("select count(r.date) from RequestEntity r where year(r.date) = :year")
+    Long countByDate(Integer year);
     //
     // get by specific request status and get older date  from source incoming only
     //    @Query("select r from RequestEntity r where r.process = :process and r.date < :requestDate and(r.subject like %:subject% or r.requestNumber like %:requestNumber%)")
