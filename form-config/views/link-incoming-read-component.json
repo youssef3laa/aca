@@ -8,7 +8,9 @@
                 "view"
             ],
             "subscribe": "linkParent",
-            "searchable": false,
+            "search": false,
+            "add":false,
+            "filter":false,
             "col": 12
         }
     ],

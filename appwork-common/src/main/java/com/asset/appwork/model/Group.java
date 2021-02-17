@@ -23,7 +23,7 @@ import java.sql.ResultSet;
 @Entity(name = "Group")
 @DiscriminatorValue("Group")
 //@Table(name = "OpenTextEntityIdentityComponentsIdentity")
-public class Group extends BaseIdentity<Group> {
+public class Group extends BaseIdentity {
     @Column(name = "GroupCode")
     String groupCode;
     @Column(name = "Head")
@@ -39,6 +39,12 @@ public class Group extends BaseIdentity<Group> {
     Unit unit;
     @Transient
     String cn;
+
+    public Group() {}
+
+    public Group(BaseIdentity identity) {
+        super(identity);
+    }
 
     @SneakyThrows
     public static Group fromString(String json) {

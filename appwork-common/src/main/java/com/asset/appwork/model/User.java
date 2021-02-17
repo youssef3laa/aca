@@ -12,7 +12,7 @@ import java.util.HashSet;
 @Entity(name = "User")
 @DiscriminatorValue("User")
 //@Table(name = "OpenTextEntityIdentityComponentsIdentity")
-public class User extends BaseIdentity<User> {
+public class User extends BaseIdentity {
     @Column(name = "UserId")
     String userId;
 
@@ -35,6 +35,12 @@ public class User extends BaseIdentity<User> {
 
     @Transient
     String cn;
+
+    public User() {}
+
+    public User(BaseIdentity identity) {
+        super(identity);
+    }
 
     @SneakyThrows
     public static User fromString(String json) {

@@ -42,6 +42,8 @@ public class IncomingRegistrationController {
     @Autowired
     CordysService cordysService;
     @Autowired
+    ModuleRouting moduleRouting;
+    @Autowired
     RequestService requestService;
     @Autowired
     ApprovalHistoryRepository approvalHistoryRepository;
@@ -101,20 +103,12 @@ public class IncomingRegistrationController {
 
             requestService.updateRequest(request.outputSchema, userCN, incomingId.toString(), request.incomingRegistration.getSubject(), "initiated");
 
-            String filePath = request.outputSchema.getProcessFilePath(environment.getProperty("process.config"));
-            String config = SystemUtil.readFile(filePath);
-
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
-            String response = moduleRouting.goToNext(request.outputSchema);
+            String response = moduleRouting.goToNext(request.outputSchema, account, cordysUrl);
             respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             log.error(e.getMessage());
             respBuilder.status(e.getCode());
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         return respBuilder.build().getResponseEntity();

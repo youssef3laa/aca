@@ -32,6 +32,8 @@ public interface UnitRepository extends GenericRepository<Unit, Long> {
 
     Page<Unit> findByNameIn(List<String> names, Pageable pageable);
 
+    Optional<Unit> findByUnitCodeAndUnitTypeCode(String unitCode, String unitTypeCode);
+
     List<Unit> findByUnitTypeCode(String code);
 
     Page<Unit> findByUnitTypeCode(String code, Pageable pageable);

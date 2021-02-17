@@ -86,8 +86,9 @@ import DataTableComponent from '../components/dataTable-component'
 import ModalComponent from '../components/modal-component'
 import D3GraphComponent from '../components/d3-graph-component'
 import SignatureComponent from '../components/signature-component'
-import ProcessRoutingComponent from '../components/process-routing-component'
+import DynamicApprovalComponent from '../components/approvalCard-dynamic-component'
 import ReceiverFormComponent from '../components/receiver-form-component'
+import DynamicReceiverFormComponent from '../components/receiver-form-dynamic-component'
 import VersionGridComponent from '../components/version-grid-component'
 import ProcessStatusControl from '../components/process-status-control'
 import SaveProcessComponent from '../components/save-process-component'
@@ -118,8 +119,9 @@ export default {
     ModalComponent,
     D3GraphComponent,
     SignatureComponent,
-    ProcessRoutingComponent,
+    DynamicApprovalComponent,
     ReceiverFormComponent,
+    DynamicReceiverFormComponent,
     VersionGridComponent,
     ProcessStatusControl,
     SaveProcessComponent

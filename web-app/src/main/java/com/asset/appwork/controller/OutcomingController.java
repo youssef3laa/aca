@@ -41,6 +41,8 @@ public class OutcomingController {
     @Autowired
     CordysService cordysService;
     @Autowired
+    ModuleRouting moduleRouting;
+    @Autowired
     OutcomingService outcomingService;
     @Autowired
     OutcomingRepository outcomingRepository;
@@ -111,18 +113,11 @@ public class OutcomingController {
 
             String cordysUrl = cordysService.getCordysUrl();
 
-            String filePath = request.outputSchema.getProcessFilePath(environment.getProperty("process.config"));
-            String config = SystemUtil.readFile(filePath);
-
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
-            String response = moduleRouting.goToNext(request.outputSchema);
+            String response = moduleRouting.goToNext(request.outputSchema, account, cordysUrl);
             respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
-        } catch (IOException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         return respBuilder.build().getResponseEntity();

@@ -26,9 +26,10 @@
   "notes": "الملاحظات",
   "opinion": "الرأي",
   "express-opinion": "إبداء الرأي",
+  "make-comment": "إبداء ملاحظات",
   "subjectSummary": "ملخص الموضوع",
   "initiate": "بدء الطلب",
-  "comment": "إبداء ملاحظات",
+  "comment": "الملاحظات",
   "memorandumCreate": "إعداد المذكرة",
   "writingDate": "تاريخ المكاتبة",
   "memorandum": "مذكرة العرض",
@@ -81,6 +82,7 @@
   "signature": "التأشيرة",
   "oldSignatures": "التأشيرات السابقة",
   "saveSignatureSuccess": "تم حفظ التأشيرة بنجاح",
+  "assignedSuccess": "تم تعيين الوحدة",
 
   "attachmentsDescription": "وصف المرفقات",
   "numberOfAttachments": "عدد المرفقات",
@@ -129,5 +131,12 @@
   "save": "حفظ",
   "temporarySave": "حفظ مؤقت",
   "createLink": "إنشاء دورة عمل ربط وارد",
-  "comments":"ملاحظات"
+  "comments":"ملاحظات",
+  "inquiryType": "نوع التحري",
+  "fullName": "الاسم بالكامل",
+  "birthDate": "تاريخ الميلاد",
+  "birthLocation": "محل الميلاد",
+  "jobEntity": "جهة الوظيفة",
+  "assignedJob":"الوظيفة المنتدب عليها",
+  "candidateJob":"الوظيفة المرشح إليها"
 }
