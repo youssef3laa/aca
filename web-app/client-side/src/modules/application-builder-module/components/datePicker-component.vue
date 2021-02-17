@@ -14,6 +14,7 @@
           clearable
           color="outline"
           outlined
+          readonly
           @click:clear="
             date = null
             datePickerChanged()
@@ -71,7 +72,8 @@ export default {
   },
   watch: {
     val: function(newVal) {
-      this.date = newVal
+      if(newVal == "") this.date = new Date().toISOString().split('T')[0]
+      else this.date = newVal
       if (this.field.max) {
         this.max = this.model[this.field.max]
         if(this.max < this.date){

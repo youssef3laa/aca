@@ -85,8 +85,8 @@ export default {
         this.$refs.appBuilder.setAppData({
           pages: [{ sections: [{ forms: [] }] }],
         });
-        console.log(this.$refs.appBuilder);
-        this.selected = event.value.value.value;
+        console.log(event);
+        this.selected = event.value.value.object.stringKey;
         this.loadForm(this.selected);
         console.log(this.selected);
       } else {

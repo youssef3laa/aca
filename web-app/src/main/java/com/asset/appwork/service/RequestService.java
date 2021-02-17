@@ -4,7 +4,6 @@ import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.RequestEntity;
-import com.asset.appwork.model.User;
 import com.asset.appwork.repository.RequestRepository;
 import com.asset.appwork.schema.OutputSchema;
 import lombok.NonNull;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +26,12 @@ public class RequestService {
     @Autowired
     OrgChartService orgChartService;
 
-    public void updateRequest(OutputSchema outputSchema, String username, String entityId, String subject, String status) throws AppworkException {
+    public void updateRequest(OutputSchema outputSchema, String userCN, String entityId, String subject, String status) throws AppworkException {
+
         Optional<RequestEntity> request = requestRepository.findById(Long.parseLong(outputSchema.getRequestId()));
         if (request.isPresent()) {
             request.get().setDate(new Date());
-            request.get().setInitiator(username);
+            request.get().setInitiator(userCN);
             request.get().setEntityName(outputSchema.getEntityName());
             request.get().setEntityId(entityId);
             request.get().setProcess(outputSchema.getProcess());
@@ -45,12 +46,18 @@ public class RequestService {
 
     public String generateRequestNumber(Account account) throws AppworkException {
         try {
-            User user = orgChartService.getLoggedInUser(account);
+//            2020 create wared
+
+            /*
+            *
+            * */
+
+//            User user = orgChartService.getLoggedInUser(account);
             Date date = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
             date = sdf.parse(sdf.format(date));
-            long count = requestRepository.countDistinctByDateAfter(date) + 1;
-            return sdf.format(date) + "-" + user.getId() + "-" + count;
+            long count = requestRepository.countByDate(Calendar.getInstance().get(Calendar.YEAR))+1;
+            return count + "/" + sdf.format(date);
         } catch (ParseException e) {
             throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         }

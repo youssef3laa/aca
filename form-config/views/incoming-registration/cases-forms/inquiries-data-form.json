@@ -1,0 +1,48 @@
+{
+    "key": "inquiryData",
+    "inputs": [
+        {
+            "type": "AutoCompleteComponent",
+            "name": "inquiryType",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "inquiryNumber",
+            "name": "inquiryNumber",
+            "col": "4"
+        },
+        {
+            "type": "DatePickerComponent",
+            "label": "inquiryDate",
+            "name": "inquiryDate",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "inquiryName",
+            "name": "inquiryName",
+            "rule": "required",
+            "col": "4"
+        },
+        {
+            "type": "DataTableComponent",
+            "name": "inquiriesTable",
+            "subscribe": "inquiries",
+            "col": 12
+        }
+    ],
+    "model": {
+        "inquiryType": {
+            "url": "lookup/get/category/caseType"
+        },
+        "inquiriesTable":{
+            "url": "",
+            "headers": [],
+            "data": []
+        },
+        "inquiryNumber": "",
+        "inquiryDate": "",
+        "inquiryName": ""
+    }
+}

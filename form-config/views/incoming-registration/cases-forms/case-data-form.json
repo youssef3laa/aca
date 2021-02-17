@@ -1,0 +1,37 @@
+{
+    "key": "caseData",
+    "inputs": [
+        {
+            "type": "AutoCompleteComponent",
+            "name": "caseType",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "caseNumber",
+            "name": "caseNumber",
+            "col": "4"
+        },
+        {
+            "type": "DatePickerComponent",
+            "label": "caseDate",
+            "name": "caseDate",
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "caseName",
+            "name": "caseName",
+            "rule": "required",
+            "col": "4"
+        }
+    ],
+    "model": {
+        "caseType": {
+            "url": "lookup/get/category/caseType"
+        },
+        "caseNumber": "",
+        "caseDate": "",
+        "caseName": ""
+    }
+}

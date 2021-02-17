@@ -19,6 +19,7 @@
                 <DataTableComponent :field="table.field" :val="table.val"></DataTableComponent>
             </v-col>
         </v-row>
+        <AlertComponent ref="alertComponent"></AlertComponent>
     </span>
 </template>
 
@@ -103,7 +104,7 @@
                     role : object.item.role
                 }
                 if(this.getAssigneeCNIndex(object.item.role.cn) > -1) this.assignees.assignee.splice(this.getAssigneeCNIndex(object.item.role.cn),1)
-                alert("Assigned")
+                this.$refs.alertComponent._alertSuccess({message:"assignedSuccess"})
                 this.onValueChange()
             },
             getAssigneeCNIndex: function(cn){
@@ -124,11 +125,11 @@
                         {
                             text: "الجهة",
                             align: "start",
-                            value: "unit.name_ar",
+                            value: "unit.nameAr",
                         },
                         {
                             text: "رئيس الجهة",
-                            value: "role.name_ar",
+                            value: "role.nameAr",
                         },
                         {
                             text: "كود الجهة",

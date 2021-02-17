@@ -55,9 +55,8 @@ export default {
                     text:"comments",
                     value:"comment"
                 },
-
             ],
-                key:"approvalDate",
+                key:"id",
                 data: []
             }
         },
