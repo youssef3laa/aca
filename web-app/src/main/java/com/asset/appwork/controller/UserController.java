@@ -1,4 +1,4 @@
-spackage com.asset.appwork.controller;
+package com.asset.appwork.controller;
 
 import com.asset.appwork.AppBuilder;
 import com.asset.appwork.config.TokenService;
