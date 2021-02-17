@@ -45,7 +45,7 @@ import java.util.HashSet;
 @DiscriminatorValue("Unit")
 //@Table(name = "OpenTextEntityIdentityComponentsIdentity")
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "id", scope = Unit.class)
-public class Unit extends BaseIdentity<Unit> {
+public class Unit extends BaseIdentity {
     @Column(name = "UnitTypeCode")
     String unitTypeCode;
     @Column(name = "UnitCode")
@@ -79,6 +79,12 @@ public class Unit extends BaseIdentity<Unit> {
 //    @JsonIdentityReference(alwaysAsId=true)
 //    @JsonFormat(with = JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED)
     Collection<Unit> parent = new HashSet<>();
+
+    public Unit() {}
+
+    public Unit(BaseIdentity identity) {
+        super(identity);
+    }
 
     @SneakyThrows
     public static Unit fromString(String json) {
