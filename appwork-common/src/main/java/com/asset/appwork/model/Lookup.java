@@ -3,7 +3,9 @@ package com.asset.appwork.model;
 import com.asset.appwork.util.SystemUtil;
 import lombok.Data;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Data
@@ -17,6 +19,7 @@ public class Lookup {
     String arValue;
     String enValue;
     Long parentId;
+    String stringKey;
 
     public String toString(){
         return SystemUtil.writeObjectIntoString(this).replace(",\"id\":null","");
