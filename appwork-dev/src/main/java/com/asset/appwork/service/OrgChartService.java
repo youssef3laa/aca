@@ -296,17 +296,18 @@ public class OrgChartService {
             throw new AppworkException("Could not update group with name " + createdGroupName, ResponseCode.UPDATE_ENTITY_FAILURE);
         }
 
-        Group platformGroupPostUpdate = groupRepository.findByName(createdGroupName).get();
+        Group platformGroupPostUpdate = new Group(identityRepository.findByName(createdGroupName).get());
 
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
                 "Group").update(platformGroupPostUpdate.getId(), Group.fromString(props).toPlatformString());
         return getGroup(platformGroupPostUpdate.getId());
     }
 
-        public Group getGroup(Long id) throws AppworkException {
-        return groupRepository.findById(id).orElseThrow(
+    public Group getGroup(Long id) throws AppworkException {
+        BaseIdentity identity = identityRepository.findById(id).orElseThrow(
                 () -> new AppworkException("Could not get Group Entity of id " + id, ResponseCode.READ_ENTITY_FAILURE)
         );
+        return new Group(identity);
     }
 
     public Group getGroupByName(String name) throws AppworkException {
@@ -317,9 +318,10 @@ public class OrgChartService {
 
     public Group getGroupByName(String name, Boolean groupCodeCouldBeNull) throws AppworkException {
         if (groupCodeCouldBeNull) {
-            return (Group) identityRepository.findByName(name).orElseThrow(
+            BaseIdentity identity = identityRepository.findByName(name).orElseThrow(
                     () -> new AppworkException("Could not get Group Entity of name " + name, ResponseCode.READ_ENTITY_FAILURE)
             );
+            return new Group(identity);
         }
         return getGroupByName(name);
     }
@@ -531,7 +533,8 @@ public class OrgChartService {
     }
 
     public void addSubGroupToGroup(Account account, Long id, Long subGroupId) throws AppworkException {
-        Group parentGroup = getGroupByName(getUnit(id).getName(), true);
+//        Group parentGroup = getGroupByName(getUnit(id).getName(), true);
+        Group parentGroup = getGroup(id);
         Group childGroup = getGroup(subGroupId);
 
         String props = new Member.StringList(

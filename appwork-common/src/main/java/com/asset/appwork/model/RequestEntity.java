@@ -33,6 +33,8 @@ public class RequestEntity {
     String subject;
     String requestNumber;
     String processInstanceId;
+    String workingUsers;
+    String workingRoles;
 
     public String toString() {
         return SystemUtil.writeObjectIntoString(this).replace(",\"id\":null", "");

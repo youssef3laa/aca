@@ -21,6 +21,7 @@ import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.xpath.operations.Mod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,8 @@ public class ProcessController {
     CordysService cordysService;
     @Autowired
     Environment environment;
+    @Autowired
+    ModuleRouting moduleRouting;
     @Autowired
     ApprovalHistoryRepository approvalHistoryRepository;
     @Autowired
@@ -69,18 +72,11 @@ public class ProcessController {
             requestService.updateRequest(requestJson.getProcessModel(), account.getUsername(), entityId.toString(),
                     "new-incoming", "created");
 
-            String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
-            String config = SystemUtil.readFile(filePath);
-
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
-            String response = moduleRouting.goToNext(requestJson.processModel);
+            String response = moduleRouting.goToNext(requestJson.processModel, account, cordysUrl);
             respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
-        } catch (IOException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         return respBuilder.build().getResponseEntity();
@@ -134,19 +130,12 @@ public class ProcessController {
 
             entity.update(linkIncomingEntityId, linkIncoming);
 
-            String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
-            String config = SystemUtil.readFile(filePath);
-
             requestJson.processModel.setRequestId(String.valueOf(requestEntityId));
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
-            String response = moduleRouting.goToNext(requestJson.processModel);
+            String response = moduleRouting.goToNext(requestJson.processModel, account, cordysUrl);
             respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
-        } catch (IOException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         return respBuilder.build().getResponseEntity();
@@ -161,18 +150,11 @@ public class ProcessController {
             Account account = tokenService.get(token);
             String cordysUrl = cordysService.getCordysUrl();
 
-            String filePath = outputSchema.getProcessFilePath(environment.getProperty("process.config"));
-            String config = SystemUtil.readFile(filePath);
-
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
-            String response = moduleRouting.goToNext(outputSchema);
+            String response = moduleRouting.goToNext(outputSchema, account, cordysUrl);
             respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
-        } catch (IOException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         return respBuilder.build().getResponseEntity();

@@ -31,7 +31,7 @@ public class DynamicReportController {
     EntityManager entityManager;
     @Autowired
     QueryService queryService;
-    @GetMapping("/get")
+    @PostMapping("/run")
     public ResponseEntity<AppResponse<JsonNode>> getForm(@RequestBody() Filter key) {
         AppResponse.ResponseBuilder<JsonNode> responseBuilder = AppResponse.builder();
         try{
