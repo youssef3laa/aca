@@ -49,7 +49,7 @@
             },
             jobTypeChange: async function(jobType){
                 console.log(jobType);
-                let view = await this.loadView("incoming-registration\\cases-forms\\case-data-form")
+                let view = await this.loadView("incoming-registration\\"+ jobType.object.stringKey )
                 console.log(view)
                 this.$refs.appBuilder.clearSectionForms("caseDataSection")
                 this.$refs.appBuilder.appendForm("caseDataSection",view)
