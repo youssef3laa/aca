@@ -5,11 +5,9 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -27,7 +25,7 @@ public class RequestEntity {
     @JsonAlias("requestDate")
     @JsonProperty("requestDate")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
-    Date date;
+    Date requestDate;
     String status;
     String initiator;
     String subject;
@@ -35,8 +33,16 @@ public class RequestEntity {
     String processInstanceId;
     String workingUsers;
     String workingRoles;
+    @Transient
+    String displayName;
+    @Transient
+    String unitName;
+    @Transient
+    String date;
 
     public String toString() {
-        return SystemUtil.writeObjectIntoString(this).replace(",\"id\":null", "");
+        return SystemUtil.writeObjectIntoString(this).replace(",\"id\":null", "")
+                .replace(",\"displayName\":null", "")
+                .replace(",\"unitName\":null", "");
     }
 }

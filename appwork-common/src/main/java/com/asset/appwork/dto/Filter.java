@@ -11,6 +11,7 @@ public class Filter {
     String type;
     String table;
     List<LinkedHashMap> aggregations = new ArrayList<>();
+    List<LinkedHashMap> sortBy = new ArrayList<>();
     List<String> columns = new ArrayList<>();
     List<String> groupBy = new ArrayList<>();
     List<LinkedHashMap> where = new ArrayList<>();

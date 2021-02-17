@@ -15,13 +15,12 @@ import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.service.ProcessService;
-import com.asset.appwork.service.RequestService;
+import com.asset.appwork.service.RequestEntityService;
 import com.asset.appwork.soup.ProcessSOAP;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.xpath.operations.Mod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +50,7 @@ public class ProcessController {
     @Autowired
     OrgChartService orgChartService;
     @Autowired
-    RequestService requestService;
+    RequestEntityService requestEntityService;
     @Autowired
     ProcessService processService;
 
@@ -69,7 +68,7 @@ public class ProcessController {
                     , requestJson.processModel.getEntityName());
             Long entityId = entity.create(requestJson.generalProcessEntity);
 
-            requestService.updateRequest(requestJson.getProcessModel(), account.getUsername(), entityId.toString(),
+            requestEntityService.updateRequest(requestJson.getProcessModel(), account.getUsername(), entityId.toString(),
                     "new-incoming", "created");
 
             String response = moduleRouting.goToNext(requestJson.processModel, account, cordysUrl);
@@ -103,14 +102,14 @@ public class ProcessController {
             Long linkIncomingEntityId = entity.create(linkIncoming);
 
 
-            String generatedRequestNumber = requestService.generateRequestNumber(account);
+            String generatedRequestNumber = requestEntityService.generateRequestNumber(account);
             RequestEntity requestEntity = new RequestEntity();
             requestEntity.setEntityId(String.valueOf(linkIncomingEntityId));
             requestEntity.setEntityName("ACA_Entity_linkIncoming");
             requestEntity.setRequestNumber(generatedRequestNumber);
             requestEntity.setSubject(String.valueOf(requestJson.getProcessModel().getExtraData().get("subject")));
             requestEntity.setProcess("linkIncoming");
-            requestEntity.setDate(new Date());
+            requestEntity.setRequestDate(new Date());
             requestEntity.setInitiator(String.valueOf(requestJson.getProcessModel().getExtraData().get("initiatorId")));
             requestEntity.setStatus("created");
             entity = new Entity(account,
