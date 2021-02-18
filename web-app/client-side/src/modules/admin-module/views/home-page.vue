@@ -38,11 +38,7 @@
         </Charts>
       </v-col>
     </v-row>
-    <div style="width: 100%; display: flex">
-      <TasksLists></TasksLists>
-      <AdvancedSearch></AdvancedSearch>
-      <OrgChartBtn></OrgChartBtn>
-    </div>
+    <Topbar></Topbar>
     <Inbox></Inbox>
 
   </v-container>
@@ -50,9 +46,7 @@
 
 <script>
 import chartsMixin from "../../../mixins/chartsMixin";
-import TasksLists from "../../application-builder-module/components/tasks-list-component";
-import AdvancedSearch from "../../application-builder-module/components/advanced-search-component";
-import OrgChartBtn from "../../application-builder-module/components/org-chart-btn-component";
+import Topbar from "../../application-builder-module/components/topbar-component";
 import Charts from "../../application-builder-module/components/charts-component";
 import Inbox from "../../application-builder-module/components/inbox-component";
 
@@ -61,9 +55,7 @@ import http from "../../core-module/services/http";
 export default {
   name: "HomePage",
   components: {
-    TasksLists,
-    AdvancedSearch,
-    OrgChartBtn,
+Topbar,
     Inbox,
     Charts,
   },
