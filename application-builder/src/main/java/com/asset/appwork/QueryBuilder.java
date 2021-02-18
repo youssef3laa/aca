@@ -3,10 +3,6 @@ package com.asset.appwork;
 import com.asset.appwork.dto.Filter;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.util.SystemUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
@@ -226,30 +222,6 @@ public class QueryBuilder<T> {
     }
 
 }
-//            ============ Add Sort By =============
-//            List<?> sortByList = SystemUtil.readJSONArray(queryJson, "sortBy");
-//            if (sortByList != null) {
-//                ArrayList<Order> sortByOrder = new ArrayList<>();
-//                for(Object sortBy: sortByList){
-//                    String[] sortBySplitStrings = ((String) sortBy).split(":");
-//
-//                    if(sortBySplitStrings.length > 1){
-//                        String sortByDirection = sortBySplitStrings[0];
-//                        String sortByColumn = sortBySplitStrings[1];
-//
-//                        if(sortByDirection == "desc"){
-//                            sortByOrder.add(criteriaBuilder.desc(root.get(sortByColumn)));
-//                        }else{
-//                            sortByOrder.add(criteriaBuilder.asc(root.get(sortByColumn)));
-//                        }
-//                    }else{
-//                        sortByOrder.add(criteriaBuilder.asc(root.get(sortBySplitStrings[0])));
-//                    }
-//                }
-//                if(sortByOrder.size() > 0){
-//                    query.orderBy(sortByOrder);
-//                }
-//            }
 //            ======== between function ========
 //            if(conditionFunction.equals("between") && conditionLength == 4){
 //                String column = condition.split(",")[1];

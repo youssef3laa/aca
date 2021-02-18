@@ -21,14 +21,13 @@ export default {
                 console.error(error);
             }
         },
-        claimTask: function (taskId) {
-            http.post('/workflow/task/claim', taskId)
-                .then((response) => {
-                    console.log("ClaimTask Response:", response);
-                })
-                .catch((error) => {
-                    console.error(error)
-                })
+        claimTask: async function (taskId , approvalId) {
+            try{
+                let response = await http.post('/workflow/task/claim', { taskId: taskId,  approvalId: approvalId } );
+                console.log("ClaimTask Response:", response);
+            } catch (error){
+                console.error(error)
+            }
         },
         getTaskData: async function (taskId) {
             try{
