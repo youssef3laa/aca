@@ -137,5 +137,15 @@
   "birthLocation": "محل الميلاد",
   "jobEntity": "جهة الوظيفة",
   "assignedJob":"الوظيفة المنتدب عليها",
-  "candidateJob":"الوظيفة المرشح إليها"
+  "candidateJob":"الوظيفة المرشح إليها",
+  "processName":"عنوان الموضوع",
+  "displayName":"المرسل",
+  "unitName":"الجهة",
+  "approvalDate":"التاريخ",
+  "requestNumber":"رقم الوارد",
+  "creator":"المنشئ",
+  "deliveryDate":"تاريخ الارسال",
+  "taskRequestNumber":"رقم الطلب"
+
+
 }
