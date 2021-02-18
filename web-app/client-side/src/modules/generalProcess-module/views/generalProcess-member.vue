@@ -29,10 +29,10 @@ export default {
   },
   async created() {
     this.taskId = this.$route.params.taskId;
-    this.claimTask(this.taskId);
 
     this.taskData = await this.getTaskData(this.taskId);
     this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
+  await this.claimTask(this.taskId, this.inputSchema.parentHistoryId)
     this.loadForm(this.inputSchema.config, this.fillForm);
 
     this.$observable.subscribe("complete-step", this.submit);

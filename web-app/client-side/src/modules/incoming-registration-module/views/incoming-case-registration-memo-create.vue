@@ -26,9 +26,9 @@
             }
         },
         async created(){
-            this.claimTask(this.taskId)
             let taskData = await this.getTaskData(this.taskId)
             this.inputSchema = taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment
+            await this.claimTask(this.taskId, this.inputSchema.parentHistoryId)
             this.loadForm(this.inputSchema.config, this.formLoaded)
             this.$observable.subscribe("complete-step", this.submit)
             this.$observable.subscribe("searchIncoming", (data) => { this.getRequestEntities(data) })

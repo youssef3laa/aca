@@ -5,11 +5,13 @@ import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.response.AppResponse;
+import com.asset.appwork.service.ApprovalHistoryService;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.util.SystemUtil;
 import com.asset.appwork.platform.soap.Workflow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +32,8 @@ public class WorkflowController {
     TokenService tokenService;
     @Autowired
     CordysService cordysService;
+    @Autowired
+    ApprovalHistoryService approvalHistoryService;
 
     @GetMapping("/human/tasks")
     public ResponseEntity<AppResponse<String>> getHumanTask(@RequestHeader("X-Auth-Token") String token) {
@@ -90,13 +94,13 @@ public class WorkflowController {
     }
 
     @PostMapping("/task/claim")
-    public ResponseEntity<AppResponse<String>> claimTask(@RequestHeader("X-Auth-Token") String token, @RequestBody() String taskId) {
+    public ResponseEntity<AppResponse<String>> claimTask(@RequestHeader("X-Auth-Token") String token, @RequestBody() Request request) {
         AppResponse.ResponseBuilder<String> responseBuilder = AppResponse.builder();
         try {
             Workflow workflow = new Workflow();
             Account account = tokenService.get(token);
             if (account != null) {
-                String response = cordysService.sendRequest(account, workflow.getTask(account.getSAMLart(), taskId));
+                String response = cordysService.sendRequest(account, workflow.getTask(account.getSAMLart(), request.taskId));
                 System.out.println(response);
 
                 Document document = SystemUtil.convertStringToXMLDocument(response);
@@ -107,7 +111,8 @@ public class WorkflowController {
                     String taskState = SystemUtil.readJSONField(response, "State");
                     if (taskState != null) {
                         if (!taskState.equals("ASSIGNED")) {
-                            response = cordysService.sendRequest(account, workflow.claimTask(account.getSAMLart(), taskId));
+                            approvalHistoryService.updateReceiveDate(Long.parseLong(request.approvalId));
+                            response = cordysService.sendRequest(account, workflow.claimTask(account.getSAMLart(), request.taskId));
                         } else {
                             response = "Task is already claimed.";
                         }
@@ -155,4 +160,9 @@ public class WorkflowController {
 
     }
 
+    @Data
+    private static class Request {
+        String taskId;
+        String approvalId;
+    }
 }

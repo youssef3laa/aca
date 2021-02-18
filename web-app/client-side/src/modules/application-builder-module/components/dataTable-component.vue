@@ -233,6 +233,7 @@ export default {
         })
         .catch((error) => {
           console.error(error);
+          this.loading = false;
         });
     },
     translateData: function() {
