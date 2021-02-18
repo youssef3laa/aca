@@ -47,8 +47,8 @@ export default {
                             col: '4',
                           },
                           {
-                            type: 'InputComponent',
-                            label: 'status',
+                            type: 'AutoCompleteComponent',
+                            // label: 'status',
                             name: 'status',
                             col: '4',
                           },
@@ -87,7 +87,9 @@ export default {
                         ],
                         model: {
                           subject: '',
-                          status: '',
+                          status: {
+                            url: 'lookup/get/category/processStatus',
+                          },
                           requestNumber: '',
                           requestDate: '',
                           process: '',
@@ -121,20 +123,24 @@ export default {
                                 value: 'status',
                               },
                               {
-                                text: 'request Number',
+                                text: 'requestNumber',
                                 value: 'requestNumber',
                               },
                               {
-                                text: 'request Date',
-                                value: 'requestDate',
+                                text: 'requestDate',
+                                value: 'date',
                               },
                               {
-                                text: 'process',
+                                text: 'processName',
                                 value: 'process',
                               },
                               {
-                                text: 'initiator',
-                                value: 'initiator',
+                                text: 'unitName',
+                                value: 'unitName',
+                              },
+                              {
+                                text: 'displayName',
+                                value: 'displayName',
                               },
                             ],
                             data: [],
@@ -154,6 +160,27 @@ export default {
   },
   mounted() {
     this.$observable.subscribe('search', (obj) => {
+      let statusQuery = {
+        type: 'like',
+        column: 'status',
+        value: '%%',
+      }
+      console.log(obj)
+      if (obj.model.status.value) {
+        if (obj.model.status.value.object.stringKey == 'end') {
+          statusQuery = {
+            type: 'equal',
+            column: 'status',
+            value: 'end',
+          }
+        } else {
+          statusQuery = {
+            type: 'notEqual',
+            column: 'status',
+            value: 'end',
+          }
+        }
+      }
       let qBody = {
         table: 'RequestEntity',
         where: [
@@ -168,19 +195,15 @@ export default {
                 type: 'greaterThanOrEqualTo',
                 column: 'requestDate',
                 // value: obj.model.requestDate + ':00:00:00',
-                value: '1900-01-01:00:00:00',
+                value: '1900-01-01T00:00:00.000',
               },
               {
                 type: 'smallerThanOrEqualTo',
                 column: 'requestDate',
                 // value: obj.model.requestDate + ':23:59:59',
-                value: '2200-01-01:23:59:59',
+                value: '2200-01-01T23:59:59.000',
               },
-              {
-                type: 'like',
-                column: 'status',
-                value: '%' + obj.model.status + '%',
-              },
+              statusQuery,
               {
                 type: 'like',
                 column: 'requestNumber',
@@ -198,7 +221,9 @@ export default {
       console.log(qBody)
       http.post('/dynamic/report/run', qBody).then((response) => {
         console.log(response)
-         this.$refs.appBuilder.setModelData('basicSearchTable',{ basicSearchTable: { data: response.data.data }})
+        this.$refs.appBuilder.setModelData('basicSearchTable', {
+          basicSearchTable: { data: response.data.data },
+        })
       })
     })
   },
