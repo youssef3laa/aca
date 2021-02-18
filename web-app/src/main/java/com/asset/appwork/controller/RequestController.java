@@ -9,7 +9,7 @@ import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.repository.RequestRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
-import com.asset.appwork.service.RequestService;
+import com.asset.appwork.service.RequestEntityService;
 import com.asset.appwork.util.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class RequestController {
     @Autowired
     Environment environment;
     @Autowired
-    RequestService requestService;
+    RequestEntityService requestEntityService;
     @Autowired
     RequestRepository requestRepository;
 
@@ -71,9 +71,9 @@ public class RequestController {
             Entity entity = new Entity(account, restAPIBaseUrl, "ACA_Entity_request");
 
             RequestEntity request = new RequestEntity();
-            request.setRequestNumber(requestService.generateRequestNumber(account));
+            request.setRequestNumber(requestEntityService.generateRequestNumber(account));
             request.setStatus("created");
-            request.setDate(new Date());
+            request.setRequestDate(new Date());
 
             Long requestId = entity.create(request);
             Optional<RequestEntity> requestOptional = requestRepository.findById(requestId);
@@ -104,7 +104,7 @@ public class RequestController {
         try {
             Account account = tokenService.get(token);
             if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
-            responseBuilder.data(requestService.getRequestsByProcessAndDateAndSubjectAndRequestNumber(process, subject, requestNumber));
+            responseBuilder.data(requestEntityService.getRequestsByProcessAndDateAndSubjectAndRequestNumber(process, subject, requestNumber));
         } catch (AppworkException e) {
             log.error(e.getMessage());
             responseBuilder.status(e.getCode());

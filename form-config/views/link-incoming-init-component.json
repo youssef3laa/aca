@@ -28,7 +28,9 @@
             "name": "linkingTable",
             "actions": [{"name": "createLink", "icon":"fas fa-link"}],
             "subscribe": "link",
-            "searchable": false,
+            "search": false,
+            "add":false,
+            "filter":false,
             "col": 12
         }
 

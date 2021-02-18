@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-row v-if="searchable">
+    <v-row>
       <v-col v-if="field.add == true" :cols="7">
         <button style="padding: 5px; margin: 20px" @click="handlAddButton()">
           <v-icon color="info">fas fa-plus</v-icon>

@@ -17,8 +17,9 @@ import { Splitpanes, Pane } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 import historyMixin from "../../history-module/mixin/historyMixin";
 import router from "../../../router";
+import formPageMixin from "../../../mixins/formPageMixin"
 export default {
-  mixins: [historyMixin],
+  mixins: [historyMixin,formPageMixin],
   components: {
     Sidebar,
     Splitpanes,
@@ -29,98 +30,7 @@ export default {
     return {
       response: [],
       sidebarItem: "viewReceived",
-      app: {
-        pages: [
-          {
-            tabs: [
-              {
-                key: "tab1",
-                id: "1",
-                name: "استيفاء",
-                icon: "fas fa-copy",
-                isActive: true,
-              },
-              {
-                id: "2",
-                name: "للتأشير",
-                icon: "fas fa-pen-square",
-              },
-              {
-                id: "3",
-                name: "لإبداء الرأي",
-                icon: "fas fa-comments",
-              },
-              {
-                id: "4",
-                name: "تكليفات",
-                icon: "fas fa-copy",
-              },
-              {
-                id: "5",
-                name: "مراسلات داخلية",
-                icon: "fas fa-inbox",
-              },
-            ],
-            sections: [
-              {
-                key: "section 1",
-                tabId: 1,
-                isTab: true,
-                type: "DefaultSection",
-                display: "block",
-                isCard: true,
-                forms: [
-                  {
-                    key: "userHistoryTable",
-                    inputs: [
-                      {
-                        type: "DataTableComponent",
-                        name: "taskTable",
-                        actions: ["view"],
-                        subscribe: "tasks",
-                        col: 12,
-                      },
-                    ],
-                    model: {
-                      taskTable: {
-                        headers: [
-                          {
-                            text: "Task",
-                            align: "start",
-                            filterable: false,
-                            value: "Activity",
-                          },
-                          {
-                            text: "Sender Name",
-                            value: "Sender.displayName",
-                          },
-                          {
-                            text: "Process Name",
-                            value:
-                              "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.process",
-                          },
-                          {
-                            text: "Date",
-                            value: "DeliveryDate",
-                          },
-                          {
-                            text: "",
-                            value: "action",
-                          },
-                        ],
-                     
-                        data: [],
-                       
-                        search: "",
-                      },
-                    },
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
+    app:{},
     };
   },
   methods: {
@@ -141,6 +51,10 @@ export default {
           console.error(e);
         }
       }
+      else{
+                console.log("item obj in sent", item);
+
+      }
     },
     getTasks: function() {
       http.get('workflow/human/tasks').then((response) => {
@@ -150,6 +64,8 @@ export default {
         for(let key in data.data){
           data.data[key].DeliveryDate = new Date(data.data[key].DeliveryDate).toLocaleString()
         }
+        console.log(data)
+
         this.$observable.fire("tasks", {
           type: "modelUpdate",
           model: data,
@@ -162,22 +78,22 @@ export default {
           url: null,
           headers: [
             {
-              text: "الموضوع",
+              text: "subject",
               align: "start",
               filterable: false,
               value:
                 "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.subject",
             },
             {
-              text: "المنشئ",
+              text: "creator",
               value: "Sender.displayName",
             },
             {
-              text: "تاريخ الارسال",
+              text: "deliveryDate",
               value: "DeliveryDate",
             },
             {
-              text: "رقم الطلب",
+              text: "taskRequestNumber",
               value:
                 "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestNumber",
             },
@@ -205,14 +121,19 @@ export default {
     },
   },
   mounted: function () {
-    this.createTasks();
-    this.getTasks();
-  },
-  created() {
+    this.loadForm("inbox",this.getTasks)
+
+  
     this.$observable.subscribe("taskTable_view", (item) => {
       this.viewTask(item);
     });
+    console.log(JSON.stringify(this.app))
   },
+  // created() {
+  //   this.$observable.subscribe("taskTable_view", (item) => {
+  //     this.viewTask(item);
+  //   });
+  // },
 };
 </script>
 

@@ -15,7 +15,7 @@ import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.service.ProcessService;
-import com.asset.appwork.service.RequestService;
+import com.asset.appwork.service.RequestEntityService;
 import com.asset.appwork.soup.ProcessSOAP;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,11 +44,13 @@ public class ProcessController {
     @Autowired
     Environment environment;
     @Autowired
+    ModuleRouting moduleRouting;
+    @Autowired
     ApprovalHistoryRepository approvalHistoryRepository;
     @Autowired
     OrgChartService orgChartService;
     @Autowired
-    RequestService requestService;
+    RequestEntityService requestEntityService;
     @Autowired
     ProcessService processService;
 
@@ -66,21 +68,14 @@ public class ProcessController {
                     , requestJson.processModel.getEntityName());
             Long entityId = entity.create(requestJson.generalProcessEntity);
 
-            requestService.updateRequest(requestJson.getProcessModel(), account.getUsername(), entityId.toString(),
+            requestEntityService.updateRequest(requestJson.getProcessModel(), account.getUsername(), entityId.toString(),
                     "new-incoming", "created");
 
-            String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
-            String config = SystemUtil.readFile(filePath);
-
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
-            String response = moduleRouting.goToNext(requestJson.processModel);
+            String response = moduleRouting.goToNext(requestJson.processModel, account, cordysUrl);
             respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
-        } catch (IOException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         return respBuilder.build().getResponseEntity();
@@ -107,14 +102,14 @@ public class ProcessController {
             Long linkIncomingEntityId = entity.create(linkIncoming);
 
 
-            String generatedRequestNumber = requestService.generateRequestNumber(account);
+            String generatedRequestNumber = requestEntityService.generateRequestNumber(account);
             RequestEntity requestEntity = new RequestEntity();
             requestEntity.setEntityId(String.valueOf(linkIncomingEntityId));
             requestEntity.setEntityName("ACA_Entity_linkIncoming");
             requestEntity.setRequestNumber(generatedRequestNumber);
             requestEntity.setSubject(String.valueOf(requestJson.getProcessModel().getExtraData().get("subject")));
             requestEntity.setProcess("linkIncoming");
-            requestEntity.setDate(new Date());
+            requestEntity.setRequestDate(new Date());
             requestEntity.setInitiator(String.valueOf(requestJson.getProcessModel().getExtraData().get("initiatorId")));
             requestEntity.setStatus("created");
             entity = new Entity(account,
@@ -134,19 +129,12 @@ public class ProcessController {
 
             entity.update(linkIncomingEntityId, linkIncoming);
 
-            String filePath = requestJson.processModel.getProcessFilePath(environment.getProperty("process.config"));
-            String config = SystemUtil.readFile(filePath);
-
             requestJson.processModel.setRequestId(String.valueOf(requestEntityId));
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
-            String response = moduleRouting.goToNext(requestJson.processModel);
+            String response = moduleRouting.goToNext(requestJson.processModel, account, cordysUrl);
             respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
-        } catch (IOException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         return respBuilder.build().getResponseEntity();
@@ -161,18 +149,11 @@ public class ProcessController {
             Account account = tokenService.get(token);
             String cordysUrl = cordysService.getCordysUrl();
 
-            String filePath = outputSchema.getProcessFilePath(environment.getProperty("process.config"));
-            String config = SystemUtil.readFile(filePath);
-
-            ModuleRouting moduleRouting = new ModuleRouting(account, cordysUrl, config, approvalHistoryRepository);
-            String response = moduleRouting.goToNext(outputSchema);
+            String response = moduleRouting.goToNext(outputSchema, account, cordysUrl);
             respBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
-        } catch (IOException e) {
-            e.printStackTrace();
-            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         return respBuilder.build().getResponseEntity();

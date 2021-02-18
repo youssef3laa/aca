@@ -27,9 +27,10 @@ import java.util.Optional;
                 "   END ) " +
                 "END "
 )
+@DiscriminatorValue("Unknown")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class BaseIdentity<T extends BaseIdentity> {
+public class BaseIdentity {
     @Id
     @Column(name = "Id")
     long id;
@@ -43,6 +44,17 @@ public abstract class BaseIdentity<T extends BaseIdentity> {
     String nameAr;
     @Column(name = "IdentityDisplayName")
     String displayName;
+
+    public BaseIdentity() {}
+
+    public BaseIdentity(BaseIdentity identity) {
+        this.id = identity.getId();
+        this.name = identity.getName();
+        this.description = identity.getDescription();
+        this.nameEn = identity.getNameEn();
+        this.nameAr = identity.getNameAr();
+        this.displayName = identity.getDisplayName();
+    }
 
     @SneakyThrows
     public String toString() {

@@ -130,5 +130,22 @@
   "save": "حفظ",
   "temporarySave": "حفظ مؤقت",
   "createLink": "إنشاء دورة عمل ربط وارد",
-  "comments":"ملاحظات"
+  "comments":"ملاحظات",
+  "inquiryType": "نوع التحري",
+  "fullName": "الاسم بالكامل",
+  "birthDate": "تاريخ الميلاد",
+  "birthLocation": "محل الميلاد",
+  "jobEntity": "جهة الوظيفة",
+  "assignedJob":"الوظيفة المنتدب عليها",
+  "candidateJob":"الوظيفة المرشح إليها",
+  "processName":"عنوان الموضوع",
+  "displayName":"المرسل",
+  "unitName":"الجهة",
+  "approvalDate":"التاريخ",
+  "requestNumber":"رقم الوارد",
+  "creator":"المنشئ",
+  "deliveryDate":"تاريخ الارسال",
+  "taskRequestNumber":"رقم الطلب"
+
+
 }

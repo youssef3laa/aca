@@ -50,9 +50,10 @@ public class UserController {
 
         String rootStr = environment.getProperty("form.config");
 
-        try (FileReader fileReader = new FileReader(rootStr +File.separator+ "output"+File.separator + key + ".json")) {
+        try (FileReader fileReader = new FileReader(new File(rootStr +File.separator+ "output"+File.separator + key + ".json"))) {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode outputData = mapper.readTree(fileReader);
+
             System.out.println(outputData);
             return responseBuilder.data(outputData).status(ResponseCode.SUCCESS).build().getResponseEntity();
         } catch (IOException e) {
