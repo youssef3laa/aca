@@ -65,27 +65,27 @@ export default {
                 url:"history/user",
                 headers: [
                     {
-                        text: "عنوان الموضوع",
+                        text: "processName",
                         value: "processName",
                       },
                       {
-                        text: "المرسل",
+                        text: "displayName",
                         value: "displayName",
                       },
                 
                     {
-                      text: "التاريخ",
+                      text: "approvalDate",
 
                       value: "approvalDate",
                     },
               
                     {
-                      text: "الجهة",
-                      value: "",
+                      text: "unitName",
+                      value: "unitName",
                     },
                     {
-                        text: "رقم الوارد",
-                        value: "processId",
+                        text: "requestNumber",
+                        value: "requestNumber",
                       },
                       {
                         text: "",

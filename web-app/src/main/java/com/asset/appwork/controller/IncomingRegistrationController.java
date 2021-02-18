@@ -16,7 +16,7 @@ import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.service.IncomingRegistrationService;
 import com.asset.appwork.service.OrgChartService;
-import com.asset.appwork.service.RequestService;
+import com.asset.appwork.service.RequestEntityService;
 import com.asset.appwork.util.SystemUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -44,7 +45,7 @@ public class IncomingRegistrationController {
     @Autowired
     ModuleRouting moduleRouting;
     @Autowired
-    RequestService requestService;
+    RequestEntityService requestEntityService;
     @Autowired
     ApprovalHistoryRepository approvalHistoryRepository;
     @Autowired
@@ -101,7 +102,7 @@ public class IncomingRegistrationController {
             request.incomingRegistration.setJobEntityId(caseId.toString());
             Long incomingId = entity.create(request.incomingRegistration);
 
-            requestService.updateRequest(request.outputSchema, userCN, incomingId.toString(), request.incomingRegistration.getSubject(), "initiated");
+            requestEntityService.updateRequest(request.outputSchema, userCN, incomingId.toString(), request.incomingRegistration.getSubject(), "initiated");
 
             String response = moduleRouting.goToNext(request.outputSchema, account, cordysUrl);
             respBuilder.data(response);

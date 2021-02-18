@@ -10,13 +10,13 @@ import java.util.List;
 @Repository
 public interface RequestRepository extends GenericRepository<RequestEntity, Long> {
 
-    @Query("select count(r.date) from RequestEntity r where year(r.date) = :year")
-    Long countByDate(Integer year);
+    @Query("select count(r.requestDate) from RequestEntity r where year(r.requestDate) = :year")
+    Long countByRequestDate(Integer year);
     //
     // get by specific request status and get older date  from source incoming only
     //    @Query("select r from RequestEntity r where r.process = :process and r.date < :requestDate and(r.subject like %:subject% or r.requestNumber like %:requestNumber%)")
     @Query("select r from RequestEntity r where r.process = :process and(r.subject like %:subject% and r.requestNumber like %:requestNumber%)")
-    List<RequestEntity> getRequestsByProcessAndDateAndSubjectAndRequestNumber(@Param("process") String process,
+    List<RequestEntity> getRequestsByProcessAndRequestDateAndSubjectAndRequestNumber(@Param("process") String process,
                                                                               @Param("subject") String subject,
                                                                               @Param("requestNumber") String requestNumber);
 }

@@ -35,10 +35,10 @@ public class ProcessService {
     @Autowired
     OrgChartService orgChartService;
     @Autowired
-    RequestService requestService;
+    RequestEntityService requestEntityService;
 
     public void pauseProcess(Account account, OutputSchema outputSchema) throws AppworkException, IOException, ParseException {
-        RequestEntity requestEntity = requestService.getRequestEntityById(Long.valueOf(outputSchema.getRequestId()));
+        RequestEntity requestEntity = requestEntityService.getRequestEntityById(Long.valueOf(outputSchema.getRequestId()));
 
         //calc outputSchema
 //        String cordysUrl = cordysService.getCordysUrl();
