@@ -32,11 +32,11 @@ export default {
             return {
                 url: "history/"+ requestId,
                 headers: [
-                    {
-                        text: "decision",
-                        align: "start",
-                        value: "decision",
-                    },
+                    // {
+                    //     text: "decision",
+                    //     align: "start",
+                    //     value: "decision",
+                    // },
                     {
                         text: "name",
                         value: "displayName",
@@ -45,9 +45,16 @@ export default {
                         text: "theEntity",
                         value: "unitName",
                     },
-
                     {
-                        text: "date",
+                        text: "receiverName",
+                        value: "receiverDisplayName",
+                    },
+                    {
+                        text: "receiveDate",
+                        value: "receiveDate",
+                    },
+                    {
+                        text: "sendDate",
                         value: "approvalDate",
                     },
                 ],

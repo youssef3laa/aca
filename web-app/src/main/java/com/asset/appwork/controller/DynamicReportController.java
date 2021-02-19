@@ -48,7 +48,6 @@ public class DynamicReportController {
                 try{
                     Class<?> serviceClass = Class.forName("com.asset.appwork.service."+filter.getTable()+"Service");
                     GenericService genericService = (GenericService) beanFactory.createBean(serviceClass);
-//                    GenericService genericService = (GenericService)serviceClass.getConstructor().newInstance();
                     list = genericService.updateResult(list);
                 }catch (Exception e){
                     e.printStackTrace();

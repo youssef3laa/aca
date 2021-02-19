@@ -27,11 +27,17 @@ public class ApprovalHistory {
     String readonlyComponent;
     String requestId;
     String requestNumber;
+    String receiverCN;
     @Transient
     String displayName;
     @Transient
     String unitName;
+    @Transient
+    String receiverDisplayName;
+
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd , hh:mm:ss a")
     Date approvalDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd , hh:mm:ss a")
+    Date receiveDate;
 }
