@@ -5,6 +5,7 @@ import incomingCaseRegistrationMemoApproval from '../views/incoming-case-registr
 import incomingCaseRegistrationMemoSignature from '../views/incoming-case-registration-signature'
 import incomingCaseRegistrationMemoOutcoming from '../views/incoming-case-registration-outcoming'
 import incomingCaseRegistrationMemoPerformance from '../views/incoming-case-registration-performance'
+import incomingCaseRegistrationRead from '../views/incoming-case-registration-read'
 
 const routes = [
     {
@@ -41,6 +42,11 @@ const routes = [
         path: '/case/incoming-case-registration-performance/:taskId/',
         name: 'incomingCaseRegistration-performance',
         component: incomingCaseRegistrationMemoPerformance
+    },
+    {
+        path: '/incoming-case-registration-read/:requestId/',
+        name: 'incomingCaseRegistration-read',
+        component: incomingCaseRegistrationRead
     }
 ]
 

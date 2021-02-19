@@ -36,8 +36,8 @@ export default {
   methods: {
     viewTask(item) {
       console.log("SideBarItem", this.sidebarItem);
+      console.log("item obj in table", item);
       if (this.sidebarItem == "viewReceived") {
-        console.log("item obj in table", item);
         try {
           let taskId = item.item.TaskId,
             page =
@@ -52,7 +52,18 @@ export default {
         }
       }
       else{
-                console.log("item obj in sent", item);
+
+        try{
+           let requestId = item.item.requestId;
+           let page = item.item.readonlyComponent;
+           router.push({
+             name: page,
+             params: { requestId: requestId}
+           })}
+           catch(e){
+             console.error(e)
+           }
+
 
       }
     },
