@@ -4,7 +4,7 @@
     <TabBuilder
       v-if="appData.pages.tabs"
       :tabkey="appData.pages.key"
-      :tabs="appData.pages.tabs"
+      :tabs="handleTabs"
     />
     <div v-for="(page, key) in appData.pages.page" :key="key">
       <PageBuilder
@@ -199,7 +199,17 @@ export default {
       return result
     },
   },
+  computed: {
+    handleTabs: function() {
+      
 
+      var x = this.appData.pages.tabs.filter((element)=>
+        (typeof element.show =="undefined" || element.show  )
+      )
+      console.log(x);
+      return x;
+    }
+  },
   props: ['app'],
 }
 </script>

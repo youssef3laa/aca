@@ -1,7 +1,11 @@
 <template>
   <span>
     <span>
-      <TabBuilder :tabkey="page.sections.key" :tabs="page.sections.tabs" />
+      <TabBuilder
+        v-if="showTab"
+        :tabkey="page.sections.key"
+        :tabs="page.sections.tabs"
+      />
     </span>
     <div v-for="(section, key) in page.sections.sec" :key="key">
       <SectionBuilder
@@ -35,13 +39,14 @@ export default {
     }
   },
   props: ['page', 'tabkey'],
-  mounted() {
+  created() {
     this.$observable.subscribe(this.tabkey, (tabId) => {
       console.log(tabId)
       this.tabId = tabId
     })
     // console.log(this.page)
   },
+
   methods: {
     dataChange: function(model) {
       console.log('Page Builder')
@@ -62,6 +67,15 @@ export default {
     // },
     // selectTabById: function(tabid){
     // }
+  },
+  computed: {
+    showTab: function() {
+      return this.page.sections.sec.filter(
+        (i) =>
+          (i.hasNestedTab && i.hasNestedTab !== false) ||
+          i.hasNestedTab == undefined
+      )
+    },
   },
   // mounted() {
   //   for (let i = 0; this.page.tabs && i < this.page.tabs.length; i++) {

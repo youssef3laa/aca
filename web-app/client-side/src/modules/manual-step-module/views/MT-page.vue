@@ -30,6 +30,8 @@ export default {
   },
   methods: {
     readEntity: function(entityId) {
+      console.log(this.app.pages.tabs[1])
+      this.app.pages.tabs[1].show= true;
       // let self = this;
       http
         .get(
@@ -88,7 +90,9 @@ export default {
         this.getTaskData()
       })
       .catch((error) => {
-        console.error(error)
+          this.readEntity(1);
+
+console.error(error)
       })
     const item = this.$route.params.item
     console.log(item)
@@ -152,14 +156,15 @@ export default {
             {
               key: 'tab1',
               id: '1',
-              isActive: false,
+              isActive: true,
               name: 'البيانات الأساسية',
               icon: 'far fa-file-alt',
             },
             {
               key: 'tab2',
               id: '2',
-              isActive: true,
+              show: false,
+              isActive: false,
               name: 'المرفقات',
               icon: 'fas fa-paperclip',
             },
@@ -204,40 +209,115 @@ export default {
                     isTab: true,
                     type: 'DefaultSection',
                     display: 'block',
-                    // isCard: true,
+                    isCard: true,
+                    show: false,
                     forms: [
                       {
-                        tabId: 1,
-                        isTab: true,
-                        display: 'block',
+                        key: 'form1',
+                        publish: 'form1Change',
                         inputs: [
                           {
-                            type: 'InputComponent',
-                            name: 'test',
-                            label: 'test',
-                            col: 6,
+                            type: 'AutoCompleteComponent',
+                            name: 'receiver',
                             rule: 'required',
+                            col: '6',
                           },
-                        ],
-                        model: {
-                          showTest: true,
-                        },
-                      },
-                      {
-                        tabId: 2,
-                        isTab: true,
-                        display: 'none',
-                        inputs: [
                           {
                             type: 'DatePickerComponent',
                             label: 'requestDate',
                             name: 'requestDate',
                             rule: 'required',
-                            show: true,
                             col: '6',
                           },
+                          {
+                            type: 'TextareaComponent',
+                            label: 'notes',
+                            name: 'notes',
+                            col: '12',
+                          },
                         ],
+                        model: {
+                          receiver: {
+                            url: 'org/group/findByCodes/HGCS,HRCA,HCAO',
+                            list: [],
+                            value: '',
+                          },
+                          requestDate: '',
+                          notes: '',
+                        },
                       },
+                      {
+                        key: 'form1',
+                        publish: 'form1Change',
+                        inputs: [
+                          {
+                            type: 'AutoCompleteComponent',
+                            name: 'receiver',
+                            rule: 'required',
+                            col: '6',
+                          },
+                          {
+                            type: 'DatePickerComponent',
+                            label: 'requestDate',
+                            name: 'requestDate',
+                            rule: 'required',
+                            col: '6',
+                          },
+                          {
+                            type: 'TextareaComponent',
+                            label: 'notes',
+                            name: 'notes',
+                            col: '12',
+                          },
+                        ],
+                        model: {
+                          receiver: {
+                            url: 'org/group/findByCodes/HGCS,HRCA,HCAO',
+                            list: [],
+                            value: '',
+                          },
+                          requestDate: '',
+                          notes: '',
+                        },
+                      },
+                      // {
+                      //   key: 'key1',
+                      //   tabId: 1,
+                      //   isTab: true,
+                      //   display: 'block',
+                      //   inputs: [
+                      //     {
+                      //       type: 'InputComponent',
+                      //       name: 'test',
+                      //       label: 'test',
+                      //       col: 6,
+                      //       show: false,
+                      //       rule: 'required',
+                      //     },
+                      //   ],
+                      //   model: {
+                      //     showTest: true,
+                      //   },
+                      // },
+                      // {
+                      //   key: 'key2',
+                      //   tabId: 2,
+                      //   isTab: true,
+                      //   display: 'none',
+                      //   inputs: [
+                      //     {
+                      //       type: 'DatePickerComponent',
+                      //       label: 'requestDate',
+                      //       name: 'requestDate',
+                      //       rule: 'required',
+                      //       show: true,
+                      //       col: '6',
+                      //     },
+                      //   ],
+                      //   model: {
+                      //     requestDate: '',
+                      //   },
+                      // },
                     ],
                   },
                   {

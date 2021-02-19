@@ -54,25 +54,25 @@ export default {
                           },
                           {
                             type: 'InputComponent',
-                            label: 'Request Number',
+                            label: 'requestNumber',
                             name: 'requestNumber',
                             col: '4',
                           },
                           {
                             type: 'DatePickerComponent',
-                            label: 'Request Date',
+                            label: 'requestDate',
                             name: 'requestDate',
                             col: '4',
                           },
                           {
                             type: 'InputComponent',
-                            label: 'Process',
+                            label: 'processName',
                             name: 'process',
                             col: '4',
                           },
                           {
                             type: 'InputComponent',
-                            label: 'Initiator',
+                            label: 'unitName',
                             name: 'initiator',
                             col: '4',
                           },
@@ -80,9 +80,17 @@ export default {
                             type: 'ButtonComponent',
                             label: 'Search',
                             name: 'searchBtn',
-                            col: '4',
+                            col: '2',
                             action: 'search',
                             publish: 'search',
+                          },
+                          {
+                            type: 'ButtonComponent',
+                            label: 'Reset',
+                            name: 'resetBtn',
+                            col: '2',
+                            action: 'reset',
+                            publish: 'reset',
                           },
                         ],
                         model: {
@@ -224,6 +232,22 @@ export default {
         this.$refs.appBuilder.setModelData('basicSearchTable', {
           basicSearchTable: { data: response.data.data },
         })
+      })
+    })
+    this.$observable.subscribe('reset', (obj) => {
+      console.log(obj)
+      this.$refs.appBuilder.setModelData('searchForm', {
+        subject: '',
+        status: {
+          url: 'lookup/get/category/processStatus',
+          value: '',
+          text: '',
+          object: '',
+        },
+        requestNumber: '',
+        requestDate: '',
+        process: '',
+        initiator: '',
       })
     })
   },

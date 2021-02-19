@@ -1,7 +1,6 @@
 <template>
   <v-card v-if="sec.isCard" v-bind:style="{ background: sec.background }" flat>
-    <span>
-
+    <span v-if="sec.show || typeof sec.show == 'undefined'">
       <component
         :is="sec.type"
         :formData="formData"
