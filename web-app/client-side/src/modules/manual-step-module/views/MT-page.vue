@@ -210,7 +210,7 @@ console.error(error)
                     type: 'DefaultSection',
                     display: 'block',
                     isCard: true,
-                    show: false,
+                    show: true,
                     forms: [
                       {
                         key: 'form1',
