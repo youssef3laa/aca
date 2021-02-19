@@ -40,6 +40,7 @@ export default {
         },
         getRequest: async function(){
             if(localStorage.getItem("requestId")){
+                console.log(localStorage.getItem("requestId"))
                 let response = await http.get('/request/read/'+ localStorage.getItem("requestId"))
                 console.log("Request Response: ", response)
                 return response.data.data
