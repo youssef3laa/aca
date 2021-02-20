@@ -113,21 +113,41 @@ public class LookupController {
     }
 
     @GetMapping("/get/category/list")
-    public ResponseEntity<AppResponse<List<JsonNode>>> getLookups(@RequestHeader("X-Auth-Token") String token,
+    public ResponseEntity<AppResponse<List<Lookup>>> getLookups(@RequestHeader("X-Auth-Token") String token,
                                                                   @RequestParam int page,
                                                                   @RequestParam int size,
                                                                   @RequestParam String search){
-        AppResponse.ResponseBuilder<List<JsonNode>> respBuilder = AppResponse.builder();
+        AppResponse.ResponseBuilder<List<Lookup>> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            Page<String> lookups = lookupRepository.findDistinctCategories(PageRequest.of(page, size));
-            List<JsonNode> nodes = new ArrayList<>();
-            ObjectMapper objectMapper = new ObjectMapper();
-            lookups.getContent().stream().forEach(l -> {
-                nodes.add(objectMapper.createObjectNode().put("category", l));
-            });
+            Page<Object[]> lookups = lookupRepository.findDistinctCategories(PageRequest.of(page, size));
+
+            List<Lookup> nodes = new ArrayList<>();
+            for (Object[] o : lookups.getContent()){
+                Lookup lookup = new Lookup();
+                lookup.setCategory((String) o[0]);
+                lookup.setId((Long) o[1]);
+                nodes.add(lookup);
+            }
+
+
+
+//            ObjectMapper objectMapper = new ObjectMapper();
+//
+//
+//
+//            lookups.getContent().stream().forEach(l -> {
+//                Lookup lookup = null;
+//                try {
+//                    lookup = objectMapper.readValue(l, Lookup.class);
+//                    nodes.add(lookup);
+//                } catch (JsonProcessingException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            });
             if(nodes.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
             respBuilder.data(nodes);
             respBuilder.info("totalCount", lookups.getTotalElements());
