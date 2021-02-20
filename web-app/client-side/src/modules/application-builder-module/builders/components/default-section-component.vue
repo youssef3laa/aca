@@ -1,6 +1,8 @@
 <template>
   <span>
-    <FormBuilder :forms="formData" :model="formData.model" />
+    <!-- <span v-for="(form, index) in formData" :key="index"> -->
+      <FormBuilder :forms="formData" :model="formData.model" />
+    <!-- </span> -->
   </span>
 </template>
 
@@ -12,7 +14,7 @@ export default {
   },
   props: ['formData'],
   mounted() {
-      console.log(this.formData)
+    console.log(this.formData)
   },
 }
 </script>

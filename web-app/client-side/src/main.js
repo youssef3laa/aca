@@ -17,7 +17,7 @@ Vue.component('ConfirmDialogue', ConfirmDialogue)
 Vue.component('AlertComponent', AlertComponent)
 
 Vue.config.productionTip = false
-
+// Vue.prototype.$alert = AlertComponent
 new Vue({
     vuetify,
     i18n,

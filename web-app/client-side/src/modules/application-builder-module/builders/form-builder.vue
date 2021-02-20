@@ -5,42 +5,13 @@
         <!-- <div v-for="(field, key) in forms" :key="key"> -->
         <!--v-if="field.show && field.show != false"-->
         <v-col
-          v-for="(field, key) in showField"
-          :key="key"
+          v-for="(field, i) in showField"
+          :key="i"
           :cols="field.col"
           :md="field.col"
         >
-          <v-expansion-panels v-if="forms.type == 'collapse'"
-                              v-model="panel"
-                              multiple>
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                <v-row no-gutters>
-                  <v-col cols="4">
-                    <span>{{ forms.name }}</span>
-                    <span class="line"></span>
-                  </v-col>
-                  <v-col cols="8" class="text--secondary"> </v-col>
-                </v-row>
-                <template v-slot:actions>
-                  <!--                  <v-icon color="error">-->
-                  <!--                    mdi-arrow-collapse-down-->
-                  <!--                  </v-icon>-->
-                </template>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <component
-                  :is="field.type"
-                  :field="field"
-                  :val="formModel[field.name]"
-                  v-on:update="updateText"
-                ></component>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
-
           <component
-            v-else-if="formModel"
+            v-if="formModel"
             :is="field.type"
             :field="field"
             :val="formModel[field.name]"
@@ -63,7 +34,7 @@
 </template>
 
 <script>
-import {ValidationObserver} from 'vee-validate'
+import { ValidationObserver } from 'vee-validate'
 import InputComponent from '../components/input-component'
 import ButtonComponent from '../components/button-component'
 import TableComponent from '../components/table-component'
@@ -124,14 +95,14 @@ export default {
     DynamicReceiverFormComponent,
     VersionGridComponent,
     ProcessStatusControl,
-    SaveProcessComponent
+    SaveProcessComponent,
   },
   data() {
     return {
       formModel: this.model,
       content: '',
       test: null,
-      panel: [0]
+      panel: [0],
     }
   },
   methods: {
@@ -178,11 +149,12 @@ export default {
   },
   props: ['forms', 'model'],
   watch: {
-    model: function (newVal) {
-      this.formModel = newVal;
-    }
+    model: function(newVal) {
+      this.formModel = newVal
+    },
   },
   created() {
+    console.log(this.forms)
     // console.log(this.model)
     // var self = this
     // if (this.forms.subscribe) {
@@ -206,10 +178,16 @@ export default {
     // })
   },
   computed: {
-    showField: function () {
-      return this.forms.inputs.filter(i => ((i.show && i.show != false) || i.show == undefined))
-    }
-  }
+    showField: function() {
+      // let inputs = []
+      // for(let i = 0; i<this.forms.length; i++){
+      //   inputs.push(this.forms[i].inputs)
+      // }
+      return this.forms.inputs.filter(
+        (i) => (i.show && i.show != false) || i.show == undefined
+      )
+    },
+  },
 }
 </script>
 

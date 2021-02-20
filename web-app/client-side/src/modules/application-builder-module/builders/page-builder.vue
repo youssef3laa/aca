@@ -1,25 +1,22 @@
 <template>
   <span>
-    <div v-for="(section, key) in page.sections" :key="key">
-      <span v-if="page.tabs && key == 0 && section.type != 'TitleComponet'">
-        <TabBuilder :page="page" />
-      </span>
+    <span>
+      <TabBuilder
+        v-if="showTab"
+        :tabkey="page.sections.key"
+        :tabs="page.sections.tabs"
+      />
+    </span>
+    <div v-for="(section, key) in page.sections.sec" :key="key">
       <SectionBuilder
+        v-on:modelChange="dataChange"
+        :section="section"
         v-bind:style="[
-          section.isTab && section.display == 'none'
-            ? { display: 'none' }
-            : { display: 'block' },
-          section.isTab && section.visibility == 'hidden'
+          section.tabId == tabId ? { display: 'block' } : { display: 'none' },
+          section.visibility == 'hidden'
             ? { visibility: 'hidden' }
             : { visibility: 'visible' },
         ]"
-        v-on:modelChange="dataChange"
-        :section="section"
-      />
-
-      <TabBuilder
-        v-if="page.tabs && key == 0 && section.type == 'TitleComponet'"
-        :page="page"
       />
     </div>
   </span>
@@ -35,15 +32,21 @@ export default {
   },
   data() {
     return {
+      tabId: null,
       // tab: null,
       // selected: null,
       // isActive: null,
     }
   },
-  props: ['page'],
-  mounted() {
-    console.log(this.page)
+  props: ['page', 'tabkey'],
+  created() {
+    this.$observable.subscribe(this.tabkey, (tabId) => {
+      console.log(tabId)
+      this.tabId = tabId
+    })
+    // console.log(this.page)
   },
+
   methods: {
     dataChange: function(model) {
       console.log('Page Builder')
@@ -64,6 +67,15 @@ export default {
     // },
     // selectTabById: function(tabid){
     // }
+  },
+  computed: {
+    showTab: function() {
+      return this.page.sections.sec.filter(
+        (i) =>
+          (i.hasNestedTab && i.hasNestedTab !== false) ||
+          i.hasNestedTab == undefined
+      )
+    },
   },
   // mounted() {
   //   for (let i = 0; this.page.tabs && i < this.page.tabs.length; i++) {

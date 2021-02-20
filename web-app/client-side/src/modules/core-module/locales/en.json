@@ -35,5 +35,14 @@
   "transferTo": "Transfer To",
   "correspondenceData": "Correspondence Data",
   "mainData": "Main Data",
-  "attachments": "Attachments"
+  "attachments": "Attachments",
+
+  "lookup": "Lookups",
+  "mainLookup": "Main Lookups",
+
+  "category": "Category",
+  "key": "Sequence Number",
+  "arValue": "Arabic Value",
+  "enValue": "English Value",
+  "parentId": "Parent Category"
 }
