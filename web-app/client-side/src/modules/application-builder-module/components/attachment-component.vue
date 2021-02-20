@@ -3,7 +3,7 @@
         <splitpanes class="default-theme"
                     dir="ltr">
             <pane dir="rtl"
-                  style="background: white">
+                  style="background: white; height: 700px">
                 <IframeComponent :val="iframeOjbect"> </IframeComponent>
             </pane>
             <pane dir="rtl"
@@ -84,7 +84,9 @@
                 <span>
                     <span>الملفات</span>
                     <v-container>
-                        <draggable :animation="150"
+                        <draggable
+                                  style="max-height: 400px; overflow-y: auto" 
+                                  :animation="150"
                                    :swapThreshold="0.5"
                                    class="row"
                                    tag="div"
@@ -106,19 +108,19 @@
                                             <v-icon style="float:left; color: #D1D1D1" size="20">fas fa-ellipsis-v</v-icon>
                                             <v-icon style="float:left; color: #D1D1D1" size="20">fas fa-ellipsis-v</v-icon>
                                         </v-col>
-                                        <v-col v-if="file.properties.name.indexOf('.pdf')!=-1" :cols="1"
+                                        <v-col v-if="file.properties.name.toLowerCase().indexOf('.pdf')!=-1" :cols="1"
                                                style="align-self: center">
                                             <v-icon style="color=#D1D1D1" size="60">fas fa-file-pdf</v-icon>
                                         </v-col>
-                                        <v-col v-else-if="excelExtension.some(substring=>file.properties.name.includes(substring))" :cols="1"
+                                        <v-col v-else-if="excelExtension.some(substring=>file.properties.name.toLowerCase().includes(substring))" :cols="1"
                                                style="align-self: center">
                                             <v-icon style="color=#D1D1D1" size="60">fas fa-file-excel</v-icon>
                                         </v-col>
-                                        <v-col  v-else-if="wordExtension.some(substring=>file.properties.name.includes(substring))" :cols="1"
+                                        <v-col  v-else-if="wordExtension.some(substring=>file.properties.name.toLowerCase().includes(substring))" :cols="1"
                                                style="align-self: center">
                                             <v-icon  style="color=#D1D1D1" size="60">fas fa-file-word</v-icon>
                                         </v-col>
-                                        <v-col v-else-if="imageExtension.some(substring=>file.properties.name.includes(substring))" :cols="1"
+                                        <v-col v-else-if="imageExtension.some(substring=>file.properties.name.toLowerCase().includes(substring))" :cols="1"
                                                style="align-self: center">
                                             <v-icon style="color=#D1D1D1" size="60">fas fa-file-image</v-icon>
                                         </v-col>

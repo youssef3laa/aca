@@ -1,6 +1,7 @@
 <template>
-  <div style="width: 100%">
+  <div style="width: 100%; height: 100%">
     <v-container
+      
         v-if="placeHolder && !loading"
         :loading="loading"
         class="attachment-iframe"
@@ -30,7 +31,7 @@
         margin: 0;
         overflow: hidden;
         width: 100%;
-        height: 500px;
+        height: 100%;
       "
         @load="iframeLoaded"
     />
@@ -69,12 +70,13 @@ export default {
 
 <style>
 .attachment-iframe {
+  
   background-color: #f1f2f3;
   border: 2px dashed #f1f2f3 !important;
   border-radius: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 500px;
+  height: 100%;
 }
 </style>
