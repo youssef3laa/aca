@@ -93,11 +93,12 @@
                                    @end="onEnd($event)">
                             <div v-for="(file, index) in filesUploaded"
                                  :key="index"
-                                 class="col-12"
+                                 class="col-12 attachment-item"
                                  @dragstart="startDrag($event, file)"
                                  @dragover.prevent
                                  @dragenter.prevent>
-                                <div class="card"
+                                <div class="card attachment-item"
+                                    
                                      max-height="100%"
                                      min-height="100%"
                                      v-bind:class="{ 'selected-card': file.isActive }">
@@ -129,8 +130,7 @@
                                             <v-icon style="color=#D1D1D1" size="60">fas fa-file</v-icon>
                                         </v-col>
                                         <v-col :cols="8"
-                                               class="card-name"
-                                               style="cursor: pointer; align-self: center"
+                                               class="card-name title"
                                                @click="openFileInBrave({ fileId: file.properties.id });">
                                             {{ file.properties.name }} <br/>
                                             {{ file.properties.fileTypeValue }}
@@ -217,10 +217,7 @@ export default {
 
   async mounted() {
     const dropzone = this.$el.querySelector("#inputFileContainer");
-    console.log(this.$el);
     const fileUpload = this.$el.querySelector("#fileInput");
-    console.log(fileUpload);
-
     if (dropzone) {
       dropzone.addEventListener("dragenter", (e) => {
         e.preventDefault();
@@ -307,6 +304,20 @@ $color-prim-bg: #f2f7fa;
 $color-secondary: #9e9e9e;
 /*fonts */
 $font-12: 12px;
+
+.title {
+  cursor: pointer; 
+  align-self: center;
+  font: normal normal normal 18px/22px Neo Sans Arabic;
+  color: #1A1A2E;
+}
+
+.attachment-item {
+  padding-bottom: 0!important;
+  padding-top: 0!important;
+  margin-bottom: 5px!important;
+  margin-top: 0!important;
+} 
 
 .card-name {
   font-size: $font-12;
