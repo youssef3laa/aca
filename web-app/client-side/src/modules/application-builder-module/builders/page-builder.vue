@@ -12,7 +12,7 @@
         v-on:modelChange="dataChange"
         :section="section"
         v-bind:style="[
-          section.tabId == tabId ? { display: 'block' } : { display: 'none' },
+          (!section.tabId  || section.tabId == tabId) ? { display: 'block' } : { display: 'none' },
           section.visibility == 'hidden'
             ? { visibility: 'hidden' }
             : { visibility: 'visible' },

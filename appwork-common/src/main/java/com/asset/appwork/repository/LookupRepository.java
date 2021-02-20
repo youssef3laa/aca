@@ -1,7 +1,9 @@
 package com.asset.appwork.repository;
 
 import com.asset.appwork.model.Lookup;
-import com.asset.appwork.model.Memorandum;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,5 +13,7 @@ import java.util.Optional;
 public interface LookupRepository extends GenericRepository<Lookup, Long> {
     List<Lookup> findByCategory(String category);
     Optional<Lookup> findByCategoryAndKey(String category, String key);
-    List<Lookup> findAll();
+
+    @Query("select DISTINCT L.category, max( L.Id) from Lookup L GROUP BY L.category")
+    Page<Object[]> findDistinctCategories(Pageable pageable);
 }

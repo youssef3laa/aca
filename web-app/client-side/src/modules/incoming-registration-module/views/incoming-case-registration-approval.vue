@@ -56,6 +56,7 @@
 
                 this.completeStep({
                     taskId: this.taskId,
+                    requestId: this.inputSchema.requestId,
                     stepId: this.inputSchema.stepId,
                     process: this.inputSchema.process,
                     parentHistoryId: this.inputSchema.parentHistoryId,

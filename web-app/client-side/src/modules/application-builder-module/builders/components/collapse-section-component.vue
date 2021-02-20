@@ -47,7 +47,7 @@ export default {
   props: ['formData', 'section'],
 }
 </script>
-<style scoped>
+<style>
 .v-application--is-rtl .v-expansion-panel-header__icon {
   border: 1px solid #0278ae !important;
   border-radius: 3px !important;

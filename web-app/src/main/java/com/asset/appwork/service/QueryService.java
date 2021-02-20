@@ -1,7 +1,7 @@
 package com.asset.appwork.service;
 
 import com.asset.appwork.QueryBuilder;
-import com.asset.appwork.dto.Filter;
+import com.asset.appwork.dto.Query;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,7 +19,7 @@ public class QueryService {
         EntityManager entityManager;
 
 
-        public JsonNode getQueryDataForCharts(Filter key) throws AppworkException {
+        public JsonNode getQueryDataForCharts(Query key) throws AppworkException {
             QueryBuilder queryBuilder = new QueryBuilder(entityManager);
             try {
                 List<LinkedHashMap> list = queryBuilder.runQuery(key);

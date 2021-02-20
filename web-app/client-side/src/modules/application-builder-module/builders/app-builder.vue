@@ -1,18 +1,20 @@
 <template>
   <span>
-    <TitleComponent v-if="appData.pages.title" :section="appData.pages.title" />
+    <TitleComponent v-if="appData && appData.pages && appData.pages.title" :section="appData.pages.title" />
     <TabBuilder
-      v-if="appData.pages.tabs"
+      v-if="appData && appData.pages && appData.pages.tabs"
       :tabkey="appData.pages.key"
       :tabs="handleTabs"
     />
-    <div v-for="(page, key) in appData.pages.page" :key="key">
-      <PageBuilder
-        :page="page"
-        v-on:modelChange="dataChange"
-        :tabkey="appData.pages.key"
-      />
-    </div>
+    <span v-if="appData && appData.pages ">
+      <div v-for="(page, key) in appData.pages.page" :key="key">
+        <PageBuilder
+          :page="page"
+          v-on:modelChange="dataChange"
+          :tabkey="appData.pages.key"
+        />
+      </div>
+    </span>
   </span>
 </template>
 
@@ -40,6 +42,14 @@ export default {
     },
 
     findKey: function(key) {
+      if(this.appData.pages.tabs){
+        for (let i = 0; i < this.appData.pages.tabs.length; i++){
+          if(this.appData.pages.tabs[i].key == key){
+            this.positions[key] = [i]
+            return
+          }
+        }
+      }
       for (let i = 0; i < this.appData.pages.page.length; i++) {
         const page = this.appData.pages.page[i]
         if (page.key === key) {
@@ -124,6 +134,12 @@ export default {
         input[property] = obj[property]
       }
     },
+
+    setShowTab: function(key, show){
+      if (!this.positions[key]) this.findKey(key)
+      this.appData.pages.tabs[this.positions[key][0]].show = show
+    },
+
     appendForm: function(key, obj) {
       if (!this.positions[key]) this.findKey(key)
       this.appData.pages.page[this.positions[key][0]].sections.sec[
@@ -164,6 +180,22 @@ export default {
                 nestedFormElement.inputs[j].readonly = true
               }
             }
+          }
+        }
+      }
+    },
+    clearSectionForms: function(key) {
+      if (!this.positions[key]) this.findKey(key);
+      this.appData.pages.page[this.positions[key][0]].sections.sec[this.positions[key][1]].forms = [];
+    },
+
+    disableAllSections: function () {
+      for (let i = 0; i < this.appData.pages.page.length; i++) {
+        const page = this.appData.pages.page[i]
+        if (page.sections) {
+          for (let j = 0; j < page.sections.length; j++) {
+            const section = page.sections.sec[j]
+            this.disableSection(section.key)
           }
         }
       }

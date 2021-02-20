@@ -6,6 +6,7 @@ import com.asset.appwork.dto.Account;
 import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.model.ApprovalHistory;
 import com.asset.appwork.model.Lookup;
 import com.asset.appwork.model.Memorandum;
 import com.asset.appwork.model.Unit;
@@ -16,12 +17,18 @@ import com.asset.appwork.service.CordysService;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.w3c.dom.Node;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -106,15 +113,44 @@ public class LookupController {
     }
 
     @GetMapping("/get/category/list")
-    public ResponseEntity<AppResponse<List<Lookup>>> getLookups(@RequestHeader("X-Auth-Token") String token){
+    public ResponseEntity<AppResponse<List<Lookup>>> getLookups(@RequestHeader("X-Auth-Token") String token,
+                                                                  @RequestParam int page,
+                                                                  @RequestParam int size,
+                                                                  @RequestParam String search){
         AppResponse.ResponseBuilder<List<Lookup>> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            List<Lookup> lookups = lookupRepository.findAll();
-            if(lookups.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
-            respBuilder.data(lookups);
+            Page<Object[]> lookups = lookupRepository.findDistinctCategories(PageRequest.of(page, size));
+
+            List<Lookup> nodes = new ArrayList<>();
+            for (Object[] o : lookups.getContent()){
+                Lookup lookup = new Lookup();
+                lookup.setCategory((String) o[0]);
+                lookup.setId((Long) o[1]);
+                nodes.add(lookup);
+            }
+
+
+
+//            ObjectMapper objectMapper = new ObjectMapper();
+//
+//
+//
+//            lookups.getContent().stream().forEach(l -> {
+//                Lookup lookup = null;
+//                try {
+//                    lookup = objectMapper.readValue(l, Lookup.class);
+//                    nodes.add(lookup);
+//                } catch (JsonProcessingException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            });
+            if(nodes.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
+            respBuilder.data(nodes);
+            respBuilder.info("totalCount", lookups.getTotalElements());
 
         } catch (AppworkException e) {
             log.error(e.getMessage());

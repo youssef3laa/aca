@@ -80,10 +80,7 @@ export default {
             }
             return obj;
           });
-          this.items.list = res.filter((e) => {
-            // console.log(e)
-            return (e.name || "").indexOf(v || "") > -1;
-          });
+          this.items.list = res;
           // console.log(this.items.list)
 
           if (this.val.default) {

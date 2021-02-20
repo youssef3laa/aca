@@ -3,7 +3,7 @@
         <splitpanes class="default-theme"
                     dir="ltr">
             <pane dir="rtl"
-                  style="background: white">
+                  style="background: white; height: 700px">
                 <IframeComponent :val="iframeOjbect"> </IframeComponent>
             </pane>
             <pane dir="rtl"
@@ -84,14 +84,16 @@
                 <span>
                     <span>الملفات</span>
                     <v-container>
-                        <draggable :animation="150"
+                        <draggable
+                                  style="max-height: 400px; overflow-y: auto" 
+                                  :animation="150"
                                    :swapThreshold="0.5"
                                    class="row"
                                    tag="div"
                                    @end="onEnd($event)">
                             <div v-for="(file, index) in filesUploaded"
                                  :key="index"
-                                 class="col-6"
+                                 class="col-12"
                                  @dragstart="startDrag($event, file)"
                                  @dragover.prevent
                                  @dragenter.prevent>
@@ -101,18 +103,39 @@
                                      v-bind:class="{ 'selected-card': file.isActive }">
                                     <div class="row pa-1"
                                          style="height: 100px">
-                                        <v-col :cols="2"
+                                         <v-col :cols="1"
                                                style="align-self: center">
-                                            <v-icon size="60"> mdi-file-pdf-outline</v-icon>
+                                            <v-icon style="float:left; color: #D1D1D1" size="20">fas fa-ellipsis-v</v-icon>
+                                            <v-icon style="float:left; color: #D1D1D1" size="20">fas fa-ellipsis-v</v-icon>
                                         </v-col>
-                                        <v-col :cols="6"
+                                        <v-col v-if="file.properties.name.toLowerCase().indexOf('.pdf')!=-1" :cols="1"
+                                               style="align-self: center">
+                                            <v-icon style="color=#D1D1D1" size="60">fas fa-file-pdf</v-icon>
+                                        </v-col>
+                                        <v-col v-else-if="excelExtension.some(substring=>file.properties.name.toLowerCase().includes(substring))" :cols="1"
+                                               style="align-self: center">
+                                            <v-icon style="color=#D1D1D1" size="60">fas fa-file-excel</v-icon>
+                                        </v-col>
+                                        <v-col  v-else-if="wordExtension.some(substring=>file.properties.name.toLowerCase().includes(substring))" :cols="1"
+                                               style="align-self: center">
+                                            <v-icon  style="color=#D1D1D1" size="60">fas fa-file-word</v-icon>
+                                        </v-col>
+                                        <v-col v-else-if="imageExtension.some(substring=>file.properties.name.toLowerCase().includes(substring))" :cols="1"
+                                               style="align-self: center">
+                                            <v-icon style="color=#D1D1D1" size="60">fas fa-file-image</v-icon>
+                                        </v-col>
+                                        <v-col v-else :cols="1"
+                                               style="align-self: center">
+                                            <v-icon style="color=#D1D1D1" size="60">fas fa-file</v-icon>
+                                        </v-col>
+                                        <v-col :cols="8"
                                                class="card-name"
                                                style="cursor: pointer; align-self: center"
                                                @click="openFileInBrave({ fileId: file.properties.id });">
                                             {{ file.properties.name }} <br/>
                                             {{ file.properties.fileTypeValue }}
                                         </v-col>
-                                        <v-col :cols="readOnly? 4 : 2"
+                                        <v-col :cols="readOnly? 2 : 1"
                                                style="cursor: pointer; align-self: center"
                                                @click="openVersionsPopup(file)">
                                             <v-icon color="#22B07D"
@@ -120,12 +143,12 @@
                                                 mdi-folder-multiple</v-icon>
                                         </v-col>
                                         <v-col v-if="!readOnly"
-                                               :cols="2"
+                                               :cols="1"
                                                style="cursor: pointer; align-self: center"
                                                @click="deleteFile(file)">
                                             <v-icon color="#ea9cb3"
                                                     size="25">
-                                                mdi-delete-circle-outline</v-icon>
+                                                fas fa-trash-alt</v-icon>
                                         </v-col>
                                     </div>
                                 </div>
@@ -169,6 +192,9 @@ export default {
   mixins: [attachmentMixin, formPageMixin],
   data() {
     return {
+      imageExtension: [".tif", ".tiff", ".bmp", ".jpg", ".jpeg", ".gif", ".png", ".eps"],
+      excelExtension: [".xlsx", ".xlsm", ".xlsb", ".xltx", ".xls", ".xlt", "xlm"],
+      wordExtension: [".doc", ".docx", ".docm", ".dotx", ".dotm", ".docb"],
       valid: this.filesUploaded > 0,
       readOnly: (this.field.readonly)? this.field.readonly:this.val.readonly,
       iframeOjbect: {src: ""},
@@ -264,6 +290,7 @@ export default {
         },
         filesUploaded: {
             handler: function (newVal) {
+              console.log(newVal)
                 this.valid = newVal.length > 0;
             }
         },

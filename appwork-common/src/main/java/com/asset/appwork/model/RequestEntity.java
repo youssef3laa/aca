@@ -3,6 +3,7 @@ package com.asset.appwork.model;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +39,13 @@ public class RequestEntity {
     @Transient
     String unitName;
     @Transient
+    @JsonIgnore
     String date;
 
     public String toString() {
         return SystemUtil.writeObjectIntoString(this).replace(",\"id\":null", "")
                 .replace(",\"displayName\":null", "")
-                .replace(",\"unitName\":null", "");
+                .replace(",\"unitName\":null", "")
+                .replace(",\"date\":null", "");
     }
 }
