@@ -1,10 +1,11 @@
 package com.asset.appwork;
 
-import com.asset.appwork.dto.Filter;
+import com.asset.appwork.dto.Query;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -23,47 +24,47 @@ public class QueryBuilder<T> {
         this.entityManager = entityManager;
     }
 
-    public List<T> runQuery(Filter filter) throws AppworkException {
+    public List<T> runQuery(Query query) throws AppworkException {
         try {
             // Create query from certain table:
-            Class<?> tableClass = Class.forName("com.asset.appwork.model." + filter.getTable());
+            Class<?> tableClass = Class.forName("com.asset.appwork.model." + query.getTable());
             CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-            CriteriaQuery query = criteriaBuilder.createQuery();
-            Root<?> root = query.from(tableClass);
+            CriteriaQuery criteriaQuery = criteriaBuilder.createQuery();
+            Root<?> root = criteriaQuery.from(tableClass);
 
             ArrayList<Selection> columnsSelection = new ArrayList<>();
 
             // Add aggregation functions
-            ArrayList<Selection> aggregationSelections = createAggregations(filter.getAggregations(), criteriaBuilder, root);
+            ArrayList<Selection> aggregationSelections = createAggregations(query.getAggregations(), criteriaBuilder, root);
             columnsSelection.addAll(aggregationSelections);
 
             // Add columns
-            filter.getColumns().stream().forEach( s -> columnsSelection.add(root.get(s).alias(s)) );
+            query.getColumns().stream().forEach( s -> columnsSelection.add(root.get(s.getName()).alias(s.getName())));
 
             // Add Where
-            ArrayList<Predicate> predicates = createWhereConditions(filter.getWhere(), criteriaBuilder, root);
+            ArrayList<Predicate> predicates = createWhereConditions(query.getWhere(), criteriaBuilder, root);
             if (predicates.size() > 0) {
                 Predicate[] predicatesArray = predicates.toArray(new Predicate[predicates.size()]);
-                query.where(predicatesArray);
+                criteriaQuery.where(predicatesArray);
             }
 
             // Add Sort By
-            ArrayList<Order> sortByOrder = createSortBy(filter.getSortBy(), criteriaBuilder, root);
-            query.orderBy(sortByOrder);
+            ArrayList<Order> sortByOrder = createSortBy(query.getSortBy(), criteriaBuilder, root);
+            criteriaQuery.orderBy(sortByOrder);
 
             // Add Group By
             ArrayList<Selection> groupBySelection = new ArrayList<>();
-            filter.getGroupBy().stream().forEach( s-> groupBySelection.add(root.get(s)) );
-            query.groupBy(groupBySelection);
+            query.getGroupBy().stream().forEach( s-> groupBySelection.add(root.get(s.getName())) );
+            criteriaQuery.groupBy(groupBySelection);
 
             // Run query
             if (columnsSelection.size() > 0) {
-                query.multiselect(columnsSelection);
-                List<T> list = entityManager.createQuery(query).getResultList();
-                data = addAliasToList(list, columnsSelection, tableClass);
+                criteriaQuery.multiselect(columnsSelection);
+                List<T> list = createPagination(criteriaQuery, query.getPage()).getResultList();
+                data = addAliasToList(list, columnsSelection);
             } else {
-                query.select(root);
-                data = entityManager.createQuery(query).getResultList();
+                criteriaQuery.select(root);
+                data = createPagination(criteriaQuery, query.getPage()).getResultList();
             }
 
             return data;
@@ -74,10 +75,8 @@ public class QueryBuilder<T> {
 
     }
 
-    private List<T> addAliasToList(List<?> list, ArrayList<Selection> columns, Class<?> tableClass) {
+    private List<T> addAliasToList(List<?> list, ArrayList<Selection> columns) {
         List<T> result = new ArrayList<>();
-//        ObjectMapper mapper = new ObjectMapper();
-//        mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
 
         list.stream().forEach(l -> {
             LinkedHashMap<String, Object> row = new LinkedHashMap<>();
@@ -94,22 +93,29 @@ public class QueryBuilder<T> {
                 columnIndex[0]++;
             });
             result.add((T)row);
-//            result.add((T)mapper.convertValue(row,tableClass));
         });
 
         return result;
     }
 
-    private ArrayList<Selection> createAggregations(List<LinkedHashMap> aggregations, CriteriaBuilder criteriaBuilder, Root root){
+    private TypedQuery createPagination(CriteriaQuery criteriaQuery,Query.Page page){
+        if(page != null){
+            return entityManager.createQuery(criteriaQuery).setFirstResult(page.getNumber()* page.getSize()).setMaxResults(page.getSize());
+        }else{
+            return entityManager.createQuery(criteriaQuery);
+        }
+    }
+
+    private ArrayList<Selection> createAggregations(List<Query.Aggregate> aggregations, CriteriaBuilder criteriaBuilder, Root root){
         ArrayList<Selection> selections = new ArrayList<>();
-        aggregations.stream().filter(s -> s.containsKey("function") && s.containsKey("column")).forEach(aggregation -> {
+        aggregations.stream().filter(s -> s.getFunction() != null && s.getColumn() != null).forEach(aggregation -> {
             try {
-                String aggregationFunction = (String) aggregation.get("function");
-                String aggregationBy = (String) aggregation.get("column");
+                String aggregationFunction = aggregation.getFunction();
+                String aggregationBy = aggregation.getColumn().getName();
 
                 Method method = CriteriaBuilder.class.getMethod(aggregationFunction, Expression.class);
                 Selection aggregationExpression = (Selection) method.invoke(criteriaBuilder, root.get(aggregationBy));
-                aggregationExpression.alias(aggregationFunction + "_" + aggregationBy);
+                aggregationExpression.alias(aggregationFunction + "_" + aggregation.getColumn().getTable() + "_" + aggregationBy);
 
                 selections.add(aggregationExpression);
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e){
@@ -120,29 +126,29 @@ public class QueryBuilder<T> {
         return selections;
     }
 
-    private ArrayList<Order> createSortBy(List<LinkedHashMap> sortByList, CriteriaBuilder criteriaBuilder, Root root){
+    private ArrayList<Order> createSortBy(List<Query.SortBy> sortByList, CriteriaBuilder criteriaBuilder, Root root){
         ArrayList<Order> orderList = new ArrayList<>();
-        sortByList.stream().filter(s -> s.containsKey("column") && s.containsKey("direction")).forEach(sortBy ->{
-            if(((String)sortBy.get("direction")).toLowerCase().equals("desc")){
-                orderList.add(criteriaBuilder.desc(root.get((String)sortBy.get("column"))));
+        sortByList.stream().filter(s -> s.getColumn() != null && s.getDirection() != null).forEach(sortBy ->{
+            if((sortBy.getDirection()).toLowerCase().equals("desc")){
+                orderList.add(criteriaBuilder.desc(root.get(sortBy.getColumn().getName())));
             }else{
-                orderList.add(criteriaBuilder.asc(root.get((String)sortBy.get("column"))));
+                orderList.add(criteriaBuilder.asc(root.get(sortBy.getColumn().getName())));
             }
         });
         return orderList;
     }
 
-    private ArrayList<Predicate> createWhereConditions(List<LinkedHashMap> conditions, CriteriaBuilder criteriaBuilder, Root root){
+    private ArrayList<Predicate> createWhereConditions(List<Query.Condition> conditions, CriteriaBuilder criteriaBuilder, Root root){
         ArrayList<Predicate> predicates = new ArrayList<>();
         conditions.stream().forEach(condition -> {
             try {
-                if(condition.containsKey("or")){
+                if(condition.getOr() != null){
                     ArrayList<Predicate> orPredicates = null;
-                    orPredicates = createWhereConditions( (List<LinkedHashMap>) condition.get("or"),criteriaBuilder,root);
+                    orPredicates = createWhereConditions(condition.getOr(), criteriaBuilder, root);
                     Predicate[] orPredicatesArray = orPredicates.toArray(new Predicate[orPredicates.size()]);
                     predicates.add(criteriaBuilder.or(orPredicatesArray));
-                }else if(condition.containsKey("and")){
-                    ArrayList<Predicate> andPredicates = createWhereConditions( (List<LinkedHashMap>) condition.get("and"),criteriaBuilder,root);
+                }else if(condition.getAnd() != null){
+                    ArrayList<Predicate> andPredicates = createWhereConditions(condition.getAnd(), criteriaBuilder, root);
                     Predicate[] andPredicatesArray = andPredicates.toArray(new Predicate[andPredicates.size()]);
                     predicates.add(criteriaBuilder.and(andPredicatesArray));
                 }else{
@@ -159,19 +165,19 @@ public class QueryBuilder<T> {
         return predicates;
     }
 
-    private Optional<Predicate> createPredicate(CriteriaBuilder criteriaBuilder, Root root, LinkedHashMap condition) throws AppworkException{
+    private Optional<Predicate> createPredicate(CriteriaBuilder criteriaBuilder, Root root, Query.Condition condition) throws AppworkException{
         try {
             Optional<Predicate> predicate = null;
-            if(condition.containsKey("type") && condition.containsKey("column")){
-                String conditionFunction = (String) condition.get("type");
-                String column = (String) condition.get("column");
+            if(condition.getType() != null && condition.getColumn() != null){
+                String conditionFunction = condition.getType();
+                String column = condition.getColumn().getName();
 
-                if (condition.containsKey("value")){
-                    String value = (String) condition.get("value");
+                if (condition.getValue() != null){
+                    String value = (String) condition.getValue();
                     Method method = CriteriaBuilder.class.getMethod(conditionFunction, Expression.class, getRequiredClassFromFunction(conditionFunction));
                     predicate = Optional.ofNullable((Predicate) method.invoke(criteriaBuilder, root.get(column), getValueObjectFromColumn(root,column,value)));
-                }else if(condition.containsKey("column2")){
-                    String column2 = (String) condition.get("column");
+                }else if(condition.getColumn2() != null){
+                    String column2 = condition.getColumn2().getName();
                     Method method = CriteriaBuilder.class.getMethod(conditionFunction, Expression.class, Expression.class);
                     predicate = Optional.ofNullable((Predicate) method.invoke(criteriaBuilder, root.get(column), root.get(column2)));
                 }
@@ -180,6 +186,17 @@ public class QueryBuilder<T> {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             throw new AppworkException(e.getMessage(),ResponseCode.QUERY_BUILDER_FAILURE);
+        }
+    }
+
+    private JoinType getJoinType(String type){
+        switch (type){
+            case "left":
+                return JoinType.LEFT;
+            case "right":
+                return JoinType.RIGHT;
+            default:
+                return JoinType.INNER;
         }
     }
 
@@ -222,6 +239,32 @@ public class QueryBuilder<T> {
     }
 
 }
+//            ======== Joins Creation =======
+//            List<Join<T, T>> joins = new ArrayList<>();
+//            query.getJoins().stream().filter(s->s.getType()!=null&&s.getOn()!=null).forEach(join->{
+//                Join<T, T> joinObject=root.join(join.getJoinable(),getJoinType(join.getType()));
+//                joinObject.alias(join.getJoinable());
+//                joins.add(joinObject);
+//                ArrayList<Predicate> predicates=createWhereConditions(join.getOn(),criteriaBuilder,root);
+//                if(predicates.size()>0){
+//                    Predicate[]predicatesArray=predicates.toArray(new Predicate[predicates.size()]);
+//                    joinObject.on(predicatesArray);
+//                }
+//            });
+//            ========= New Get Column ========
+//            private Path getColumn(Root root, List<Join<T,T>> joins, Query.Column column){
+//                Path[] path = {null};
+//                if(root.getJavaType().getSimpleName().equals(column.getTable())){
+//                    path[0] = root.get(column.getName());
+//                }else{
+//                    joins.stream().forEach(s -> {
+//                        if(s.getAlias().equals(column.getTable())){
+//                            path[0] = s.get(column.getName());
+//                        }
+//                    });
+//                }
+//                return path[0];
+//            }
 //            ======== between function ========
 //            if(conditionFunction.equals("between") && conditionLength == 4){
 //                String column = condition.split(",")[1];

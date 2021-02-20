@@ -21,16 +21,16 @@ public class AppBuilder {
             while(fileContent.indexOf("$path(") > -1){
                 int firstIndex = fileContent.indexOf("$path(")+6;
                 int lastIndex = firstIndex + fileContent.substring(firstIndex).indexOf(")");
-                String[] paths = fileContent.substring(firstIndex,lastIndex).split("\\|");
+                String[] paths = fileContent.substring(firstIndex,lastIndex).split("\\\\");
 
                 StringBuilder path = new StringBuilder();
                 if(paths.length > 0){
-                    paths[0]= paths[0].replaceAll("\\\\", File.separator);
+//                    paths[0] = paths[0].replaceAll("\\\\", File.separator);
 
                     path = new StringBuilder(paths[0]);
 
                     for(int i =1 ; i < paths.length ; i++) {
-                        paths[i] = paths[i].replaceAll("\\\\", File.separator);
+//                        paths[i] = paths[i].replaceAll("\\\\", File.separator);
                         path.append(File.separator).append(paths[i]);
                     }
                 }

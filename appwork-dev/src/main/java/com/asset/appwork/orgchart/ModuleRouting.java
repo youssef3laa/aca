@@ -383,7 +383,7 @@ public class ModuleRouting {
             if(request.isPresent()){
                 String users = "";
                 String roles = "";
-                if(request.get().getWorkingUsers().isEmpty()){
+                if(request.get().getWorkingUsers() == null){
                     users += ";";
                     roles += ";";
                 }else{
@@ -393,7 +393,7 @@ public class ModuleRouting {
                 User userData = orgChartService.getLoggedInUser(account);
                 Optional<Group> groupData = userData.getGroup().stream().findFirst();
 
-                users += userData.getUserId() + ";";
+                users += userData.getId() + ";";
                 if(groupData.isPresent()){
                     roles += groupData.get().getGroupCode() + ";";
                 }

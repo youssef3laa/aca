@@ -59,8 +59,8 @@
                 let approvalForm = this.$refs.appBuilder.getModelData("saveProcessForm");
 
                 let dataObj = {
-                    requestId: this.inputSchema.requestId,
                     taskId: this.taskId,
+                    requestId: this.inputSchema.requestId,
                     stepId: this.inputSchema.stepId,
                     process: this.inputSchema.process,
                     parentHistoryId: this.inputSchema.parentHistoryId,

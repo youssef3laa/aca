@@ -41,22 +41,37 @@ export default {
         aggregations: [
           {
             function: "count",
-            column: "processName",
+            column: {
+              table: "ApprovalHistory",
+              name: "processName"
+            },
           },
         ],
-        columns: ["processName"],
-        groupBy: ["processName"],
+        columns: [{
+          table: "ApprovalHistory",
+          name: "processName"
+        }],
+        groupBy: [{
+          table: "ApprovalHistory",
+          name: "processName"
+        }],
         where: [
           {
             or: [
               {
                 type: "equal",
-                column: "processName",
+                column: {
+                  table: "ApprovalHistory",
+                  name: "processName"
+                },
                 value: "generalProcess",
               },
               {
                 type: "equal",
-                column: "processName",
+                column: {
+                  table: "ApprovalHistory",
+                  name: "processName"
+                },
                 value: "process-1",
               },
             ],

@@ -5,7 +5,7 @@ package com.asset.appwork.controller;
  */
 
 import com.asset.appwork.QueryBuilder;
-import com.asset.appwork.dto.Filter;
+import com.asset.appwork.dto.Query;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.response.AppResponse;
@@ -14,15 +14,12 @@ import com.asset.appwork.service.QueryService;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -30,26 +27,27 @@ import java.util.List;
 @RequestMapping("/api/dynamic/report")
 @RestController
 public class DynamicReportController {
+
     @Autowired
     private AutowireCapableBeanFactory beanFactory;
-
     @Autowired
     EntityManager entityManager;
     @Autowired
     QueryService queryService;
+
     @PostMapping("/run")
-    public ResponseEntity<AppResponse<JsonNode>> getForm(@RequestBody() Filter filter) {
+    public ResponseEntity<AppResponse<JsonNode>> getForm(@RequestBody() Query query) {
         AppResponse.ResponseBuilder<JsonNode> responseBuilder = AppResponse.builder();
         try{
             QueryBuilder queryBuilder = new QueryBuilder(entityManager);
-            List<?> list = queryBuilder.runQuery(filter);
+            List<?> list = queryBuilder.runQuery(query);
 
-            if(filter.getColumns().size() < 1 && filter.getAggregations().size() < 1){
+            if(query.getColumns().size() < 1 && query.getAggregations().size() < 1){
                 try{
-                    Class<?> serviceClass = Class.forName("com.asset.appwork.service."+filter.getTable()+"Service");
+                    Class<?> serviceClass = Class.forName("com.asset.appwork.service."+ query.getTable() +"Service");
                     GenericService genericService = (GenericService) beanFactory.createBean(serviceClass);
                     list = genericService.updateResult(list);
-                }catch (Exception e){
+                }catch (ClassNotFoundException e){
                     e.printStackTrace();
                 }
             }
@@ -66,8 +64,10 @@ public class DynamicReportController {
         }
         return responseBuilder.build().getResponseEntity();
     }
+
+
     @PostMapping("/get")
-    public ResponseEntity<AppResponse<JsonNode>> getChartData(@RequestBody() Filter key) {
+    public ResponseEntity<AppResponse<JsonNode>> getChartData(@RequestBody() Query key) {
         AppResponse.ResponseBuilder<JsonNode> responseBuilder = AppResponse.builder();
         try{
 //            QueryBuilder queryBuilder = new QueryBuilder(entityManager);

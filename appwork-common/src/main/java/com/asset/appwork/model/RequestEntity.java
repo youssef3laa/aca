@@ -45,6 +45,7 @@ public class RequestEntity {
     public String toString() {
         return SystemUtil.writeObjectIntoString(this).replace(",\"id\":null", "")
                 .replace(",\"displayName\":null", "")
-                .replace(",\"unitName\":null", "");
+                .replace(",\"unitName\":null", "")
+                .replace(",\"date\":null", "");
     }
 }

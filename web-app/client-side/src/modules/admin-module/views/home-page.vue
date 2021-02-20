@@ -109,11 +109,20 @@ Topbar,
           aggregations: [
             {
               function: "count",
-              column: "jsonKey",
+              column: {
+                table: "memoValues",
+                name: "jsonKey"
+              },
             },
           ],
-          columns: ["jsonKey"],
-          groupBy: ["jsonKey"],
+          columns: [{
+            table: "memoValues",
+            name: "jsonKey"
+          }],
+          groupBy: [{
+            table: "memoValues",
+            name: "jsonKey"
+          }],
         },
       },
       processHistory: {
@@ -123,22 +132,37 @@ Topbar,
           aggregations: [
             {
               function: "count",
-              column: "processName",
+              column: {
+                table: "ApprovalHistory",
+                name: "processName"
+              },
             },
           ],
-          columns: ["processName"],
-          groupBy: ["processName"],
+          columns: [{
+            table: "ApprovalHistory",
+            name: "processName"
+          }],
+          groupBy: [{
+            table: "ApprovalHistory",
+            name: "processName"
+          }],
           where: [
             {
               or: [
                 {
                   type: "equal",
-                  column: "processName",
+                  column: {
+                    table: "ApprovalHistory",
+                    name: "processName"
+                  },
                   value: "generalProcess",
                 },
                 {
                   type: "equal",
-                  column: "processName",
+                  column: {
+                    table: "ApprovalHistory",
+                    name: "processName"
+                  },
                   value: "process-1",
                 },
               ],
