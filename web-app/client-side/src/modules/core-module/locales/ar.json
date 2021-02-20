@@ -4,7 +4,7 @@
   "password": "كلمه المرور",
   "currentLanguage": "عربي",
   "orgChart": "الهيكل التنظيمي",
-  "advancedSearch": "بحث متقدم",
+  "basicSearch": "بحث متقدم",
   "requestDate": "تاريخ الطلب",
   "decision": "الإجراء",
   "receiver": "التوجيه",
@@ -116,7 +116,7 @@
   "recipientName": "اسم المستلم",
   "job": "الوظيفة",
   "receivingAdministration": "الإدارة المستلمة",
-
+  "status" : "الحالة",
   "caseData": "بيانات القضية",
   "caseType": "نوع القضية",
   "caseNumber": "رقم القضية",
@@ -130,6 +130,7 @@
   "displayDate": "تاريخ العرض",
 
   "send": "إرسال",
+  "end" : "منتهية",
   "cancel": "إلغاء",
   "save": "حفظ",
   "temporarySave": "حفظ مؤقت",
@@ -149,7 +150,16 @@
   "requestNumber":"رقم الوارد",
   "creator":"المنشئ",
   "deliveryDate":"تاريخ الارسال",
-  "taskRequestNumber":"رقم الطلب"
+  "taskRequestNumber":"رقم الطلب",
 
 
+
+  "lookup": "عمليات البحث",
+  "mainLookup": "عمليات البحث الاساسية",
+
+  "category": "الفئة",
+  "key": "الرقم التسلسلي",
+  "arValue": "القيمة بالعربية",
+  "enValue": "القيمة بالانجليزية",
+  "parentId": "الفئة الأم"
 }

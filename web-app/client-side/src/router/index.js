@@ -7,11 +7,13 @@ import DemoRoutes from '../modules/demo-module/router/router'
 import ManualStep from '../modules/manual-step-module/router/router'
 import generalProcessRoutes from '../modules/generalProcess-module/router/router'
 import incomingRegistrationRoutes from '../modules/incoming-registration-module/router/router'
+import lookupRoutes from '../modules/lookup-module/router/router'
 import HistoryRoutes from '../modules/history-module/router/router'
 import correspondenceRoutes from '../modules/correspondence-data-module/router/router'
 import OrgChartRoutes from '../modules/orgChart-module/router/router'
 import observable from "../modules/core-module/lib/vue-sub-lib";
 import linkingRoutes from '../modules/link-incoming-module/router/router'
+import basicSearchRoutes from '../modules/basicSearch-module/router/router'
 
 Vue.use(VueRouter)
 
@@ -39,11 +41,12 @@ allRoutes = allRoutes.concat(
     ManualStep,
     generalProcessRoutes,
     incomingRegistrationRoutes,
+    lookupRoutes,
     HistoryRoutes,
     correspondenceRoutes,
     OrgChartRoutes,
     linkingRoutes,
-    {
+    basicSearchRoutes, {
         path: '/',
         name: 'Home',
         component: Home,

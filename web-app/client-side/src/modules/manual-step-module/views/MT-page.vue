@@ -30,6 +30,8 @@ export default {
   },
   methods: {
     readEntity: function(entityId) {
+      console.log(this.app.pages.tabs[1])
+      this.app.pages.tabs[1].show= true;
       // let self = this;
       http
         .get(
@@ -88,7 +90,9 @@ export default {
         this.getTaskData()
       })
       .catch((error) => {
-        console.error(error)
+          this.readEntity(1);
+
+console.error(error)
       })
     const item = this.$route.params.item
     console.log(item)
@@ -140,209 +144,282 @@ export default {
       taskId: '',
       tasks: [],
       app: {
-        pages: [
-          {
-            key: 'page1',
-            tabs: [
-              {
-                key: 'tab1',
-                id: '1',
-                isActive: true,
-                name: 'البيانات الأساسية',
-                icon: 'far fa-file-alt',
-              },
-              {
-                key: 'tab2',
-                id: '2',
-                name: 'المرفقات',
-                icon: 'fas fa-paperclip',
-              },
-              {
-                key: 'tab3',
-                id: '3',
-                name: 'collapse',
-                icon: 'fas fa-paperclip',
-              },
-              {
-                key: 'tab4',
-                id: '4',
-                name: 'التأشيرات',
-                icon: '',
-              },
-            ],
-            sections: [
-              {
-                key: 'title',
-                type: 'TitleComponet',
-                name: 'بيانات المكاتبة',
-                actions: ['cancel', 'save', 'complete'],
-                // sections: [
-                //   {
-                //     type: 'title',
-                //   },
-                // ],
-              },
-              {
-                key: 'section1',
-                tabId: '1',
-                isTab: true,
-                type: 'DefaultSection',
-                isCard: true,
-                display: 'block',
-                forms: [
-                  {
-                    key: 'form1',
-                    publish: 'form1Change',
-                    inputs: [
-                      {
-                        type: 'AutoCompleteComponent',
-                        name: 'receiver',
-                        rule: 'required',
-                        show: 'showTest',
-                        readonly: 'testReadOnly',
-                        // url: '',
-                        // list: '',
-                        // isAutoComplete: true,
-                        col: '6',
-                      },
-                      {
-                        type: 'InputComponent',
-                        name: 'test',
-                        label: 'test',
-                        col: 6,
-                        rule: 'required',
-                        readonly: 'testReadOnly',
-                        show: 'showTest',
-                      },
-                      {
-                        type: 'DatePickerComponent',
-                        label: 'requestDate',
-                        name: 'requestDate',
-                        rule: 'required',
-                        show: true,
-                        col: '6',
-                      },
-                      {
-                        type: 'TextareaComponent',
-                        label: 'notes',
-                        name: 'notes',
-                        col: '12',
-                      },
-                    ],
-                    model: {
-                      receiver: {
-                        url: 'org/group/findByCodes/HGCS,HRCA,HCAO',
-                        list: [],
-                        value: '',
-                      },
-                      test: 'Ask',
-                      requestDate: '',
-                      notes: '',
-
-                      testReadOnly: false,
-                      showTest: true,
-                    },
-                  },
-                ],
-              },
-              {
-                key: 'section2',
-                type: 'Resizable',
-                tabId: '2',
-                isTab: true,
-                isCard: true,
-                display: 'none',
-                forms: [
-                  {
-                    resizable: {
-                      forms: [
-                        {
-                          key: 'iframeObj',
-                          background: 'white',
-                          inputs: [
-                            {
-                              type: 'IframeComponent',
-                              name: 'iframeObj',
-                              col: 12,
-                            },
-                          ],
-                          model: {
-                            iframeObj: {
-                              src: '',
-                            },
-                          },
-                        },
-                        {
-                          background: 'white',
-                          inputs: [
-                            {
-                              type: 'InputFileComponent',
-                              name: 'inputFile',
-                              col: 12,
-                            },
-                          ],
-                          model: {
-                            inputFile: '',
-                          },
-                        },
-                      ],
-                    },
-                  },
-                ],
-              },
-              {
-                key: 'section3',
-                tabId: '3',
-                isTab: true,
-                isCard: true,
-                display: 'none',
-                type: 'CollapseSection',
-                name: 'النص',
-                forms: [
-                  {
-                    key: 'richtext',
-                    inputs: [
-                      {
-                        type: 'richtextComponent',
-                        name: 'richtext',
-                        col: 12,
-                      },
-                    ],
-                    model: {
-                      richtext: '<p></p>',
-                    },
-                  },
-                ],
-              },
-              {
-                key: 'section4',
-                tabId: '4',
-                isTab: true,
-                isCard: true,
-                isCanvas: true,
-                display: 'none',
-                // visibility: 'hidden',
-                type: 'DefaultSection',
-                name: 'النص',
-                forms: [
-                  {
-                    key: 'richtext',
-                    inputs: [
-                      {
-                        type: 'SignatureComponent',
-                        name: 'richtext',
-                        col: 12,
-                      },
-                    ],
-                    model: {
-                      richtext: '<p></p>',
-                    },
-                  },
-                ],
-              },
-            ],
+        pages: {
+          key: 'tabtest',
+          title: {
+            key: 'title',
+            type: 'TitleComponet',
+            name: 'بيانات المكاتبة',
+            actions: ['cancel', 'save', 'complete'],
           },
-        ],
+          tabs: [
+            {
+              key: 'tab1',
+              id: '1',
+              isActive: true,
+              name: 'البيانات الأساسية',
+              icon: 'far fa-file-alt',
+            },
+            {
+              key: 'tab2',
+              id: '2',
+              show: false,
+              isActive: false,
+              name: 'المرفقات',
+              icon: 'fas fa-paperclip',
+            },
+            {
+              key: 'tab3',
+              id: '3',
+              name: 'collapse',
+              icon: 'fas fa-paperclip',
+            },
+            {
+              key: 'tab4',
+              id: '4',
+              name: 'التأشيرات',
+              icon: '',
+            },
+          ],
+          page: [
+            {
+              key: 'page1',
+              sections: {
+                key: 'tabtest',
+                tabs: [
+                  {
+                    key: 'tab1',
+                    id: '1',
+                    isActive: true,
+                    name: 'sub tab 1',
+                    icon: 'far fa-file-alt',
+                  },
+                  {
+                    key: 'tab2',
+                    id: '2',
+                    isActive: false,
+                    name: 'sub tab 2',
+                    icon: 'far fa-file-alt',
+                  },
+                ],
+                sec: [
+                  {
+                    key: 'sectionTab',
+                    tabId: '1',
+                    isTab: true,
+                    type: 'DefaultSection',
+                    display: 'block',
+                    isCard: true,
+                    show: true,
+                    forms: [
+                      {
+                        key: 'form1',
+                        publish: 'form1Change',
+                        inputs: [
+                          {
+                            type: 'AutoCompleteComponent',
+                            name: 'receiver',
+                            rule: 'required',
+                            col: '6',
+                          },
+                          {
+                            type: 'DatePickerComponent',
+                            label: 'requestDate',
+                            name: 'requestDate',
+                            rule: 'required',
+                            col: '6',
+                          },
+                          {
+                            type: 'TextareaComponent',
+                            label: 'notes',
+                            name: 'notes',
+                            col: '12',
+                          },
+                        ],
+                        model: {
+                          receiver: {
+                            url: 'org/group/findByCodes/HGCS,HRCA,HCAO',
+                            list: [],
+                            value: '',
+                          },
+                          requestDate: '',
+                          notes: '',
+                        },
+                      },
+                      {
+                        key: 'form1',
+                        publish: 'form1Change',
+                        inputs: [
+                          {
+                            type: 'AutoCompleteComponent',
+                            name: 'receiver',
+                            rule: 'required',
+                            col: '6',
+                          },
+                          {
+                            type: 'DatePickerComponent',
+                            label: 'requestDate',
+                            name: 'requestDate',
+                            rule: 'required',
+                            col: '6',
+                          },
+                          {
+                            type: 'TextareaComponent',
+                            label: 'notes',
+                            name: 'notes',
+                            col: '12',
+                          },
+                        ],
+                        model: {
+                          receiver: {
+                            url: 'org/group/findByCodes/HGCS,HRCA,HCAO',
+                            list: [],
+                            value: '',
+                          },
+                          requestDate: '',
+                          notes: '',
+                        },
+                      },
+                      // {
+                      //   key: 'key1',
+                      //   tabId: 1,
+                      //   isTab: true,
+                      //   display: 'block',
+                      //   inputs: [
+                      //     {
+                      //       type: 'InputComponent',
+                      //       name: 'test',
+                      //       label: 'test',
+                      //       col: 6,
+                      //       show: false,
+                      //       rule: 'required',
+                      //     },
+                      //   ],
+                      //   model: {
+                      //     showTest: true,
+                      //   },
+                      // },
+                      // {
+                      //   key: 'key2',
+                      //   tabId: 2,
+                      //   isTab: true,
+                      //   display: 'none',
+                      //   inputs: [
+                      //     {
+                      //       type: 'DatePickerComponent',
+                      //       label: 'requestDate',
+                      //       name: 'requestDate',
+                      //       rule: 'required',
+                      //       show: true,
+                      //       col: '6',
+                      //     },
+                      //   ],
+                      //   model: {
+                      //     requestDate: '',
+                      //   },
+                      // },
+                    ],
+                  },
+                  {
+                    key: 'section2',
+                    type: 'Resizable',
+                    tabId: '2',
+                    isTab: true,
+                    isCard: true,
+                    display: 'none',
+                    forms: [
+                      {
+                        resizable: {
+                          forms: [
+                            {
+                              key: 'iframeObj',
+                              background: 'white',
+                              inputs: [
+                                {
+                                  type: 'IframeComponent',
+                                  name: 'iframeObj',
+                                  col: 12,
+                                },
+                              ],
+                              model: {
+                                iframeObj: {
+                                  src: '',
+                                },
+                              },
+                            },
+                            {
+                              background: 'white',
+                              inputs: [
+                                {
+                                  type: 'InputFileComponent',
+                                  name: 'inputFile',
+                                  col: 12,
+                                },
+                              ],
+                              model: {
+                                inputFile: '',
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    key: 'section3',
+                    tabId: '3',
+                    isTab: true,
+                    isCard: true,
+                    display: 'none',
+                    type: 'CollapseSection',
+                    name: 'النص',
+                    forms: [
+                      {
+                        key: 'richtext',
+                        inputs: [
+                          {
+                            type: 'richtextComponent',
+                            name: 'richtext',
+                            col: 12,
+                          },
+                        ],
+                        model: {
+                          richtext: '<p></p>',
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    key: 'section4',
+                    tabId: '4',
+                    isTab: true,
+                    isCard: true,
+                    isCanvas: true,
+                    display: 'none',
+                    // visibility: 'hidden',
+                    type: 'DefaultSection',
+                    name: 'النص',
+                    forms: [
+                      {
+                        key: 'richtext',
+                        inputs: [
+                          {
+                            type: 'SignatureComponent',
+                            name: 'richtext',
+                            col: 12,
+                          },
+                        ],
+                        model: {
+                          richtext: '<p></p>',
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
       },
     }
   },
