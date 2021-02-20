@@ -1,23 +1,28 @@
 package com.asset.appwork.controller;
 
 import com.asset.appwork.config.TokenService;
+import com.asset.appwork.cs.AppworkCSOperations;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.Lookup;
 import com.asset.appwork.model.Memorandum;
+import com.asset.appwork.model.Unit;
 import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.repository.LookupRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.util.SystemUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -97,6 +102,48 @@ public class LookupController {
             respBuilder.status(e.getCode());
         }
 
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @GetMapping("/get/category/list")
+    public ResponseEntity<AppResponse<List<Lookup>>> getLookups(@RequestHeader("X-Auth-Token") String token){
+        AppResponse.ResponseBuilder<List<Lookup>> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+
+            List<Lookup> lookups = lookupRepository.findAll();
+            if(lookups.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
+            respBuilder.data(lookups);
+
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<AppResponse<String>> updateLookup(@RequestHeader("X-Auth-Token") String token,
+                                                            @PathVariable("id") Long id,
+                                                            @RequestBody Lookup lookup
+    ) {
+        AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            String lookupId = new Entity(account, SystemUtil.generateRestAPIBaseUrl(environment, "AssetGeneralACA"),
+                    "ACA_Entity_lookup").update(id, lookup);
+            respBuilder.data(lookupId);
+            
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
         return respBuilder.build().getResponseEntity();
     }
 }

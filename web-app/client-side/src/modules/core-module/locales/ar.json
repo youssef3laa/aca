@@ -149,7 +149,16 @@
   "requestNumber":"رقم الوارد",
   "creator":"المنشئ",
   "deliveryDate":"تاريخ الارسال",
-  "taskRequestNumber":"رقم الطلب"
+  "taskRequestNumber":"رقم الطلب",
 
 
+
+  "lookup": "عمليات البحث",
+  "mainLookup": "عمليات البحث الاساسية",
+
+  "category": "الفئة",
+  "key": "الرقم التسلسلي",
+  "arValue": "القيمة بالعربية",
+  "enValue": "القيمة بالانجليزية",
+  "parentId": "الفئة الأم"
 }
