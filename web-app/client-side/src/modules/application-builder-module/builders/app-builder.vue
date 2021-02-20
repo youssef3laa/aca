@@ -1,18 +1,20 @@
 <template>
   <span>
-    <TitleComponent v-if="appData.pages.title" :section="appData.pages.title" />
+    <TitleComponent v-if="appData && appData.pages && appData.pages.title" :section="appData.pages.title" />
     <TabBuilder
-      v-if="appData.pages.tabs"
+      v-if="appData && appData.pages && appData.pages.tabs"
       :tabkey="appData.pages.key"
       :tabs="handleTabs"
     />
-    <div v-for="(page, key) in appData.pages.page" :key="key">
-      <PageBuilder
-        :page="page"
-        v-on:modelChange="dataChange"
-        :tabkey="appData.pages.key"
-      />
-    </div>
+    <span v-if="appData && appData.pages ">
+      <div v-for="(page, key) in appData.pages.page" :key="key">
+        <PageBuilder
+          :page="page"
+          v-on:modelChange="dataChange"
+          :tabkey="appData.pages.key"
+        />
+      </div>
+    </span>
   </span>
 </template>
 
