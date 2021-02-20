@@ -59,13 +59,13 @@
                 action: "add",
                 })
             });
-            this.$observable.subscribe("lookupTable_edit", (data) => {
-                this.$refs.appBuilder.setModelData("editLookupModal", data.item)
-                this.$observable.fire("editLookupModal", {
-                action: "edit",
-                obj: data.item,
-                })
-            })
+            // this.$observable.subscribe("lookupTable_edit", (data) => {
+            //     this.$refs.appBuilder.setModelData("editLookupModal", data.item)
+            //     this.$observable.fire("editLookupModal", {
+            //     action: "edit",
+            //     obj: data.item,
+            //     })
+            // })
             }
         }
     };
