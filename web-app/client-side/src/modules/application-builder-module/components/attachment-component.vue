@@ -106,34 +106,34 @@
                                          style="height: 100px">
                                          <v-col :cols="1"
                                                style="align-self: center">
-                                            <v-icon style="float:left; color: #D1D1D1" size="20">fas fa-ellipsis-v</v-icon>
-                                            <v-icon style="float:left; color: #D1D1D1" size="20">fas fa-ellipsis-v</v-icon>
+                                            <v-icon style="float:left; color: #D5D5D5" size="20">fas fa-ellipsis-v</v-icon>
+                                            <v-icon style="float:left; color: #D5D5D5" size="20">fas fa-ellipsis-v</v-icon>
                                         </v-col>
                                         <v-col v-if="file.properties.name.toLowerCase().indexOf('.pdf')!=-1" :cols="1"
                                                style="align-self: center">
-                                            <v-icon style="color=#D1D1D1" size="60">fas fa-file-pdf</v-icon>
+                                            <v-icon class="attachment-icon" style="color=#F8F8F8" size="60">fas fa-file-pdf</v-icon>
                                         </v-col>
                                         <v-col v-else-if="excelExtension.some(substring=>file.properties.name.toLowerCase().includes(substring))" :cols="1"
                                                style="align-self: center">
-                                            <v-icon style="color=#D1D1D1" size="60">fas fa-file-excel</v-icon>
+                                            <v-icon class="attachment-icon" style="color=#F8F8F8" size="60">fas fa-file-excel</v-icon>
                                         </v-col>
                                         <v-col  v-else-if="wordExtension.some(substring=>file.properties.name.toLowerCase().includes(substring))" :cols="1"
                                                style="align-self: center">
-                                            <v-icon  style="color=#D1D1D1" size="60">fas fa-file-word</v-icon>
+                                            <v-icon class="attachment-icon"  style="color=#F8F8F8" size="60">fas fa-file-word</v-icon>
                                         </v-col>
                                         <v-col v-else-if="imageExtension.some(substring=>file.properties.name.toLowerCase().includes(substring))" :cols="1"
                                                style="align-self: center">
-                                            <v-icon style="color=#D1D1D1" size="60">fas fa-file-image</v-icon>
+                                            <v-icon class="attachment-icon" style="color=#F8F8F8" size="60">fas fa-file-image</v-icon>
                                         </v-col>
                                         <v-col v-else :cols="1"
                                                style="align-self: center">
-                                            <v-icon style="color=#D1D1D1" size="60">fas fa-file</v-icon>
+                                            <v-icon class="attachment-icon" style="color=#F8F8F8" size="60">fas fa-file</v-icon>
                                         </v-col>
                                         <v-col :cols="8"
-                                               class="card-name title"
+                                               class="card-name "
                                                @click="openFileInBrave({ fileId: file.properties.id });">
-                                            {{ file.properties.name }} <br/>
-                                            {{ file.properties.fileTypeValue }}
+                                            <span class="attachment-title">{{ file.properties.name }}</span> <br/>
+                                            <span class="attachment-category">{{ file.properties.fileTypeValue }}</span>
                                         </v-col>
                                         <v-col :cols="readOnly? 2 : 1"
                                                style="cursor: pointer; align-self: center"
@@ -146,7 +146,7 @@
                                                :cols="1"
                                                style="cursor: pointer; align-self: center"
                                                @click="deleteFile(file)">
-                                            <v-icon color="#ea9cb3"
+                                            <v-icon color="#CD4846"
                                                     size="25">
                                                 fas fa-trash-alt</v-icon>
                                         </v-col>
@@ -305,14 +305,24 @@ $color-secondary: #9e9e9e;
 /*fonts */
 $font-12: 12px;
 
-.title {
+.attachment-category {
+  font-size: 16px;
+  color: #9E9E9E;
+}
+
+.attachment-icon {
+  height: 60px;
+  color: #D5D5D5!important;
+}
+.attachment-title {
   cursor: pointer; 
   align-self: center;
-  font: normal normal normal 18px/22px Neo Sans Arabic;
   color: #1A1A2E;
+  font-size: 18px;
 }
 
 .attachment-item {
+  height: 95px;
   padding-bottom: 0!important;
   padding-top: 0!important;
   margin-bottom: 5px!important;
