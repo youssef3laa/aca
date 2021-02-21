@@ -115,23 +115,26 @@
         </v-menu>
       </template>
       <template v-slot:expanded-item="{ item }">
-        <!-- <span v-for="(subHeader,i) in d.subHeaders" :key="i"> -->
-        <td
-        
-          :colspan="12"
-          style="margin:10px"
-        >
-          <div  v-for="(subHeader, i) in d.subHeaders"
-          :key="i">
-          <div class="top-bot-margins" style="color:#9E9E9E">{{ $t(subHeader.text) }}</div>
+        <v-data-table v-if="d.subItems"
+            :headers="d.subHeaders"
+            :items="item[d.subItems]">
+        </v-data-table>
 
-          <span v-if="isArray(item[subHeader.value])">
-             <div v-for="(val, k) in item[subHeader.value]" :key="k" class="top-bot-margins" >{{ val[item[subHeader.items]] }} </div>
-          </span>
-          
-          <div v-else  class="top-bot-margins" >{{ item[subHeader.value] }} </div>
-        </div>
+        <!-- <span v-for="(subHeader,i) in d.subHeaders" :key="i"> -->
+        <td v-else :colspan="12"
+          style="margin:10px" >
+          <div  v-for="(subHeader, i) in d.subHeaders" :key="i">
+            <div class="top-bot-margins" style="color:#9E9E9E">{{ $t(subHeader.text) }}</div>
+
+            <span v-if="isArray(item[subHeader.value])">
+              <div v-for="(val, k) in item[subHeader.value]" :key="k" class="top-bot-margins" >{{ val[subHeader.items]}} </div>
+            </span>
+            
+            <div v-else  class="top-bot-margins" >{{ item[subHeader.value] }} </div>
+          </div>
         </td>
+
+        
         <!-- </span> -->
       </template>
     </v-data-table>

@@ -123,7 +123,7 @@ public class LookupController {
             Account account = tokenService.get(token);
             if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            Page<Object[]> lookups = lookupRepository.findDistinctCategories(PageRequest.of(page, size));
+            Page<Object[]> lookups = lookupRepository.findDistinctCategories(PageRequest.of(page, size), search);
 
             List<LookupCategoryValues> nodes = new ArrayList<>();
             for (Object[] o : lookups.getContent()){
