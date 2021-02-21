@@ -15,6 +15,6 @@ public interface LookupRepository extends GenericRepository<Lookup, Long> {
 
     Optional<Lookup> findByCategoryAndKey(String category, String key);
 
-    @Query("select DISTINCT L.category, max( L.Id) from Lookup L GROUP BY L.category")
-    Page<Object[]> findDistinctCategories(Pageable pageable);
+    @Query("select DISTINCT L.category, max( L.Id) from Lookup L where L.category like %:search% GROUP BY L.category")
+    Page<Object[]> findDistinctCategories(Pageable pageable, String search);
 }
