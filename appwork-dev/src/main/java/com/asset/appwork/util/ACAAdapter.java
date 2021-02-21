@@ -13,38 +13,38 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
 
 public class ACAAdapter {
-    public static class UnitDeserializer extends StdDeserializer<Unit> {
+    public static class UnitCreationDeserializer extends StdDeserializer<Unit> {
 
-        public UnitDeserializer() {
+        public UnitCreationDeserializer() {
             this(null);
         }
 
-        public UnitDeserializer(Class<?> cls) {
+        public UnitCreationDeserializer(Class<?> cls) {
             super(cls);
         }
 
         @Override
-        public Unit deserialize(JsonParser parser, DeserializationContext context) throws IOException, JsonProcessingException {
+        public Unit deserialize(JsonParser parser, DeserializationContext context) throws IOException {
             JsonNode root = parser.getCodec().readTree(parser);
             Unit unit = new Unit();
-            unit.setName(String.format("%s-%s", root.at("/typeCode").asText(), root.at("/code").asText()));
-            unit.setNameAr(root.at("/name").asText());
-            unit.setUnitCode(root.at("/code").asText());
-            unit.setUnitTypeCode(root.at("/typeCode").asText());
+            unit.setName(String.format("%s-%s", root.get("typeCode").asText(), root.get("code").asText()));
+            unit.setNameAr(root.get("name").asText());
+            unit.setUnitCode(root.get("code").asText());
+            unit.setUnitTypeCode(root.get("typeCode").asText());
 
-            unit.setDescription(String.format("%s-%s", root.at("/parentTypeCode").asText(), root.at("/parentCode").asText()));
+            unit.setDescription(String.format("%s-%s", root.get("parentTypeCode").asText(), root.get("parentCode").asText()));
 
             return unit;
         }
 
     }
-    public static class UnitSerializer extends StdSerializer<Unit> {
+    public static class UnitCreationSerializer extends StdSerializer<Unit> {
 
-        public UnitSerializer() {
+        public UnitCreationSerializer() {
             this(null);
         }
 
-        public UnitSerializer(Class<Unit> t) {
+        public UnitCreationSerializer(Class<Unit> t) {
             super(t);
         }
 
@@ -52,8 +52,134 @@ public class ACAAdapter {
         public void serialize(Unit unit, JsonGenerator jsonGenerator, SerializerProvider provider) throws IOException {
             jsonGenerator.writeStartObject();
             jsonGenerator.writeStringField("name", unit.getName());
-            jsonGenerator.writeStringField("nameEn", unit.getNameEn());
             jsonGenerator.writeStringField("nameAr", unit.getNameAr());
+            jsonGenerator.writeStringField("unitTypeCode", unit.getUnitTypeCode());
+            jsonGenerator.writeStringField("unitCode", unit.getUnitCode());
+            jsonGenerator.writeEndObject();
+        }
+    }
+
+    public static class UnitRenamingDeserializer extends StdDeserializer<Unit> {
+
+        public UnitRenamingDeserializer() {
+            this(null);
+        }
+
+        public UnitRenamingDeserializer(Class<?> cls) {
+            super(cls);
+        }
+
+        @Override
+        public Unit deserialize(JsonParser parser, DeserializationContext context) throws IOException  {
+            JsonNode root = parser.getCodec().readTree(parser);
+            Unit unit = new Unit();
+            unit.setNameAr(root.get("newName").asText());
+            unit.setUnitCode(root.get("newCode").asText());
+            unit.setUnitTypeCode(root.get("typeCode").asText());
+
+            unit.setDescription(root.get("code").asText());
+
+            return unit;
+        }
+
+    }
+    public static class UnitRenamingSerializer extends StdSerializer<Unit> {
+
+        public UnitRenamingSerializer() {
+            this(null);
+        }
+
+        public UnitRenamingSerializer(Class<Unit> t) {
+            super(t);
+        }
+
+        @Override
+        public void serialize(Unit unit, JsonGenerator jsonGenerator, SerializerProvider provider) throws IOException {
+            jsonGenerator.writeStartObject();
+            jsonGenerator.writeStringField("name", unit.getName());
+            jsonGenerator.writeStringField("nameAr", unit.getNameAr());
+            jsonGenerator.writeStringField("unitCode", unit.getUnitCode());
+            jsonGenerator.writeEndObject();
+        }
+    }
+
+    public static class UnitChangingParentDeserializer extends StdDeserializer<Unit> {
+
+        public UnitChangingParentDeserializer() {
+            this(null);
+        }
+
+        public UnitChangingParentDeserializer(Class<?> cls) {
+            super(cls);
+        }
+
+        @Override
+        public Unit deserialize(JsonParser parser, DeserializationContext context) throws IOException {
+            JsonNode root = parser.getCodec().readTree(parser);
+            Unit unit = new Unit();
+            unit.setUnitCode(root.get("code").asText());
+            unit.setUnitTypeCode(root.get("typeCode").asText());
+
+            unit.setDescription(String.format("%s-%s-%s", root.get("newParentTypeCode").asText(), root.get("newParentCode").asText(), root.get("newCode").asText()));
+
+            return unit;
+        }
+
+    }
+    public static class UnitChangingParentSerializer extends StdSerializer<Unit> {
+
+        public UnitChangingParentSerializer() {
+            this(null);
+        }
+
+        public UnitChangingParentSerializer(Class<Unit> t) {
+            super(t);
+        }
+
+        @Override
+        public void serialize(Unit unit, JsonGenerator jsonGenerator, SerializerProvider provider) throws IOException {
+            jsonGenerator.writeStartObject();
+            jsonGenerator.writeStringField("unitCode", unit.getUnitCode());
+            jsonGenerator.writeEndObject();
+        }
+    }
+
+    public static class UnitParentAndChangingUnitTypeCodeDeserializer extends StdDeserializer<Unit> {
+
+        public UnitParentAndChangingUnitTypeCodeDeserializer() {
+            this(null);
+        }
+
+        public UnitParentAndChangingUnitTypeCodeDeserializer(Class<?> cls) {
+            super(cls);
+        }
+
+        @Override
+        public Unit deserialize(JsonParser parser, DeserializationContext context) throws IOException {
+            JsonNode root = parser.getCodec().readTree(parser);
+            Unit unit = new Unit();
+            unit.setUnitCode(root.get("code").asText());
+            unit.setUnitTypeCode(root.get("typeCode").asText());
+
+            unit.setDescription(String.format("%s-%s-%s-%s", root.get("newParentTypeCode").asText(), root.get("newParentCode").asText(), root.get("newTypeCode").asText(), root.get("newCode").asText()));
+
+            return unit;
+        }
+
+    }
+    public static class UnitParentAndChangingUnitTypeCodeSerializer extends StdSerializer<Unit> {
+
+        public UnitParentAndChangingUnitTypeCodeSerializer() {
+            this(null);
+        }
+
+        public UnitParentAndChangingUnitTypeCodeSerializer(Class<Unit> t) {
+            super(t);
+        }
+
+        @Override
+        public void serialize(Unit unit, JsonGenerator jsonGenerator, SerializerProvider provider) throws IOException {
+            jsonGenerator.writeStartObject();
             jsonGenerator.writeStringField("unitTypeCode", unit.getUnitTypeCode());
             jsonGenerator.writeStringField("unitCode", unit.getUnitCode());
             jsonGenerator.writeEndObject();

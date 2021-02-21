@@ -3,6 +3,7 @@ package com.asset.appwork.controller;
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.cs.AppworkCSOperations;
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.dto.LookupCategoryValues;
 import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
@@ -113,24 +114,28 @@ public class LookupController {
     }
 
     @GetMapping("/get/category/list")
-    public ResponseEntity<AppResponse<List<Lookup>>> getLookups(@RequestHeader("X-Auth-Token") String token,
+    public ResponseEntity<AppResponse<List<LookupCategoryValues>>> getLookups(@RequestHeader("X-Auth-Token") String token,
                                                                   @RequestParam int page,
                                                                   @RequestParam int size,
                                                                   @RequestParam String search){
-        AppResponse.ResponseBuilder<List<Lookup>> respBuilder = AppResponse.builder();
+        AppResponse.ResponseBuilder<List<LookupCategoryValues>> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
             Page<Object[]> lookups = lookupRepository.findDistinctCategories(PageRequest.of(page, size));
 
-            List<Lookup> nodes = new ArrayList<>();
+            List<LookupCategoryValues> nodes = new ArrayList<>();
             for (Object[] o : lookups.getContent()){
-                Lookup lookup = new Lookup();
-                lookup.setCategory((String) o[0]);
-                lookup.setId((Long) o[1]);
-                nodes.add(lookup);
+                LookupCategoryValues lookupCategoryValues = new LookupCategoryValues();
+
+                lookupCategoryValues.setCategory((String) o[0]);
+                lookupCategoryValues.setId((Long) o[1]);
+                List<Lookup> lookup = lookupRepository.findByCategory(lookupCategoryValues.getCategory());
+                lookupCategoryValues.setLookups(lookup);
+                nodes.add(lookupCategoryValues);
             }
+
 
 
 

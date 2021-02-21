@@ -1,8 +1,8 @@
 <template>
   <span>
     <span>
-      <TabBuilder
-        v-if="showTab"
+      <NestedTabBuilder
+        v-if="page.sections.tabs.length > 0"
         :tabkey="page.sections.key"
         :tabs="page.sections.tabs"
       />
@@ -10,9 +10,13 @@
     <div v-for="(section, key) in page.sections.sec" :key="key">
       <SectionBuilder
         v-on:modelChange="dataChange"
+        :tabsSection="page.sections"
         :section="section"
+        :tabkey="section.key"
         v-bind:style="[
-          (!section.tabId  || section.tabId == tabId) ? { display: 'block' } : { display: 'none' },
+          !section.tabId || section.tabId == tabId
+            ? { display: 'block' }
+            : { display: 'none' },
           section.visibility == 'hidden'
             ? { visibility: 'hidden' }
             : { visibility: 'visible' },
@@ -23,12 +27,12 @@
 </template>
 <script>
 import SectionBuilder from './section-builder'
-import TabBuilder from './tab-builder'
+import NestedTabBuilder from './nested-tabs-builder'
 export default {
   name: 'PageBuilder',
   components: {
     SectionBuilder,
-    TabBuilder,
+    NestedTabBuilder,
   },
   data() {
     return {
@@ -40,6 +44,7 @@ export default {
   },
   props: ['page', 'tabkey'],
   created() {
+    console.log(this.page.sections.sec[0].forms[0])
     this.$observable.subscribe(this.tabkey, (tabId) => {
       console.log(tabId)
       this.tabId = tabId

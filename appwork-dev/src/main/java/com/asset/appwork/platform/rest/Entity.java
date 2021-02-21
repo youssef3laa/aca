@@ -67,7 +67,7 @@ public class Entity {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public <T> String update(Long id, T data) {
+    public <T> String update(Long id, T data) throws AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
@@ -76,7 +76,16 @@ public class Entity {
                         data.toString() +
                         "}")
                 .put(this.apiBaseUrl + String.format(API.ITEM.getUrl(), this.entityName, id.toString()));
-        return http.getResponse();
+        String response = http.getResponse();
+        if(response == null)
+            return response;
+        else {
+            try {
+                throw new AppworkException(SystemUtil.getJsonByPtrExpr(response, "/message"), ResponseCode.UPDATE_ENTITY_FAILURE);
+            } catch (AppworkException er) {
+                throw new AppworkException(er.getMessage(), ResponseCode.UPDATE_ENTITY_FAILURE);
+            }
+        }
     }
 
     public String delete(Long id) {

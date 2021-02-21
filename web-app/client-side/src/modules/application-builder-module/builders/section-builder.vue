@@ -7,6 +7,11 @@
         :section="sec"
         v-for="formData in sec.forms"
         :key="formData.id"
+        v-bind:style="[
+          !formData.tabId || formData.tabId == tabId
+            ? { display: 'block' }
+            : { display: 'none' },
+        ]"
       ></component>
     </span>
   </v-card>
@@ -23,6 +28,7 @@ import TitleComponet from '../builders/components/title-component'
 import ModalSection from '../builders/components/modal-section-component'
 import ActionsSection from '../builders/components/actions-section-component'
 import TabsSection from '../builders/components/tabs-section-component'
+import NestedTabs from './nested-tabs-builder'
 // import TabBuilder from './tab-builder'
 // import FormBuilder from './form-builder'
 // import { Splitpanes, Pane } from 'splitpanes'
@@ -38,6 +44,7 @@ export default {
     ModalSection,
     ActionsSection,
     TabsSection,
+    NestedTabs,
     // TabBuilder,
     // FormBuilder,
     // Splitpanes,
