@@ -31,6 +31,7 @@
           <span>الملفات المعلقة</span>
           <v-container>
             <v-alert
+              style="margin-left: 30px;margin-right: 15px;"
               border="left"
               color="outline"
               colored-border
@@ -41,9 +42,28 @@
               {{ $t('pleaseChooseFileTypeToCompleteFileUpload') }}
             </v-alert>
 
-            <v-row v-for="(file, index) in files" :key="index">
-              <v-col cols="5">
-                <v-text-field
+            <v-row
+              v-for="(file, index) in files"
+              :key="index"
+              style="border:1px solid #eaeaea; border-radius:6px; margin-left: 30px;margin-right: 15px;"
+            >
+              <v-col cols="12">
+                <span>
+                  <v-row>
+                    <v-col :cols="11">
+                      {{ file.file.name }}
+                    </v-col>
+                    <v-col :cols="1">
+                      <v-icon
+                        slot="append"
+                        color="red"
+                        @click="file.removeFile({ file, index })"
+                        >mdi-close-circle-outline</v-icon
+                      >
+                    </v-col>
+                  </v-row>
+                </span>
+                <!-- <v-text-field
                   v-model="file.file.name"
                   color="outline"
                   hide-details
@@ -57,10 +77,10 @@
                     @click="file.removeFile({ file, index })"
                     >mdi-close-circle-outline</v-icon
                   >
-                </v-text-field>
+                </v-text-field> -->
               </v-col>
 
-              <v-col cols="5">
+              <v-col cols="12">
                 <v-autocomplete
                   v-model="file.fileTypeSelected"
                   :items="fileTypes"
@@ -76,12 +96,15 @@
                 </v-autocomplete>
               </v-col>
 
-              <v-col cols="2">
+              <v-col cols="12">
                 <v-btn
-                  style="height: 100%"
+                  style="height: 100%;width: 100%; background: #edf4f8; padding: 5px;"
                   @click="uploadFile({ file, index })"
                 >
-                  <v-icon>mdi-plus</v-icon>
+                  <span style="color:#408bb5">
+                    <v-icon>mdi-plus</v-icon>
+                    إضافة
+                  </span>
                 </v-btn>
               </v-col>
             </v-row>
@@ -455,5 +478,10 @@ $font-12: 12px;
   flex-wrap: unset !important;
   overflow-y: hidden;
   overflow-x: scroll;
+}
+.v-application {
+  .red--text {
+    bottom: 0;
+  }
 }
 </style>
