@@ -1,64 +1,73 @@
 {
     "key": "addInquiryModal",
     "modalId": "addInquiryModal",
-    "modalTitle": "AddInquiry",
+    "modalTitle": "addInquiry",
     "inputs": [
-      {
-        "type": "AutoCompleteComponent",
-        "label": "inquiryType",
-        "name": "inquiryType",
-        "col": "4",
-        "rule": "required"
-      },
-      {
-        "type": "InputComponent",
-        "label": "fullName",
-        "name": "fullName",
-        "col": "4",
-        "rule": "required"
-      },
-      {
-        "type": "DatePickerComponent",
-        "label": "birthDate",
-        "name": "birthDate",
-        "col": "4"
-      },
-      {
-        "type": "InputComponent",
-        "label": "birthLocation",
-        "name": "birthLocation",
-        "col": "4"
-      },
-      {
-        "type": "AutoCompleteComponent",
-        "label": "jobEntity",
-        "name": "jobEntity",
-        "col": "4",
-        "rule": "required"
-      },
-      {
-        "type": "AutoCompleteComponent",
-        "label": " assignedJob",
-        "name": "assignedJob",
-        "col": "4",
-        "rule": "required"
-      },
-      {
-        "type": "AutoCompleteComponent",
-        "label": "candidateJob",
-        "name": "candidateJob",
-        "col": "4",
-        "rule": "required"
-      }
+        {
+            "type": "InputComponent",
+            "label": "fullName",
+            "name": "fullName",
+            "col": "4",
+            "rule": "required"
+        },
+        {
+            "type": "AutoCompleteComponent",
+            "label": "inquiryType",
+            "name": "inquiryType",
+            "col": "4",
+            "rule": "required"
+        },
+        {
+            "type": "DatePickerComponent",
+            "label": "birthDate",
+            "name": "birthDate",
+            "col": "4",
+            "max": "maxBirthDate"
+        },
+        {
+            "type": "InputComponent",
+            "label": "birthPlace",
+            "name": "birthPlace",
+            "col": "4"
+        },
+        {
+            "type": "AutoCompleteComponent",
+            "label": "jobAuthority",
+            "name": "jobAuthority",
+            "col": "4",
+            "rule": "required"
+        },
+        {
+            "type": "AutoCompleteComponent",
+            "label": "positionAssignedTo",
+            "name": "positionAssignedTo",
+            "col": "4",
+            "rule": "required"
+        },
+        {
+            "type": "AutoCompleteComponent",
+            "label": "candidatePosition",
+            "name": "candidatePosition",
+            "col": "4",
+            "rule": "required"
+        }
     ],
     "model": {
-      "inquiryType": "",
-      "fullName": "",
-      "birthDate": "",
-      "birthLocation": "",
-      "jobEntity": "",
-      "assignedJob":"",
-      "candidateJob":""
-
+        "inquiryType": {
+            "url": "lookup/get/category/inquiryType"
+        },
+        "fullName": "",
+        "birthDate": "",
+        "birthPlace": "",
+        "jobAuthority": {
+            "url": "lookup/get/category/jobAuthority"
+        },
+        "positionAssignedTo": {
+            "url": "lookup/get/category/positionAssignedTo"
+        },
+        "candidatePosition": {
+            "url": "lookup/get/category/candidatePosition"
+        },
+        "maxBirthDate": null
     }
-  }
+}

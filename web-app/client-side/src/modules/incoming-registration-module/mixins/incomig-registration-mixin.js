@@ -1,5 +1,5 @@
 import http from "../../core-module/services/http";
-import router from "../../../router";
+// import router from "../../../router";
 
 export default {
     methods: {
@@ -21,16 +21,8 @@ export default {
                 console.log(error)
             }
         },
-        initiateCaseProcess: function(data){
-            http.post("/incoming/registration/case/initiate", data)
-                .then((response) => {
-                    console.log(response);
-                    localStorage.removeItem("requestId")
-                    // alert("Initiate Complete!");
-                    this.$refs.alertComponent._alertSuccess({message:"initiateSuccess"})
-                    router.push({name: 'HomePage'})
-                })
-                .catch((error) => console.error(error));
+        initiateCaseProcess:function (data) {
+            return http.post("/incoming/registration/initiate", data);
         }
     }
 }

@@ -7,7 +7,6 @@ import com.asset.appwork.util.SystemUtil;
 import lombok.Data;
 
 import java.util.HashMap;
-import java.util.List;
 
 @Data
 public class OutputSchema<T> {
@@ -22,6 +21,8 @@ public class OutputSchema<T> {
     String decision, comment, opinion;
     String code, assignedCN;
     String receiverType;
+    String entityId;
+    String requestPriority;
     Router router = new Router();
     Assignees assignees = new Assignees();
     HashMap<String,T> extraData = new HashMap<>();
@@ -48,6 +49,7 @@ public class OutputSchema<T> {
                 "<addApproval>"+removeNull(this.addApproval)+"</addApproval>"+
                 "<router>"+getObjectXML(this.router)+"</router>"+
                 "<assignees>"+getObjectXML(this.assignees)+"</assignees>"+
+                "<requestPriority>"+getObjectXML(this.requestPriority)+"</requestPriority>"+
                 "<extraData>"+getObjectXML(this.extraData)+"</extraData>";
     }
 

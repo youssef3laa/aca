@@ -2,16 +2,17 @@ package com.asset.appwork.service;
 
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.model.IncomingCase;
 import com.asset.appwork.model.IncomingRegistration;
 import com.asset.appwork.model.Lookup;
 import com.asset.appwork.repository.IncomingRegistrationRepository;
 import com.asset.appwork.repository.LookupRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class IncomingRegistrationService {
 
@@ -20,47 +21,79 @@ public class IncomingRegistrationService {
     @Autowired
     IncomingRegistrationRepository incomingRegistrationRepository;
 
-    public void updateWithOutcomingId(Long registrationId, Long outcomingId) throws AppworkException{
+    @Autowired
+    OrgChartService orgChartService;
+
+    public void updateWithOutcomingId(Long registrationId, Long outcomingId) throws AppworkException {
         Optional<IncomingRegistration> incomingRegistration = incomingRegistrationRepository.findById(registrationId);
-        if(incomingRegistration.isPresent()){
+        if (incomingRegistration.isPresent()) {
             incomingRegistration.get().setOutcomingId(outcomingId);
             incomingRegistrationRepository.save(incomingRegistration.get());
-        }else{
+        } else {
             throw new AppworkException(ResponseCode.NO_CONTENT);
         }
     }
 
-    public IncomingRegistration findById(Long id) throws AppworkException{
+    public IncomingRegistration findById(Long id) throws AppworkException {
         Optional<IncomingRegistration> incomingRegistration = incomingRegistrationRepository.findById(id);
-        if(incomingRegistration.isPresent()){
+        if (incomingRegistration.isPresent()) {
             return addLookupToIncomingRegistration(incomingRegistration.get());
-        }else{
+        } else {
             throw new AppworkException(ResponseCode.NO_CONTENT);
         }
     }
 
-    public IncomingRegistration addLookupToIncomingRegistration(IncomingRegistration incomingRegistration){
+    public IncomingRegistration addLookupToIncomingRegistration(IncomingRegistration incomingRegistration) {
         Optional<Lookup> confidentiality = lookupRepository.findByCategoryAndKey("confidentialityType", incomingRegistration.getConfidentiality());
-        if(confidentiality.isPresent()){
-            incomingRegistration.setConfidentiality(confidentiality.get().getArValue());
-        }
+        confidentiality.ifPresent(lookup -> incomingRegistration.setConfidentiality(lookup.getArValue()));
+
         Optional<Lookup> incomingType = lookupRepository.findByCategoryAndKey("incomingType", incomingRegistration.getIncomingType());
-        if(incomingType.isPresent()){
-            incomingRegistration.setIncomingType(incomingType.get().getArValue());
-        }
+        incomingType.ifPresent(lookup -> incomingRegistration.setIncomingType(lookup.getArValue()));
+
         Optional<Lookup> jobType = lookupRepository.findByCategoryAndKey("jobType", incomingRegistration.getJobType());
-        if(jobType.isPresent()){
-            incomingRegistration.setJobType(jobType.get().getArValue());
-        }
+        jobType.ifPresent(lookup -> incomingRegistration.setJobType(lookup.getArValue()));
+
         Optional<Lookup> priorityLevel = lookupRepository.findByCategoryAndKey("priority", incomingRegistration.getPriorityLevel());
-        if(priorityLevel.isPresent()){
-            incomingRegistration.setPriorityLevel(priorityLevel.get().getArValue());
-        }
+        priorityLevel.ifPresent(lookup -> incomingRegistration.setPriorityLevel(lookup.getArValue()));
+
         Optional<Lookup> taskType = lookupRepository.findByCategoryAndKey("taskType", incomingRegistration.getTaskType());
-        if(taskType.isPresent()){
-            incomingRegistration.setTaskType(taskType.get().getArValue());
-        }
+        taskType.ifPresent(lookup -> incomingRegistration.setTaskType(lookup.getArValue()));
+
+        Optional<String> responsibleEntityGehaz = Optional.ofNullable(incomingRegistration.getResponsibleEntityGehaz());
+        responsibleEntityGehaz.ifPresent(element -> {
+            try {
+                incomingRegistration.setResponsibleEntityGehaz(orgChartService.getUnitByName(element).getNameAr());
+            } catch (AppworkException e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+            }
+
+        });
+        Optional<String> responsibleEntityKeta3 = Optional.ofNullable(incomingRegistration.getResponsibleEntityketa3());
+        responsibleEntityKeta3.ifPresent(element -> {
+            try {
+                incomingRegistration.setResponsibleEntityketa3(orgChartService.getUnitByName(element).getNameAr());
+            } catch (AppworkException e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+            }
+        });
+
+        Optional<String> responsibleEntityEdara = Optional.ofNullable(incomingRegistration.getResponsibleEntityEdara());
+        responsibleEntityEdara.ifPresent(element -> {
+            try {
+                incomingRegistration.setResponsibleEntityEdara(orgChartService.getUnitByName(element).getNameAr());
+            } catch (AppworkException e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+            }
+        });
+
 
         return incomingRegistration;
+    }
+
+    public IncomingRegistration updateIncomingEntity(IncomingRegistration incomingRegistration) {
+        return incomingRegistrationRepository.save(incomingRegistration);
     }
 }

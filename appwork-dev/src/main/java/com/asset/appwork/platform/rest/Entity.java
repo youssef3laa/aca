@@ -21,15 +21,24 @@ public class Entity {
     }
 
     public <T> Long create(T data) throws AppworkException {
+        String dataToBeSent;
+
+        if (data instanceof String) {
+            dataToBeSent = (String) data;
+        } else {
+            dataToBeSent = data.toString();
+        }
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
                 .setData("{" +
                         "  \"Properties\": " +
-                        data.toString() +
+                        dataToBeSent +
                         "}")
                 .post(this.apiBaseUrl + String.format(API.ADD.getUrl(), this.entityName));
         String response = http.getResponse();
+        if (!http.isSuccess())
+            throw new AppworkException(SystemUtil.getJsonByPtrExpr(response, "/message"), ResponseCode.CREATE_ENTITY_FAILURE);
         try {
             return Long.parseLong(SystemUtil.getJsonByPtrExpr(response, "/Identity/Id"));
         } catch (NumberFormatException e) {
@@ -88,11 +97,12 @@ public class Entity {
         }
     }
 
-    public String delete(Long id) {
+    public String delete(Long id) throws AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
                 .delete(this.apiBaseUrl + String.format(API.ITEM.getUrl(), this.entityName, id.toString()));
+        if (!http.isSuccess()) throw new AppworkException(ResponseCode.DELETE_ENTITY_FAILURE);
         return http.getResponse();
     }
 

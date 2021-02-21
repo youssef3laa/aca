@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -34,6 +33,7 @@ public class RequestEntity {
     String processInstanceId;
     String workingUsers;
     String workingRoles;
+    String priority;
     @Transient
     String displayName;
     @Transient

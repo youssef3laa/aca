@@ -6,15 +6,15 @@
 </template>
 
 <script>
-    import AppBuilder from "../../application-builder-module/builders/app-builder";
-    import formPageMixin from "../../../mixins/formPageMixin";
-    import historyMixin from "../../history-module/mixin/historyMixin";
-    import incomingRegistrationMixin from "../mixins/incomig-registration-mixin";
-    import http from "../../core-module/services/http";
-    import orgChartMixin from "../../../mixins/orgChartMixin";
-    import userMixin from "../../../mixins/userMixin";
+import AppBuilder from "../../application-builder-module/builders/app-builder";
+import formPageMixin from "../../../mixins/formPageMixin";
+import historyMixin from "../../history-module/mixin/historyMixin";
+import incomingRegistrationMixin from "../mixins/incomig-registration-mixin";
+import http from "../../core-module/services/http";
+import orgChartMixin from "../../../mixins/orgChartMixin";
+import userMixin from "../../../mixins/userMixin";
 
-    export default {
+export default {
         name: "incoming-case-registration-memo-create",
         mixins: [formPageMixin, historyMixin, incomingRegistrationMixin, orgChartMixin, userMixin],
         components: {AppBuilder},
@@ -22,7 +22,8 @@
             return {
                 taskId: this.$route.params.taskId,
                 inputSchema: {},
-                app: {}
+                app: {},
+                userDetails:{}
             }
         },
         async created(){
@@ -32,8 +33,20 @@
             this.loadForm(this.inputSchema.config, this.formLoaded)
             this.$observable.subscribe("complete-step", this.submit)
             this.$observable.subscribe("searchIncoming", (data) => { this.getRequestEntities(data) })
+            this.userDetails = await this.getUserDetails();
+            this.logPrimaryUserWorkedOnMemo()
+
         },
         methods: {
+            logPrimaryUserWorkedOnMemo: function () {
+
+                http.post("/primaryMember", {
+                    userCN: this.userDetails.cn,
+                    incomingRegistrationEntityId: this.inputSchema.entityId
+                })
+                    .then((response) => console.log("user working on memo has been logged", response))
+                    .catch((error) => console.error("error in loggin user working on memo", error));
+            },
             getRequestEntities: async function(data) {
                 let requestEntities = await http.get("/request/read/forLinkIncoming", {
                     params: {
@@ -47,8 +60,7 @@
                 let parentDetails = await this.getParentDetails();
                 console.log(parentDetails)
                 console.log(this.$user);
-                let userDetails = await this.getUserDetails();
-                console.log(userDetails);
+                console.log(this.userDetails);
 
                 this.$observable.fire("link", {
                     type: "modelUpdate",
@@ -72,7 +84,7 @@
                                     "targetRequestId": item.id,
                                     "sourceRequestId": this.inputSchema.requestId,
                                     "subject": "طلب ربط وارد: " + item.subject,
-                                    "initiatorId": userDetails.cn
+                                    "initiatorId": this.userDetails.cn
                                 }
                             }
                         }
@@ -96,6 +108,7 @@
                 this.$refs.appBuilder.setModelData("mainData", incomingRegistration)
                 let incomingCase = await this.readIncomingCase(incomingRegistration.jobEntityId)
                 this.$refs.appBuilder.setModelData("caseData", incomingCase)
+                this.$refs.appBuilder.setModelData("responsibleEntityForm",incomingRegistration )
             },
             submit: function(){
                 let approvalCard = this.$refs.appBuilder.getModelData("approvalForm");
@@ -106,7 +119,6 @@
                     stepId: this.inputSchema.stepId,
                     process: this.inputSchema.process,
                     parentHistoryId: this.inputSchema.parentHistoryId,
-
                     code: approvalCard.approval.code,
                     assignedCN: approvalCard.approval.assignedCN,
                     decision: "memorandumCreate",
