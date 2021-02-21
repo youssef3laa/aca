@@ -69,7 +69,7 @@ export default {
   color: #0278ae !important;
   font-size: 18px;
 }
-.v-expansion-panel-content__wrap {
+/* .v-expansion-panel-content__wrap {
   padding: 0 !important;
-}
+} */
 </style>

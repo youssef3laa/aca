@@ -855,16 +855,16 @@ export default {
                               font-size:20px;
                               font-weight:bold;
                               text-align: center;
-                         ">${item.nameAr} </div>
+                         ">${(item.nameAr !== undefined)? item.nameAr: ""} </div>
                  <div style="margin-top:3px;
                               font-size:16px;
                               text-align: center;
-                         ">${item.nameEn} </div>
+                         ">${(item.nameEn !== undefined)? item.nameEn: ""} </div>
 
                  <div style="margin-top:3px;
                               font-size:14px;
                               text-align: center;
-                         ">${item.name}</div>
+                         ">${(item.name !== undefined)? item.name: ""}</div>
               </div>`,
             connectorLineColor: {
               red: 2,

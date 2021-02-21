@@ -167,9 +167,9 @@ public class OrgChartService {
         addSubGroupToGroup(account, parentUnitGroup.getId(), childUnitGroup.getId());
     }
 
-    public void addSubUnitToUnit(Account account, String parentUnitCode, String subUnitCode) throws AppworkException {
-        Long id = getUnitByName(parentUnitCode).getId();
-        Long subUnitId = getUnitByName(subUnitCode).getId();
+    public void addSubUnitToUnit(Account account, String unitName, String subUnitName) throws AppworkException {
+        Long id = getUnitByName(unitName).getId();
+        Long subUnitId = getUnitByName(subUnitName).getId();
 
         addSubUnitToUnit(account, id, subUnitId);
     }
