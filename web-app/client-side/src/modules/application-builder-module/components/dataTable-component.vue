@@ -124,7 +124,12 @@
           <div  v-for="(subHeader, i) in d.subHeaders"
           :key="i">
           <div class="top-bot-margins" style="color:#9E9E9E">{{ $t(subHeader.text) }}</div>
-          <div class="top-bot-margins" >{{ item[subHeader.value] }} </div>
+
+          <span v-if="isArray(item[subHeader.value])">
+             <div v-for="(val, k) in item[subHeader.value]" :key="k" class="top-bot-margins" >{{ val[item[subHeader.items]] }} </div>
+          </span>
+          
+          <div v-else  class="top-bot-margins" >{{ item[subHeader.value] }} </div>
         </div>
         </td>
         <!-- </span> -->
@@ -191,6 +196,9 @@ export default {
     handlAddButton() {
       console.log(this.field);
       this.$observable.fire(this.field.name + "_add");
+    },
+    isArray(item){
+      return item instanceof Array;
     },
     handleAction(item, actionName) {
       if (actionName instanceof Object) actionName = actionName.name;
