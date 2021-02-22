@@ -3,27 +3,26 @@
     <v-card>
       <v-row>
         <v-col :cols="10">
-          <v-card-title class="headline">{{
-                  $t(formData.modalTitle)
-            }}
+          <v-card-title class="headline"
+            >{{ $t(formData.modalTitle) }}
           </v-card-title>
         </v-col>
         <v-col :cols="2">
           <span
-              style="text-align: left; padding: 25px 30px; float: left;"
-              @click="dialog = false"
-          ><v-icon> fas fa-times</v-icon></span
+            style="text-align: left; padding: 25px 30px; float: left;"
+            @click="dialog = false"
+            ><v-icon> fas fa-times</v-icon></span
           >
         </v-col>
       </v-row>
       <span>
-        <FormBuilder :forms="formData" :model="formData.model"/>
+        <FormBuilder :forms="formData" :model="formData.model" />
       </span>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-            style="color:#07689f;height: 36px !important;background-color: transparent;"
-            @click="dialog = false"
+          style="color:#07689f;height: 36px !important;background-color: transparent;"
+          @click="dialog = false"
         >
           إلغاء
         </v-btn>
@@ -46,21 +45,23 @@ export default {
   data() {
     return {
       dialog: this.dialogState,
-      modalWidth: this.width
+      modalWidth: this.width,
     }
   },
   methods: {
-    submitModal: function () {
-      if (this.modalAction == 'edit') {
-        this.$observable.fire(this.formData.modalId + '_updateModal', {
-          obj: this.formData.model,
-        })
-      } else if (this.modalAction == 'add') {
-        this.$observable.fire(this.formData.modalId + '_addModal', {
-          obj: this.formData.model,
-        })
+    submitModal: function() {
+      if (this.formData.model._valid) {
+        if (this.modalAction == 'edit') {
+          this.$observable.fire(this.formData.modalId + '_updateModal', {
+            obj: this.formData.model,
+          })
+        } else if (this.modalAction == 'add') {
+          this.$observable.fire(this.formData.modalId + '_addModal', {
+            obj: this.formData.model,
+          })
+        }
+        this.dialog = false
       }
-      this.dialog = false
     },
   },
   mounted() {
@@ -68,10 +69,8 @@ export default {
     console.log(this.formData.modalId)
     this.$observable.context = this
     this.$observable.subscribe(this.formData.modalId, (modalObj) => {
-      if (modalObj && modalObj.action)
-        this.modalAction = modalObj.action
-      this.dialog = !this.dialog;
-
+      if (modalObj && modalObj.action) this.modalAction = modalObj.action
+      this.dialog = !this.dialog
     })
     // console.log(this.formData.forms[0])
     // console.log(this.val)
@@ -80,13 +79,12 @@ export default {
   props: {
     formData: Object,
     width: {
-      default: 1200
+      default: 1200,
     },
     dialogState: {
-      default: false
+      default: false,
     },
-  }
-
+  },
 }
 </script>
 <style>

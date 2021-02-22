@@ -2,7 +2,10 @@
   <span>
     <span>
       <NestedTabBuilder
-        v-if="page.sections.tabs.length > 0"
+        v-if="
+           typeof page.sections.tabs !== 'undefined' &&
+            page.sections.tabs.length > 0
+        "
         :tabkey="page.sections.key"
         :tabs="page.sections.tabs"
       />
