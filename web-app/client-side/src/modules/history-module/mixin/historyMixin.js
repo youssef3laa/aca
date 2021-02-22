@@ -98,7 +98,11 @@ export default {
                         text: "",
                         value: "action",
                         sortable: false,
-                      }
+                      },
+                      {
+                        text: "",
+                        value: "checkBox"
+                      },
                
                   ],
                   data: [],

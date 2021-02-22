@@ -137,6 +137,11 @@
         
         <!-- </span> -->
       </template>
+        <template v-slot:item.checkBox="{ item }">
+          <v-simple-checkbox
+            v-model="item.checkBox"
+          ></v-simple-checkbox>
+        </template>
     </v-data-table>
 
   </div>

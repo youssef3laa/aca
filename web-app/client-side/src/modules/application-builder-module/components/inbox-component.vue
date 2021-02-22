@@ -4,7 +4,7 @@
       <AppBuilder dir="rtl" ref="appBuilder" :app="app" />
     </pane>
     <pane style="height: auto" max-size="20" size="14">
-      <Sidebar :val="val"  @btnClicked="updateView"></Sidebar>
+      <Sidebar :val="val.sideBar"  @btnClicked="updateView"></Sidebar>
     </pane>
   </splitpanes>
 </template>

@@ -38,8 +38,8 @@
         </Charts>
       </v-col>
     </v-row>
-    <!-- <SecrtaryInbox></SecrtaryInbox> -->
-    <Inbox></Inbox>
+    <SecrtaryInbox></SecrtaryInbox>
+    <!-- <Inbox :val="{sideBar:items}" ></Inbox> -->
 
   </v-container>
 </template>
@@ -47,18 +47,18 @@
 <script>
 import chartsMixin from "../../../mixins/chartsMixin";
 import Charts from "../../application-builder-module/components/charts-component";
-import Inbox from "../../application-builder-module/components/inbox-component";
-// import SecrtaryInbox from "../../application-builder-module/components/secretary-inbox-component"
+// import Inbox from "../../application-builder-module/components/inbox-component";
+import SecrtaryInbox from "../../application-builder-module/components/secretary-inbox-component"
 import http from "../../core-module/services/http";
-
+import userMixin from '../../../mixins/userMixin'
 export default {
   name: "HomePage",
   components: {
-  // SecrtaryInbox,
-    Inbox,
+  SecrtaryInbox,
+    // Inbox,
     Charts,
   },
-  mixins: [chartsMixin],
+  mixins: [chartsMixin, userMixin],
   async mounted() {
     try {
       this.barChartData = await this.getDynamicReport(
@@ -68,6 +68,8 @@ export default {
         this.processHistory.requestData
       );
       this.loaded = true;
+      this.userDetails = await this.getUserDetails();
+      console.log(this.userDetails)
 
     } catch (e) {
       console.error(e);
@@ -91,11 +93,14 @@ export default {
 
   data() {
     return {
+       items:[{name:"الوارد",notifications:21, icon:"fas fa-download",action:"viewReceived"},{name:"المرسل",notifications:34, icon:"far fa-paper-plane",action:"viewSent"},
+        ],
       response: [],
       chartsLoaded: 0,
       barChartData: {},
       pieChartData: {},
       loaded: false,
+      userDetails:{},
       // barChartData:{},
 
       richtextChart: {
