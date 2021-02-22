@@ -1,5 +1,8 @@
 package com.asset.appwork;
 
+import com.asset.appwork.enums.ResponseCode;
+import com.asset.appwork.exception.AppworkException;
+
 import java.io.*;
 
 public class AppBuilder {
@@ -9,13 +12,11 @@ public class AppBuilder {
         AppBuilder.rootPath = rootPath;
     }
 
-
-    public void run(String... args) {
-        if (args.length == 0) return;
-        String nameOfViewFolder = args[0].split("\\.")[0];
+    public StringBuilder retrieveFile(String fileName) throws AppworkException {
+        String nameOfViewFolder = fileName;
 
         String formPath = rootPath + File.separator + "config" + File.separator + nameOfViewFolder + ".conf";
-        StringBuilder fileContent;
+        StringBuilder fileContent = new StringBuilder();
         try {
             fileContent = readFile(formPath);
             while(fileContent.indexOf("$path(") > -1){
@@ -37,20 +38,15 @@ public class AppBuilder {
                 String file = readFile(rootPath+ File.separator + "views" + File.separator + path+ ".json").toString();
                 fileContent.replace(firstIndex-6,lastIndex+1, file);
             }
-//            Pattern pattern = Pattern.compile("(?<=\\$path\\()(.*)(?=\\))");
-//            Matcher matcher = pattern.matcher(fileContent);
-//            while (matcher.find()) {
-//                String path = matcher.group();
-//                System.out.println(path);
-//                String file = readFile(rootPath + File.separator + "views" + File.separator + path + ".json").toString();
-//                fileContent = fileContent.replace(matcher.start() - 6, matcher.end() + 1, file);
-//            }
-            writeFile(rootPath + File.separator + "output" + File.separator + nameOfViewFolder + ".json", fileContent.toString());
+
+//            writeFile(nameOfViewFolder, fileContent.toString());
 
         } catch (IOException e) {
             e.printStackTrace();
+            throw new AppworkException(ResponseCode.APP_BUILDER_FAILURE);
         }
 
+        return fileContent;
     }
 
     private StringBuilder readFile(String rootPath) throws IOException {
@@ -67,7 +63,8 @@ public class AppBuilder {
         return fileContent;
     }
 
-    private void writeFile(String rootPath, String fileContent) throws IOException {
+    public void writeFile(String nameOfFile, String fileContent) throws IOException {
+        String rootPath = this.rootPath + File.separator + "output" + File.separator + nameOfFile + ".json";
         try (FileWriter fr = new FileWriter(rootPath);
              BufferedWriter br = new BufferedWriter(fr)) {
             br.write(fileContent);
