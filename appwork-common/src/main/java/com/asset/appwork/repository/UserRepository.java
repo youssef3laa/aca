@@ -28,6 +28,8 @@ public interface UserRepository extends GenericRepository<User, Long> {
 
     Optional<User> findByUserId(String userId);
 
+    Optional<User> findByDescription(String description);
+
     List<User> findByGroup(Group group);
     Page<User> findByGroup(Group group, Pageable pageable);
 

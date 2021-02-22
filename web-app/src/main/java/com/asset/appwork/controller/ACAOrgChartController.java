@@ -96,7 +96,36 @@ public class ACAOrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 orgChartService.changeUnitParent(account, props, changeTypeCode.orElse(false));
-//                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.changeUnitParent(account, props).toString()));
+//                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.changeUnitParent(account, props, changeTypeCode.orElse(false)).toString()));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @PutMapping("/user/update")
+    public ResponseEntity<AppResponse<JsonNode>> updateUser(@RequestHeader("X-Auth-Token") String token,
+                                                            @RequestBody String props,
+                                                            @RequestParam(value = "unitChanged") Optional<Boolean> unitChanged,
+                                                            @RequestParam(value = "revokeTasks") Optional<Boolean> revokeTasks
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                orgChartService.updateUser(account, props, unitChanged.orElse(false), revokeTasks.orElse(false));
+//                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.updateUser(account, props, unitChanged.orElse(false), revokeTasks.orElse(false)).toString()));
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();

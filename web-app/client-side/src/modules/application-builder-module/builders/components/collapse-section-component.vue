@@ -60,7 +60,7 @@ export default {
 }
 .collapse-section {
   display: block;
-  padding: 30px 30px 10px 30px;
+  /* padding: 30px 30px 10px 30px; */
 }
 .v-expansion-panels {
   border: thin solid rgba(0, 0, 0, 0.12);
@@ -69,7 +69,7 @@ export default {
   color: #0278ae !important;
   font-size: 18px;
 }
-/* .v-expansion-panel-content__wrap {
+.v-expansion-panel-content__wrap {
   padding: 0 !important;
-} */
+}
 </style>
