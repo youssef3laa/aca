@@ -54,6 +54,7 @@ public class Query {
 
     @Data
     public static class Join {
+        String table;
         String joinable;
         String type;
         List<Condition> on;

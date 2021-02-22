@@ -1,12 +1,12 @@
 package com.asset.appwork.controller;
 
-import com.asset.appwork.AppBuilder;
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.orgchart.UserManagement;
 import com.asset.appwork.response.AppResponse;
+import com.asset.appwork.service.AppBuilderService;
 import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -40,15 +40,30 @@ public class UserController {
     Environment environment;
     @Autowired
     OrgChartService orgChartService;
+    @Autowired
+    AppBuilderService appBuilderService;
 
+    @Transactional
     @GetMapping("/form/{key}")
-    public ResponseEntity<AppResponse<JsonNode>> getForm(@PathVariable("key") String key) {
-        String appBuild = environment.getProperty("build.app");
-        if (appBuild.equals("true"))  new AppBuilder(environment.getProperty("form.config")).run(key);
-
+    public ResponseEntity<AppResponse<JsonNode>> getForm(@RequestHeader("X-Auth-Token") String token,
+                                                         @PathVariable("key") String key) {
         AppResponse.ResponseBuilder<JsonNode> responseBuilder = AppResponse.builder();
-
         String rootStr = environment.getProperty("form.config");
+
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) {
+                throw new AppworkException(ResponseCode.UNAUTHORIZED);
+            }
+
+            String appBuild = environment.getProperty("build.app");
+            if (appBuild.equals("true")) appBuilderService.createPage(key, account);
+        }catch (AppworkException e){
+            log.error(e.getMessage());
+            e.printStackTrace();
+            responseBuilder.status(e.getCode());
+            responseBuilder.info("errorMessage", e.getMessage());
+        }
 
         try (FileReader fileReader = new FileReader(new File(rootStr +File.separator+ "output"+File.separator + key + ".json"))) {
             ObjectMapper mapper = new ObjectMapper();

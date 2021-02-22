@@ -20,7 +20,7 @@ public class ApplicationBuilder {
 
     public static void main(String[] args) {
 
-        SpringApplication.run(ApplicationBuilder.class, args);
+//        SpringApplication.run(ApplicationBuilder.class, args);
 
         /*
         page1.json - page1.conf
