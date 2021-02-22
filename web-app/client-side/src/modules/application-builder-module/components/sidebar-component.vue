@@ -1,32 +1,35 @@
 <template>
   <div class="sidebar-wrapper">
-    <div v-for="(d,key) in data" :key="key" @click="btnClicked(d.action)" class="sidebar-item">
-      <span> <span> {{d.name}}</span> {{d.notifications}}</span>
+    <div
+      v-for="(d, key) in field.items"
+      :key="key"
+      @click="btnClicked(d.action)"
+      class="sidebar-item"
+    >
+      <span>
+        <span> {{ d.name }}</span> {{ d.notifications }}</span
+      >
       <div class="icon-wrapper">
-     <i :class=d.icon></i>
+        <i :class="d.icon"></i>
       </div>
-
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  props:["val","field"],
-  data(){
-    return{
-        data:[{name:"الوارد",notifications:21, icon:"fas fa-download",action:"viewReceived"},{name:"المرسل",notifications:34, icon:"far fa-paper-plane",action:"viewSent"},
-        ],
-        selected : null
+  props: ["val", "field"],
+  data() {
+    return {
+      selected: null,
     };
   },
-  methods:{
-    btnClicked(action){
+  methods: {
+    btnClicked(action) {
       this.selected = action;
-      this.$emit('btnClicked',action);
-    }
-  }
-  
+      this.$emit("btnClicked", action);
+    },
+  },
 };
 </script>
 
@@ -46,11 +49,11 @@ export default {
   margin: 10px;
   height: 40px;
   width: 85%;
-  cursor:pointer;
+  cursor: pointer;
   padding: 10px;
   justify-content: center;
   border-radius: 5px;
-  margin-right:4px ;
+  margin-right: 4px;
   color: #0278ae;
 }
 .sidebar-item--selected {
@@ -63,14 +66,13 @@ export default {
   padding: 10px;
   justify-content: center;
   border-radius: 5px;
-  margin-right:4px ;
+  margin-right: 4px;
   color: #0278ae;
 }
 
-
 .icon-wrapper {
   display: flex;
-  color:white;
+  color: white;
   width: 22px;
   height: 22px;
   font-size: 12px;

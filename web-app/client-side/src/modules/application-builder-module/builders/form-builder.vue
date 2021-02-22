@@ -63,6 +63,9 @@ import DynamicReceiverFormComponent from '../components/receiver-form-dynamic-co
 import VersionGridComponent from '../components/version-grid-component'
 import ProcessStatusControl from '../components/process-status-control'
 import SaveProcessComponent from '../components/save-process-component'
+import SecretaryViewSignaturesComponent from '../components/secretary-view-signatures-component'
+import InboxComponent from '../components/inbox-component'
+import ImageComponent from "../components/image-component"
 
 export default {
   name: 'FormBuilder',
@@ -96,6 +99,9 @@ export default {
     VersionGridComponent,
     ProcessStatusControl,
     SaveProcessComponent,
+    SecretaryViewSignaturesComponent,
+    InboxComponent,
+    ImageComponent
   },
   data() {
     return {

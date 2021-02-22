@@ -7,7 +7,7 @@
       <span>شريط المهام</span>
     </div>
     <div ref="taskList" id="task-list">
-      <div  v-for="(task, key) in taskList" :key="key" class="task">
+      <div  v-for="(task, key) in val" :key="key" class="task">
         <i class="far fa-edit"></i>
         <span class="task-name">{{ task.title }}</span>
       </div>
@@ -66,6 +66,7 @@ export default {
   height: 100%;
   align-items: center;
   padding-left: 2% ;
+  padding-right: 1%;
   border-left: 1px solid #00000012;
 }
 .bolt-icon-wrapper {
@@ -102,7 +103,7 @@ export default {
   width: 70%;
   margin: 10px;
   align-items: center !important;
-  justify-content: space-around;
+  justify-content: space-between;
 }
 #task-list {
   overflow-x: hidden;
@@ -130,6 +131,7 @@ export default {
   height: 100%;
   align-items: center;
   padding-right: 2% ;
+  padding-left:1%;
   border-right: 1px solid #00000012;
 }
 </style>

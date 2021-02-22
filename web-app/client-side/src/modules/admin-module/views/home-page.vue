@@ -38,25 +38,24 @@
         </Charts>
       </v-col>
     </v-row>
-    <Topbar></Topbar>
-    <Inbox></Inbox>
+    <SecrtaryInbox></SecrtaryInbox>
+    <!-- <Inbox></Inbox> -->
 
   </v-container>
 </template>
 
 <script>
 import chartsMixin from "../../../mixins/chartsMixin";
-import Topbar from "../../application-builder-module/components/topbar-component";
 import Charts from "../../application-builder-module/components/charts-component";
-import Inbox from "../../application-builder-module/components/inbox-component";
-
+// import Inbox from "../../application-builder-module/components/inbox-component";
+import SecrtaryInbox from "../../application-builder-module/components/secretary-inbox-component"
 import http from "../../core-module/services/http";
 
 export default {
   name: "HomePage",
   components: {
-Topbar,
-    Inbox,
+  SecrtaryInbox,
+    // Inbox,
     Charts,
   },
   mixins: [chartsMixin],

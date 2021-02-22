@@ -11,7 +11,13 @@
     </span>
   </v-card>
   <span v-else>
-    <component :is="sec.type" :section="sec" :formData="sec.forms"></component>
+      <component
+        :is="sec.type"
+        :formData="formData"
+        :section="sec"
+        v-for="formData in sec.forms"
+        :key="formData.id"
+      ></component>
   </span>
 </template>
 
