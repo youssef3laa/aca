@@ -4,7 +4,7 @@
       <AppBuilder dir="rtl" ref="appBuilder" :app="app" />
     </pane>
     <pane style="height: auto" max-size="20" size="14">
-      <Sidebar :field="{items:items}"  @btnClicked="updateView"></Sidebar>
+      <Sidebar :val="val"  @btnClicked="updateView"></Sidebar>
     </pane>
   </splitpanes>
 </template>
@@ -26,6 +26,7 @@ export default {
       AppBuilder: () => import("../builders/app-builder"),
 
   },
+  props:["val","field"],
   data() {
     return {
       response: [],

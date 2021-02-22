@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar-wrapper">
     <div
-      v-for="(d, key) in field.items"
+      v-for="(d, key) in val"
       :key="key"
       @click="btnClicked(d.action)"
       class="sidebar-item"

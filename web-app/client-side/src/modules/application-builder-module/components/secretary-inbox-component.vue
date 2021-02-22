@@ -2,8 +2,7 @@
   <div style="width:100%">
     <Topbar :val="{ tasks: taskList }"></Topbar>
     <v-container>
-      
-          <AppBuilder ref="appBuilder" :app="app3" />
+      <AppBuilder ref="appBuilder" :app="app3" />
     </v-container>
   </div>
 </template>
@@ -18,8 +17,7 @@ export default {
   },
   data() {
     return {
-
-      app3:{
+      app3: {
         pages: {
           key: "inboxPage",
           tabs: [
@@ -27,7 +25,7 @@ export default {
               key: "outgoingTab",
               id: "1",
               isActive: "true",
-              name: "incomingFromManagement",
+              name: "sentFromManagement",
               icon: "fas fa-feather-alt",
             },
             {
@@ -59,7 +57,6 @@ export default {
                             col: 12,
                           },
                         ],
-
                       },
                     ],
                   },
@@ -72,24 +69,57 @@ export default {
                     isCard: true,
                     forms: [
                       {
-                        key: "outcoming",
+                        key: "outgoing",
                         inputs: [
                           {
-                            type: "InboxComponent",
-                            name: "inbox",
-                            col: 12,
+                            type: "DataTableComponent",
+                            name: "secertaryOutgoing",
+                            actions: ["view"],
+                            subscribe: "outgoing",
+                            search: true,
 
+                            col: 12,
                           },
                         ],
-                    model:{
-                      inbox:[{name:"الوارد",notifications:21, icon:"fas fa-download",action:"viewReceived"}]
-                      },
+                        model: {
+                          secertaryOutgoing: {
+                            url: null,
+                            headers: [
+                              {
+                                text: "requestNumber",
+                                value: "requestNumber",
+                              },
+                              {
+                                text: "processName",
+                                value: "processName",
+                              },
+                              {
+                                text: "displayName",
+                                value: "displayName",
+                              },
+
+                              {
+                                text: "unitName",
+                                value: "unitName",
+                              },
+                              {
+                                text: "approvalDate",
+                                value: "approvalDate",
+                              },
+                              {
+                                text: "",
+                                value: "action",
+                                sortable: false,
+                              },
+                            ],
+                            data: [],
+                          },
+                        },
                       },
                     ],
                   },
                 ],
               },
-              
             },
           ],
         },

@@ -237,8 +237,8 @@ export default {
                         key: "viceChairmanOfCommisionSignatureForm",
                         inputs: [
                           {
-                            type: "SignatureComponent",
-                            name: "viceChairmanOfCommisionSignature",
+                            type: "ImageComponent",
+                            name: "chairmanOfCommisionSignature",
                             col: 12,
                           },
                           {
@@ -249,31 +249,15 @@ export default {
                           },
                         ],
                         model: {
-                          viceChairmanOfCommisionSignature: {},
+                          chairmanOfCommisionSignature: {
+                            url:"https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ"
+                          },
                           viceChairmanOfCommisionText: "",
                         },
                       },
                     ],
                   },
-                  {
-                    key: "processRouting",
-                    type: "DefaultSection",
-                    isCard: true,
-                    forms: [
-                      {
-                        key: "approvalForm",
-                        inputs: [
-                          {
-                            type: "ApprovalComponent",
-                            name: "approval",
-                          },
-                        ],
-                        model: {
-                          approval: {},
-                        },
-                      },
-                    ],
-                  },
+
                   {
                     key: "actionsSection",
                     type: "ActionsSection",
