@@ -43,7 +43,7 @@ public class AppBuilderService {
         try {
             HashMap fileMap = (HashMap) SystemUtil.readJSONObject(file.toString(),"app", HashMap.class);
             traverseFile(fileMap, user);
-            newFile = SystemUtil.writeObjectIntoString(fileMap);
+            newFile = "{ \"app\":"+ SystemUtil.writeObjectIntoString(fileMap) +"}";
         }catch (JsonProcessingException e){
             throw new AppworkException(ResponseCode.APP_BUILDER_FAILURE);
         }
