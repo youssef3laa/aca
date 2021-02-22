@@ -41,9 +41,10 @@ public class AppBuilderService {
         User user = orgChartService.getLoggedInUser(account);
         String newFile;
         try {
-            HashMap fileMap = (HashMap) SystemUtil.readJSONObject(file.toString(),"app", HashMap.class);
+            HashMap fileMap = new HashMap();
+            fileMap.put("app", (HashMap) SystemUtil.readJSONObject(file.toString(),"app", HashMap.class));
             traverseFile(fileMap, user);
-            newFile = "{ \"app\":"+ SystemUtil.writeObjectIntoString(fileMap) +"}";
+            newFile = SystemUtil.writeObjectIntoString(fileMap);
         }catch (JsonProcessingException e){
             throw new AppworkException(ResponseCode.APP_BUILDER_FAILURE);
         }

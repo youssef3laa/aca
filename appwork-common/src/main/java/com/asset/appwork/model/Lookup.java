@@ -17,6 +17,8 @@ public class Lookup {
     String arValue;
     String enValue;
     Long parentId;
+    Long categoryId;
+    Integer type;
 
     public String toString(){
         return SystemUtil.writeObjectIntoString(this).replace(",\"id\":null","");

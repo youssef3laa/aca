@@ -11,10 +11,12 @@ import java.util.Optional;
 
 @Repository
 public interface LookupRepository extends GenericRepository<Lookup, Long> {
-    List<Lookup> findByCategory(String category);
 
+    @Query("select L from Lookup L inner join Lookup parent on (L.categoryId = parent.Id) where parent.category = :category and L.key = :key ")
     Optional<Lookup> findByCategoryAndKey(String category, String key);
 
-    @Query("select DISTINCT L.category, max( L.Id) from Lookup L where L.category like %:search% GROUP BY L.category")
-    Page<Object[]> findDistinctCategories(Pageable pageable, String search);
+    @Query("select L from Lookup L inner join Lookup parent on (L.categoryId = parent.Id) where parent.category = :category and (L.arValue like %:search% or L.stringKey like %:search%)")
+    Page<Lookup> findCategoryValues(String category, String search, Pageable pageable);
+
+    Page<Lookup> findByTypeAndArValueContainsOrCategoryContains(Integer type, String arValue, String category, Pageable pageable);
 }

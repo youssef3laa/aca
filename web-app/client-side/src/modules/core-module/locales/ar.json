@@ -133,6 +133,7 @@
   "end": "منتهية",
   "cancel": "إلغاء",
   "save": "حفظ",
+  "add": "إضافة",
   "temporarySave": "حفظ مؤقت",
   "createLink": "إنشاء دورة عمل ربط وارد",
   "comments": "ملاحظات",
@@ -164,11 +165,26 @@
   "lookup": "عمليات البحث",
   "mainLookup": "عمليات البحث الاساسية",
   "advancedSearch": "بحث متقدم",
-  "category": "الفئة",
-  "key": "الرقم التسلسلي",
+  "category": "القائمة",
+  "lookupKey": "الرقم التعريفي",
+  "lookupStringKey": "الاسم التعريفي",
   "arValue": "القيمة بالعربية",
   "enValue": "القيمة بالانجليزية",
   "parentId": "الفئة الأم",
 
-  "sentFromManagement":"المرسل من الادارات"
+  "sentFromManagement":"المرسل من الادارات",
+
+  "categoryName": "اسم القائمة",
+  "categoryKey": "كود القائمة",
+  "editCategory": "تعديل قائمة",
+  "addCategory": "إضافة قائمة",
+
+  "lookupValue": "القيمة",
+  "addLookup": "إضافة قيمة",
+  "editLookup": "تعديل قيمة",
+
+  "editSuccess": "تم تعديل البيانات بنجاح",
+  "addSuccess": "تم إضافة البيانات بنجاح",
+  "systemError": "لقد حدث خطأ بالنظام"
+
 }

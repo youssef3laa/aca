@@ -24,10 +24,10 @@
           style="color:#07689f;height: 36px !important;background-color: transparent;"
           @click="dialog = false"
         >
-          إلغاء
+          {{$t('cancel')}}
         </v-btn>
         <v-btn class="modalAddButton" @click="submitModal">
-          <span style="color:#ecf3f7">إضافة</span>
+          <span style="color:#ecf3f7">{{$t(modalAction)}}</span>
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -46,6 +46,7 @@ export default {
     return {
       dialog: this.dialogState,
       modalWidth: this.width,
+      modalAction: 'add'
     }
   },
   methods: {

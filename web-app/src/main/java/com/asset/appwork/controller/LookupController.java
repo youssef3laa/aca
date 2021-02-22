@@ -1,36 +1,23 @@
 package com.asset.appwork.controller;
 
 import com.asset.appwork.config.TokenService;
-import com.asset.appwork.cs.AppworkCSOperations;
 import com.asset.appwork.dto.Account;
-import com.asset.appwork.dto.LookupCategoryValues;
-import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.model.ApprovalHistory;
 import com.asset.appwork.model.Lookup;
-import com.asset.appwork.model.Memorandum;
-import com.asset.appwork.model.Unit;
 import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.repository.LookupRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.util.SystemUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,16 +59,19 @@ public class LookupController {
 
     @GetMapping("/get/category/{category}")
     public ResponseEntity<AppResponse<List<Lookup>>> getLookupsByCategory(@RequestHeader("X-Auth-Token") String token,
-                                                                       @PathVariable("category") String category){
+                                                                       @PathVariable("category") String category,
+                                                                          @RequestParam int page,
+                                                                          @RequestParam int size,
+                                                                          @RequestParam String search){
         AppResponse.ResponseBuilder<List<Lookup>> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            List<Lookup> lookups = lookupRepository.findByCategory(category);
+            Page<Lookup> lookups = lookupRepository.findCategoryValues(category, search, PageRequest.of(page, size));
             if(lookups.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
-            respBuilder.data(lookups);
-
+            respBuilder.data(lookups.getContent());
+            respBuilder.info("totalCount", lookups.getTotalElements());
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -114,47 +104,19 @@ public class LookupController {
     }
 
     @GetMapping("/get/category/list")
-    public ResponseEntity<AppResponse<List<LookupCategoryValues>>> getLookups(@RequestHeader("X-Auth-Token") String token,
+    public ResponseEntity<AppResponse<List<Lookup>>> getLookups(@RequestHeader("X-Auth-Token") String token,
                                                                   @RequestParam int page,
                                                                   @RequestParam int size,
                                                                   @RequestParam String search){
-        AppResponse.ResponseBuilder<List<LookupCategoryValues>> respBuilder = AppResponse.builder();
+        AppResponse.ResponseBuilder<List<Lookup>> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            Page<Object[]> lookups = lookupRepository.findDistinctCategories(PageRequest.of(page, size), search);
+            Page<Lookup> lookups = lookupRepository.findByTypeAndArValueContainsOrCategoryContains(1, search, search, PageRequest.of(page, size));
 
-            List<LookupCategoryValues> nodes = new ArrayList<>();
-            for (Object[] o : lookups.getContent()){
-                LookupCategoryValues lookupCategoryValues = new LookupCategoryValues();
-
-                lookupCategoryValues.setCategory((String) o[0]);
-                lookupCategoryValues.setId((Long) o[1]);
-                List<Lookup> lookup = lookupRepository.findByCategory(lookupCategoryValues.getCategory());
-                lookupCategoryValues.setLookups(lookup);
-                nodes.add(lookupCategoryValues);
-            }
-
-
-
-
-//            ObjectMapper objectMapper = new ObjectMapper();
-//
-//
-//
-//            lookups.getContent().stream().forEach(l -> {
-//                Lookup lookup = null;
-//                try {
-//                    lookup = objectMapper.readValue(l, Lookup.class);
-//                    nodes.add(lookup);
-//                } catch (JsonProcessingException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            });
-            if(nodes.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
-            respBuilder.data(nodes);
+            if(lookups.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
+            respBuilder.data(lookups.getContent());
             respBuilder.info("totalCount", lookups.getTotalElements());
 
         } catch (AppworkException e) {
@@ -175,9 +137,10 @@ public class LookupController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            String lookupId = new Entity(account, SystemUtil.generateRestAPIBaseUrl(environment, "AssetGeneralACA"),
-                    "ACA_Entity_lookup").update(id, lookup);
-            respBuilder.data(lookupId);
+//            String lookupId = new Entity(account, SystemUtil.generateRestAPIBaseUrl(environment, "AssetGeneralACA"),
+//                    "ACA_Entity_lookup").update(id, lookup);
+            lookupRepository.save(lookup);
+            respBuilder.data(lookup.getId().toString());
             
         } catch (AppworkException e) {
             log.error(e.getMessage());

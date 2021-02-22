@@ -1,10 +1,10 @@
-import lookupInit from '../views/lookup-init'
+import lookupRecords from '../views/lookup-page'
 
 const routes = [
     {
-        path: '/lookup-init',
-        name: 'lookup-init',
-        component: lookupInit
+        path: '/lookup-records',
+        name: 'lookup-records',
+        component: lookupRecords
     }
 ]
 

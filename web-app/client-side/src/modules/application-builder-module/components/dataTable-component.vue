@@ -4,7 +4,7 @@
       <v-col v-if="field.add == true" :cols="7">
         <button style="padding: 5px; margin: 20px" @click="handlAddButton()">
           <v-icon color="info">fas fa-plus</v-icon>
-          <span> إضافة </span>
+          <span> {{$t('add')}} </span>
         </button>
       </v-col>
       <v-col v-if="field.filter == true"  :cols="1">
@@ -31,7 +31,7 @@
       :loading="loading"
       :footer-props="footerProps"
       :search="search"
-      :show-expand="!!d.key"
+      :show-expand="!!(d.subTable || d.subHeaders)"
       :item-key="d.key"
       class="elevation-1"
     >
@@ -115,10 +115,18 @@
         </v-menu>
       </template>
       <template v-slot:expanded-item="{ item }">
-        <v-data-table v-if="d.subItems"
-            :headers="d.subHeaders"
-            :items="item[d.subItems]">
-        </v-data-table>
+<!--        <v-data-table v-if="d.subItems"-->
+<!--            :headers="d.subHeaders"-->
+<!--            :items="item[d.subItems]">-->
+<!--        </v-data-table>-->
+        <td :colspan="12" style="padding-bottom: 20px" v-if="d.subTable" >
+          <data-table-component
+                              :key="item[getProperty(item,d.subTable.value)]"
+                              :field="item.subTable_ComponentOptions.field"
+                              :val="item.subTable_ComponentOptions.val"
+           >
+          </data-table-component>
+        </td>
 
         <!-- <span v-for="(subHeader,i) in d.subHeaders" :key="i"> -->
         <td v-else :colspan="12"
@@ -137,11 +145,11 @@
         
         <!-- </span> -->
       </template>
-        <template v-slot:item.checkBox="{ item }">
-          <v-simple-checkbox
-            v-model="item.checkBox"
-          ></v-simple-checkbox>
-        </template>
+      <template v-slot:item.checkBox="{ item }">
+        <v-simple-checkbox
+          v-model="item.checkBox"
+        ></v-simple-checkbox>
+      </template>
     </v-data-table>
 
   </div>
@@ -226,18 +234,61 @@ export default {
     }
   },
   methods: {
+
+    updateData: function(){
+      if(this.d.data instanceof Array){
+        for(let item in this.d.data){
+          if(this.d.subTable){
+            this.d.data[item].subTable_ComponentOptions = {
+              field: this.d.subTable.options,
+              val: this.updateSubTableModel(this.d.data[item])
+            }
+          }
+        }
+      }
+      this.translateData()
+    },
+    updateSubTableModel: function(item){
+      let model = { headers: [], data: [], parent: item }
+      if(this.d.subTable.model){
+        for(let key in  this.d.subTable.model){
+          model[key] = this.d.subTable.model[key]
+        }
+        if(model.url){
+          if(this.d.subTable.value){
+             let property = this.getProperty(item, this.d.subTable.value)
+             model.url = model.url.replace(/\$\d+/,property)
+          }
+        }else{
+          if(this.d.subTable.value){
+             let property = this.getProperty(item, this.d.subTable.value)
+             model.data = property;
+          }
+        }
+      }
+      return model
+    },
     handlAddButton() {
-      console.log(this.field);
-      this.$observable.fire(this.field.name + "_add");
+      let item = {};
+      for(let key in this.d.parent){
+        if(key == "subTable_ComponentOptions")continue
+        item[key] = this.d.parent[key];
+      }
+      this.$observable.fire(this.field.name + "_add", { item });
     },
     isArray(item){
       return item instanceof Array;
     },
-    handleAction(item, actionName) {
+    handleAction(obj, actionName) {
       if (actionName instanceof Object) actionName = actionName.name;
-      console.log(this.field.name + "_" + actionName);
       //   console.log(item)
       //   console.log(actionName)
+      let item = {};
+      for(let key in obj){
+        if(key == "subTable_ComponentOptions")continue
+        item[key] = obj[key];
+      }
+      item.parentTableRow = this.d.parent
 
       this.$observable.fire(this.field.name + "_" + actionName, { item });
     },
@@ -263,15 +314,21 @@ export default {
       http
         .get(URL)
         .then((response) => {
-            console.log(response)
+            // console.log(response)
+            if(!response.data.data){
+              this.d.data = []
+              this.loading = false
+              return
+            }
             // eslint-disable-next-line no-prototype-builtins
             let dataToBePopulated = response.data.data.hasOwnProperty("content") ? response.data.data.content : response.data.data ? response.data.data : [];
             // eslint-disable-next-line no-prototype-builtins
             this.totalItems = (response.data.metaInfo !== undefined&&response.data.metaInfo.hasOwnProperty("totalCount")) ? response.data.metaInfo.totalCount : response.data.data.totalElements;
-            console.log(this.totalItems);
+            // console.log(this.totalItems);
             this.d.data = dataToBePopulated;
             if (dataToBePopulated && dataToBePopulated.length > 0) {
-                this.translateData();
+                // this.translateData();
+                this.updateData();
             }
             this.loading = false;
         })
@@ -283,6 +340,7 @@ export default {
     translateData: function() {
       for (var key in this.d.data) {
         for (var i = 0; i < this.d.headers.length; i++) {
+          if(this.d.headers[i].translate == false) continue
           this.translateProperty(this.d.data[key], this.d.headers[i].value);
         }
       }
@@ -292,11 +350,32 @@ export default {
         this.d.headers[key].text = this.$t(this.d.headers[key].text);
       }
     },
-    translateProperty: function(obj, prop) {
-      var parts = prop.split(".");
+    getProperty: function(obj, prop){
+      let parts = prop.split(".");
 
       if (Array.isArray(parts)) {
-        var last = parts.pop(),
+        let last = parts.pop(),
+                l = parts.length,
+                i = 1,
+                current = parts[0];
+
+        while (current && (obj = obj[current]) && i < l) {
+          current = parts[i];
+          i++;
+        }
+
+        if (obj) {
+          return obj[last];
+        }
+      } else {
+        throw "parts is not valid array";
+      }
+    },
+    translateProperty: function(obj, prop) {
+      let parts = prop.split(".");
+
+      if (Array.isArray(parts)) {
+        let last = parts.pop(),
           l = parts.length,
           i = 1,
           current = parts[0];
@@ -308,7 +387,6 @@ export default {
 
         if (obj) {
           obj[last] = this.$t(obj[last]);
-          // return obj[last];
         }
       } else {
         throw "parts is not valid array";
@@ -317,7 +395,7 @@ export default {
   },
   created() {
       if (this.field.subscribe) {
-          console.log("subscribe");
+          // console.log("subscribe");
           this.$observable.subscribe(this.field.subscribe, (data) => {
               if (data.type == "modelUpdate") {
                   var keys = Object.keys(data.model);
@@ -327,9 +405,10 @@ export default {
                   });
               }
               if (this.d.data) {
-                  this.translateData();
+                  // this.translateData();
+                this.updateData();
               }
-              console.log(data);
+              // console.log(data);
           });
       }
       this.$observable.subscribe(this.field.name + "_refresh",  ()=> {
@@ -337,9 +416,13 @@ export default {
       })
   },
   mounted() {
-    console.log(this.d);
+    // console.log(this.d);
     if (this.d.headers) {
       this.translateHeaders();
+    }
+    if (this.d.data) {
+      // this.translateData();
+      this.updateData();
     }
   },
   props: ["val", "field"],
