@@ -3,10 +3,13 @@
 
 {
    "app": {
-      "pages": [
+      "pages": {
+      "page": [
          {
             "key": "memoPage",
-            "sections": [
+            "sections": {
+                "tabs": [],
+            "sec": [
                {
                   "isTab": false,
                   "type": "DefaultSection",
@@ -47,6 +50,8 @@
 
             ]
          }
+         }
       ]
+   }
    }
 }
