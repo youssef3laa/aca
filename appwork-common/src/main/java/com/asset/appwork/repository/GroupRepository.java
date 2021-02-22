@@ -23,6 +23,8 @@ public interface GroupRepository extends GenericRepository<Group, Long> {
 
     Page<Group> findByNameIn(List<String> names, Pageable pageable);
 
+    Optional<Group> findByUnit_UnitTypeCodeAndUnit_UnitCodeAndIsHeadRoleAndIsViceRole(String unitTypeCode, String unitCode, Boolean isHeadRole, Boolean isViceRole);
+
     List<Group> findByUnit(Unit unit);
 
     Page<Group> findByUnit(Unit unit, Pageable pageable);

@@ -1,6 +1,8 @@
 package com.asset.appwork.util;
 
+import com.asset.appwork.model.Person;
 import com.asset.appwork.model.Unit;
+import com.asset.appwork.model.User;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -182,6 +184,52 @@ public class ACAAdapter {
             jsonGenerator.writeStartObject();
             jsonGenerator.writeStringField("unitTypeCode", unit.getUnitTypeCode());
             jsonGenerator.writeStringField("unitCode", unit.getUnitCode());
+            jsonGenerator.writeEndObject();
+        }
+    }
+
+    public static class UserUpdateDeserializer extends StdDeserializer<User> {
+
+        public UserUpdateDeserializer() {
+            this(null);
+        }
+
+        public UserUpdateDeserializer(Class<?> cls) {
+            super(cls);
+        }
+
+        @Override
+        public User deserialize(JsonParser parser, DeserializationContext context) throws IOException {
+            JsonNode root = parser.getCodec().readTree(parser);
+            User user = new User();
+            Person person = new Person();
+            user.setDescription(Integer.toString(root.get("id").asInt()));
+            user.setDisplayName(root.get("displayName").asText());
+            person.setTitle(root.get("grade").asText());
+
+            person.setNotes(String.format("%s-%s-%s", root.get("newTypeCode").asText(), root.get("newUnitTypeCode").asText(), root.get("newUnitCode").asText()));
+
+            user.setPerson(person);
+
+            return user;
+        }
+
+    }
+    public static class UserUpdateSerializer extends StdSerializer<User> {
+
+        public UserUpdateSerializer() {
+            this(null);
+        }
+
+        public UserUpdateSerializer(Class<User> t) {
+            super(t);
+        }
+
+        @Override
+        public void serialize(User user, JsonGenerator jsonGenerator, SerializerProvider provider) throws IOException {
+            jsonGenerator.writeStartObject();
+//            jsonGenerator.writeStringField("unitTypeCode", user.getUnitTypeCode());
+//            jsonGenerator.writeStringField("unitCode", user.getUnitCode());
             jsonGenerator.writeEndObject();
         }
     }
