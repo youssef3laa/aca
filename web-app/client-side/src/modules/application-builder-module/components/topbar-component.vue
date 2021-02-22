@@ -1,24 +1,29 @@
 <template>
-      <div style="width: 100%; display: flex">
-      <TasksLists></TasksLists>
-      <AdvancedSearch></AdvancedSearch>
-      <OrgChartBtn></OrgChartBtn>
+      <div class="top-bar-wrapper">
+      <TasksLists :val="val.tasks"></TasksLists>
+      <TopBarBtn :val="{backgroundColor:'#22B07D'}" :field="{label:'advancedSearch',icon:'fas fa-search'}"></TopBarBtn>
+      <TopBarBtn :val="{backgroundColor:'#F37121'}" :field="{label:'orgChart',icon:'fas fa-sitemap'}"></TopBarBtn>
+
     </div>
 </template>
 
 <script>
 import TasksLists from "../../application-builder-module/components/tasks-list-component";
-import AdvancedSearch from "../../application-builder-module/components/advanced-search-component";
-import OrgChartBtn from "../../application-builder-module/components/org-chart-btn-component";
+import TopBarBtn from "../../application-builder-module/components/topbar-btn-component";
 export default {
 name:"Topbar",
+props:["val","field"],
  components: {
     TasksLists,
-    AdvancedSearch,
-    OrgChartBtn}
+    TopBarBtn,
+   },
+
 }
 </script>
 
 <style>
-
+.top-bar-wrapper{
+width: 100%;
+ display: flex;
+}
 </style>

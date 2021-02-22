@@ -153,11 +153,22 @@
   "creator": "المنشئ",
   "deliveryDate": "تاريخ الارسال",
   "taskRequestNumber": "رقم الطلب",
+  "followUpNumber": "رقم المتابعة",
+  "followUpDate": "تاريخ المتابعة ",
+  "nextFollowUpDate": "تاريخ المتابعة القادم",
+  "chairmanOfCommisionApprovalDate": "تاريخ تصديق السيد رئيس الهيئة",
+  "viceChairmanOfCommisionApprovalDate": "تاريخ تصديق السيد نائب رئيس الهيئة",
+  "chairmanOfCommisionSignature": "تأشيرة السيد رئيس الهيئة",
+  "viceChairmanOfCommisionSignature": "تأشيرة السيد نائب رئيس الهيئة",
+
   "lookup": "عمليات البحث",
   "mainLookup": "عمليات البحث الاساسية",
+  "advancedSearch": "بحث متقدم",
   "category": "الفئة",
   "key": "الرقم التسلسلي",
   "arValue": "القيمة بالعربية",
   "enValue": "القيمة بالانجليزية",
-  "parentId": "الفئة الأم"
+  "parentId": "الفئة الأم",
+
+  "sentFromManagement":"المرسل من الادارات"
 }

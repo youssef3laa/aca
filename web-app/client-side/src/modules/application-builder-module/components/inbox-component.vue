@@ -4,7 +4,7 @@
       <AppBuilder dir="rtl" ref="appBuilder" :app="app" />
     </pane>
     <pane style="height: auto" max-size="20" size="14">
-      <Sidebar @btnClicked="updateView"></Sidebar>
+      <Sidebar :val="val"  @btnClicked="updateView"></Sidebar>
     </pane>
   </splitpanes>
 </template>
@@ -12,7 +12,6 @@
 <script>
 import http from "../../core-module/services/http";
 import Sidebar from "../../application-builder-module/components/sidebar-component";
-import AppBuilder from "../../application-builder-module/builders/app-builder";
 import { Splitpanes, Pane } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 import historyMixin from "../../history-module/mixin/historyMixin";
@@ -24,13 +23,17 @@ export default {
     Sidebar,
     Splitpanes,
     Pane,
-    AppBuilder,
+      AppBuilder: () => import("../builders/app-builder"),
+
   },
+  props:["val","field"],
   data() {
     return {
       response: [],
       sidebarItem: "viewReceived",
     app:{},
+    items:[{name:"الوارد",notifications:21, icon:"fas fa-download",action:"viewReceived"},{name:"المرسل",notifications:34, icon:"far fa-paper-plane",action:"viewSent"},
+        ],
     };
   },
   methods: {

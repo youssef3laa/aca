@@ -38,7 +38,7 @@
         </Charts>
       </v-col>
     </v-row>
-    <Topbar></Topbar>
+    <!-- <SecrtaryInbox></SecrtaryInbox> -->
     <Inbox></Inbox>
 
   </v-container>
@@ -46,16 +46,15 @@
 
 <script>
 import chartsMixin from "../../../mixins/chartsMixin";
-import Topbar from "../../application-builder-module/components/topbar-component";
 import Charts from "../../application-builder-module/components/charts-component";
 import Inbox from "../../application-builder-module/components/inbox-component";
-
+// import SecrtaryInbox from "../../application-builder-module/components/secretary-inbox-component"
 import http from "../../core-module/services/http";
 
 export default {
   name: "HomePage",
   components: {
-Topbar,
+  // SecrtaryInbox,
     Inbox,
     Charts,
   },
@@ -69,10 +68,7 @@ Topbar,
         this.processHistory.requestData
       );
       this.loaded = true;
-      // setTimeout(async ()=>{
-      // this.barChartData = await this.getDynamicReport(this.processHistory.requestData);
 
-      // },2000)
     } catch (e) {
       console.error(e);
     }

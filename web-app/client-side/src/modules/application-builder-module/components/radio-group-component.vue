@@ -1,6 +1,6 @@
 <template>
   <v-radio-group v-model="selected" row>
-    <span class="radio-group-component-title-class" :style="{color: color}" v-t="title"></span>
+    <span v-if="title" class="radio-group-component-title-class" :style="{color: color}" v-t="title"></span>
     <v-radio v-for="(type, index) in d.options"
              :key="index"
              :value="type.name"
@@ -49,11 +49,11 @@ export default {
 <style>
   .radio-group-component-title-class {
     font-size: 20px;
-    padding: 0px 30px 0px 30px;
+    padding: 0px 30px 0px 80px;
   }
 
   .radio-group-component-radio-class {
-    padding: 0px 50px 0px 50px;
+    padding: 0px 0px 0px 100px;
     font-weight: bold;
   }
 </style>

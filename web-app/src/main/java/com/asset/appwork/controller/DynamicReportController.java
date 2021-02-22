@@ -5,7 +5,10 @@ package com.asset.appwork.controller;
  */
 
 import com.asset.appwork.QueryBuilder;
+import com.asset.appwork.config.TokenService;
+import com.asset.appwork.dto.Account;
 import com.asset.appwork.dto.Query;
+import com.asset.appwork.dto.QueryResult;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.response.AppResponse;
@@ -29,38 +32,25 @@ import java.util.List;
 public class DynamicReportController {
 
     @Autowired
-    private AutowireCapableBeanFactory beanFactory;
-    @Autowired
-    EntityManager entityManager;
+    TokenService tokenService;
     @Autowired
     QueryService queryService;
 
     @PostMapping("/run")
-    public ResponseEntity<AppResponse<JsonNode>> getForm(@RequestBody() Query query) {
-        AppResponse.ResponseBuilder<JsonNode> responseBuilder = AppResponse.builder();
+    public ResponseEntity<AppResponse<List>> getForm(@RequestHeader("X-Auth-Token") String token,
+                                                     @RequestBody() Query query) {
+        AppResponse.ResponseBuilder<List> responseBuilder = AppResponse.builder();
         try{
-            QueryBuilder queryBuilder = new QueryBuilder(entityManager);
-            List<?> list = queryBuilder.runQuery(query);
+            Account account = tokenService.get(token);
+            if (account == null) return responseBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            if(query.getColumns().size() < 1 && query.getAggregations().size() < 1){
-                try{
-                    Class<?> serviceClass = Class.forName("com.asset.appwork.service."+ query.getTable() +"Service");
-                    GenericService genericService = (GenericService) beanFactory.createBean(serviceClass);
-                    list = genericService.updateResult(list);
-                }catch (ClassNotFoundException e){
-                    e.printStackTrace();
-                }
-            }
-
-            String resultString = SystemUtil.writeObjectIntoString(list);
-            responseBuilder.status(ResponseCode.SUCCESS);
-            return responseBuilder.data(SystemUtil.convertStringToJsonNode(resultString)).build().getResponseEntity();
+            QueryResult queryResult = queryService.runQuery(query,account);
+            if(queryResult.getContent().isEmpty()) throw new AppworkException(ResponseCode.NO_CONTENT);
+            responseBuilder.info("totalCount", queryResult.getTotalCount());
+            responseBuilder.data(queryResult.getContent());
         }catch (AppworkException e){
             e.printStackTrace();
             responseBuilder.status(e.getCode());
-        }catch (JsonProcessingException e){
-            e.printStackTrace();
-            responseBuilder.status(ResponseCode.QUERY_BUILDER_FAILURE);
         }
         return responseBuilder.build().getResponseEntity();
     }
