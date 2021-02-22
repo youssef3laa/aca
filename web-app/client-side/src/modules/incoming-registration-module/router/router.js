@@ -14,32 +14,32 @@ const routes = [
         component: incomingRegistrationInit
     },
     {
-        path: '/incoming-case-registration-comment/:taskId/',
+        path: '/case/incoming-case-registration-comment/:taskId/',
         name: 'incomingCaseRegistration-comment',
         component: incomingCaseRegistrationComment
     },
     {
-        path: '/incoming-case-registration-memo-create/:taskId/',
+        path: '/case/incoming-case-registration-memo-create/:taskId/',
         name: 'incomingCaseRegistration-memoCreate',
         component: incomingCaseRegistrationMemoCreate
     },
     {
-        path: '/incoming-case-registration-approval/:taskId/',
+        path: '/case/incoming-case-registration-approval/:taskId/',
         name: 'incomingCaseRegistration-approval',
         component: incomingCaseRegistrationMemoApproval
     },
     {
-        path: '/incoming-case-registration-signature/:taskId/',
+        path: '/case/incoming-case-registration-signature/:taskId/',
         name: 'incomingCaseRegistration-signature',
         component: incomingCaseRegistrationMemoSignature
     },
     {
-        path: '/incoming-case-registration-outcoming/:taskId/',
+        path: '/case/incoming-case-registration-outcoming/:taskId/',
         name: 'incomingCaseRegistration-outcoming',
         component: incomingCaseRegistrationMemoOutcoming
     },
     {
-        path: '/incoming-case-registration-performance/:taskId/',
+        path: '/case/incoming-case-registration-performance/:taskId/',
         name: 'incomingCaseRegistration-performance',
         component: incomingCaseRegistrationMemoPerformance
     },

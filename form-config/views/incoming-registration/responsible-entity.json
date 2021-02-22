@@ -1,0 +1,31 @@
+{
+    "key": "responsibleEntityForm",
+    "inputs": [
+        {
+            "type": "InputComponent",
+            "label": "theAgency",
+            "name": "responsibleEntityGehaz",
+            "readonly":true,
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "theSector",
+            "name": "responsibleEntityketa3",
+            "readonly":true,
+            "col": "4"
+        },
+        {
+            "type": "InputComponent",
+            "label": "theAdminOffice",
+            "name": "responsibleEntityEdara",
+            "readonly":true,
+            "col": "4"
+        }
+    ],
+    "model": {
+        "responsibleEntityEdara": "",
+        "responsibleEntityGehaz": "",
+        "responsibleEntityketa3": ""
+    }
+}

@@ -4,7 +4,7 @@
       <v-row>
         <v-col :cols="10">
           <v-card-title class="headline">{{
-              formData.modalTitle
+                  $t(formData.modalTitle)
             }}
           </v-card-title>
         </v-col>

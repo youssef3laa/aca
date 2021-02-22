@@ -115,7 +115,12 @@ export default {
                 .then((response) => {
                     console.log(response);
                     // alert("Step Complete!");
-                    router.push({name: 'HomePage'})
+
+                    this.$refs.alertComponent._alertSuccess({
+                        type: "success",
+                        message: "actionHasBeenSentSuccessfully"
+                    }, () => router.push({name: 'HomePage'}).then(r => console.log(r)));
+
                 })
                 .catch((error) => console.error(error));
         }

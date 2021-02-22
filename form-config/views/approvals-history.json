@@ -1,0 +1,18 @@
+{
+    "key": "historyTable",
+    "inputs": [
+        {
+            "type": "DataTableComponent",
+            "name": "historyTable",
+            "subscribe": "tasks",
+            "col": 12
+        }
+    ],
+    "model": {
+        "historyTable": {
+            "url": "",
+            "headers": [],
+            "data": []
+        }
+    }
+}

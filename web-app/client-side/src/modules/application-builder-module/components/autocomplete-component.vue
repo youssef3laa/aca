@@ -33,6 +33,7 @@
 
 <script>
 import http from "../../core-module/services/http";
+
 export default {
   name: "autoCompleteComponent",
   data() {
@@ -72,6 +73,7 @@ export default {
             } else {
               obj = {
                 value: element["key"],
+                  //TODO hanlde enValue
                 text: element["arValue"],
                 object: element,
               };
