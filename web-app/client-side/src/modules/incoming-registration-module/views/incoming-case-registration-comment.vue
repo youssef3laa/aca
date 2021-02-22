@@ -6,12 +6,12 @@
 </template>
 
 <script>
-    import AppBuilder from "../../application-builder-module/builders/app-builder";
-    import formPageMixin from "../../../mixins/formPageMixin";
-    import historyMixin from "../../history-module/mixin/historyMixin";
-    import incomingRegistrationMixin from "../mixins/incomig-registration-mixin";
+import AppBuilder from "../../application-builder-module/builders/app-builder";
+import formPageMixin from "../../../mixins/formPageMixin";
+import historyMixin from "../../history-module/mixin/historyMixin";
+import incomingRegistrationMixin from "../mixins/incomig-registration-mixin";
 
-    export default {
+export default {
         name: "incoming-case-registration-comment",
         mixins: [formPageMixin, historyMixin, incomingRegistrationMixin],
         components: {AppBuilder},
@@ -40,6 +40,9 @@
                 this.$refs.appBuilder.setModelData("mainData", incomingRegistration)
                 let incomingCase = await this.readIncomingCase(incomingRegistration.jobEntityId)
                 this.$refs.appBuilder.setModelData("caseData", incomingCase)
+
+                this.$refs.appBuilder.setModelData("responsibleEntityForm",incomingRegistration )
+
             },
             submit: function(){
                 let approvalCard = this.$refs.appBuilder.getModelData("approvalForm");
@@ -50,7 +53,6 @@
                     stepId: this.inputSchema.stepId,
                     process: this.inputSchema.process,
                     parentHistoryId: this.inputSchema.parentHistoryId,
-
                     code: approvalCard.approval.code,
                     assignedCN: approvalCard.approval.assignedCN,
                     decision: approvalCard.approval.decision,

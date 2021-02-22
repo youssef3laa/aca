@@ -29,7 +29,7 @@ public class RequestEntityService extends GenericService{
     @Autowired
     OrgChartService orgChartService;
 
-    public void updateRequest(OutputSchema outputSchema, String userCN, String entityId, String subject, String status) throws AppworkException {
+    public void updateRequest(OutputSchema outputSchema, String userCN, String entityId, String subject, String status,String priority) throws AppworkException {
 
         Optional<RequestEntity> request = requestRepository.findById(Long.parseLong(outputSchema.getRequestId()));
         if (request.isPresent()) {
@@ -40,22 +40,18 @@ public class RequestEntityService extends GenericService{
             request.get().setProcess(outputSchema.getProcess());
             request.get().setSubject(subject);
             request.get().setStatus(status);
-
+            request.get().setPriority(priority);
             requestRepository.save(request.get());
         } else {
             throw new AppworkException(ResponseCode.UPDATE_ENTITY_FAILURE);
         }
     }
+    public RequestEntity updateRequest(RequestEntity requestEntity){
+        return requestRepository.save(requestEntity);
+    }
 
     public String generateRequestNumber(Account account) throws AppworkException {
         try {
-//            2020 create wared
-
-            /*
-            *
-            * */
-
-//            User user = orgChartService.getLoggedInUser(account);
             Date date = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
             date = sdf.parse(sdf.format(date));

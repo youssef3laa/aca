@@ -6,9 +6,7 @@
                 "AGN": "headOfAgencyComment",
                 "SCT": "headOfSectorComment",
                 "ADM": "headOfOfficeComment",
-                "OFC": "headOfOfficeComment",
-                "GRP": "headOfGroupComment",
-                "initiate": "memberMemoCreate"
+                "OFC": "headOfOfficeComment"
             }
         },
         "headOfAgencyComment": {

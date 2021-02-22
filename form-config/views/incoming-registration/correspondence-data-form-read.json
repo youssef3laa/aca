@@ -51,12 +51,6 @@
         },
         {
             "type": "InputComponent",
-            "label": "transferTo",
-            "name": "transferTo",
-            "col": "4"
-        },
-        {
-            "type": "InputComponent",
             "label": "correspondenceNumber",
             "name": "correspondenceNumber",
             "col": "4"

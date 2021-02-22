@@ -30,13 +30,14 @@ export default {
     }
   },
   methods: {
-    _alertSuccess(opts = {}) {
+    _alertSuccess(opts = {},callback) {
       if(opts.type) this.type = opts.type
       else this.type = "success"
       this.message = this.$t(opts.message)
       this.isVisible = true
       setTimeout(() => {
         this.isVisible = false
+          if(callback) callback();
       }, 2000)
       // this.isVisible = false
     },

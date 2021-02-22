@@ -54,32 +54,32 @@ public class ProcessController {
     @Autowired
     ProcessService processService;
 
-    @PostMapping("/initiate")
-    public ResponseEntity<AppResponse<String>> initiate(@RequestHeader("X-Auth-Token") String token, @RequestBody Request requestJson) {
-        AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            String cordysUrl = cordysService.getCordysUrl();
-
-            //Note: Entity Creation
-            String restAPIBaseUrl = SystemUtil.generateRestAPIBaseUrl(environment, "AssetGeneralACA");
-            Entity entity = new Entity(account,
-                    restAPIBaseUrl
-                    , requestJson.processModel.getEntityName());
-            Long entityId = entity.create(requestJson.generalProcessEntity);
-
-            requestEntityService.updateRequest(requestJson.getProcessModel(), account.getUsername(), entityId.toString(),
-                    "new-incoming", "created");
-
-            String response = moduleRouting.goToNext(requestJson.processModel, account, cordysUrl);
-            respBuilder.data(response);
-        } catch (AppworkException e) {
-            e.printStackTrace();
-            respBuilder.status(e.getCode());
-        }
-
-        return respBuilder.build().getResponseEntity();
-    }
+//    @PostMapping("/initiate")
+//    public ResponseEntity<AppResponse<String>> initiate(@RequestHeader("X-Auth-Token") String token, @RequestBody Request requestJson) {
+//        AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
+//        try {
+//            Account account = tokenService.get(token);
+//            String cordysUrl = cordysService.getCordysUrl();
+//
+//            //Note: Entity Creation
+//            String restAPIBaseUrl = SystemUtil.generateRestAPIBaseUrl(environment, "AssetGeneralACA");
+//            Entity entity = new Entity(account,
+//                    restAPIBaseUrl
+//                    , requestJson.processModel.getEntityName());
+//            Long entityId = entity.create(requestJson.generalProcessEntity);
+//
+//            requestEntityService.updateRequest(requestJson.getProcessModel(), account.getUsername(), entityId.toString(),
+//                    "new-incoming", "created",requestJson.ge);
+//
+//            String response = moduleRouting.goToNext(requestJson.processModel, account, cordysUrl);
+//            respBuilder.data(response);
+//        } catch (AppworkException e) {
+//            e.printStackTrace();
+//            respBuilder.status(e.getCode());
+//        }
+//
+//        return respBuilder.build().getResponseEntity();
+//    }
 
 
     @PostMapping("/initiateLinkedIncoming")

@@ -69,13 +69,13 @@ public class UserController {
         String rootStr = environment.getProperty("form.config");
 
         String[] paths = key.split("\\|");
-        String path = "";
+        StringBuilder path = new StringBuilder();
         if(paths.length > 0){
-            path = paths[0];
-            for(int i =1 ; i < paths.length ; i++) path += File.separator + paths[i];
+            path = new StringBuilder(paths[0]);
+            for(int i =1 ; i < paths.length ; i++) path.append(File.separator).append(paths[i]);
         }
 
-        try (FileReader fileReader = new FileReader(new File(rootStr +File.separator+ "views" + File.separator + path + ".json"))) {
+        try (FileReader fileReader = new FileReader(rootStr +File.separator+ "views" + File.separator + path + ".json")) {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode outputData = mapper.readTree(fileReader);
 

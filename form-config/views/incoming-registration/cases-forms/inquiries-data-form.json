@@ -9,18 +9,52 @@
             "search": true,
             "filter": true,
             "add": true,
-            "actions": ["edit", "delete"],
+            "actions": [
+                "edit",
+                "delete"
+            ],
             "modalId": "addInquiryModal"
-          }
-    
+        }
     ],
     "model": {
-  
-        "inquiryTable":{
+        "inquiryTable": {
             "url": "",
-            "headers": [],
+            "headers": [
+                {
+                    "text": "fullName",
+                    "value": "fullName"
+                },
+                {
+                    "text": "inquiryType",
+                    "value": "inquiryType"
+                },
+                {
+                    "text": "birthDate",
+                    "value": "birthDate"
+                },
+                {
+                    "text": "birthPlace",
+                    "value": "birthPlace"
+                },
+                {
+                    "text": "jobAuthority",
+                    "value": "jobAuthority"
+                },
+                {
+                    "text": "positionAssignedTo",
+                    "value": "positionAssignedTo"
+                },
+                {
+                    "text": "candidatePosition",
+                    "value": "candidatePosition"
+                },
+                {
+                    "text": "",
+                    "value": "action",
+                    "sortable": false
+                }
+            ],
             "data": []
         }
-
     }
 }

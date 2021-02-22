@@ -18,567 +18,574 @@ export default {
   data() {
     return {
       app: {
-        pages: [
-          {
-            tabs: [
-              {
-                key: "units",
-                id: "1",
-                isActive: true,
-                name: "Units",
-                icon: "fas fa-layer-group",
-              },
-              {
-                key: "roles",
-                id: "2",
-                name: "Roles",
-                icon: "fas fa-briefcase",
-              },
-              {
-                key: "users",
-                id: "3",
-                name: "Users",
-                icon: "fas fa-user",
-              },
-              {
-                key: "chart",
-                id: "4",
-                name: "Chart",
-                icon: "fas fa-project-diagram",
-              },
-            ],
-            sections: [
-              {
-                key: "title",
-                type: "TitleComponet",
-                name: "Organizational Chart",
-              },
-              {
-                key: "unitModal",
-                type: "ModalSection",
-                name: "unitModal",
-                isCard: true,
-                forms: [
-                  {
-                    key: "addUnitModal",
-                    modalId: "addUnitModal",
-                    modalTitle: "Add Unit",
-                    inputs: [
-                      {
-                        type: "InputComponent",
-                        label: "Arabic name",
-                        name: "nameAr",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "English name",
-                        name: "nameEn",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Unit type code",
-                        name: "unitTypeCode",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Unit code",
-                        name: "unitCode",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Parent code",
-                        name: "parentCode",
-                        col: "4",
-                        rule: "required",
-                      },
-                    ],
-                    model: {
-                      nameAr: "",
-                      nameEn: "",
-                      unitTypeCode: "",
-                      unitCode: "",
-                      parentCode: ""
-                    },
-                  },
-                  {
-                    key: "editUnitModal",
-                    modalId: "editUnitModal",
-                    modalTitle: "Edit Unit",
-                    inputs: [
-                      {
-                        type: "InputComponent",
-                        label: "Internal code",
-                        name: "name",
-                        col: "4",
-                        readonly: true
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Arabic name",
-                        name: "nameAr",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "English name",
-                        name: "nameEn",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Unit type code",
-                        name: "unitTypeCode",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Unit code",
-                        name: "unitCode",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Parent code",
-                        name: "parentCode",
-                        col: "4",
-                        rule: "required",
-                      },
-                    ],
-                    model: {
-                      id: "",
-                      name: "",
-                      nameAr: "",
-                      nameEn: "",
-                      unitTypeCode: "",
-                      unitCode: "",
-                      parentCode: "",
-                    },
-                  },
-                ],
-              },
-              {
-                key: "roleModal",
-                type: "ModalSection",
-                name: "roleModal",
-                isCard: true,
-                forms: [
-                  {
-                    key: "addRoleModal",
-                    modalId: "addRoleModal",
-                    modalTitle: "Add Role",
-                    inputs: [
-                      {
-                        type: "InputComponent",
-                        label: "Arabic name",
-                        name: "nameAr",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "English name",
-                        name: "nameEn",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Role code",
-                        name: "groupCode",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Unit code",
-                        name: "unitCode",
-                        col: "4",
-                        rule: "required",
-                      },
-                      // {
-                      //   type: "CheckboxComponent",
-                      //   label: "Head role",
-                      //   name: "isHeadRole",
-                      //   col: "4",
-                      //   rule: "required",
-                      // },
-                      // {
-                      //   type: "CheckboxComponent",
-                      //   label: "Vice role",
-                      //   name: "isViceRole",
-                      //   col: "4",
-                      //   rule: "required",
-                      // },
-                    ],
-                    model: {
-                      "id": "",
-                      "name": "",
-                      "description": "",
-                      "nameEn": "",
-                      "nameAr": "",
-                      "groupCode": "",
-                      "isHeadRole": "",
-                      "isViceRole": "",
-                      "unitCode": ""
-                    },
-                  },
-                  {
-                    key: "editRoleModal",
-                    modalId: "editRoleModal",
-                    modalTitle: "Edit Role",
-                    inputs: [
-                      {
-                        type: "InputComponent",
-                        label: "Arabic name",
-                        name: "nameAr",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "English name",
-                        name: "nameEn",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Role code",
-                        name: "groupCode",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Unit code",
-                        name: "unitCode",
-                        col: "4",
-                        rule: "required",
-                      },
-                      // {
-                      //   type: "CheckboxComponent",
-                      //   label: "Head role",
-                      //   name: "isHeadRole",
-                      //   col: "4",
-                      //   rule: "required",
-                      // },
-                      // {
-                      //   type: "CheckboxComponent",
-                      //   label: "Vice role",
-                      //   name: "isViceRole",
-                      //   col: "4",
-                      //   rule: "required",
-                      // },
-                    ],
-                    model: {
-                      "id": "",
-                      "name": "",
-                      "description": "",
-                      "nameEn": "",
-                      "nameAr": "",
-                      "groupCode": "",
-                      "isHeadRole": "",
-                      "isViceRole": "",
-                      "unitCode": "",
-                    },
-                  },
-                ],
-              },
-              {
-                key: "userModal",
-                type: "ModalSection",
-                name: "userModal",
-                isCard: true,
-                forms: [
-                  {
-                    key: "addUserModal",
-                    modalId: "addUserModal",
-                    modalTitle: "Add User",
-                    inputs: [
-                      {
-                        type: "InputComponent",
-                        label: "Username",
-                        name: "username",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Password",
-                        name: "password",
-                        col: "4",
-                        inputType: "password",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Email",
-                        name: "email",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Group code",
-                        name: "groupCode",
-                        col: "4",
-                        rule: "required",
-                      },
-                    ],
-                    model: {
-                      "id": "",
-                      "username": "",
-                      "password": "",
-                      "email": "",
-                      "groupCode": "",
-                    },
-                  },
-                  {
-                    key: "editUserModal",
-                    modalId: "editUserModal",
-                    modalTitle: "Edit User",
-                    inputs: [
-                      {
-                        type: "InputComponent",
-                        label: "Username",
-                        name: "username",
-                        col: "4",
-                        rule: "required",
-                      },
-                      // {
-                      //   type: "InputComponent",
-                      //   label: "Password",
-                      //   name: "password",
-                      //   col: "4",
-                      //   rule: "required",
-                      // },
-                      {
-                        type: "InputComponent",
-                        label: "Email",
-                        name: "email",
-                        col: "4",
-                        rule: "required",
-                      },
-                      {
-                        type: "InputComponent",
-                        label: "Group code",
-                        name: "groupCode",
-                        col: "4",
-                        rule: "required",
-                      },
-                    ],
-                    model: {
-                      "id": "",
-                      "username": "",
-                      // "password": "",
-                      "email": "",
-                      "groupCode": "",
-                    },
-                  },
-                ],
-              },
-              {
-                tabId: "1",
-                isTab: true,
-                type: "DefaultSection",
-                isCard: true,
-                display: "block",
-                isActive: true,
-                forms: [
-                  {
-                    inputs: [
-                      {
-                        type: "DataTableComponent",
-                        name: "unitsTable",
-                        subscribe: "units",
-                        col: 12,
-                        search: true,
-                        filter: true,
-                        add: true,
-                        actions: ["edit", "delete"],
-                        modalId: "addUnitModal",
-                      },
-                    ],
-                    model: {
-                      unitsTable: {
-                        url: "org/unit/read/list",
-                        headers: [
-                          {
-                            text: "Internal code",
-                            value: "name",
-                          },
-                          {
-                            text: "Name ar",
-                            value: "nameAr",
-                          },
-                          {
-                            text: "Name en",
-                            value: "nameEn",
-                          },
-                          {
-                            text: "Unit type code",
-                            value: "unitTypeCode",
-                          },
-                          {
-                            text: "Unit code",
-                            value: "unitCode",
-                          },
-                          {
-                            text: "",
-                            value: "action",
-                          },
-                        ],
-                        data: [],
-                        search: "",
-                      },
-                    },
-                  },
-                ],
-              },
-              {
-                tabId: "2",
-                isTab: true,
-                type: "DefaultSection",
-                isCard: true,
-                display: "none",
-                forms: [
-                  {
-                    inputs: [
-                      {
-                        type: "DataTableComponent",
-                        name: "rolesTable",
-                        subscribe: "roles",
-                        col: 12,
-                        search: true,
-                        filter: true,
-                        add: true,
-                        actions: ["edit", "delete"],
-                        modalId: "addRoleModal",
-                      },
-                    ],
-                    model: {
-                      rolesTable: {
-                        url: "org/group/read/list",
-                        headers: [
-                          {
-                            text: "Internal code",
-                            value: "name",
-                          },
-                          {
-                            text: "Name ar",
-                            value: "nameAr",
-                          },
-                          {
-                            text: "Name en",
-                            value: "nameEn",
-                          },
-                          {
-                            text: "Role code",
-                            value: "groupCode",
-                          },
-                          {
-                            text: "",
-                            value: "action",
-                          },
-                        ],
-                        data: [],
-                        search: "",
-                      },
-                    },
-                  },
-                ],
-              },
-              {
-                tabId: "3",
-                isTab: true,
-                type: "DefaultSection",
-                isCard: true,
-                display: "none",
-                forms: [
-                  {
-                    inputs: [
-                      {
-                        type: "DataTableComponent",
-                        name: "usersTable",
-                        subscribe: "users",
-                        col: 12,
-                        search: true,
-                        filter: true,
-                        add: true,
-                        actions: ["edit", "delete"],
-                        modalId: "addUserModal",
-                      },
-                    ],
-                    model: {
-                      usersTable: {
-                        url: "org/user/read/list",
-                        headers: [
-                          {
-                            text: "Username",
-                            value: "name",
-                          },
-                          {
-                            text: "Display name",
-                            value: "displayName",
-                          },
-                          {
-                            text: "Email",
-                            value: "details.email",
-                          },
-                          {
-                            text: "Phone",
-                            value: "details.phone",
-                          },
-                          {
-                            text: "",
-                            value: "action",
-                          },
-                        ],
-                        data: [],
-                        search: "",
-                      },
-                    },
-                  },
-                ],
-              },
-              {
-                tabId: "4",
-                isTab: true,
-                type: "DefaultSection",
-                isCard: true,
-                display: "none",
-                // background: "transparent",
-                forms: [
-                  {
-                    inputs: [
-                      {
-                        type: "D3GraphComponent",
-                        name: "chart",
-                        subscribe: "chart",
-                        col: 12,
-                      },
-                    ],
-                    model: {
-                      chart: {},
-                    },
-                  },
-                ],
-              },
-            ],
+        pages: {
+          key: 'tabtest',
+          title: {
+            key: 'title',
+            type: 'TitleComponet',
+            name: 'Organizational Chart',
           },
-        ],
+          tabs: [
+            {
+              key: 'units',
+              id: '1',
+              isActive: true,
+              name: 'Units',
+              icon: 'fas fa-layer-group',
+            },
+            {
+              key: 'roles',
+              id: '2',
+              name: 'Roles',
+              icon: 'fas fa-briefcase',
+            },
+            {
+              key: 'users',
+              id: '3',
+              name: 'Users',
+              icon: 'fas fa-user',
+            },
+            {
+              key: 'chart',
+              id: '4',
+              name: 'Chart',
+              icon: 'fas fa-project-diagram',
+            },
+          ],
+          page: [
+            {
+              key: 'page1',
+              sections: {
+                key: 'tabtest',
+                sec: [
+                  {
+                    key: 'unitModal',
+                    type: 'ModalSection',
+                    name: 'unitModal',
+                    isCard: true,
+                    forms: [
+                      {
+                        key: 'addUnitModal',
+                        modalId: 'addUnitModal',
+                        modalTitle: 'Add Unit',
+                        inputs: [
+                          {
+                            type: 'InputComponent',
+                            label: 'Arabic name',
+                            name: 'nameAr',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'English name',
+                            name: 'nameEn',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Unit type code',
+                            name: 'unitTypeCode',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Unit code',
+                            name: 'unitCode',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Parent code',
+                            name: 'parentCode',
+                            col: '4',
+                            rule: 'required',
+                          },
+                        ],
+                        model: {
+                          nameAr: '',
+                          nameEn: '',
+                          unitTypeCode: '',
+                          unitCode: '',
+                          parentCode: '',
+                        },
+                      },
+                      {
+                        key: 'editUnitModal',
+                        modalId: 'editUnitModal',
+                        modalTitle: 'Edit Unit',
+                        inputs: [
+                          {
+                            type: 'InputComponent',
+                            label: 'Internal code',
+                            name: 'name',
+                            col: '4',
+                            readonly: true,
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Arabic name',
+                            name: 'nameAr',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'English name',
+                            name: 'nameEn',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Unit type code',
+                            name: 'unitTypeCode',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Unit code',
+                            name: 'unitCode',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Parent code',
+                            name: 'parentCode',
+                            col: '4',
+                            rule: 'required',
+                          },
+                        ],
+                        model: {
+                          id: '',
+                          name: '',
+                          nameAr: '',
+                          nameEn: '',
+                          unitTypeCode: '',
+                          unitCode: '',
+                          parentCode: '',
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    key: 'roleModal',
+                    type: 'ModalSection',
+                    name: 'roleModal',
+                    isCard: true,
+                    forms: [
+                      {
+                        key: 'addRoleModal',
+                        modalId: 'addRoleModal',
+                        modalTitle: 'Add Role',
+                        inputs: [
+                          {
+                            type: 'InputComponent',
+                            label: 'Arabic name',
+                            name: 'nameAr',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'English name',
+                            name: 'nameEn',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Role code',
+                            name: 'groupCode',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Unit code',
+                            name: 'unitCode',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          // {
+                          //   type: "CheckboxComponent",
+                          //   label: "Head role",
+                          //   name: "isHeadRole",
+                          //   col: "4",
+                          //   rule: "required",
+                          // },
+                          // {
+                          //   type: "CheckboxComponent",
+                          //   label: "Vice role",
+                          //   name: "isViceRole",
+                          //   col: "4",
+                          //   rule: "required",
+                          // },
+                        ],
+                        model: {
+                          id: '',
+                          name: '',
+                          description: '',
+                          nameEn: '',
+                          nameAr: '',
+                          groupCode: '',
+                          isHeadRole: '',
+                          isViceRole: '',
+                          unitCode: '',
+                        },
+                      },
+                      {
+                        key: 'editRoleModal',
+                        modalId: 'editRoleModal',
+                        modalTitle: 'Edit Role',
+                        inputs: [
+                          {
+                            type: 'InputComponent',
+                            label: 'Arabic name',
+                            name: 'nameAr',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'English name',
+                            name: 'nameEn',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Role code',
+                            name: 'groupCode',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Unit code',
+                            name: 'unitCode',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          // {
+                          //   type: "CheckboxComponent",
+                          //   label: "Head role",
+                          //   name: "isHeadRole",
+                          //   col: "4",
+                          //   rule: "required",
+                          // },
+                          // {
+                          //   type: "CheckboxComponent",
+                          //   label: "Vice role",
+                          //   name: "isViceRole",
+                          //   col: "4",
+                          //   rule: "required",
+                          // },
+                        ],
+                        model: {
+                          id: '',
+                          name: '',
+                          description: '',
+                          nameEn: '',
+                          nameAr: '',
+                          groupCode: '',
+                          isHeadRole: '',
+                          isViceRole: '',
+                          unitCode: '',
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    key: 'userModal',
+                    type: 'ModalSection',
+                    name: 'userModal',
+                    isCard: true,
+                    forms: [
+                      {
+                        key: 'addUserModal',
+                        modalId: 'addUserModal',
+                        modalTitle: 'Add User',
+                        inputs: [
+                          {
+                            type: 'InputComponent',
+                            label: 'Username',
+                            name: 'username',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Password',
+                            name: 'password',
+                            col: '4',
+                            inputType: 'password',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Email',
+                            name: 'email',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Group code',
+                            name: 'groupCode',
+                            col: '4',
+                            rule: 'required',
+                          },
+                        ],
+                        model: {
+                          id: '',
+                          username: '',
+                          password: '',
+                          email: '',
+                          groupCode: '',
+                        },
+                      },
+                      {
+                        key: 'editUserModal',
+                        modalId: 'editUserModal',
+                        modalTitle: 'Edit User',
+                        inputs: [
+                          {
+                            type: 'InputComponent',
+                            label: 'Username',
+                            name: 'username',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          // {
+                          //   type: "InputComponent",
+                          //   label: "Password",
+                          //   name: "password",
+                          //   col: "4",
+                          //   rule: "required",
+                          // },
+                          {
+                            type: 'InputComponent',
+                            label: 'Email',
+                            name: 'email',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'InputComponent',
+                            label: 'Group code',
+                            name: 'groupCode',
+                            col: '4',
+                            rule: 'required',
+                          },
+                        ],
+                        model: {
+                          id: '',
+                          username: '',
+                          // "password": "",
+                          email: '',
+                          groupCode: '',
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    tabId: '1',
+                    isTab: true,
+                    type: 'DefaultSection',
+                    isCard: true,
+                    display: 'block',
+                    isActive: true,
+                    forms: [
+                      {
+                        inputs: [
+                          {
+                            type: 'DataTableComponent',
+                            name: 'unitsTable',
+                            subscribe: 'units',
+                            col: 12,
+                            search: true,
+                            filter: true,
+                            add: true,
+                            actions: ['edit', 'delete'],
+                            modalId: 'addUnitModal',
+                          },
+                        ],
+                        model: {
+                          unitsTable: {
+                            url: 'org/unit/read/list',
+                            headers: [
+                              {
+                                text: 'Internal code',
+                                value: 'name',
+                              },
+                              {
+                                text: 'Name ar',
+                                value: 'nameAr',
+                              },
+                              {
+                                text: 'Name en',
+                                value: 'nameEn',
+                              },
+                              {
+                                text: 'Unit type code',
+                                value: 'unitTypeCode',
+                              },
+                              {
+                                text: 'Unit code',
+                                value: 'unitCode',
+                              },
+                              {
+                                text: '',
+                                value: 'action',
+                              },
+                            ],
+                            data: [],
+                            search: '',
+                          },
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    tabId: '2',
+                    isTab: true,
+                    type: 'DefaultSection',
+                    isCard: true,
+                    display: 'none',
+                    forms: [
+                      {
+                        inputs: [
+                          {
+                            type: 'DataTableComponent',
+                            name: 'rolesTable',
+                            subscribe: 'roles',
+                            col: 12,
+                            search: true,
+                            filter: true,
+                            add: true,
+                            actions: ['edit', 'delete'],
+                            modalId: 'addRoleModal',
+                          },
+                        ],
+                        model: {
+                          rolesTable: {
+                            url: 'org/group/read/list',
+                            headers: [
+                              {
+                                text: 'Internal code',
+                                value: 'name',
+                              },
+                              {
+                                text: 'Name ar',
+                                value: 'nameAr',
+                              },
+                              {
+                                text: 'Name en',
+                                value: 'nameEn',
+                              },
+                              {
+                                text: 'Role code',
+                                value: 'groupCode',
+                              },
+                              {
+                                text: '',
+                                value: 'action',
+                              },
+                            ],
+                            data: [],
+                            search: '',
+                          },
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    tabId: '3',
+                    isTab: true,
+                    type: 'DefaultSection',
+                    isCard: true,
+                    display: 'none',
+                    forms: [
+                      {
+                        inputs: [
+                          {
+                            type: 'DataTableComponent',
+                            name: 'usersTable',
+                            subscribe: 'users',
+                            col: 12,
+                            search: true,
+                            filter: true,
+                            add: true,
+                            actions: ['edit', 'delete'],
+                            modalId: 'addUserModal',
+                          },
+                        ],
+                        model: {
+                          usersTable: {
+                            url: 'org/user/read/list',
+                            headers: [
+                              {
+                                text: 'Username',
+                                value: 'name',
+                              },
+                              {
+                                text: 'Display name',
+                                value: 'displayName',
+                              },
+                              {
+                                text: 'Email',
+                                value: 'details.email',
+                              },
+                              {
+                                text: 'Phone',
+                                value: 'details.phone',
+                              },
+                              {
+                                text: '',
+                                value: 'action',
+                              },
+                            ],
+                            data: [],
+                            search: '',
+                          },
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    tabId: '4',
+                    isTab: true,
+                    type: 'DefaultSection',
+                    isCard: true,
+                    display: 'none',
+                    // background: "transparent",
+                    forms: [
+                      {
+                        inputs: [
+                          {
+                            type: 'D3GraphComponent',
+                            name: 'chart',
+                            subscribe: 'chart',
+                            col: 12,
+                          },
+                        ],
+                        model: {
+                          chart: {},
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
       },
     }
   },
@@ -848,16 +855,16 @@ export default {
                               font-size:20px;
                               font-weight:bold;
                               text-align: center;
-                         ">${item.nameAr} </div>
+                         ">${(item.nameAr !== undefined)? item.nameAr: ""} </div>
                  <div style="margin-top:3px;
                               font-size:16px;
                               text-align: center;
-                         ">${item.nameEn} </div>
+                         ">${(item.nameEn !== undefined)? item.nameEn: ""} </div>
 
                  <div style="margin-top:3px;
                               font-size:14px;
                               text-align: center;
-                         ">${item.name}</div>
+                         ">${(item.name !== undefined)? item.name: ""}</div>
               </div>`,
             connectorLineColor: {
               red: 2,

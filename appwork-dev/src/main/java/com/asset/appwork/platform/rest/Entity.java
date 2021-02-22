@@ -21,15 +21,24 @@ public class Entity {
     }
 
     public <T> Long create(T data) throws AppworkException {
+        String dataToBeSent;
+
+        if (data instanceof String) {
+            dataToBeSent = (String) data;
+        } else {
+            dataToBeSent = data.toString();
+        }
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
                 .setData("{" +
                         "  \"Properties\": " +
-                        data.toString() +
+                        dataToBeSent +
                         "}")
                 .post(this.apiBaseUrl + String.format(API.ADD.getUrl(), this.entityName));
         String response = http.getResponse();
+        if (!http.isSuccess())
+            throw new AppworkException(SystemUtil.getJsonByPtrExpr(response, "/message"), ResponseCode.CREATE_ENTITY_FAILURE);
         try {
             return Long.parseLong(SystemUtil.getJsonByPtrExpr(response, "/Identity/Id"));
         } catch (NumberFormatException e) {
@@ -67,7 +76,7 @@ public class Entity {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public <T> String update(Long id, T data) {
+    public <T> String update(Long id, T data) throws AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
@@ -76,14 +85,24 @@ public class Entity {
                         data.toString() +
                         "}")
                 .put(this.apiBaseUrl + String.format(API.ITEM.getUrl(), this.entityName, id.toString()));
-        return http.getResponse();
+        String response = http.getResponse();
+        if(response == null)
+            return response;
+        else {
+            try {
+                throw new AppworkException(SystemUtil.getJsonByPtrExpr(response, "/message"), ResponseCode.UPDATE_ENTITY_FAILURE);
+            } catch (AppworkException er) {
+                throw new AppworkException(er.getMessage(), ResponseCode.UPDATE_ENTITY_FAILURE);
+            }
+        }
     }
 
-    public String delete(Long id) {
+    public String delete(Long id) throws AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
                 .delete(this.apiBaseUrl + String.format(API.ITEM.getUrl(), this.entityName, id.toString()));
+        if (!http.isSuccess()) throw new AppworkException(ResponseCode.DELETE_ENTITY_FAILURE);
         return http.getResponse();
     }
 

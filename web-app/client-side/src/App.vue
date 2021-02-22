@@ -15,6 +15,13 @@
 @import url(https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400&display=swap);
 @import url(https://use.fontawesome.com/releases/v5.15.2/css/all.css);
 
+@font-face {
+  font-family: 'Neo Sans Arabic Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Neo Sans Arabic Regular'), url('./assets/fonts/Neo Sans Arabic Regular.woff') format('woff');
+}
+
 .content {
   margin-top: 80px;
 }
@@ -38,10 +45,10 @@ h1 {
 
 .v-application {
   background-color: #f2f2f2 !important;
-  font-family: 'Amiri', serif !important;
+  font-family: 'Neo Sans Arabic Regular', serif !important;
   .title {
     // To pin point specific classes of some components
-    font-family: 'Amiri', serif !important;
+    font-family: 'Neo Sans Arabic Regular', serif !important;
   }
   .red--text {
     color: #900 !important;

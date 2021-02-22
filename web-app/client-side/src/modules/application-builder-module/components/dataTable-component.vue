@@ -115,18 +115,26 @@
         </v-menu>
       </template>
       <template v-slot:expanded-item="{ item }">
+        <v-data-table v-if="d.subItems"
+            :headers="d.subHeaders"
+            :items="item[d.subItems]">
+        </v-data-table>
+
         <!-- <span v-for="(subHeader,i) in d.subHeaders" :key="i"> -->
-        <td
-        
-          :colspan="12"
-          style="margin:10px"
-        >
-          <div  v-for="(subHeader, i) in d.subHeaders"
-          :key="i">
-          <div class="top-bot-margins" style="color:#9E9E9E">{{ $t(subHeader.text) }}</div>
-          <div class="top-bot-margins" >{{ item[subHeader.value] }} </div>
-        </div>
+        <td v-else :colspan="12"
+          style="margin:10px" >
+          <div  v-for="(subHeader, i) in d.subHeaders" :key="i">
+            <div class="top-bot-margins" style="color:#9E9E9E">{{ $t(subHeader.text) }}</div>
+
+            <span v-if="isArray(item[subHeader.value])">
+              <div v-for="(val, k) in item[subHeader.value]" :key="k" class="top-bot-margins" >{{ val[subHeader.items]}} </div>
+            </span>
+            
+            <div v-else  class="top-bot-margins" >{{ item[subHeader.value] }} </div>
+          </div>
         </td>
+
+        
         <!-- </span> -->
       </template>
     </v-data-table>
@@ -144,7 +152,7 @@ export default {
       expanded: [],
       totalItems: this.val.data.length,
       d: this.val,
-      loading: true,
+      loading: false,
       footerProps: {
         "items-per-page-options": [5, 10, 25, -1],
         "show-first-last-page": true,
@@ -170,27 +178,55 @@ export default {
       },
       deep: true,
     },
-    val: function(newVal) {
-      for (var key in newVal) {
-        this.d[key] = newVal[key];
-      }
-      if (this.d.data) {
-        this.translateData();
-      }
-      if (this.d.headers) {
-        this.translateHeaders();
-      }
-      if (this.d.url) {
-        this.getDataFromApi({ page: 1, itemsPerPage: 10 });
-      } else {
-        this.loading = false;
-      }
+    val: {
+
+        handler: function (newVal) {
+            for (const key in newVal) {
+                this.d[key] = newVal[key];
+            }
+            if (this.d.data && (this.d.data instanceof Array && this.d.data.length > 0)) {
+                this.translateData();
+            }
+            if (this.d.headers) {
+                this.translateHeaders();
+            }
+            // if (this.d.url) {
+            //     this.getDataFromApi({page: 1, itemsPerPage: 10});
+            // }
+            else {
+                this.loading = false;
+            }
+        }
     },
+    'val.url':{
+          deep:true,
+        handler: function (newVal) {
+            this.d.url=newVal;
+            // for (const key in newVal) {
+            //     this.d[key] = newVal[key];
+            // }
+            // if (this.d.data && (this.d.data instanceof Array && this.d.data.length > 0)) {
+            //     this.translateData();
+            // }
+            // if (this.d.headers) {
+            //     this.translateHeaders();
+            // }
+            // if (this.d.url) {
+            if(newVal !== undefined)
+                this.getDataFromApi({page: 1, itemsPerPage: 10});
+            // } else {
+            //     this.loading = false;
+            // }
+        }
+    }
   },
   methods: {
     handlAddButton() {
       console.log(this.field);
       this.$observable.fire(this.field.name + "_add");
+    },
+    isArray(item){
+      return item instanceof Array;
     },
     handleAction(item, actionName) {
       if (actionName instanceof Object) actionName = actionName.name;
@@ -205,6 +241,7 @@ export default {
         this.loading = false;
         return;
       }
+      if(this.loading) return;
 
       this.loading = true;
       const page = event.page - 1;
@@ -221,15 +258,17 @@ export default {
       http
         .get(URL)
         .then((response) => {
-          if (response.data.data) {
-            this.totalItems = response.data.metaInfo.totalCount;
-            this.d.data = response.data.data;
-            this.translateData();
-          } else {
-            this.totalItems = 0;
-            this.d.data = [];
-          }
-          this.loading = false;
+            console.log(response)
+            // eslint-disable-next-line no-prototype-builtins
+            let dataToBePopulated = response.data.data.hasOwnProperty("content") ? response.data.data.content : response.data.data ? response.data.data : [];
+            // eslint-disable-next-line no-prototype-builtins
+            this.totalItems = (response.data.metaInfo !== undefined&&response.data.metaInfo.hasOwnProperty("totalCount")) ? response.data.metaInfo.totalCount : response.data.data.totalElements;
+            console.log(this.totalItems);
+            this.d.data = dataToBePopulated;
+            if (dataToBePopulated && dataToBePopulated.length > 0) {
+                this.translateData();
+            }
+            this.loading = false;
         })
         .catch((error) => {
           console.error(error);
@@ -272,22 +311,25 @@ export default {
     },
   },
   created() {
-    if (this.field.subscribe) {
-      console.log("subscribe");
-      this.$observable.subscribe(this.field.subscribe, (data) => {
-        if (data.type == "modelUpdate") {
-          var keys = Object.keys(data.model);
-          keys.forEach((key, index) => {
-            console.log(index);
-            this.d[key] = data.model[key];
+      if (this.field.subscribe) {
+          console.log("subscribe");
+          this.$observable.subscribe(this.field.subscribe, (data) => {
+              if (data.type == "modelUpdate") {
+                  var keys = Object.keys(data.model);
+                  keys.forEach((key, index) => {
+                      console.log(index);
+                      this.d[key] = data.model[key];
+                  });
+              }
+              if (this.d.data) {
+                  this.translateData();
+              }
+              console.log(data);
           });
-        }
-        if (this.d.data) {
-          this.translateData();
-        }
-        console.log(data);
-      });
-    }
+      }
+      this.$observable.subscribe(this.field.name + "_refresh",  ()=> {
+          this.getDataFromApi({page: 1, itemsPerPage: 10});
+      })
   },
   mounted() {
     console.log(this.d);

@@ -115,7 +115,11 @@ export default {
     updateText: async function(data) {
       // console.log(data)
 
-      if (data.name && data.value) this.forms.model[data.name] = data.value
+        if (data.name && (data.value!==undefined)) {
+            if (data.key) {
+                this.forms.model[data.name][data.key] = data.value;
+            } else this.forms.model[data.name] = data.value
+        }
 
       if (this.forms.model)
         this.forms.model['_valid'] = !this.$refs[this.forms.key]['_data'].flags
