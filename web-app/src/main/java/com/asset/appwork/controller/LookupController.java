@@ -58,6 +58,26 @@ public class LookupController {
     }
 
     @GetMapping("/get/category/{category}")
+    public ResponseEntity<AppResponse<List<Lookup>>> getLookupsByCategoryOnly(@RequestHeader("X-Auth-Token") String token,
+                                                                          @PathVariable("category") String category){
+        AppResponse.ResponseBuilder<List<Lookup>> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if(account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+
+            Page<Lookup> lookups = lookupRepository.findCategoryValues(category, "", PageRequest.of(0, 2147483647));
+            if(lookups.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
+            respBuilder.data(lookups.getContent());
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @GetMapping("/get/table/category/{category}")
     public ResponseEntity<AppResponse<List<Lookup>>> getLookupsByCategory(@RequestHeader("X-Auth-Token") String token,
                                                                        @PathVariable("category") String category,
                                                                           @RequestParam int page,
