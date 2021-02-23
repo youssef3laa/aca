@@ -1,6 +1,8 @@
 package com.asset.appwork.otds;
 
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.enums.ResponseCode;
+import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.util.Http;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -188,12 +190,15 @@ public final class Otds {
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public <T> String updateUserByUserId(String userId, T data) {
+    public <T> String updateUserByUserId(String userId, T data) throws AppworkException, JsonProcessingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .put(this.apiBaseUrl + String.format(API.USERS_UPDATE.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
-        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        String response = new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        if(http.getStatusCode() != 200)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
@@ -214,12 +219,27 @@ public final class Otds {
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public <T> String assignUserToGroupsByUserId(String userId, T data) throws JsonProcessingException {
+    public <T> String assignUserToGroupsByUserId(String userId, T data) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .post(this.apiBaseUrl + String.format(API.USERS_ASSIGN_GROUP.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
-        return http.getResponse();
+        String response = http.getResponse();
+        if(http.getStatusCode() != 204)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
+    }
+
+    @SneakyThrows(UnsupportedEncodingException.class)
+    public <T> String unassignUserToGroupsByUserId(String userId, T data) throws JsonProcessingException, AppworkException {
+        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
+                .setHeader("OTDSTicket", this.account.getTicket())
+                .setData(data.toString())
+                .post(this.apiBaseUrl + String.format(API.USERS_UNASSIGN_GROUP.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
+        String response = http.getResponse();
+        if(http.getStatusCode() != 204)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
 
@@ -238,6 +258,7 @@ public final class Otds {
         GROUPS_UNASSIGN_GROUPS("/groups/%s/groups/deletionset"),
         GROUPS_UPDATE("/groups/%s"),
         USERS_ASSIGN_GROUP("/users/%s/memberof"),
+        USERS_UNASSIGN_GROUP("/users/%s/memberof/deletionset"),
         USERS_CREATE("/users"),
         USERS_DELETE("/users/%s"),
         USERS_GET("/users/%s"),

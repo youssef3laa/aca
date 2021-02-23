@@ -257,6 +257,11 @@ public class OrgChartService {
                 "Assignment").addRelation(id, "toPersonToOne", props);
     }
 
+    public void removeAssignmentToPersonRelation(Account account, Long id) throws AppworkException {
+        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "OpenTextEntityIdentityComponents"),
+                "Assignment").deleteToOneRelation(id, "toPersonToOne");
+    }
+
     public Unit getUnitParent(String code) throws AppworkException {
         return unitRepository.findByName(code)
                 .flatMap(unit -> unitRepository.findByChild(unit)).orElseThrow(
@@ -568,6 +573,7 @@ public class OrgChartService {
     }
 
     public void removeSubGroupsFromGroup(Account account, String groupCode) throws AppworkException {
+        // TODO: Fix the removal of all sub groups
         String props = new Member.StringList(
                 Collections.emptyList()
         ).toString();
@@ -679,17 +685,30 @@ public class OrgChartService {
 
     public void assignUserToGroup(Account account, String userId, String groupCode) throws JsonProcessingException, AppworkException {
         Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
+        User user = getUserByUserId(userId);
+
+        List<String> groupCodes = new ArrayList<>();
+        user.getGroup().forEach(group -> groupCodes.add(group.getGroupCode()));
+        otds.unassignUserToGroupsByUserId(userId, new Member.StringList(groupCodes));
+
+        if(groupCodes.size() > 0) {
+            Person person = user.getPerson();
+            getAssignmentByPerson(person).forEach(assignment -> {
+                try {
+                    deleteAssignment(assignment.getId());
+                } catch (AppworkException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
+                }
+            });
+        }
+
         otds.assignUserToGroupsByUserId(userId, new Member.StringList(
                 Collections.singletonList(groupCode)
         ));
-
-        User user = getUserByUserId(userId);
         Position position = getPositionByName(groupCode);
         Assignment assignment = new Assignment();
         assignment.setPrincipal(position.getIsLead());
-        System.out.println(assignment.toString());
-        System.out.println(position.toString());
-        System.out.println(position.toPlatformString());
         assignment = createAssignment(account, position.getUnit().getId(), position.getId(), assignment.toPlatformString());
 
         addAssignmentToPersonRelation(account, assignment.getId(), new Member.TargetId(user.getPerson().getId()).toString());

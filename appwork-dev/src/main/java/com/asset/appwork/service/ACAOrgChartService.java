@@ -1,6 +1,7 @@
 package com.asset.appwork.service;
 
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.enums.GroupType;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.*;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @Slf4j
@@ -130,11 +132,10 @@ public class ACAOrgChartService extends OrgChartService {
         Unit unit = fromACAUnitCreationString(props);
         String newData = unit.getDescription();
         unit.setDescription(null);
-        String parentTypeCode = newData.split("-")[0];
-        String parentCode = newData.split("-")[1];
         Unit createdUnit = super.createUnit(account, toUnitCreationString(unit));
-        if(!isRootUnit)
-            addSubUnitToUnit(account, getUnit(parentTypeCode, parentCode).getId(), createdUnit.getId());
+        if(!isRootUnit) {
+            addSubUnitToUnit(account, getUnit(newData.split("-")[0], newData.split("-")[1]).getId(), createdUnit.getId());
+        }
         return createdUnit;
     }
 
@@ -202,26 +203,29 @@ public class ACAOrgChartService extends OrgChartService {
         );
     }
 
-    public Group getGroupByUnitTypeCodeAndUnitCodeAndIsHeadRoleAndIsViceRole(String unitTypeCode, String unitCode, Boolean isHeadRole, Boolean isViceRole) throws AppworkException{
-        return groupRepository.findByUnit_UnitTypeCodeAndUnit_UnitCodeAndIsHeadRoleAndIsViceRole(unitTypeCode, unitCode, isHeadRole, isViceRole).orElseThrow(
+    public Group getGroupByUnitTypeCodeAndUnitCodeAndType(String unitTypeCode, String unitCode, GroupType type) throws AppworkException{
+        return groupRepository.findByUnit_UnitTypeCodeAndUnit_UnitCodeAndType(unitTypeCode, unitCode, type).orElseThrow(
                 () -> new AppworkException("Could not get Group", ResponseCode.READ_ENTITY_FAILURE)
         );
     }
 
-    public Group getGroupByLevel(String unitTypeCode, String unitCode, String level) throws AppworkException {
-        switch (level) {
+    public GroupType getGroupTypeByLevel(String level) {
+        switch (level.toUpperCase()) {
             case "H":
-                return getGroupByUnitTypeCodeAndUnitCodeAndIsHeadRoleAndIsViceRole(unitTypeCode, unitCode, true, false);
+                return GroupType.HEAD;
             case "V":
-                return getGroupByUnitTypeCodeAndUnitCodeAndIsHeadRoleAndIsViceRole(unitTypeCode, unitCode, false, true);
+                return GroupType.VICE;
             case "A":
-                break;
+                return GroupType.ASSISTANT;
             case "S":
-                break;
+                return GroupType.SECRETARY;
             default:
-                return getGroupByUnitTypeCodeAndUnitCodeAndIsHeadRoleAndIsViceRole(unitTypeCode, unitCode, false, false);
+                return GroupType.MEMBER;
         }
-        return getGroupByUnitTypeCodeAndUnitCodeAndIsHeadRoleAndIsViceRole(unitTypeCode, unitCode, false, false);
+    }
+
+    public Group getGroupByLevel(String unitTypeCode, String unitCode, String level) throws AppworkException {
+        return getGroupByUnitTypeCodeAndUnitCodeAndType(unitTypeCode, unitCode, getGroupTypeByLevel(level));
     }
 
     public User updateUser(Account account, String props, Boolean unitChanged, Boolean revokeTasks) throws AppworkException, JsonProcessingException {
@@ -229,14 +233,14 @@ public class ACAOrgChartService extends OrgChartService {
 
         String newData = user.getPerson().getNotes();
         user.getPerson().setNotes(null);
-        String newTypeCode = newData.split("-")[0];
-        String newUnitTypeCode = newData.split("-")[1];
-        String newUnitCode = newData.split("-")[2];
 
         User internalUser = getUserByDescription(user.getDescription());
-        if(unitChanged)
+        if(unitChanged) {
             assignUserToGroup(account, internalUser.getUserId(),
-                    getGroupByLevel(newUnitTypeCode, newUnitCode, newTypeCode).getGroupCode());
+                    getGroupByLevel(
+                            newData.split("-")[1], newData.split("-")[2], newData.split("-")[0]
+                    ).getGroupCode());
+        }
 
         List<Member.Values> memberValues = new ArrayList<>();
         List<String> titleValues = new ArrayList<>();
@@ -246,10 +250,11 @@ public class ACAOrgChartService extends OrgChartService {
         displayNameValues.add(user.getDisplayName());
         memberValues.add(new Member.Values("displayName", displayNameValues));
 
-        Member member = new Member(env.getProperty("otds.partition"), internalUser.getUserId(), memberValues);
+        Member member = new Member(env.getProperty("otds.active-directory.partition"), null, memberValues);
+        member.setDescription(null);
 
-        Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"));
-        otds.updateUserByUserId(internalUser.getUserId(), member.toString());
+//        Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.active-directory.partition"));
+//        otds.updateUserByUserId(internalUser.getUserId(), member.toString());
 
         return getUserByUserId(internalUser.getUserId());
     }

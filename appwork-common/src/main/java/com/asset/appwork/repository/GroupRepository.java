@@ -1,5 +1,6 @@
 package com.asset.appwork.repository;
 
+import com.asset.appwork.enums.GroupType;
 import com.asset.appwork.model.Group;
 import com.asset.appwork.model.Unit;
 import org.springframework.data.domain.Page;
@@ -23,7 +24,7 @@ public interface GroupRepository extends GenericRepository<Group, Long> {
 
     Page<Group> findByNameIn(List<String> names, Pageable pageable);
 
-    Optional<Group> findByUnit_UnitTypeCodeAndUnit_UnitCodeAndIsHeadRoleAndIsViceRole(String unitTypeCode, String unitCode, Boolean isHeadRole, Boolean isViceRole);
+    Optional<Group> findByUnit_UnitTypeCodeAndUnit_UnitCodeAndType(String unitTypeCode, String unitCode, GroupType type);
 
     List<Group> findByUnit(Unit unit);
 
