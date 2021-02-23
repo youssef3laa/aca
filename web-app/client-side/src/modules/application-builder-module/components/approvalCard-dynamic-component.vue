@@ -1,8 +1,35 @@
 <template>
     <div>
         <v-row v-if="d.fields">
-            <v-col v-for="(field, index) in d.fields" :key="index" :cols="(d.fields.length>1)? 6:0">
-                <v-card outlined>
+            <v-col v-for="(field, index) in d.fields" :key="index" cols="12">
+
+                <v-card v-if="field == 'comment'" outlined>
+                    <v-alert outlined type="info" prominent icon="fas fa-scroll" style="padding-bottom: 5px">
+                        <p style="font-size: 16px; color: black">
+                            <span style="font-size: 20px; color: #07689F" v-t="'make-comment'"></span>
+                            <br/>
+                            <span v-t="'this-field-for-notes'"></span> {{displayName}}
+                        </p>
+                    </v-alert>
+                    <v-card-text style="padding-top: 0px">
+                        <TextareaComponent :field="{ name: 'comment', label: 'notes' }"
+                                           @update="onChangeField($event,field)"></TextareaComponent>
+                    </v-card-text>
+                </v-card>
+                <v-card v-else-if="field == 'opinion'" outlined>
+                    <v-alert outlined type="info" prominent icon="far fa-file-alt" style="padding-bottom: 5px">
+                        <p style="font-size: 16px; color: black">
+                            <span style="font-size: 20px; color: #07689F" v-t="'express-opinion'"></span>
+                            <br/>
+                            <span v-t="'this-field-for-opinion'"></span> {{displayName}}
+                        </p>
+                    </v-alert>
+                    <v-card-text style="padding-top: 0px">
+                        <TextareaComponent :field="{ name: 'opinion', label: 'opinion' }"
+                                           @update="onChangeField($event,field)"></TextareaComponent>
+                    </v-card-text>
+                </v-card>
+                <v-card v-else outlined>
                     <v-alert outlined type="info" prominent :icon="field.icon" style="padding-bottom: 5px">
                         <p style="font-size: 16px; color: black">
                             <span style="font-size: 20px; color: #07689F" v-t="field.title"></span>
@@ -94,7 +121,8 @@
                 })
             },
             onChangeField: function(event, field) {
-                this.inputs[field.name] = event.value
+                if(field instanceof String) this.inputs[field] = event.value
+                else this.inputs[field.name] = event.value
                 console.log("Fields",this.fields)
                 this.onValueChange()
             },
