@@ -168,13 +168,22 @@ public class Entity {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public <T> String addRelation(Long parentId, String relationName, T data) {
+    public <T> String addRelation(Long parentId, String relationName, T data) throws AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
                 .setData(data.toString())
                 .put(this.apiBaseUrl + String.format(API.ONE_RELATION.getUrl(), this.entityName, parentId.toString(), relationName));
-        return http.getResponse();
+        String response = http.getResponse();
+        if(response == null)
+            return response;
+        else {
+            try {
+                throw new AppworkException(SystemUtil.getJsonByPtrExpr(response, "/message"), ResponseCode.ADD_RELATION_TO_ENTITY_FAILURE);
+            } catch (AppworkException er) {
+                throw new AppworkException(er.getMessage(), ResponseCode.ADD_RELATION_TO_ENTITY_FAILURE);
+            }
+        }
     }
 
     public <T> String readToManyRelation(Long parentId, String relationName) {
@@ -185,12 +194,21 @@ public class Entity {
         return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
-    public <T> String deleteToOneRelation(Long parentId, String relationName) {
+    public <T> String deleteToOneRelation(Long parentId, String relationName) throws AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("X-Requested-With", "XMLHttpRequest")
                 .setHeader("SAMLart", this.account.getSAMLart())
                 .delete(this.apiBaseUrl + String.format(API.ONE_RELATION.getUrl(), this.entityName, parentId.toString(), relationName));
-        return http.getResponse();
+        String response = http.getResponse();
+        if(response == null)
+            return response;
+        else {
+            try {
+                throw new AppworkException(SystemUtil.getJsonByPtrExpr(response, "/message"), ResponseCode.DELETE_RELATION_TO_ENTITY_FAILURE);
+            } catch (AppworkException er) {
+                throw new AppworkException(er.getMessage(), ResponseCode.DELETE_RELATION_TO_ENTITY_FAILURE);
+            }
+        }
     }
 
     public <T> String deleteToManyRelation(Long parentId, String relationName) {
