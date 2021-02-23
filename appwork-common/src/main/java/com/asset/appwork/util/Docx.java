@@ -61,6 +61,15 @@ public class Docx {
                 String value = memoValuesStringArray[0];
                 value = value.replaceAll("<br>", "<br></br>");
                 String value2 = "";
+                if (value.contains("<img"))
+                {
+                    int imageIndex = value.indexOf("<img");
+                    int imageEndIndex = value.indexOf(">", imageIndex) + 1;
+                    StringBuilder stringBuilder = new StringBuilder(value);
+                    stringBuilder.insert(imageEndIndex, "</img>");
+                    value = stringBuilder.toString();
+                    System.out.println(value);
+                }
 
                 if (!name2.isEmpty()) {
                     value2 = memoValuesStringArray[1];
