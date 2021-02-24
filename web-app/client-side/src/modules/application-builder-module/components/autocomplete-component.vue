@@ -54,6 +54,10 @@ export default {
       http
         .get(url)
         .then((response) => {
+          if(!response.data.data) {
+            this.loading = false;
+            return
+          }
           const res = response.data.data.map((element) => {
             let obj = {};
             if (element["cn"]) {

@@ -105,12 +105,10 @@
                 //     this.code = this.parent.groupCode
                 //     this.assignedRole = this.parent
                 // }
-                if(this.receiverType) this.receiver.type = this.receiverType
-                console.log("Approval Card", {
-                    decision: this.decision,
-                    inputs: this.inputs,
-                    selected: this.receiver
-                })
+                if(this.receiverType) {
+                    this.receiver.type = this.receiverType
+                    this.setReceiverTypeValues()
+                }
                 this.$emit('update', {
                     name: this.field.name,
                     value: {
@@ -121,9 +119,8 @@
                 })
             },
             onChangeField: function(event, field) {
-                if(field instanceof String) this.inputs[field] = event.value
+                if(typeof field == "string") this.inputs[field] = event.value
                 else this.inputs[field.name] = event.value
-                console.log("Fields",this.fields)
                 this.onValueChange()
             },
             onChangeMultipleUnits: function(event){
@@ -136,7 +133,6 @@
                 this.onValueChange()
             },
             onChangeReceiver: async function(event) {
-                console.log("ReceiverForm", event)
                 this.receiver = event.value
                 this.onValueChange()
             },
@@ -159,6 +155,18 @@
                 this.receiverType = event.value
                 this.onValueChange()
             },
+            getFieldsOptions: function(fields){
+                if(!(fields instanceof Array)) fields = [fields]
+                let inputs = {}
+                for(let key in fields){
+                    if(fields[key] instanceof Object){
+                        inputs[fields[key].name] = undefined
+                    }else{
+                        inputs[fields[key]] = undefined
+                    }
+                }
+                return inputs;
+            },
             getDecisionOptions: function(decisions) {
                 if(!decisions) return null
                 if(!(decisions instanceof Array)) decisions = [decisions]
@@ -180,13 +188,26 @@
                 if(!(receiverTypes instanceof Array)) receiverTypes = [receiverTypes]
                 let options = [];
                 for(let i in receiverTypes){
-                    options.push({
-                        name: receiverTypes[i],
-                        label: this.getReceiverTypeLabel(receiverTypes[i])
-                    })
+                    if(typeof receiverTypes[i] == "string"){
+                        options.push({
+                            name: receiverTypes[i],
+                            label: this.getReceiverTypeLabel(receiverTypes[i])
+                        })
+                    }else if(receiverTypes[i] instanceof Object) {
+                        // let obj = {
+                        //     name: receiverTypes[i].value,
+                        //     label: receiverTypes[i].text
+                        // }
+                        // for(let key in receiverTypes[i]){
+                        //     if(key == "value" || key == "text") continue
+                        //     obj[key] = receiverTypes[i][key]
+                        // }
+                        options.push(receiverTypes[i])
+                    }
                 }
-                this.receiverType = receiverTypes[0]
-                return {options: options, value: receiverTypes[0]}
+                if(receiverTypes[0] instanceof Object) this.receiverType = receiverTypes[0].name
+                else this.receiverType = receiverTypes[0]
+                return {options: options, value: this.receiverType}
             },
             getReceiverTypeLabel: function(value) {
                 switch (value) {
@@ -195,13 +216,24 @@
                     case "multiple":
                         return "multiple-units"
                 }
+            },
+            setReceiverTypeValues: function(){
+                for(let key in this.receiverTypes.options){
+                    if(this.receiverTypes.options[key] instanceof Object && this.receiverType.value == this.receiverTypes.options[key].value){
+                        for(let i in this.receiverTypes.options[key]){
+                            if(i == "name" || i == "label") continue
+                            this.receiver[i] = this.receiverTypes.options[key][i]
+                        }
+                        break
+                    }
+                }
             }
         },
         watch: {
             val: function (newVal) {
                 if(newVal.fields){
                     if(!(newVal.fields instanceof Array)) newVal.fields = [newVal.fields]
-                    this.inputs = {}
+                    this.inputs = this.getFieldsOptions(newVal.fields)
                 }
                 if(newVal.decisions){
                     this.decisions = this.getDecisionOptions(newVal.decisions)
@@ -225,6 +257,7 @@
             }
         },
         async created() {
+            this.inputs = this.getFieldsOptions(this.val.fields)
             this.decisions = this.getDecisionOptions(this.val.decisions)
             if(this.val.receiver){
                 this.receiverTypes = (this.val.decisions)? null:this.getReceiverTypeOptions(this.val.receiver.types)
