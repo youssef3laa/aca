@@ -2,7 +2,7 @@
     "key": "approvalForm",
     "inputs": [
         {
-            "type": "ApprovalComponent",
+            "type": "DynamicApprovalComponent",
             "name": "approval"
         }
     ],

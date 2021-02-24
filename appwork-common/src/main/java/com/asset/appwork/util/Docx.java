@@ -61,15 +61,22 @@ public class Docx {
                 String value = memoValuesStringArray[0];
                 value = value.replaceAll("<br>", "<br></br>");
                 String value2 = "";
-                if (value.contains("<img"))
+                System.out.println(value);
+                if (value.contains("<p hidden=\"\">Sign</p>"))
                 {
-                    int imageIndex = value.indexOf("<img");
-                    int imageEndIndex = value.indexOf(">", imageIndex) + 1;
-                    StringBuilder stringBuilder = new StringBuilder(value);
-                    stringBuilder.insert(imageEndIndex, "</img>");
-                    value = stringBuilder.toString();
-                    System.out.println(value);
+                    System.out.println("7mada");
+                    value = value.replace("<p hidden=\"\">Sign</p>", "<img src=\"https://upload.wikimedia.org/wikipedia/commons/f/f9/Phoenicopterus_ruber_in_S%C3%A3o_Paulo_Zoo.jpg\"></img>");
                 }
+                System.out.println(value);
+//                if (value.contains("<img"))
+//                {
+//                    int imageIndex = value.indexOf("<img");
+//                    int imageEndIndex = value.indexOf(">", imageIndex) + 1;
+//                    StringBuilder stringBuilder = new StringBuilder(value);
+//                    stringBuilder.insert(imageEndIndex, "</img>");
+//                    value = stringBuilder.toString();
+//                    System.out.println(value);
+//                }
 
                 if (!name2.isEmpty()) {
                     value2 = memoValuesStringArray[1];

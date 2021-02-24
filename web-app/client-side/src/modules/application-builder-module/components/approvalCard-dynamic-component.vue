@@ -1,8 +1,35 @@
 <template>
     <div>
         <v-row v-if="d.fields">
-            <v-col v-for="(field, index) in d.fields" :key="index" :cols="(d.fields.length>1)? 6:0">
-                <v-card outlined>
+            <v-col v-for="(field, index) in d.fields" :key="index" cols="12">
+
+                <v-card v-if="field == 'comment'" outlined>
+                    <v-alert outlined type="info" prominent icon="fas fa-scroll" style="padding-bottom: 5px">
+                        <p style="font-size: 16px; color: black">
+                            <span style="font-size: 20px; color: #07689F" v-t="'make-comment'"></span>
+                            <br/>
+                            <span v-t="'this-field-for-notes'"></span> {{displayName}}
+                        </p>
+                    </v-alert>
+                    <v-card-text style="padding-top: 0px">
+                        <TextareaComponent :field="{ name: 'comment', label: 'notes' }"
+                                           @update="onChangeField($event,field)"></TextareaComponent>
+                    </v-card-text>
+                </v-card>
+                <v-card v-else-if="field == 'opinion'" outlined>
+                    <v-alert outlined type="info" prominent icon="far fa-file-alt" style="padding-bottom: 5px">
+                        <p style="font-size: 16px; color: black">
+                            <span style="font-size: 20px; color: #07689F" v-t="'express-opinion'"></span>
+                            <br/>
+                            <span v-t="'this-field-for-opinion'"></span> {{displayName}}
+                        </p>
+                    </v-alert>
+                    <v-card-text style="padding-top: 0px">
+                        <TextareaComponent :field="{ name: 'opinion', label: 'opinion' }"
+                                           @update="onChangeField($event,field)"></TextareaComponent>
+                    </v-card-text>
+                </v-card>
+                <v-card v-else outlined>
                     <v-alert outlined type="info" prominent :icon="field.icon" style="padding-bottom: 5px">
                         <p style="font-size: 16px; color: black">
                             <span style="font-size: 20px; color: #07689F" v-t="field.title"></span>
@@ -78,12 +105,10 @@
                 //     this.code = this.parent.groupCode
                 //     this.assignedRole = this.parent
                 // }
-                if(this.receiverType) this.receiver.type = this.receiverType
-                console.log("Approval Card", {
-                    decision: this.decision,
-                    inputs: this.inputs,
-                    selected: this.receiver
-                })
+                if(this.receiverType) {
+                    this.receiver.type = this.receiverType
+                    this.setReceiverTypeValues()
+                }
                 this.$emit('update', {
                     name: this.field.name,
                     value: {
@@ -94,8 +119,8 @@
                 })
             },
             onChangeField: function(event, field) {
-                this.inputs[field.name] = event.value
-                console.log("Fields",this.fields)
+                if(typeof field == "string") this.inputs[field] = event.value
+                else this.inputs[field.name] = event.value
                 this.onValueChange()
             },
             onChangeMultipleUnits: function(event){
@@ -108,7 +133,6 @@
                 this.onValueChange()
             },
             onChangeReceiver: async function(event) {
-                console.log("ReceiverForm", event)
                 this.receiver = event.value
                 this.onValueChange()
             },
@@ -131,6 +155,17 @@
                 this.receiverType = event.value
                 this.onValueChange()
             },
+            getFieldsOptions: function(fields){
+                let inputs = {}
+                for(let key in fields){
+                    if(fields[key] instanceof Object){
+                        inputs[fields[key].name] = undefined
+                    }else{
+                        inputs[fields[key]] = undefined
+                    }
+                }
+                return inputs;
+            },
             getDecisionOptions: function(decisions) {
                 if(!decisions) return null
                 if(!(decisions instanceof Array)) decisions = [decisions]
@@ -152,13 +187,26 @@
                 if(!(receiverTypes instanceof Array)) receiverTypes = [receiverTypes]
                 let options = [];
                 for(let i in receiverTypes){
-                    options.push({
-                        name: receiverTypes[i],
-                        label: this.getReceiverTypeLabel(receiverTypes[i])
-                    })
+                    if(typeof receiverTypes[i] == "string"){
+                        options.push({
+                            name: receiverTypes[i],
+                            label: this.getReceiverTypeLabel(receiverTypes[i])
+                        })
+                    }else if(receiverTypes[i] instanceof Object) {
+                        // let obj = {
+                        //     name: receiverTypes[i].value,
+                        //     label: receiverTypes[i].text
+                        // }
+                        // for(let key in receiverTypes[i]){
+                        //     if(key == "value" || key == "text") continue
+                        //     obj[key] = receiverTypes[i][key]
+                        // }
+                        options.push(receiverTypes[i])
+                    }
                 }
-                this.receiverType = receiverTypes[0]
-                return {options: options, value: receiverTypes[0]}
+                if(receiverTypes[0] instanceof Object) this.receiverType = receiverTypes[0].name
+                else this.receiverType = receiverTypes[0]
+                return {options: options, value: this.receiverType}
             },
             getReceiverTypeLabel: function(value) {
                 switch (value) {
@@ -167,13 +215,24 @@
                     case "multiple":
                         return "multiple-units"
                 }
+            },
+            setReceiverTypeValues: function(){
+                for(let key in this.receiverTypes.options){
+                    if(this.receiverTypes.options[key] instanceof Object && this.receiverType.value == this.receiverTypes.options[key].value){
+                        for(let i in this.receiverTypes.options[key]){
+                            if(i == "name" || i == "label") continue
+                            this.receiver[i] = this.receiverTypes.options[key][i]
+                        }
+                        break
+                    }
+                }
             }
         },
         watch: {
             val: function (newVal) {
                 if(newVal.fields){
                     if(!(newVal.fields instanceof Array)) newVal.fields = [newVal.fields]
-                    this.inputs = {}
+                    this.inputs = this.getFieldsOptions(newVal.fields)
                 }
                 if(newVal.decisions){
                     this.decisions = this.getDecisionOptions(newVal.decisions)
@@ -183,24 +242,26 @@
                     this.receiverInputs = (newVal.decisions)? null:{inputs:newVal.receiver.inputs}
                 }
 
-                if(this.firstTime){
-                    if(newVal.fields || newVal.decisions || newVal.receiverTypes){
-                        this.d = newVal
-                    }
-                    this.firstTime=false
-                    this.onValueChange()
-                }else{
+                if(this.d){
                     for(let key in newVal){
                         this.d[key] = newVal[key]
                     }
+                }else{
+                    this.d = newVal
+                }
+                if(this.firstTime){
+                    this.firstTime=false
+                    this.onValueChange()
                 }
             }
         },
-        async created() {
-            this.decisions = this.getDecisionOptions(this.val.decisions)
-            if(this.val.receiver){
-                this.receiverTypes = (this.val.decisions)? null:this.getReceiverTypeOptions(this.val.receiver.types)
-                this.receiverInputs = (this.val.decisions)? null:{inputs:this.val.receiver.inputs}
+        async mounted() {
+            if(!(this.d.fields instanceof Array)) this.d.fields = [this.d.fields]
+            this.inputs = this.getFieldsOptions(this.d.fields)
+            this.decisions = this.getDecisionOptions(this.d.decisions)
+            if(this.d.receiver){
+                this.receiverTypes = (this.d.decisions)? null:this.getReceiverTypeOptions(this.d.receiver.types)
+                this.receiverInputs = (this.d.decisions)? null:{inputs:this.d.receiver.inputs}
             }
 
             this.userDetails = await this.getUserDetails()
