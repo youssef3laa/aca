@@ -23,6 +23,7 @@
                 d: this.val,
                 firstTime: true,
                 userDetails: null,
+                parent: null,
                 code: null,
                 assignedCN: null,
                 assignedRole: null,
@@ -118,6 +119,10 @@
                 url = url.replace(/\$user/, this.userDetails.userId)
                 url = url.replace(/\$group/, this.userDetails.groups[0].groupCode)
                 url = url.replace(/\$unit/, this.userDetails.groups[0].unit.unitCode)
+
+                url = url.replace(/\$parentGroup/, this.parent.groupCode)
+                url = url.replace(/\$parentUnit/, this.parent.unit.unitCode)
+
                 url = url.replace(/\$\d+/,code)
                 return url
             },
@@ -148,6 +153,7 @@
         },
         async mounted() {
             this.userDetails = await this.getUserDetails()
+            this.parent = await this.getParentDetails()
             if(this.val.inputs){
                 this.inputs = this.initializeInputs(this.val.inputs)
             }
@@ -155,14 +161,3 @@
         }
     }
 </script>
-
-<!--{-->
-<!--    "name": "",-->
-<!--    "url": "get/list/ACA/",-->
-<!--    "checkSelf": true,-->
-<!--    "type": "unit" // role-->
-<!--},-->
-<!--{-->
-<!--    "label": "",-->
-<!--    "url": "get/list/$1"-->
-<!--}-->
