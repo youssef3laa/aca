@@ -156,7 +156,6 @@
                 this.onValueChange()
             },
             getFieldsOptions: function(fields){
-                if(!(fields instanceof Array)) fields = [fields]
                 let inputs = {}
                 for(let key in fields){
                     if(fields[key] instanceof Object){
@@ -243,25 +242,26 @@
                     this.receiverInputs = (newVal.decisions)? null:{inputs:newVal.receiver.inputs}
                 }
 
-                if(this.firstTime){
-                    if(newVal.fields || newVal.decisions || newVal.receiverTypes){
-                        this.d = newVal
-                    }
-                    this.firstTime=false
-                    this.onValueChange()
-                }else{
+                if(this.d){
                     for(let key in newVal){
                         this.d[key] = newVal[key]
                     }
+                }else{
+                    this.d = newVal
+                }
+                if(this.firstTime){
+                    this.firstTime=false
+                    this.onValueChange()
                 }
             }
         },
-        async created() {
-            this.inputs = this.getFieldsOptions(this.val.fields)
-            this.decisions = this.getDecisionOptions(this.val.decisions)
-            if(this.val.receiver){
-                this.receiverTypes = (this.val.decisions)? null:this.getReceiverTypeOptions(this.val.receiver.types)
-                this.receiverInputs = (this.val.decisions)? null:{inputs:this.val.receiver.inputs}
+        async mounted() {
+            if(!(this.d.fields instanceof Array)) this.d.fields = [this.d.fields]
+            this.inputs = this.getFieldsOptions(this.d.fields)
+            this.decisions = this.getDecisionOptions(this.d.decisions)
+            if(this.d.receiver){
+                this.receiverTypes = (this.d.decisions)? null:this.getReceiverTypeOptions(this.d.receiver.types)
+                this.receiverInputs = (this.d.decisions)? null:{inputs:this.d.receiver.inputs}
             }
 
             this.userDetails = await this.getUserDetails()
