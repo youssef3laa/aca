@@ -30,6 +30,38 @@
         </router-link>
       </div>
       <v-spacer></v-spacer>
+      <div>
+        <v-icon style="float:left; margin: 7px;">mdi-bell-outline</v-icon>
+        <p style="float:left; margin: 7px;">EN</p>
+      </div>
+      <div style="float:left; margin: 7px; border-left: 2px solid #F1F2F3; height: 42px; opacity: 1;"></div>
+      <div>
+        <v-avatar size="36px" style=" margin:7px;">
+          <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John">
+        </v-avatar>
+        <div style="float:left; margin: 7px;" class="text-center">
+          <v-menu offset-y>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon v-bind="attrs" v-on="on" style="margin: 7px;">mdi-menu-down</v-icon>
+            </template>
+            <v-list style="padding: 1px;">
+              <v-list-item style="border-bottom: 1px solid #AAAAAA57; opacity: 1;">
+                <v-icon style="width: 12px; height: 12px;">mdi-account-box</v-icon>
+                <v-list-item-title style="font: normal 16px/20px Neo Sans Arabic; margin: 8px;">الملف الشخصي</v-list-item-title>
+              </v-list-item>
+              <v-list-item>
+                <v-icon style="width: 12px; height: 12px;">mdi-exit-to-app</v-icon>
+                <v-list-item-title style="font: normal 16px/20px Neo Sans Arabic; margin: 8px;">خروج</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </div>
+        <p style="float:left; margin: 4px;">
+          <span style="font: normal 18px/22px Neo Sans Arabic; opacity: 1;">أحمد عزت</span> <br>
+          <span style="font: normal 12px/15px Neo Sans Arabic; color: #9E9E9E; opacity: 1;"> إدارة المعلومات</span>
+        </p> 
+      </div>
+      
     </v-app-bar>
     <v-navigation-drawer
       style="margin-top: 80px"

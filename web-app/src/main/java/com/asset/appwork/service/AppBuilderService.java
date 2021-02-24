@@ -39,14 +39,14 @@ public class AppBuilderService {
 
     private String updateAccess(StringBuilder file, Account account) throws AppworkException{
         User user = orgChartService.getLoggedInUser(account);
-        String newFile;
+        String newFile = file.toString();
         try {
             HashMap fileMap = new HashMap();
             fileMap.put("app", (HashMap) SystemUtil.readJSONObject(file.toString(),"app", HashMap.class));
             traverseFile(fileMap, user);
             newFile = SystemUtil.writeObjectIntoString(fileMap);
         }catch (JsonProcessingException e){
-            throw new AppworkException(ResponseCode.APP_BUILDER_FAILURE);
+            return newFile;
         }
         return newFile;
     }

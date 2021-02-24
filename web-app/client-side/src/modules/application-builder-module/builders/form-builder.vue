@@ -67,6 +67,7 @@ import SecretaryViewSignaturesComponent from '../components/secretary-view-signa
 import InboxComponent from '../components/inbox-component'
 import ImageComponent from "../components/image-component"
 import ActionsTopComponent from "../components/actions-top-component"
+import BarcodeComponent from "../components/barcode-component"
 
 export default {
   name: 'FormBuilder',
@@ -103,7 +104,8 @@ export default {
     SecretaryViewSignaturesComponent,
     InboxComponent,
     ImageComponent,
-    ActionsTopComponent
+    ActionsTopComponent,
+    BarcodeComponent,
   },
   data() {
     return {
