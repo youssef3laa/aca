@@ -295,10 +295,10 @@ public class OrgChartService {
                 e.printStackTrace();
             }
             counter++;
-        } while (counter < 5 || identityRepository.findByName(createdGroupName).isEmpty());
+        } while (counter < 5 && identityRepository.findByName(createdGroupName).isEmpty());
 
         if (identityRepository.findByName(createdGroupName).isEmpty()) {
-            throw new AppworkException("Could not update group with name " + createdGroupName, ResponseCode.UPDATE_ENTITY_FAILURE);
+            throw new AppworkException("Could not get group: " + SystemUtil.getJsonByPtrExpr(props, "/name"), ResponseCode.UPDATE_ENTITY_FAILURE);
         }
 
         Group platformGroupPostUpdate = new Group(identityRepository.findByName(createdGroupName).get());
@@ -583,6 +583,9 @@ public class OrgChartService {
     }
 
     public User createUser(Account account, String props) throws AppworkException, JsonProcessingException {
+
+        String username = SystemUtil.getJsonByPtrExpr(props, "/username");
+
         UserMember userMember = new ObjectMapper().readValue(props, UserMember.class);
         Member member = userMember.getMember(env.getProperty("otds.partition"));
 
@@ -601,10 +604,10 @@ public class OrgChartService {
                 e.printStackTrace();
             }
             counter++;
-        } while (counter < 5 || userRepository.findByUserId(createdUserId).isEmpty());
+        } while (counter < 5 && userRepository.findByUserId(createdUserId).isEmpty());
 
         if (userRepository.findByUserId(createdUserId).isEmpty()) {
-            throw new AppworkException("Could not get user with usedId " + createdUserId, ResponseCode.READ_ENTITY_FAILURE);
+            throw new AppworkException("Could not get User of username: " + username, ResponseCode.READ_ENTITY_FAILURE);
         }
 
         return userRepository.findByUserId(createdUserId).get();
