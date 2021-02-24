@@ -172,8 +172,13 @@
   "enValue": "القيمة بالانجليزية",
   "parentId": "الفئة الأم",
 
-  "sentFromManagement":"المرسل من الادارات",
-
+  "sentFromManagement": "المرسل من الادارات",
+  "sentFromCertification": "مرسل من التصديق",
+  "temporarilySavedForModification": "حفظ مؤقت للاستيفاء",
+  "section/management": "القطاع/الادارة",
+  "importantAndImmediate": "هام وعاجل",
+  "sendToAnotherManagement": "ارسال لادارة اخري",
+  "backToCertification": "ارجاع للتصديق",
   "categoryName": "اسم القائمة",
   "categoryKey": "كود القائمة",
   "editCategory": "تعديل قائمة",
@@ -186,5 +191,4 @@
   "editSuccess": "تم تعديل البيانات بنجاح",
   "addSuccess": "تم إضافة البيانات بنجاح",
   "systemError": "لقد حدث خطأ بالنظام"
-
 }

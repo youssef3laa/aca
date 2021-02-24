@@ -66,6 +66,7 @@ import SaveProcessComponent from '../components/save-process-component'
 import SecretaryViewSignaturesComponent from '../components/secretary-view-signatures-component'
 import InboxComponent from '../components/inbox-component'
 import ImageComponent from "../components/image-component"
+import ActionsTopComponent from "../components/actions-top-component"
 
 export default {
   name: 'FormBuilder',
@@ -101,7 +102,8 @@ export default {
     SaveProcessComponent,
     SecretaryViewSignaturesComponent,
     InboxComponent,
-    ImageComponent
+    ImageComponent,
+    ActionsTopComponent
   },
   data() {
     return {
