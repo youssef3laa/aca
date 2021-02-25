@@ -182,11 +182,14 @@ public final class Otds {
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public String getUserByUserName(String userName) {
+    public String getUserByUserId(String userId) throws AppworkException, JsonProcessingException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
-                .get(this.apiBaseUrl + String.format(API.USERS_GET.getUrl(), URLEncoder.encode(userName + "@" + this.partition, StandardCharsets.UTF_8.name())));
-        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+                .get(this.apiBaseUrl + String.format(API.USERS_GET.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
+        String response = new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        if(http.getStatusCode() != 200)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
