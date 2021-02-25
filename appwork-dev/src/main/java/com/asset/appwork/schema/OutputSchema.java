@@ -20,6 +20,7 @@ public class OutputSchema<T> {
     String component, config, readonlyComponent;
     String decision, comment, opinion;
     String code, assignedCN;
+    String caseType;
     String receiverType;
     String entityId;
     String requestPriority;
@@ -45,6 +46,7 @@ public class OutputSchema<T> {
                 "<decision>"+removeNull(this.decision)+"</decision>"+
                 "<comment>"+removeNull(this.comment)+"</comment>"+
                 "<opinion>"+removeNull(this.opinion)+"</opinion>"+
+                "<caseType>"+removeNull(this.caseType)+"</caseType>"+
                 "<breakProcess>"+removeNull(this.breakProcess)+"</breakProcess>"+
                 "<addApproval>"+removeNull(this.addApproval)+"</addApproval>"+
                 "<router>"+getObjectXML(this.router)+"</router>"+

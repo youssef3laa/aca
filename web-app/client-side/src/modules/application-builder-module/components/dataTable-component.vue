@@ -25,6 +25,8 @@
     </v-row>
 
     <v-data-table
+      :sort-by="field.sortBy"
+      :sort-desc="field.sortDesc"
       :headers="d.headers"
       :items="d.data"
       v-model="d.selected"
