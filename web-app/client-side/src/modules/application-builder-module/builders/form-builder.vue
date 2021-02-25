@@ -65,7 +65,8 @@ import ProcessStatusControl from '../components/process-status-control'
 import SaveProcessComponent from '../components/save-process-component'
 import SecretaryViewSignaturesComponent from '../components/secretary-view-signatures-component'
 import InboxComponent from '../components/inbox-component'
-import ImageComponent from "../components/image-component"
+import ImageComponent from '../components/image-component'
+import MemoView from '../components/memo-view'
 
 export default {
   name: 'FormBuilder',
@@ -101,7 +102,8 @@ export default {
     SaveProcessComponent,
     SecretaryViewSignaturesComponent,
     InboxComponent,
-    ImageComponent
+    ImageComponent,
+    MemoView,
   },
   data() {
     return {
@@ -115,11 +117,11 @@ export default {
     updateText: async function(data) {
       // console.log(data)
 
-        if (data.name && (data.value!==undefined)) {
-            if (data.key) {
-                this.forms.model[data.name][data.key] = data.value;
-            } else this.forms.model[data.name] = data.value
-        }
+      if (data.name && data.value !== undefined) {
+        if (data.key) {
+          this.forms.model[data.name][data.key] = data.value
+        } else this.forms.model[data.name] = data.value
+      }
 
       if (this.forms.model)
         this.forms.model['_valid'] = !this.$refs[this.forms.key]['_data'].flags

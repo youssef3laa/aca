@@ -38,8 +38,8 @@
         </Charts>
       </v-col>
     </v-row>
-    <SecrtaryInbox></SecrtaryInbox>
-    <!-- <Inbox :val="{sideBar:items}" ></Inbox> -->
+    <!-- <SecrtaryInbox></SecrtaryInbox> -->
+    <Inbox :val="{sideBar:items}" ></Inbox>
 
   </v-container>
 </template>
@@ -47,15 +47,15 @@
 <script>
 import chartsMixin from "../../../mixins/chartsMixin";
 import Charts from "../../application-builder-module/components/charts-component";
-// import Inbox from "../../application-builder-module/components/inbox-component";
-import SecrtaryInbox from "../../application-builder-module/components/secretary-inbox-component"
+import Inbox from "../../application-builder-module/components/inbox-component";
+// import SecrtaryInbox from "../../application-builder-module/components/secretary-inbox-component"
 import http from "../../core-module/services/http";
 import userMixin from '../../../mixins/userMixin'
 export default {
   name: "HomePage",
   components: {
-  SecrtaryInbox,
-    // Inbox,
+  // SecrtaryInbox,
+    Inbox,
     Charts,
   },
   mixins: [chartsMixin, userMixin],

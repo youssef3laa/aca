@@ -1,6 +1,16 @@
 <template>
   <v-card v-if="sec.isCard" v-bind:style="{ background: sec.background }" flat>
     <span v-if="sec.show || typeof sec.show == 'undefined'">
+      <span v-if="sec.isNestedTab">
+        <NestedTabBuilder
+          v-if="
+            typeof page.sections.tabs !== 'undefined' &&
+              page.sections.tabs.length > 0
+          "
+          :tabkey="sec.key"
+          :tabs="page.sections.tabs"
+        />
+      </span>
       <component
         :is="sec.type"
         :formData="formData"
@@ -16,7 +26,7 @@
     </span>
   </v-card>
   <span v-else>
-  <component :is="sec.type" :section="sec" :formData="sec.forms"></component>
+    <component :is="sec.type" :section="sec" :formData="sec.forms"></component>
   </span>
 </template>
 
@@ -28,7 +38,7 @@ import TitleComponet from '../builders/components/title-component'
 import ModalSection from '../builders/components/modal-section-component'
 import ActionsSection from '../builders/components/actions-section-component'
 import TabsSection from '../builders/components/tabs-section-component'
-import NestedTabs from './nested-tabs-builder'
+import NestedTabBuilder from './nested-tabs-builder'
 // import TabBuilder from './tab-builder'
 // import FormBuilder from './form-builder'
 // import { Splitpanes, Pane } from 'splitpanes'
@@ -44,7 +54,7 @@ export default {
     ModalSection,
     ActionsSection,
     TabsSection,
-    NestedTabs,
+    NestedTabBuilder,
     // TabBuilder,
     // FormBuilder,
     // Splitpanes,
@@ -71,6 +81,7 @@ export default {
   },
   data() {
     return {
+      tabId: null,
       panel: [0],
       sec: this.section,
     }
@@ -81,10 +92,13 @@ export default {
       this.sec = newVal
     },
   },
-  mounted() {
-    console.log(this.section)
+  created() {
+    this.$observable.subscribe(this.sec.key, (tabId) => {
+      console.log(tabId)
+      this.tabId = tabId
+    })
   },
-  props: ['section'],
+  props: ['section', 'page'],
 }
 </script>
 <style scoped>
