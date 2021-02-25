@@ -148,15 +148,28 @@ public class ApprovalHistoryController {
         log.error(e.getMessage());
         e.printStackTrace();
         responseBuilder.status(e.getCode());
-    } catch (Exception e) {
-        log.error(e.getMessage());
-        e.printStackTrace();
-        responseBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
     }
     return responseBuilder.build().getResponseEntity();
 }
 
-
-
+    @Transactional
+    @GetMapping("/user/count")
+    public ResponseEntity<AppResponse<Long>> getUserHistoryCount(@RequestHeader("X-Auth-Token") String token){
+    AppResponse.ResponseBuilder<Long> responseBuilder = AppResponse.builder();
+    try {
+        Account account = tokenService.get(token);
+        if (account == null) return responseBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+        User user = orgChartService.getLoggedInUser(account);
+        Optional<Group> group = user.getGroup().stream().findFirst();
+        String groupCn = group.isPresent()? group.get().getCn() :"-1";
+        Long histories = historyRepository.countByUserCNOrUserCN(user.getCN(), groupCn);
+        responseBuilder.data(histories);
+    } catch (AppworkException e) {
+        log.error(e.getMessage());
+        e.printStackTrace();
+        responseBuilder.status(e.getCode());
+    }
+    return responseBuilder.build().getResponseEntity();
+}
 
 }

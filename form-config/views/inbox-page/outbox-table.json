@@ -1,0 +1,32 @@
+{
+    "url": "history/user",
+    "headers": [
+        {
+            "text": "requestNumber",
+            "value": "requestNumber"
+        },
+        {
+            "text": "processName",
+            "value": "processName"
+        },
+        {
+            "text": "displayName",
+            "value": "displayName"
+        },
+        {
+            "text": "unitName",
+            "value": "unitName"
+        },
+        {
+            "text": "approvalDate",
+            "value": "approvalDate"
+        },
+        {
+            "text": "",
+            "value": "action",
+            "sortable": false
+        }
+    ],
+    "data": [],
+    "search": ""
+}

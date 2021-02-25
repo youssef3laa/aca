@@ -39,8 +39,10 @@
       </v-col>
     </v-row>
     <!-- <SecrtaryInbox></SecrtaryInbox> -->
-    <Inbox :val="{sideBar:items}" ></Inbox>
+    <Topbar :val="{ tasks: taskList }"></Topbar>
   <!-- <OfficeGroudHeadInbox></OfficeGroudHeadInbox> -->
+     <Inbox></Inbox>
+
   </v-container>
 </template>
 
@@ -52,13 +54,15 @@ import Inbox from "../../application-builder-module/components/inbox-component";
 // import OfficeGroudHeadInbox from "../../application-builder-module/components/office-group-head-inbox"
 import http from "../../core-module/services/http";
 import userMixin from '../../../mixins/userMixin'
+// import AppBuilder from "../../application-builder-module/builders/app-builder";
+import Topbar from "../../application-builder-module/components/topbar-component";
 export default {
   name: "HomePage",
   components: {
   // SecrtaryInbox,
     Inbox,
     // OfficeGroudHeadInbox,
-    Charts,
+    Charts, Topbar
   },
   mixins: [chartsMixin, userMixin],
   async mounted() {
@@ -95,8 +99,7 @@ export default {
 
   data() {
     return {
-       items:[{name:"الوارد",notifications:21, icon:"fas fa-download",action:"viewReceived"},{name:"المرسل",notifications:34, icon:"far fa-paper-plane",action:"viewSent"},
-        ],
+      taskList: [{ title: "إنشاء وارد جديد" }, { title: "تسجيل موضوع" }],
       response: [],
       chartsLoaded: 0,
       barChartData: {},
