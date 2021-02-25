@@ -5,7 +5,7 @@
       :key="key"
       @click="btnClicked(d.action)"
         width="90%"
-       color="#07689F" style="margin-bottom: 10px;align-self:center; background-color: #f2f7fa"
+       color="#07689F" style="justify-content: space-between;margin-bottom: 10px;align-self:center; background-color: #f2f7fa"
     >
       <div class="icon-wrapper">
         <i :class="d.icon"></i>

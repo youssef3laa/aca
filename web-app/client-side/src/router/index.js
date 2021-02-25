@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import LoginRoutes from '../modules/login-module/router/router'
-import AdminRoutes from '../modules/admin-module/router/router'
+// import HomePage from '../modules/admin-module/router/router-home-page'
 import DemoRoutes from '../modules/demo-module/router/router'
 import ManualStep from '../modules/manual-step-module/router/router'
 import generalProcessRoutes from '../modules/generalProcess-module/router/router'
@@ -32,11 +32,11 @@ Vue.use(VueRouter)
 //     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
 //   }
 // ]
-
 let allRoutes = [];
+
 allRoutes = allRoutes.concat(
     LoginRoutes,
-    AdminRoutes,
+    // HomePage,
     DemoRoutes,
     ManualStep,
     generalProcessRoutes,

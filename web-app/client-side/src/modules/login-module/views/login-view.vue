@@ -72,6 +72,7 @@ import http from '../../core-module/services/http'
 import system from '../../core-module/services/system-service'
 import router from '../../../router'
 import Vue from 'vue'
+import homePageMixin from "../../admin-module/mixins/homePageMixin";
 
 export default {
     name: 'LoginView',
@@ -81,6 +82,7 @@ export default {
         LocaleSwitcher,
         TheMessage
     },
+    mixins: [homePageMixin],
     data(){
         return {
             user:  this.$user,
@@ -95,12 +97,13 @@ export default {
             http.addHeader('X-Auth-Username', this.user.username)
             http.addHeader('X-Auth-Password', this.user.password)
             // this.$refs.form.reset()
-            http.post('user/login', this.user.toJson()).then(response=> {
+            http.post('user/login', this.user.toJson()).then(async response=> {
                 system.showMessage(this.$refs.message, "logged-in-success", 'success')
                 this.user.setSAMLart(response.data.data)
                 Vue.prototype.$user = this.user;
                 localStorage.setItem("user", this.user.toString());
 
+                await this.appendHomeRoutes()
                 router.push('home')
                 
             }).catch(error=> {
