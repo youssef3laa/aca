@@ -9,12 +9,14 @@ import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.Memorandum;
+import com.asset.appwork.model.User;
 import com.asset.appwork.model.memoValues;
 import com.asset.appwork.platform.soap.memorandumSOAP;
 import com.asset.appwork.repository.MemoValuesRepository;
 import com.asset.appwork.repository.MemosRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
+import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.util.Docx;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -51,6 +53,8 @@ public class MemorandumController {
     MemoValuesRepository memoValuesRepository;
     @Autowired
     Docx docx;
+    @Autowired
+    OrgChartService orgChartService;
 
     @PostMapping("/create")
     public ResponseEntity<AppResponse<String>> createMemorandum(@RequestHeader("X-Auth-Token") String token, @RequestBody() Memos memo) {
@@ -58,6 +62,8 @@ public class MemorandumController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+//            User user = orgChartService.getLoggedInUser(account);
+//            user.getGroup();//unit collection stream
 
 
             File file = docx.exportJsonToDocx(memo);

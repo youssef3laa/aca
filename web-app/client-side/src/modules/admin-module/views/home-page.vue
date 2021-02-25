@@ -38,9 +38,10 @@
         </Charts>
       </v-col>
     </v-row>
-    <!-- <SecrtaryInbox></SecrtaryInbox> -->
-    <Inbox :val="{sideBar:items}" ></Inbox>
-  <!-- <OfficeGroudHeadInbox></OfficeGroudHeadInbox> -->
+    <Topbar :val="{ tasks: taskList }"></Topbar>
+
+    <Inbox></Inbox>
+
   </v-container>
 </template>
 
@@ -48,17 +49,14 @@
 import chartsMixin from "../../../mixins/chartsMixin";
 import Charts from "../../application-builder-module/components/charts-component";
 import Inbox from "../../application-builder-module/components/inbox-component";
-// import SecrtaryInbox from "../../application-builder-module/components/secretary-inbox-component"
-// import OfficeGroudHeadInbox from "../../application-builder-module/components/office-group-head-inbox"
 import http from "../../core-module/services/http";
 import userMixin from '../../../mixins/userMixin'
+import Topbar from "../../application-builder-module/components/topbar-component";
 export default {
   name: "HomePage",
   components: {
-  // SecrtaryInbox,
     Inbox,
-    // OfficeGroudHeadInbox,
-    Charts,
+    Charts, Topbar
   },
   mixins: [chartsMixin, userMixin],
   async mounted() {
@@ -95,8 +93,7 @@ export default {
 
   data() {
     return {
-       items:[{name:"الوارد",notifications:21, icon:"fas fa-download",action:"viewReceived"},{name:"المرسل",notifications:34, icon:"far fa-paper-plane",action:"viewSent"},
-        ],
+      taskList: [{ title: "إنشاء وارد جديد" }, { title: "تسجيل موضوع" }],
       response: [],
       chartsLoaded: 0,
       barChartData: {},
@@ -177,6 +174,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>

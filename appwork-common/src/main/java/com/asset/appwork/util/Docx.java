@@ -14,6 +14,12 @@ import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.NumberingDefinitionsPart;
 import org.docx4j.wml.Text;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attribute;
+import org.jsoup.nodes.Attributes;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -59,24 +65,43 @@ public class Docx {
                 Object[] memoValuesObjectArray = memoValues.values().toArray();
                 String[] memoValuesStringArray = Arrays.copyOf(memoValuesObjectArray, memoValuesObjectArray.length, String[].class);
                 String value = memoValuesStringArray[0];
-                value = value.replaceAll("<br>", "<br></br>");
+                value = value.replaceAll("&nbsp;", "");
+                value = value.replaceAll("-&nbsp;", "");
                 String value2 = "";
+                Document doc = Jsoup.parse(value);
                 System.out.println(value);
-                if (value.contains("<p hidden=\"\">Sign</p>"))
-                {
-                    System.out.println("7mada");
-                    value = value.replace("<p hidden=\"\">Sign</p>", "<img src=\"https://upload.wikimedia.org/wikipedia/commons/f/f9/Phoenicopterus_ruber_in_S%C3%A3o_Paulo_Zoo.jpg\"></img>");
-                }
-                System.out.println(value);
-//                if (value.contains("<img"))
-//                {
-//                    int imageIndex = value.indexOf("<img");
-//                    int imageEndIndex = value.indexOf(">", imageIndex) + 1;
-//                    StringBuilder stringBuilder = new StringBuilder(value);
-//                    stringBuilder.insert(imageEndIndex, "</img>");
-//                    value = stringBuilder.toString();
-//                    System.out.println(value);
+//                <p roleCode="MSM" type="signature" hidden></p>
+//                <p roleCode="MSM" type="signature" >text</p>
+//
+                //if (value.contains("<p rolecode=\"MSM\" type=\"signature\" hidden=\"\"><br></br></p>"))
+                //{
+                Element element = doc.select("#signature").first();
+
+//                List<String>  attToRemove = new ArrayList<>();
+//                Attributes at = element.attributes();
+//                for (Attribute a : at) {
+//                    // transfer it into a list -
+//                    // to be sure ALL data-attributes will be removed!!!
+//                    attToRemove.add(a.getKey());
 //                }
+//                System.out.println(attToRemove);
+
+                String newElement = "<img src=\"https://upload.wikimedia.org/wikipedia/commons/f/f9/Phoenicopterus_ruber_in_S%C3%A3o_Paulo_Zoo.jpg\"></img>";
+                doc.select("#signature").first().removeAttr("hidden").append(newElement);
+                //value = value.replace("<p rolecode=\"MSM\" type=\"signature\" hidden=\"\"><br></br></p>", "<img src=\"https://upload.wikimedia.org/wikipedia/commons/f/f9/Phoenicopterus_ruber_in_S%C3%A3o_Paulo_Zoo.jpg\"></img>");
+                //}
+                value=doc.toString();
+                System.out.println(doc.toString());
+                if (value.contains("<img"))
+                {
+                    int imageIndex = value.indexOf("<img");
+                    int imageEndIndex = value.indexOf(">", imageIndex) + 1;
+                    StringBuilder stringBuilder = new StringBuilder(value);
+                    stringBuilder.insert(imageEndIndex, "</img>");
+                    value = stringBuilder.toString();
+                    System.out.println(value);
+                }
+                value = value.replaceAll("<br>", "<br></br>");
 
                 if (!name2.isEmpty()) {
                     value2 = memoValuesStringArray[1];
@@ -95,14 +120,7 @@ public class Docx {
                 }
                 else
                 {
-                    wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n" +
-                            "\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n" +
-                            "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-                            "<body>\n" +
-                            "<p style = 'font-size: 50px; font-weight: bold; text-align:right;'>" + name + "</p>" + "\n" + "<hr></hr>" +
-                            "<p style = 'text-align:right;'>" + value + "</p>" + "\n" +
-                            "</body>\n" +
-                            "</html>", null));
+                    wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert(value, null));
                 }
             } catch (IOException e) {
                 e.printStackTrace();

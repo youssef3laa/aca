@@ -19,4 +19,5 @@ Page<ApprovalHistory> findByRequestIdOrderByApprovalDateAsc(String requestId, Pa
 //    Optional<ApprovalHistory> findTop1ByProcessNameAndEntityIdOrderByIdDesc(String processName, String entityId);
 
     Page<ApprovalHistory> findByUserCNOrUserCNOrderByApprovalDateAsc(String userCN, String roleCN, Pageable pageable);
+    Long countByUserCNOrUserCN(String userCN, String roleCN);
 }

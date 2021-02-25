@@ -3,10 +3,11 @@ import router from "../router";
 
 export default {
     methods: {
-        loadForm: function (formName,callBack) {
+        loadForm: function (formName,callBack,appBuilder) {
             http.get("/user/form/"+formName)
                 .then((response) => {
-                    this.$refs.appBuilder.setAppData(response.data.data.app);
+                    if(appBuilder) this.$refs[appBuilder].setAppData(response.data.data.app);
+                    else this.$refs.appBuilder.setAppData(response.data.data.app);
                     if(callBack){
                         callBack();
                     }

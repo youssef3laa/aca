@@ -1,18 +1,17 @@
 <template>
   <div class="sidebar-wrapper">
-    <div
+    <v-btn text
       v-for="(d, key) in val"
       :key="key"
       @click="btnClicked(d.action)"
-      class="sidebar-item"
+        width="90%"
+       color="#07689F" style="justify-content: space-between;margin-bottom: 10px;align-self:center; background-color: #f2f7fa"
     >
-      <span>
-        <span> {{ d.name }}</span> {{ d.notifications }}</span
-      >
       <div class="icon-wrapper">
         <i :class="d.icon"></i>
       </div>
-    </div>
+      <span style="font-weight: bold; color: black">{{ $t(d.name) }}</span> <span style="margin-right: 10px;margin-left: 10px">{{ d.notifications }}</span>
+    </v-btn>
   </div>
 </template>
 
@@ -40,34 +39,6 @@ export default {
   background: white;
   padding-top: 10%;
   height: 100%;
-  align-items: flex-end !important;
-}
-.sidebar-item {
-  display: flex;
-  align-items: center;
-  background-color: rgba(7, 104, 159, 0.05);
-  margin: 10px;
-  height: 40px;
-  width: 85%;
-  cursor: pointer;
-  padding: 10px;
-  justify-content: center;
-  border-radius: 5px;
-  margin-right: 4px;
-  color: #0278ae;
-}
-.sidebar-item--selected {
-  display: flex;
-  align-items: center;
-  background-color: rgba(62, 66, 68, 0.05);
-  margin: 10px;
-  height: 40px;
-  width: 85%;
-  padding: 10px;
-  justify-content: center;
-  border-radius: 5px;
-  margin-right: 4px;
-  color: #0278ae;
 }
 
 .icon-wrapper {

@@ -1,0 +1,34 @@
+{
+  "url": null,
+  "headers": [
+    {
+      "text": "incomingNumber",
+      "align": "start",
+      "value": "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestNumber"
+    },
+    {
+      "text": "processName",
+      "value": "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.subject"
+    },
+    {
+      "text": "sender",
+      "value": "Sender.displayName"
+    },
+    {
+      "text": "theEntity",
+      "value": ""
+    },
+    {
+      "text": "date",
+      "value": "DeliveryDate"
+    },
+    {
+      "text": "",
+      "value": "action",
+      "sortable": "false",
+      "align": "end"
+    }
+  ],
+  "data": [],
+  "search": ""
+}

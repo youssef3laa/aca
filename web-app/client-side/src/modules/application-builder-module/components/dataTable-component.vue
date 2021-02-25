@@ -25,6 +25,8 @@
     </v-row>
 
     <v-data-table
+      :sort-by="field.sortBy"
+      :sort-desc="field.sortDesc"
       :headers="d.headers"
       :items="d.data"
       v-model="d.selected"
@@ -152,7 +154,7 @@
           v-model="item[field.selectable]"
 
         ></v-checkbox>
-        <!-- <span>{{item}}</span> -->
+<!--         <span>{{item}}</span>-->
       </template>
             <!-- <template  v-for="(selectable,index) in field.selectables" v-slot:[`item.${selectable}`]="{ item }">
         <v-simple-checkbox
@@ -195,8 +197,10 @@ export default {
       d: this.val,
       loading: false,
       footerProps: {
-        "items-per-page-options": [5, 10, 25, -1],
+        "items-per-page-options": [5, 10, 25],
         "show-first-last-page": true,
+        "show-current-page": true,
+        "items-per-page-text": '',
       },
       options: {},
       imageSrc:"https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ"

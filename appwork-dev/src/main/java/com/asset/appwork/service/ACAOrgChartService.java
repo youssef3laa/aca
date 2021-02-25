@@ -4,23 +4,51 @@ import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.GroupType;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.model.*;
+import com.asset.appwork.model.Group;
+import com.asset.appwork.model.Member;
+import com.asset.appwork.model.Unit;
+import com.asset.appwork.model.User;
 import com.asset.appwork.otds.Otds;
+import com.asset.appwork.repository.*;
 import com.asset.appwork.util.ACAAdapter;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 @Slf4j
-public class ACAOrgChartService extends OrgChartService {
+public class ACAOrgChartService {
+
+    @Autowired
+    OrgChartService orgChartService;
+    @Autowired
+    BaseIdentityRepository identityRepository;
+    @Autowired
+    UnitRepository unitRepository;
+    @Autowired
+    GroupRepository groupRepository;
+    @Autowired
+    PositionRepository positionRepository;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    PersonRepository personRepository;
+    @Autowired
+    AssignmentRepository assignmentRepository;
+
+    @Autowired
+    Environment env;
 
     public Unit fromACAUnitCreationString(String json) throws JsonProcessingException, AppworkException {
         ObjectMapper mapper = new ObjectMapper();
@@ -132,16 +160,26 @@ public class ACAOrgChartService extends OrgChartService {
         Unit unit = fromACAUnitCreationString(props);
         String newData = unit.getDescription();
         unit.setDescription(null);
-        Unit createdUnit = super.createUnit(account, toUnitCreationString(unit));
+        Unit createdUnit = orgChartService.createUnit(account, toUnitCreationString(unit));
         if(!isRootUnit) {
-            addSubUnitToUnit(account, getUnit(newData.split("-")[0], newData.split("-")[1]).getId(), createdUnit.getId());
+            try {
+                orgChartService.addSubUnitToUnit(account, getUnit(newData.split("-")[0], newData.split("-")[1]).getId(), createdUnit.getId());
+            } catch (AppworkException e) {
+                orgChartService.deleteUnit(account, createdUnit.getId());
+                throw new AppworkException(e.getMessage(), e.getCode());
+            }
         }
-        return createdUnit;
-    }
 
-    @Override
-    public Unit createUnit(Account account, String props) throws AppworkException, JsonProcessingException {
-        return createUnit(account, props, false);
+        Arrays.asList(GroupType.values()).forEach(groupType -> {
+            try {
+                orgChartService.createGroup(account, generateGroupByTypeAndUnit(groupType, createdUnit).toString());
+            } catch (AppworkException | JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+            }
+        });
+
+        return createdUnit;
     }
 
     public Unit renameUnit(Account account, String props) throws AppworkException, JsonProcessingException {
@@ -150,7 +188,7 @@ public class ACAOrgChartService extends OrgChartService {
         newUnit.setDescription(null);
 
         // TODO: Check Cached result
-        return updateUnit(account, unit.getId(), toUnitRenamingString(newUnit));
+        return orgChartService.updateUnit(account, unit.getId(), toUnitRenamingString(newUnit));
     }
 
     public Unit changeUnitParent(Account account, String props, Boolean changeTypeCode) throws JsonProcessingException, AppworkException {
@@ -168,11 +206,11 @@ public class ACAOrgChartService extends OrgChartService {
         String newParentUnitCode = newData.split("-")[1];
         String newUnitCode = newData.split("-")[2];
 
-        addSubUnitToUnit(account, getUnit(newParentUnitTypeCode, newParentUnitCode).getId(),
+        orgChartService.addSubUnitToUnit(account, getUnit(newParentUnitTypeCode, newParentUnitCode).getId(),
                 getUnit(oldUnit.getUnitTypeCode(), oldUnit.getUnitCode()).getId());
 
         unit.setUnitCode(newUnitCode);
-        return updateUnit(account, oldUnit.getId(), toUnitChangingParentString(unit));
+        return orgChartService.updateUnit(account, oldUnit.getId(), toUnitChangingParentString(unit));
     }
 
     public Unit changeUnitParentAndTypeCode(Account account, String props) throws JsonProcessingException, AppworkException {
@@ -190,9 +228,9 @@ public class ACAOrgChartService extends OrgChartService {
 
         unit.setUnitTypeCode(newUnitTypeCode);
         unit.setUnitCode(newUnitCode);
-        Unit updatedUnit = updateUnit(account, oldUnit.getId(), toUnitParentAndChangingUnitTypeCodeString(unit));
+        Unit updatedUnit = orgChartService.updateUnit(account, oldUnit.getId(), toUnitParentAndChangingUnitTypeCodeString(unit));
 
-        addSubUnitToUnit(account, getUnit(newParentUnitTypeCode, newParentUnitCode).getId(),
+        orgChartService.addSubUnitToUnit(account, getUnit(newParentUnitTypeCode, newParentUnitCode).getId(),
                 getUnit(unit.getUnitTypeCode(), unit.getUnitCode()).getId());
         return updatedUnit;
     }
@@ -224,6 +262,46 @@ public class ACAOrgChartService extends OrgChartService {
         }
     }
 
+    public String getGroupLevelByType(GroupType type) {
+        switch (type) {
+            case HEAD:
+                return "H";
+            case VICE:
+                return "V";
+            case ASSISTANT:
+                return "A";
+            case SECRETARY:
+                return "S";
+            default:
+                return "M";
+        }
+    }
+
+    public Group generateGroupByTypeAndUnit(GroupType type, Unit unit) {
+        Group group = new Group();
+        group.setType(type);
+        group.setName(getGroupLevelByType(type) + unit.getName());
+        group.setGroupCode(getGroupLevelByType(type) + unit.getUnitCode());
+        switch (type) {
+            case HEAD:
+                group.setNameAr("رئيس " + unit.getNameAr());
+                break;
+            case VICE:
+                group.setNameAr("نائب رئيس " + unit.getNameAr());
+                break;
+            case ASSISTANT:
+                group.setNameAr("مساعد رئيس " + unit.getNameAr());
+                break;
+            case SECRETARY:
+                group.setNameAr("سكرتارية " + unit.getNameAr());
+                break;
+            default:
+                group.setNameAr("عضو " + unit.getNameAr());
+                break;
+        }
+        return group;
+    }
+
     public Group getGroupByLevel(String unitTypeCode, String unitCode, String level) throws AppworkException {
         return getGroupByUnitTypeCodeAndUnitCodeAndType(unitTypeCode, unitCode, getGroupTypeByLevel(level));
     }
@@ -236,7 +314,7 @@ public class ACAOrgChartService extends OrgChartService {
 
         User internalUser = getUserByDescription(user.getDescription());
         if(unitChanged) {
-            assignUserToGroup(account, internalUser.getUserId(),
+            orgChartService.assignUserToGroup(account, internalUser.getUserId(),
                     getGroupByLevel(
                             newData.split("-")[1], newData.split("-")[2], newData.split("-")[0]
                     ).getGroupCode());
@@ -256,6 +334,9 @@ public class ACAOrgChartService extends OrgChartService {
 //        Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.active-directory.partition"));
 //        otds.updateUserByUserId(internalUser.getUserId(), member.toString());
 
-        return getUserByUserId(internalUser.getUserId());
+//      String userResponse = otds.getUserByUserId(internalUser.getUserId());
+//        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).readValue(userResponse, Member.class);
+//        System.out.println(userResponse);
+        return orgChartService.getUserByUserId(internalUser.getUserId());
     }
 }
