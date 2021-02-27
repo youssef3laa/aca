@@ -100,6 +100,8 @@ export default {
             http.post('user/login', this.user.toJson()).then(async response=> {
                 system.showMessage(this.$refs.message, "logged-in-success", 'success')
                 this.user.setSAMLart(response.data.data)
+                this.user.setDetails(response.data.metaInfo.user)
+                this.user.setCN(response.data.metaInfo.cn)
                 Vue.prototype.$user = this.user;
                 localStorage.setItem("user", this.user.toString());
 
