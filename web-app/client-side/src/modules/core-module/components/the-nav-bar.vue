@@ -37,7 +37,7 @@
       <div style="float:left; margin: 7px; border-left: 2px solid #F1F2F3; height: 42px; opacity: 1;"></div>
       <div>
         <v-avatar size="36px" style=" margin:7px;">
-          <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John">
+          <img src="https://image.flaticon.com/icons/png/512/17/17004.png" alt="John">
         </v-avatar>
         <div style="float:left; margin: 7px;" class="text-center">
           <v-menu offset-y>
@@ -57,7 +57,7 @@
           </v-menu>
         </div>
         <p style="float:left; margin: 4px;">
-          <span style="font: normal 18px/22px Neo Sans Arabic; opacity: 1;">أحمد عزت</span> <br>
+          <span style="font: normal 18px/22px Neo Sans Arabic; opacity: 1;">{{user.username}}</span> <br>
           <span style="font: normal 12px/15px Neo Sans Arabic; color: #9E9E9E; opacity: 1;"> إدارة المعلومات</span>
         </p> 
       </div>
