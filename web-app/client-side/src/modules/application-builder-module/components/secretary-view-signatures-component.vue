@@ -3,10 +3,10 @@
     <v-container>
       <v-row>
         <v-col class="padding-left" cols="5">
-          <AppBuilder ref="appBuilder" :app="app" />
+          <AppBuilder ref="tableAppBuilder" :app="app" />
         </v-col>
         <v-col class="no-padding" cols="7">
-          <AppBuilder ref="appBuilder1" :app="app1" />
+          <AppBuilder v-if="itemIsSelected" ref="appBuilder" :app="app1" />
         </v-col>
       </v-row>
     </v-container>
@@ -14,20 +14,41 @@
 </template>
 
 <script>
-import http from "../../core-module/services/http"
+import http from "../../core-module/services/http";
+import formPageMixin from "../../../mixins/formPageMixin";
+
 export default {
   components: {
     AppBuilder: () => import("../builders/app-builder"),
   },
-  mounted() {
-    console.log(JSON.stringify(this.app));
-    console.log(JSON.stringify(this.app1));
-    this.loadForm("secretary-incoming-signatures-table","appBuilder");
-    this.loadForm("secretary-incoming-signatures-form","appBuilder1");
+  mixins: [formPageMixin],
 
+   mounted() {
+    this.loadForm("secretary-incoming-signatures-table", "tableAppBuilder");
+    this.loadForm("secretary-incoming-signatures-form", "appBuilder");
+
+    this.getTasks("signatures");
+
+    this.$observable.subscribe("signaturesTable_selected", async (selected) => {
+      console.log(selected);
+      
+      if (selected.length) {
+        let requestData = await this.readRequest( selected[selected.length - 1].TaskData.ApplicationData
+              .ACA_ProcessRouting_InputSchemaFragment.requestId)
+
+        console.log(requestData);
+        this.$refs.appBuilder.setModelData("mainData", {
+          followUpNumber:
+            selected[selected.length - 1].TaskData.ApplicationData
+              .ACA_ProcessRouting_InputSchemaFragment.requestNumber,
+          followUpDate: requestData.requestDate,
+          nextFollowUpDate: requestData.requestDate,
+        });
+      }
+    });
   },
   methods: {
-    loadForm: function(formName,appBuilder, callBack) {
+    loadForm: function(formName, appBuilder, callBack) {
       http
         .get("/user/form/" + formName)
         .then((response) => {
@@ -41,10 +62,10 @@ export default {
   },
   data() {
     return {
-  
       taskList: [{ title: "إنشاء وارد جديد" }, { title: "تسجيل موضوع" }],
-      app:{},
-      app1:{}
+      app: {},
+      app1: {},
+      itemIsSelected: true,
     };
   },
 };

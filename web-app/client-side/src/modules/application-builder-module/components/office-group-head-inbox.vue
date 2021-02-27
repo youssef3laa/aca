@@ -8,39 +8,60 @@
 
 <script>
 import formPageMixin from "../../../mixins/formPageMixin";
+import router from "../../../router";
+
 export default {
   components: {
     AppBuilder: () => import("../builders/app-builder"),
   },
   mixins: [formPageMixin],
   mounted() {
+    this.getTasks("technicalTasks");
     // this.loadForm("secertary-inbox");
-    this.$observable.subscribe("secertaryOutgoing_selected", (selected) => {
+    this.topActionsSubscriptions();
+    this.$observable.subscribe("technicalTasksTable_view", (item) => {
+      this.viewTask(item);
+    });
+    this.$observable.subscribe("technicalTasksTable_selected", (selected) => {
       console.log(selected);
       if (selected.length != 0) {
-        this.$refs.appBuilder.setFieldData("outgoing", "actionTopComponent", {
-          show: true,
-        });
+        this.$refs.appBuilder.setFieldData(
+          "sentFromManagement",
+          "actionTopComponent",
+          {
+            show: true,
+          }
+        );
       } else {
-        this.$refs.appBuilder.setFieldData("outgoing", "actionTopComponent", {
-          show: false,
-        });
+        this.$refs.appBuilder.setFieldData(
+          "sentFromManagement",
+          "actionTopComponent",
+          {
+            show: false,
+          }
+        );
       }
     });
     this.$observable.subscribe("subjectHeadOfOfficeGroup", (text) => {
       console.log(text);
-      this.$observable.fire("outgoing",{type:'modelUpdate',model:{data:[
-                              {
-                                requestNumber: "Frozen Yogurt",
-                                incomingDate: "159",
-                                subject: "6.0",
-                                management: "24",
-                                importance: true,
-                                chairmanOfCommisionSignature:
-                                  "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-                                viceChairmanOfCommisionSignature:
-                                  "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-                              },]}})
+      this.$observable.fire("sentFromManagement", {
+        type: "modelUpdate",
+        model: {
+          data: [
+            {
+              requestNumber: "Frozen Yogurt",
+              incomingDate: "159",
+              subject: "6.0",
+              management: "24",
+              importance: true,
+              chairmanOfCommisionSignature:
+                "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
+              viceChairmanOfCommisionSignature:
+                "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
+            },
+          ],
+        },
+      });
     });
     this.$observable.subscribe("incomingNumberHeadOfOfficeGroup", (text) => {
       console.log(text);
@@ -48,12 +69,13 @@ export default {
   },
   data() {
     return {
+      inputSchemaArray:[],
       app: {
         pages: {
           key: "officeGroupHeadInboxPage",
           tabs: [
             {
-              key: "outgoingTab",
+              key: "sentFromManagementTab",
               id: "1",
               isActive: "true",
               name: "sentFromManagement",
@@ -87,7 +109,7 @@ export default {
                     isCard: true,
                     forms: [
                       {
-                        key: "outgoing",
+                        key: "sentFromManagement",
                         inputs: [
                           {
                             type: "ActionsTopComponent",
@@ -114,9 +136,9 @@ export default {
 
                           {
                             type: "DataTableComponent",
-                            name: "secertaryOutgoing",
+                            name: "technicalTasksTable",
                             actions: ["view"],
-                            subscribe: "outgoing",
+                            subscribe: "technicalTasks",
                             select: true,
                             col: 12,
                             images: [
@@ -136,32 +158,34 @@ export default {
                             {
                               title: "temporarySave",
                               icon: "far fa-save",
-                              publish: "backToCertification",
+                              publish: "temporarySave",
                             },
                             {
                               title: "send",
                               icon: "far fa-paper-plane",
-                              publish: "backToCertification",
+                              publish: "send",
                             },
                             {
                               title: "sendToAnotherManagement",
                               icon: "far fa-save",
-                              publish: "backToCertification",
+                              publish: "sendToAnotherManagement",
                             },
                           ],
 
-                          secertaryOutgoing: {
+                          technicalTasksTable: {
                             url: null,
-                            key: "requestNumber",
+                            key: "TaskId",
                             headers: [
                               {
                                 text: "requestNumber",
-                                value: "requestNumber",
+                                value:
+                                  "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestNumber",
                               },
-                              { text: "incomingDate", value: "incomingDate" },
+                              { text: "incomingDate", value: "DeliveryDate" },
                               {
                                 text: "subject",
-                                value: "subject",
+                                value:
+                                  "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.subject",
                               },
                               {
                                 text: "section/management",
@@ -186,30 +210,7 @@ export default {
                                 sortable: false,
                               },
                             ],
-                            data: [
-                              {
-                                requestNumber: "Frozen Yogurt",
-                                incomingDate: "159",
-                                subject: "6.0",
-                                management: "24",
-                                importance: true,
-                                chairmanOfCommisionSignature:
-                                  "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-                                viceChairmanOfCommisionSignature:
-                                  "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-                              },
-                              {
-                                requestNumber: "soba3 kofta",
-                                incomingDate: "159",
-                                subject: "4.0",
-                                management: "24",
-                                importance: false,
-                                chairmanOfCommisionSignature:
-                                  "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-                                viceChairmanOfCommisionSignature:
-                                  "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-                              },
-                            ],
+                            data: [],
                           },
                         },
                       },
@@ -223,6 +224,36 @@ export default {
       },
       taskList: [{ title: "إنشاء وارد جديد" }, { title: "تسجيل موضوع" }],
     };
+  },
+  methods: {
+    viewTask(item) {
+      try {
+        let taskId = item.item.TaskId,
+          page =
+            item.item.TaskData.ApplicationData
+              .ACA_ProcessRouting_InputSchemaFragment.component;
+        router.push({
+          name: page,
+          params: { taskId: taskId },
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    topActionsSubscriptions() {
+      this.$observable.subscribe("sendToAnotherManagement", () => {
+        console.log("sendToAnotherManagement");
+      });
+      this.$observable.subscribe("backToCertification", () => {
+        console.log("backToCertification");
+      });
+      this.$observable.subscribe("temporarySave", () => {
+        console.log("temporarySave");
+      });
+      this.$observable.subscribe("send", () => {
+        console.log("send");
+      });
+    },
   },
 };
 </script>
