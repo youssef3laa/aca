@@ -16,14 +16,15 @@ export default {
   },
   mixins: [formPageMixin],
   mounted() {
+    this.loadForm("office-group-head-inbox");
     this.getTasks("technicalTasks");
-    // this.loadForm("secertary-inbox");
     this.topActionsSubscriptions();
     this.$observable.subscribe("technicalTasksTable_view", (item) => {
       this.viewTask(item);
     });
     this.$observable.subscribe("technicalTasksTable_selected", (selected) => {
-      console.log(selected);
+      this.selected = selected;
+      console.log(this.selected);
       if (selected.length != 0) {
         this.$refs.appBuilder.setFieldData(
           "sentFromManagement",
@@ -69,163 +70,21 @@ export default {
   },
   data() {
     return {
-      inputSchemaArray:[],
-      app: {
-        pages: {
-          key: "officeGroupHeadInboxPage",
-          tabs: [
-            {
-              key: "sentFromManagementTab",
-              id: "1",
-              isActive: "true",
-              name: "sentFromManagement",
-              icon: "fas fa-copy",
-            },
-            {
-              key: "signaturesTab",
-              id: "2",
-              name: "sentFromCertification",
-              icon: "fas fa-pen-alt",
-            },
-            {
-              key: "temporarilySavedForModificationTab",
-              id: "3",
-              name: "temporarilySavedForModification",
-              icon: "fas fa-save",
-            },
-          ],
-          page: [
-            {
-              key: "page1",
-              sections: {
-                tabs: [],
-                sec: [
-                  {
-                    key: "section 1",
-                    tabId: 1,
-                    isTab: true,
-                    type: "DefaultSection",
-                    display: "block",
-                    isCard: true,
-                    forms: [
-                      {
-                        key: "sentFromManagement",
-                        inputs: [
-                          {
-                            type: "ActionsTopComponent",
-                            name: "actionTopComponent",
-                            show: false,
-                            col: 6,
-                          },
-                          {
-                            type: "InputComponent",
-                            label: "subject",
-                            name: "subject",
-                            readonly: false,
-                            publish: "subjectHeadOfOfficeGroup",
-                            col: 3,
-                          },
-                          {
-                            type: "InputComponent",
-                            label: "incomingNumber",
-                            name: "incomingNumber",
-                            readonly: false,
-                            publish: "incomingNumberHeadOfOfficeGroup",
-                            col: 3,
-                          },
-
-                          {
-                            type: "DataTableComponent",
-                            name: "technicalTasksTable",
-                            actions: ["view"],
-                            subscribe: "technicalTasks",
-                            select: true,
-                            col: 12,
-                            images: [
-                              "chairmanOfCommisionSignature",
-                              "viceChairmanOfCommisionSignature",
-                            ],
-                            selectable: "importance",
-                          },
-                        ],
-                        model: {
-                          actionTopComponent: [
-                            {
-                              title: "backToCertification",
-                              icon: "fas fa-undo",
-                              publish: "backToCertification",
-                            },
-                            {
-                              title: "temporarySave",
-                              icon: "far fa-save",
-                              publish: "temporarySave",
-                            },
-                            {
-                              title: "send",
-                              icon: "far fa-paper-plane",
-                              publish: "send",
-                            },
-                            {
-                              title: "sendToAnotherManagement",
-                              icon: "far fa-save",
-                              publish: "sendToAnotherManagement",
-                            },
-                          ],
-
-                          technicalTasksTable: {
-                            url: null,
-                            key: "TaskId",
-                            headers: [
-                              {
-                                text: "requestNumber",
-                                value:
-                                  "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestNumber",
-                              },
-                              { text: "incomingDate", value: "DeliveryDate" },
-                              {
-                                text: "subject",
-                                value:
-                                  "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.subject",
-                              },
-                              {
-                                text: "section/management",
-                                value: "management",
-                              },
-                              {
-                                text: "chairmanOfCommisionSignature",
-                                value: "chairmanOfCommisionSignature",
-                              },
-                              {
-                                text: "viceChairmanOfCommisionSignature",
-                                value: "viceChairmanOfCommisionSignature",
-                              },
-                              {
-                                text: "importantAndImmediate",
-                                translate: false,
-                                value: "importance",
-                              },
-                              {
-                                text: "",
-                                value: "action",
-                                sortable: false,
-                              },
-                            ],
-                            data: [],
-                          },
-                        },
-                      },
-                    ],
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      },
+      selected: [],
+      inputSchemaArray: [],
+      app: {},
       taskList: [{ title: "إنشاء وارد جديد" }, { title: "تسجيل موضوع" }],
     };
   },
   methods: {
+    submit() {
+      this.selected.forEach((item) => {
+        this.inputSchemaArray.push(
+          item.taskData.TaskData.ApplicationData
+            .ACA_ProcessRouting_InputSchemaFragments
+        );
+      });
+    },
     viewTask(item) {
       try {
         let taskId = item.item.TaskId,

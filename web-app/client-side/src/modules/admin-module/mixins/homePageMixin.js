@@ -21,6 +21,7 @@ export default {
                     if(unitCode == "COC" && group.isHeadRole) homeComponent = HomePageSecretary
                     else if((unitCode == "TVS" || unitCode == "TCS" || unitCode == "TVA" || unitCode == "TCA") && group.isHeadRole) homeComponent = HomePageTechnicalOfficeHead
                 }
+                console.log(router)
                 router.addRoutes([{
                     path: '/home',
                     name: 'HomePage',
