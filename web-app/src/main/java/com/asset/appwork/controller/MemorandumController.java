@@ -62,11 +62,9 @@ public class MemorandumController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-//            User user = orgChartService.getLoggedInUser(account);
-//            user.getGroup();//unit collection stream
+            User user = orgChartService.getLoggedInUser(account);
 
-
-            File file = docx.exportJsonToDocx(memo);
+            File file = docx.exportJsonToDocx(memo, user);
 
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
 

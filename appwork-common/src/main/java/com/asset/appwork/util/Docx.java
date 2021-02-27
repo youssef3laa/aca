@@ -3,6 +3,7 @@ package com.asset.appwork.util;
 import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.model.User;
 import com.asset.appwork.repository.MemoValuesRepository;
 import com.asset.appwork.repository.MemosRepository;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,7 +20,6 @@ import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ public class Docx {
     @Autowired
     Environment env;
 
-    public File exportJsonToDocx(Memos memo) throws AppworkException {
+    public File exportJsonToDocx(Memos memo, User user) throws AppworkException {
         try {
             WordprocessingMLPackage wordPackage = WordprocessingMLPackage.createPackage();
             NumberingDefinitionsPart ndp = new NumberingDefinitionsPart();
@@ -56,42 +56,41 @@ public class Docx {
             XHTMLImporter.setHyperlinkStyle("Hyperlink");
 
             JsonNode jsonNode = null;
-            try {
+            try {//<iframe src="http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&amp;nodeid=730301&amp;viewType=1&amp;OTDSTicket=*OTDSSSO*AXhBQlRqZjBLaThfcEtXdVVqLUo0dmdnQV81UTdFZ3dBUVRxbWRQNF9ZMGZKWXpSdjVLUUg5SGdEdzlDU2lYbUhjem9MS08yQTUxOGx1SkJfbUlEemMzbHhVNHpMcTZpUmFieklLY3JlMWlKdTRxZi1rSm9ZcHJNUWpsYXNQUkdrQjZOcEZXdUJBU0owbkl1YkhUa2JsSHVCbmFiSDMxQWtMbHBRdUtGRFB1ZFlzeWx2eEFGWXVhOHAxZ2k5a2NmT3RjMGNSNTdpTGpEclRDb1p3RXpuZUhtem5ScU9rZ3Q2RHJqbXdIRXZybFpYWkJ6c09BR295VVBieTJpVndfa2VUYVdxUFMxX1N1Ql83NUhwcnNrb3psLUVISC1PbVRPRmVHandBZ2dkczAzelNremdpNHdfZW5VZXZ4aDhiNTV2Z0o4RExVbjVhblQzdm9OeEQ0RmVVOHo0YmNlYTV4MzBWbHFSaXE4bTR4dG5odXR2RnpvcnByM1pKAE4ASgAU6Kg-_nQYvkr-yBVhvvHDzVKVes4AEFqGcE-28Fv5ID3bwyUXiKUAIPtbzpFAz0_64zbZ6K1oisKPpcxifBLPLpD1l5ZAVgxhAAA*" style="border-width: 0px;padding: 0px;margin: 0px;overflow: hidden;width: 100%;height: 1000px;"></iframe>
                 jsonNode = SystemUtil.convertStringToJsonNode(SystemUtil.readFile(System.getProperty("user.dir") + env.getProperty("memosPath") + memo.getJsonId() + ".json"));
-                String name = jsonNode.at("/app/pages/0/sections/0/forms/0/name").asText();
-                String name2 = jsonNode.at("/app/pages/0/sections/0/forms/1/name").asText();
+                jsonNode = jsonNode.get("app").get("pages").get("page").get(0).get("sections").get("sec").get(0).get("forms");
+                List<String> sections = new ArrayList<>();
+                for(int i = 0; i < jsonNode.size(); i++){
+                    sections.add(jsonNode.get(i).get("name").asText());
+                }
 
                 HashMap<String, String> memoValues = memo.getValues();
                 Object[] memoValuesObjectArray = memoValues.values().toArray();
                 String[] memoValuesStringArray = Arrays.copyOf(memoValuesObjectArray, memoValuesObjectArray.length, String[].class);
-                String value = memoValuesStringArray[0];
-                value = value.replaceAll("&nbsp;", "");
-                value = value.replaceAll("-&nbsp;", "");
-                String value2 = "";
+                String value = "";
+                for(int i = 0; i < memoValuesStringArray.length; i++){
+                    memoValuesStringArray[i] = memoValuesStringArray[i].replaceAll("&nbsp;", "");
+                    memoValuesStringArray[i] = memoValuesStringArray[i].replaceAll("-&nbsp;", "");
+                    value += "<p style = 'font-size: 50px; font-weight: bold; text-align:right;'>" + sections.get(i) + "</p>" + "<br>";
+                    value += memoValuesStringArray[i] + "<br>";
+                }
+
                 Document doc = Jsoup.parse(value);
-                System.out.println(value);
-//                <p roleCode="MSM" type="signature" hidden></p>
-//                <p roleCode="MSM" type="signature" >text</p>
-//
-                //if (value.contains("<p rolecode=\"MSM\" type=\"signature\" hidden=\"\"><br></br></p>"))
-                //{
-                Element element = doc.select("#signature").first();
+//                user.getGroup().stream().forEach(s ->
+//                {
+//                    System.out.println(s.getGroupCode());
+//                });
 
-//                List<String>  attToRemove = new ArrayList<>();
-//                Attributes at = element.attributes();
-//                for (Attribute a : at) {
-//                    // transfer it into a list -
-//                    // to be sure ALL data-attributes will be removed!!!
-//                    attToRemove.add(a.getKey());
-//                }
-//                System.out.println(attToRemove);
+                String signature = "<img src=\"https://i.ibb.co/h94n9bR/signature.png\"></img>";
+                String name = "<span>Mohamed Mohamed</span>";
+                try {
+                    doc.select("#MCMsignature").first().removeAttr("hidden").append(signature);
+                    doc.select("#MCMname").first().removeAttr("hidden").append(name);
+                }
+                catch (NullPointerException e)
+                {}
+                value = doc.toString();
 
-                String newElement = "<img src=\"https://upload.wikimedia.org/wikipedia/commons/f/f9/Phoenicopterus_ruber_in_S%C3%A3o_Paulo_Zoo.jpg\"></img>";
-                doc.select("#signature").first().removeAttr("hidden").append(newElement);
-                //value = value.replace("<p rolecode=\"MSM\" type=\"signature\" hidden=\"\"><br></br></p>", "<img src=\"https://upload.wikimedia.org/wikipedia/commons/f/f9/Phoenicopterus_ruber_in_S%C3%A3o_Paulo_Zoo.jpg\"></img>");
-                //}
-                value=doc.toString();
-                System.out.println(doc.toString());
                 if (value.contains("<img"))
                 {
                     int imageIndex = value.indexOf("<img");
@@ -99,29 +98,10 @@ public class Docx {
                     StringBuilder stringBuilder = new StringBuilder(value);
                     stringBuilder.insert(imageEndIndex, "</img>");
                     value = stringBuilder.toString();
-                    System.out.println(value);
                 }
                 value = value.replaceAll("<br>", "<br></br>");
+                wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert(value, null));
 
-                if (!name2.isEmpty()) {
-                    value2 = memoValuesStringArray[1];
-                    value2 = value2.replaceAll("<br>", "<br></br>");
-
-                    wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n" +
-                            "\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n" +
-                            "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-                            "<body>\n" +
-                            "<p style = 'font-size: 50px; font-weight: bold; text-align:right;'>" + name + "</p>" + "\n" + "<hr></hr>" +
-                            "<p style = 'text-align:right;'>" + value + "</p>" + "\n" +
-                            "<p style = 'font-size: 50px; font-weight: bold; text-align:right;'>" + name2 + "</p>" + "\n" + "<hr></hr>" +
-                            "<p style = 'text-align:right;'>" + value2 + "</p>" + "\n" +
-                            "</body>\n" +
-                            "</html>", null));
-                }
-                else
-                {
-                    wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert(value, null));
-                }
             } catch (IOException e) {
                 e.printStackTrace();
                 log.error("Docx: " + e.getMessage());
