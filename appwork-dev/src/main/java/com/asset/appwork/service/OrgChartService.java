@@ -527,7 +527,8 @@ public class OrgChartService {
 
     public void updateGroupUnitRelationByCodes(Account account, String oldGroupCode, String groupCode, String unitCode) throws AppworkException {
         String props = new Member.TargetId(getUnitByName(unitCode).getId()).toString();
-        updateGroupUnitRelation(account, getGroupByName(groupCode).getId(), oldGroupCode, props);
+        //TODO: Could need to remove groupCodeCouldBeNull
+        updateGroupUnitRelation(account, getGroupByName(groupCode, true).getId(), oldGroupCode, props);
     }
 
     public void deleteGroup(Account account, Long id) throws AppworkException {
