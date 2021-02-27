@@ -23,8 +23,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -161,7 +162,7 @@ public class ACAOrgChartService {
         String newData = unit.getDescription();
         unit.setDescription(null);
         Unit createdUnit = orgChartService.createUnit(account, toUnitCreationString(unit));
-        if(!isRootUnit) {
+        if (!isRootUnit) {
             try {
                 orgChartService.addSubUnitToUnit(account, getUnit(newData.split("-")[0], newData.split("-")[1]).getId(), createdUnit.getId());
             } catch (AppworkException e) {
@@ -170,14 +171,17 @@ public class ACAOrgChartService {
             }
         }
 
-        Arrays.asList(GroupType.values()).forEach(groupType -> {
+        for (GroupType groupType : GroupType.values()) {
             try {
-                orgChartService.createGroup(account, generateGroupByTypeAndUnit(groupType, createdUnit).toString());
-            } catch (AppworkException | JsonProcessingException e) {
-                log.error(e.getMessage());
-                e.printStackTrace();
+                Group group = orgChartService.createGroup(account, generateGroupByTypeAndUnit(groupType, createdUnit).toString());
+                orgChartService.addSubGroupToUnitGroup(account, createdUnit.getName(), group.getName());
+                orgChartService.updateGroupUnitRelationByCodes(account, group.getName(), group.getName(), createdUnit.getName());
+            } catch (AppworkException e) {
+                throw new AppworkException(e.getMessage(), e.getCode());
+            } catch (JsonProcessingException e) {
+                throw new AppworkException(e.getMessage(), ResponseCode.INTERNAL_SERVER_ERROR);
             }
-        });
+        }
 
         return createdUnit;
     }
@@ -192,7 +196,7 @@ public class ACAOrgChartService {
     }
 
     public Unit changeUnitParent(Account account, String props, Boolean changeTypeCode) throws JsonProcessingException, AppworkException {
-        if(!changeTypeCode)
+        if (!changeTypeCode)
             return changeUnitParentOnly(account, props);
         return changeUnitParentAndTypeCode(account, props);
     }
@@ -214,9 +218,6 @@ public class ACAOrgChartService {
     }
 
     public Unit changeUnitParentAndTypeCode(Account account, String props) throws JsonProcessingException, AppworkException {
-
-        // TODO: Set Active with false and see if any groups needs updating
-
         Unit unit = fromACAUnitParentAndChangingUnitTypeCodeString(props);
         Unit oldUnit = getUnit(unit.getUnitTypeCode(), unit.getUnitCode());
         String newData = unit.getDescription();
@@ -241,7 +242,7 @@ public class ACAOrgChartService {
         );
     }
 
-    public Group getGroupByUnitTypeCodeAndUnitCodeAndType(String unitTypeCode, String unitCode, GroupType type) throws AppworkException{
+    public Group getGroupByUnitTypeCodeAndUnitCodeAndType(String unitTypeCode, String unitCode, GroupType type) throws AppworkException {
         return groupRepository.findByUnit_UnitTypeCodeAndUnit_UnitCodeAndType(unitTypeCode, unitCode, type).orElseThrow(
                 () -> new AppworkException("Could not get Group", ResponseCode.READ_ENTITY_FAILURE)
         );
@@ -284,6 +285,7 @@ public class ACAOrgChartService {
         group.setGroupCode(getGroupLevelByType(type) + unit.getUnitCode());
         switch (type) {
             case HEAD:
+                group.setIsHeadRole(true);
                 group.setNameAr("رئيس " + unit.getNameAr());
                 break;
             case VICE:
@@ -309,34 +311,50 @@ public class ACAOrgChartService {
     public User updateUser(Account account, String props, Boolean unitChanged, Boolean revokeTasks) throws AppworkException, JsonProcessingException {
         User user = fromACAUserUpdate(props);
 
+        Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.active-directory.partition"));
+
         String newData = user.getPerson().getNotes();
         user.getPerson().setNotes(null);
 
         User internalUser = getUserByDescription(user.getDescription());
-        if(unitChanged) {
-            orgChartService.assignUserToGroup(account, internalUser.getUserId(),
-                    getGroupByLevel(
-                            newData.split("-")[1], newData.split("-")[2], newData.split("-")[0]
-                    ).getGroupCode());
-        }
 
-        List<Member.Values> memberValues = new ArrayList<>();
-        List<String> titleValues = new ArrayList<>();
-        titleValues.add(user.getPerson().getTitle());
-        memberValues.add(new Member.Values("title", titleValues));
-        List<String> displayNameValues = new ArrayList<>();
-        displayNameValues.add(user.getDisplayName());
-        memberValues.add(new Member.Values("displayName", displayNameValues));
+        String userResponse = otds.getUserByUserId(internalUser.getUserId());
+        Member responseMember = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).readValue(userResponse, Member.class);
+
+        List<Member.Values> memberValues = Arrays.asList(
+                new Member.Values("title", new ArrayList<>(Collections.singletonList(user.getPerson().getTitle()))),
+                new Member.Values("displayName", new ArrayList<>(Collections.singletonList(user.getDisplayName()))),
+
+                new Member.Values("oTObjectIDInResource", new ArrayList<>(Collections.singletonList(
+                        responseMember.getValues().stream().filter(value -> value.getName().equals("oTObjectIDInResource")).collect(Collectors.toList()).get(0).getValues().get(0)
+                ))),
+                new Member.Values("oTExternalID1", new ArrayList<>(Collections.singletonList(
+                        responseMember.getValues().stream().filter(value -> value.getName().equals("oTExternalID1")).collect(Collectors.toList()).get(0).getValues().get(0)
+                ))),
+                new Member.Values("oTExternalID2", new ArrayList<>(Collections.singletonList(
+                        responseMember.getValues().stream().filter(value -> value.getName().equals("oTExternalID2")).collect(Collectors.toList()).get(0).getValues().get(0)
+                ))),
+                new Member.Values("oTExternalID3", new ArrayList<>(Collections.singletonList(
+                        responseMember.getValues().stream().filter(value -> value.getName().equals("oTExternalID3")).collect(Collectors.toList()).get(0).getValues().get(0)
+                ))),
+                new Member.Values("oTExternalID4", new ArrayList<>(Collections.singletonList(
+                        responseMember.getValues().stream().filter(value -> value.getName().equals("oTExternalID4")).collect(Collectors.toList()).get(0).getValues().get(0)
+                )))
+        );
+
 
         Member member = new Member(env.getProperty("otds.active-directory.partition"), null, memberValues);
         member.setDescription(null);
 
-//        Otds otds = new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.active-directory.partition"));
-//        otds.updateUserByUserId(internalUser.getUserId(), member.toString());
+        otds.updateUserByUserId(internalUser.getUserId(), member.toString());
 
-//      String userResponse = otds.getUserByUserId(internalUser.getUserId());
-//        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).readValue(userResponse, Member.class);
-//        System.out.println(userResponse);
+        if (unitChanged) {
+            orgChartService.assignUserToGroup(account, internalUser.getUserId(),
+                    getGroupByLevel(
+                            newData.split("-")[1], newData.split("-")[2], newData.split("-")[0]
+                    ).getName());
+        }
+
         return orgChartService.getUserByUserId(internalUser.getUserId());
     }
 }

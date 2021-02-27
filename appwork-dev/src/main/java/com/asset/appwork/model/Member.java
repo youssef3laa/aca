@@ -69,6 +69,8 @@ public class Member {
         String name;
         List<String> values;
 
+        public Values() {}
+
         public Values(String name, List<String> values) {
             this.name = name;
             this.values = values;
