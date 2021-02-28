@@ -13,6 +13,7 @@
       </span>
       <component
         :is="sec.type"
+        ref="section"
         :formData="formData"
         :section="sec"
         v-for="formData in sec.forms"
@@ -61,6 +62,9 @@ export default {
     // Pane,
   },
   methods: {
+    validateModel: function(key){
+      return this.$refs.section.validateModel(key);
+    },
     dataChange: function(model) {
       console.log('Section Builder')
       console.log(model)

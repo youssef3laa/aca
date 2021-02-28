@@ -5,6 +5,7 @@
         v-on:modelChange="dataChange"
         :tabsSection="page.sections"
         :page="page"
+        ref="page"
         :section="section"
         :tabkey="section.key"
         v-bind:style="[
@@ -47,6 +48,9 @@ export default {
   },
 
   methods: {
+    validateModel: function(key){
+      return this.$refs.page.validateModel(key);
+    },
     dataChange: function(model) {
       console.log('Page Builder')
       console.log(model)

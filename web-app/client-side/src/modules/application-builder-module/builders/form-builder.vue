@@ -157,6 +157,12 @@ export default {
         })
       }
     },
+    validateModel: function(key){
+      if(this.forms.key == key){
+        return !this.$refs[this.forms.key]['_data'].flags
+          .invalid
+      }
+    },
     saveValue: function() {},
   },
   props: ['forms', 'model'],
@@ -164,9 +170,24 @@ export default {
     model: function(newVal) {
       this.formModel = newVal
     },
+    forms: {
+      immediate: true,
+      handler(newVal) {
+        if(newVal && newVal.key){
+          this.$observable.subscribe("validate-"+newVal.key+"-model",  async ()=> {
+            return !this.$refs[this.forms.key]['_data'].flags
+          .invalid
+          })
+        }
+      },
+    },
   },
   created() {
+    // this.forms.model['_valid'] = !this.$refs[this.forms.key]['_data'].flags
+    //   .invalid
     console.log(this.forms)
+    console.log(this.$refs[this.forms.key])
+
     // console.log(this.model)
     // var self = this
     // if (this.forms.subscribe) {

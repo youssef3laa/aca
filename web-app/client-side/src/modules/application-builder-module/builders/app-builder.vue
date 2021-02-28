@@ -9,6 +9,7 @@
     <span v-if="appData && appData.pages ">
       <div v-for="(page, key) in appData.pages.page" :key="key">
         <PageBuilder
+          ref="pageBuild"
           :page="page"
           v-on:modelChange="dataChange"
           :tabkey="appData.pages.key"
@@ -32,6 +33,10 @@ export default {
     }
   },
   methods: {
+    validateModel: function(key){
+      if(this.$refs.pageBuild)
+        return this.$refs.pageBuild.validateModel(key);
+    },
     dataChange: function(model) {
       console.log('App Builder')
       console.log(model)
