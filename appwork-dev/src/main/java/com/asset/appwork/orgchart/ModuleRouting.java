@@ -140,7 +140,7 @@ public class ModuleRouting {
     private <T> void calculateNextStep(T outputSchema,Account account) throws AppworkException {
         //TODO: Create Setter function in reflection class
         try {
-            String nextStep = "", nextComponent = "", nextConfig = "", nextReadonlyCompnent = "", nextSubBP = "", nextType = "";
+            String nextStep = "", nextComponent = "", nextConfig = "", nextReadonlyCompnent = "", nextSubBP = "";
             Router nextRouter = new Router();
 
             RoutingConfig routingConfig = generateRoutingConfig(outputSchema);
@@ -181,7 +181,7 @@ public class ModuleRouting {
                     nextStep = handleRedirectCase(routingConfig, currentStepId[0], codeSelected[0]);
                     break;
                 case requestModificationString:
-                    nextType = "modification";
+//                    nextType = "modification";
                     nextStep = handleRequestModificationCase(outputSchema, routingConfig, currentStepId[0], parentHistoryId[0]);
                     break;
                 case parallelString:
@@ -212,7 +212,7 @@ public class ModuleRouting {
                     nextComponent = routingConfig.getSteps().get(nextStep).getComponent();
                     nextConfig = routingConfig.getSteps().get(nextStep).getConfig();
                     nextReadonlyCompnent = routingConfig.getSteps().get(nextStep).getReadonlyComponent();
-                    if(nextType.isEmpty()) nextType = routingConfig.getSteps().get(nextStep).getType();
+//                    if(nextType.isEmpty()) nextType = routingConfig.getSteps().get(nextStep).getType();
                 }else{
                     throw new AppworkException(ResponseCode.MODULE_ROUTING_INPUTS_ERROR);
                 }
@@ -227,7 +227,7 @@ public class ModuleRouting {
 
             updateOutputSchemaExtraData(outputSchema, routingConfig, currentStepId[0]);
             updateOutputSchema(outputSchema, nextStep,
-                    nextComponent, nextConfig, nextReadonlyCompnent, nextSubBP, nextRouter, nextStep);
+                    nextComponent, nextConfig, nextReadonlyCompnent, nextSubBP, nextRouter);
 
             addUserToRequest(outputSchema, account);
         } catch (JsonProcessingException e) {
@@ -322,14 +322,14 @@ public class ModuleRouting {
 
     private <T> void updateOutputSchema(T outputSchema, String nextStep,
                                         String nextComponent, String nextConfig, String nextReadonlyComponent,
-                                        String nextSubBP, Router nextRouter, String nextType) {
+                                        String nextSubBP, Router nextRouter) {
         ((OutputSchema) outputSchema).setStepId(nextStep);
         ((OutputSchema) outputSchema).setComponent(nextComponent);
         ((OutputSchema) outputSchema).setConfig(nextConfig);
         ((OutputSchema) outputSchema).setReadonlyComponent(nextReadonlyComponent);
         ((OutputSchema) outputSchema).setSubBP(nextSubBP);
         ((OutputSchema) outputSchema).setRouter(nextRouter);
-        ((OutputSchema) outputSchema).setCaseType(nextType);
+//        ((OutputSchema) outputSchema).setCaseType(nextType);
     }
 
     private <T> void updateOutputSchemaAssignees(T outputSchema, String stepId,

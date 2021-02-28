@@ -210,6 +210,13 @@ public class SystemUtil {
         return json;
     }
 
+    public static JsonNode convertDocumentNodeToJsonNode(Node node) throws IOException {
+        String xml = convertXMLDocumentNodeToString(node);
+        String json = convertXMLtoJSON(xml);
+        JsonNode jsonNode = convertStringToJsonNode(json);
+        return jsonNode;
+    }
+
     public static String convertXMLtoJSON(String xml) throws IOException {
         ObjectWriter objectWriter = new ObjectMapper().writerWithDefaultPrettyPrinter();
         return objectWriter.writeValueAsString(new XmlMapper().registerModule(new SimpleModule().addDeserializer(Object.class, new SystemUtil.FixedUntypedObjectDeserializer())).readValue(xml, Object.class));

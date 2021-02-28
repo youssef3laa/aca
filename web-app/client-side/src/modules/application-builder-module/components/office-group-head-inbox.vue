@@ -9,25 +9,42 @@
 <script>
 import formPageMixin from "../../../mixins/formPageMixin";
 import router from "../../../router";
+import http from "../../core-module/services/http";
 
 export default {
   components: {
     AppBuilder: () => import("../builders/app-builder"),
   },
   mixins: [formPageMixin],
+  data() {
+    return {
+      selected: [],
+      selectedCertfication:[],
+      inputSchemaArray: [],
+      app: {},
+      taskList: [{ title: "إنشاء وارد جديد" }, { title: "تسجيل موضوع" }],
+      sentFromManagementFilter: [{
+          property: "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.subject",
+          value: ""
+        }, {
+          property: "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestNumber",
+          value: ""
+        }]
+    };
+  },
   mounted() {
-    this.loadForm("office-group-head-inbox");
-    this.getTasks("technicalTasks");
-    this.topActionsSubscriptions();
+    this.loadForm("office-group-head-inbox", this.formLoaded);
+    this.certificationTopActionsSubscriptions();
+    this.managementTopActionsSubscriptions();
     this.$observable.subscribe("technicalTasksTable_view", (item) => {
       this.viewTask(item);
     });
-    this.$observable.subscribe("technicalTasksTable_selected", (selected) => {
-      this.selected = selected;
+    this.$observable.subscribe("technicalTasksTableCertification_selected", (selected) => {
+      this.selectedCertfication = selected;
       console.log(this.selected);
-      if (selected.length != 0) {
+      if (this.selectedCertfication.length != 0) {
         this.$refs.appBuilder.setFieldData(
-          "sentFromManagement",
+          "sentFromCertification",
           "actionTopComponent",
           {
             show: true,
@@ -35,7 +52,7 @@ export default {
         );
       } else {
         this.$refs.appBuilder.setFieldData(
-          "sentFromManagement",
+          "sentFromCertification",
           "actionTopComponent",
           {
             show: false,
@@ -43,40 +60,75 @@ export default {
         );
       }
     });
+    this.$observable.subscribe("technicalTasksTable_selected", (selected) => {
+      this.selected = selected;
+      console.log(this.selected);
+      if (this.selected.length != 0) {
+        this.$refs.appBuilder.setFieldData(
+                "sentFromManagement",
+                "actionTopComponent",
+                {
+                  show: true,
+                }
+        );
+      } else {
+        this.$refs.appBuilder.setFieldData(
+                "sentFromManagement",
+                "actionTopComponent",
+                {
+                  show: false,
+                }
+        );
+      }
+    });
+
     this.$observable.subscribe("subjectHeadOfOfficeGroup", (text) => {
-      console.log(text);
-      this.$observable.fire("sentFromManagement", {
+      this.sentFromManagementFilter[0].value = text
+
+      this.$observable.fire("technicalTasks", {
         type: "modelUpdate",
         model: {
-          data: [
-            {
-              requestNumber: "Frozen Yogurt",
-              incomingDate: "159",
-              subject: "6.0",
-              management: "24",
-              importance: true,
-              chairmanOfCommisionSignature:
-                "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-              viceChairmanOfCommisionSignature:
-                "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-            },
-          ],
+          filter: this.sentFromManagementFilter
         },
       });
     });
     this.$observable.subscribe("incomingNumberHeadOfOfficeGroup", (text) => {
-      console.log(text);
+      this.sentFromManagementFilter[1].value = text
+
+      this.$observable.fire("technicalTasks", {
+        type: "modelUpdate",
+        model: {
+          filter: this.sentFromManagementFilter
+        },
+      });
     });
   },
-  data() {
-    return {
-      selected: [],
-      inputSchemaArray: [],
-      app: {},
-      taskList: [{ title: "إنشاء وارد جديد" }, { title: "تسجيل موضوع" }],
-    };
-  },
   methods: {
+    formLoaded(){
+      http.get('workflow/human/tasks').then((response) => {
+        console.log(response)
+        let data = response.data.data
+
+        let fromAdmins = [];
+        let fromCertifications = [];
+
+        for (let key in data) {
+          switch (data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.caseType) {
+            case "certificationTechnicalOffice":
+              fromCertifications.push(data[key])
+              break
+            default: // "sentFromAdministratorsTechnicalOffice"
+              fromAdmins.push(data[key])
+          }
+        }
+
+        this.$refs.appBuilder.setTabValue("sentFromManagementTab", fromAdmins.length + "")
+        this.$observable.fire("technicalTasks",{ type: "modelUpdate", model: {data: fromAdmins}});
+
+        this.$refs.appBuilder.setTabValue("signaturesTab", fromCertifications.length + "")
+        this.$observable.fire("technicalTasksCertifications",{ type: "modelUpdate", model: {data: fromCertifications}});
+      });
+    },
     submit() {
       this.selected.forEach((item) => {
         this.inputSchemaArray.push(
@@ -99,20 +151,33 @@ export default {
         console.error(e);
       }
     },
-    topActionsSubscriptions() {
+    certificationTopActionsSubscriptions() {
       this.$observable.subscribe("sendToAnotherManagement", () => {
         console.log("sendToAnotherManagement");
       });
       this.$observable.subscribe("backToCertification", () => {
         console.log("backToCertification");
       });
-      this.$observable.subscribe("temporarySave", () => {
-        console.log("temporarySave");
+      this.$observable.subscribe("ManagementtemporarySave", () => {
+        console.log("ManagementtemporarySave");
       });
       this.$observable.subscribe("send", () => {
         console.log("send");
       });
     },
+    managementTopActionsSubscriptions() {
+      this.$observable.subscribe("backToManagement", () => {
+        console.log("backToManagement");
+      });
+      this.$observable.subscribe("temporarySave", () => {
+        console.log("temporarySave");
+      });
+
+      this.$observable.subscribe("sendToCertification", () => {
+        console.log("sendToCertification");
+      });
+    },
+
   },
 };
 </script>

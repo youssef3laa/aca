@@ -94,9 +94,7 @@ export default {
         },
         getTasks: function (publish) {
             http.get("workflow/human/tasks").then((response) => {
-              console.log(response);
-              var data = JSON.parse(response.data.data);
-              console.log(data);
+              var data = response.data.data;
               this.$observable.fire(publish, {
                 type: "modelUpdate",
                 model: data,

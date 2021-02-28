@@ -191,5 +191,8 @@
 
   "editSuccess": "تم تعديل البيانات بنجاح",
   "addSuccess": "تم إضافة البيانات بنجاح",
-  "systemError": "لقد حدث خطأ بالنظام"
+  "systemError": "لقد حدث خطأ بالنظام",
+
+  "backToManagement": "إرجاع للإدارة",
+  "sendToCertification": "إرسال للتصديق"
 }
