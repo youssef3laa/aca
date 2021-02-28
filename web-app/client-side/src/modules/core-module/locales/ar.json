@@ -191,5 +191,13 @@
 
   "editSuccess": "تم تعديل البيانات بنجاح",
   "addSuccess": "تم إضافة البيانات بنجاح",
-  "systemError": "لقد حدث خطأ بالنظام"
+  "systemError": "لقد حدث خطأ بالنظام",
+
+  "subjects":"الموضوعات",
+  "outgoingMemos":"المذكرات الصادرة",
+  "supervisorLevels/technicalOffice":"رأي المستويات الإشرافية / المكتب الفني",
+  "presidentDirections":"توجيهات رئيس الجمهورية",
+  "situationEstimate":"تقدير الموقف",
+  "proposals":"المقترحات",
+  "viceOpinion":"رأي السيد النائب"
 }
