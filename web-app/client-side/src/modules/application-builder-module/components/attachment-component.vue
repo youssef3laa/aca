@@ -137,10 +137,12 @@
                 >
                   <div class="row pa-1" style="height: 100px">
                     <v-col :cols="1" style="align-self: center">
-                      <v-icon style="float:left; color: #D5D5D5" size="20"
+                      <v-icon
+                        style="float:left; color: #D5D5D5 margin:1px"
+                        size="15"
                         >fas fa-ellipsis-v</v-icon
                       >
-                      <v-icon style="float:left; color: #D5D5D5" size="20"
+                      <v-icon style="float:left; color: #D5D5D5" size="15"
                         >fas fa-ellipsis-v</v-icon
                       >
                     </v-col>
