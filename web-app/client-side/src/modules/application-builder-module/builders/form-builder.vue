@@ -1,7 +1,61 @@
 <template>
   <v-container>
     <validation-observer :ref="forms.key">
-      <v-row>
+      <span v-if="forms.type == 'collapse'">
+        <v-expansion-panels
+          style="position:relative; width: 100%;
+    display: block;"
+          v-model="panel"
+          multiple
+        >
+          <v-expansion-panel>
+            <v-expansion-panel-header>
+              <v-row no-gutters>
+                <v-col cols="4">
+                  <span>{{ $t(forms.name) }}</span>
+                  <span class="line"></span>
+                </v-col>
+                <v-col cols="8" class="text--secondary"> </v-col>
+              </v-row>
+              <template v-slot:actions>
+                <!--                    <v-icon color="error">-->
+                <!--                      mdi-arrow-collapse-down-->
+                <!--                    </v-icon>-->
+              </template>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-row>
+                <!-- <div v-for="(field, key) in forms" :key="key"> -->
+                <!--v-if="field.show && field.show != false"-->
+                <v-col
+                  v-for="(field, i) in showField"
+                  :key="i"
+                  :cols="field.col"
+                  :md="field.col"
+                >
+                  <component
+                    v-if="formModel"
+                    :is="field.type"
+                    :field="field"
+                    :val="formModel[field.name]"
+                    :model="formModel"
+                    v-on:update="updateText"
+                  ></component>
+
+                  <component
+                    v-else
+                    :is="field.type"
+                    :field="field"
+                    v-on:update="updateText"
+                  ></component>
+                </v-col>
+                <!-- </div> -->
+              </v-row>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </span>
+      <v-row v-else>
         <!-- <div v-for="(field, key) in forms" :key="key"> -->
         <!--v-if="field.show && field.show != false"-->
         <v-col
@@ -65,9 +119,9 @@ import ProcessStatusControl from '../components/process-status-control'
 import SaveProcessComponent from '../components/save-process-component'
 import SecretaryViewSignaturesComponent from '../components/secretary-view-signatures-component'
 import InboxComponent from '../components/inbox-component'
-import ImageComponent from "../components/image-component"
-import ActionsTopComponent from "../components/actions-top-component"
-import BarcodeComponent from "../components/barcode-component"
+import ImageComponent from '../components/image-component'
+import ActionsTopComponent from '../components/actions-top-component'
+import BarcodeComponent from '../components/barcode-component'
 
 export default {
   name: 'FormBuilder',
@@ -159,10 +213,9 @@ export default {
         })
       }
     },
-    validateModel: function(key){
-      if(this.forms.key == key){
-        return !this.$refs[this.forms.key]['_data'].flags
-          .invalid
+    validateModel: function(key) {
+      if (this.forms.key == key) {
+        return !this.$refs[this.forms.key]['_data'].flags.invalid
       }
     },
     saveValue: function() {},
@@ -175,11 +228,13 @@ export default {
     forms: {
       immediate: true,
       handler(newVal) {
-        if(newVal && newVal.key){
-          this.$observable.subscribe("validate-"+newVal.key+"-model",  async ()=> {
-            return !this.$refs[this.forms.key]['_data'].flags
-          .invalid
-          })
+        if (newVal && newVal.key) {
+          this.$observable.subscribe(
+            'validate-' + newVal.key + '-model',
+            async () => {
+              return !this.$refs[this.forms.key]['_data'].flags.invalid
+            }
+          )
         }
       },
     },
