@@ -66,47 +66,6 @@ export default {
                 key:"id",
                 data: []
             }
-        },
-        createSentHistoryTableModel() {
-            return {
-                url:"history/user",
-                headers: [
-                    {
-                        text: "processName",
-                        value: "processName",
-                      },
-                      {
-                        text: "displayName",
-                        value: "displayName",
-                      },
-                
-                    {
-                      text: "approvalDate",
-
-                      value: "approvalDate",
-                    },
-              
-                    {
-                      text: "unitName",
-                      value: "unitName",
-                    },
-                    {
-                        text: "requestNumber",
-                        value: "requestNumber",
-                      },
-                      {
-                        text: "",
-                        value: "action",
-                        sortable: false,
-                      },
-                      {
-                        text: "",
-                        value: "checkBox"
-                      },
-               
-                  ],
-                  data: [],
-            }
         }
     }
 }

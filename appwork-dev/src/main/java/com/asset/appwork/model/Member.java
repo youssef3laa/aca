@@ -1,11 +1,13 @@
 package com.asset.appwork.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
 import java.util.List;
 import java.util.Optional;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Member {
     String userPartitionID;
     String name;
@@ -66,6 +68,8 @@ public class Member {
     public static class Values {
         String name;
         List<String> values;
+
+        public Values() {}
 
         public Values(String name, List<String> values) {
             this.name = name;

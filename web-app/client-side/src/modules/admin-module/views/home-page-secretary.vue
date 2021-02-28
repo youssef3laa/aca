@@ -39,24 +39,24 @@
       </v-col>
     </v-row>
     <Topbar :val="{ tasks: taskList }"></Topbar>
-
-    <Inbox></Inbox>
-
+    <SecrtaryInbox></SecrtaryInbox>
   </v-container>
 </template>
 
 <script>
 import chartsMixin from "../../../mixins/chartsMixin";
 import Charts from "../../application-builder-module/components/charts-component";
-import Inbox from "../../application-builder-module/components/inbox-component";
+import SecrtaryInbox from "../../application-builder-module/components/secretary-inbox-component";
 import http from "../../core-module/services/http";
-import userMixin from '../../../mixins/userMixin'
+import userMixin from "../../../mixins/userMixin";
 import Topbar from "../../application-builder-module/components/topbar-component";
+
 export default {
-  name: "HomePage",
+  name: "HomePageSecretary",
   components: {
-    Inbox,
-    Charts, Topbar
+    SecrtaryInbox,
+    Charts,
+    Topbar,
   },
   mixins: [chartsMixin, userMixin],
   async mounted() {
@@ -69,15 +69,13 @@ export default {
       );
       this.loaded = true;
       this.userDetails = await this.getUserDetails();
-      console.log(this.userDetails)
-
+      console.log(this.userDetails);
     } catch (e) {
       console.error(e);
     }
   },
   methods: {
-    
-    getTasks: function () {
+    getTasks: function() {
       http.get("workflow/human/tasks").then((response) => {
         console.log(response);
         var data = JSON.parse(response.data.data);
@@ -88,7 +86,6 @@ export default {
         });
       });
     },
-
   },
 
   data() {
@@ -99,7 +96,7 @@ export default {
       barChartData: {},
       pieChartData: {},
       loaded: false,
-      userDetails:{},
+      userDetails: {},
       // barChartData:{},
 
       richtextChart: {
@@ -111,18 +108,22 @@ export default {
               function: "count",
               column: {
                 table: "memoValues",
-                name: "jsonKey"
+                name: "jsonKey",
               },
             },
           ],
-          columns: [{
-            table: "memoValues",
-            name: "jsonKey"
-          }],
-          groupBy: [{
-            table: "memoValues",
-            name: "jsonKey"
-          }],
+          columns: [
+            {
+              table: "memoValues",
+              name: "jsonKey",
+            },
+          ],
+          groupBy: [
+            {
+              table: "memoValues",
+              name: "jsonKey",
+            },
+          ],
         },
       },
       processHistory: {
@@ -134,18 +135,22 @@ export default {
               function: "count",
               column: {
                 table: "ApprovalHistory",
-                name: "processName"
+                name: "processName",
               },
             },
           ],
-          columns: [{
-            table: "ApprovalHistory",
-            name: "processName"
-          }],
-          groupBy: [{
-            table: "ApprovalHistory",
-            name: "processName"
-          }],
+          columns: [
+            {
+              table: "ApprovalHistory",
+              name: "processName",
+            },
+          ],
+          groupBy: [
+            {
+              table: "ApprovalHistory",
+              name: "processName",
+            },
+          ],
           where: [
             {
               or: [
@@ -153,7 +158,7 @@ export default {
                   type: "equal",
                   column: {
                     table: "ApprovalHistory",
-                    name: "processName"
+                    name: "processName",
                   },
                   value: "generalProcess",
                 },
@@ -161,7 +166,7 @@ export default {
                   type: "equal",
                   column: {
                     table: "ApprovalHistory",
-                    name: "processName"
+                    name: "processName",
                   },
                   value: "process-1",
                 },
@@ -175,5 +180,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

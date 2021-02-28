@@ -13,6 +13,7 @@
         {{ tab.icon }}
       </v-icon>
       {{ $t(tab.name) }}
+      <span v-if="tab.value" style="margin: 10px;color: rgba(2, 120, 174, 1)">{{ tab.value }}</span>
     </button>
   </span>
 </template>
@@ -27,6 +28,11 @@ export default {
       selected: null,
       isActive: null,
       formId: null,
+    }
+  },
+  watch:{
+    tabs: function(newVal){
+      console.log("TabBuilder", newVal)
     }
   },
   methods: {

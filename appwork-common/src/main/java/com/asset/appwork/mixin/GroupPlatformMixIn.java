@@ -1,9 +1,14 @@
 package com.asset.appwork.mixin;
 
+import com.asset.appwork.enums.GroupType;
 import com.asset.appwork.model.Unit;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 public abstract class GroupPlatformMixIn {
     @JsonIgnore
@@ -27,6 +32,10 @@ public abstract class GroupPlatformMixIn {
     @JsonAlias({"groupCode", "GroupCode"})
     @JsonProperty("GroupCode")
     String groupCode;
+    @JsonAlias({"type", "Type"})
+    @Enumerated(EnumType.STRING)
+    @JsonProperty("Type")
+    GroupType type;
     @JsonAlias({"isHeadRole", "Head"})
     @JsonProperty("Head")
     Boolean isHeadRole;

@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-row>
+
       <v-col v-if="field.add == true" :cols="7">
         <button style="padding: 5px; margin: 20px" @click="handlAddButton()">
           <v-icon color="info">fas fa-plus</v-icon>
@@ -12,7 +13,7 @@
           <v-icon>fas fa-filter</v-icon>
         </button>
       </v-col>
-      <v-col v-if="field.search == true"  :cols="4">
+      <v-col  v-if="field.search == true"  :cols="4">
         <v-text-field
           v-model="search"
           append-icon="mdi-magnify"
@@ -24,24 +25,24 @@
     </v-row>
 
     <v-data-table
+      :sort-by="field.sortBy"
+      :sort-desc="field.sortDesc"
       :headers="d.headers"
       :items="d.data"
+      v-model="d.selected"
       :options.sync="options"
       :server-items-length="d.url ? totalItems : -1"
       :loading="loading"
       :footer-props="footerProps"
       :search="search"
       :show-expand="!!(d.subTable || d.subHeaders)"
+      :show-select="field.select"
       :item-key="d.key"
+      color="blue"
       class="elevation-1"
     >
+ 
       <template v-slot:item.action="{ item }">
-        <!-- <v-btn
-          color="primary"
-          dark
-        >
-          {{item.name_ar}}
-        </v-btn> -->
 
         <v-menu offset-y left allow-overflow max-width="300">
           <template v-slot:activator="{ on, attrs }">
@@ -145,12 +146,41 @@
         
         <!-- </span> -->
       </template>
-      <template v-slot:item.checkBox="{ item }">
+      <template   v-slot:[`item.${field.selectable}`]="{ item }">
+        <v-checkbox
+           color="#07689F"
+          :ripple="false"
+          :value="false" 
+          v-model="item[field.selectable]"
+
+        ></v-checkbox>
+<!--         <span>{{item}}</span>-->
+      </template>
+            <!-- <template  v-for="(selectable,index) in field.selectables" v-slot:[`item.${selectable}`]="{ item }">
         <v-simple-checkbox
-          v-model="item.checkBox"
+         :key="index"
+           color="#07689F"
+          :ripple="false"
+          v-model="item[selectable]"
         ></v-simple-checkbox>
+        <span
+         :key="index"
+        >{{item}}</span>
+      </template> -->
+       <template v-for="(image,index) in field.images"  v-slot:[`item.${image}`]="{ item }">
+              <v-img :key="index" :src="item[image]" :alt="'signature'" class="thumbnail"></v-img>
+          </template>
+
+
+      <template v-slot:header.data-table-select="{props,on}">
+        <v-simple-checkbox color="#07689F" :ripple="false" v-bind="props" v-on="on"></v-simple-checkbox>
+      </template>
+
+      <template v-slot:item.data-table-select="{isSelected,select}">
+        <v-simple-checkbox color="#07689F" :ripple="false" :value="isSelected" @input="select($event)"></v-simple-checkbox>
       </template>
     </v-data-table>
+
 
   </div>
 </template>
@@ -167,19 +197,17 @@ export default {
       d: this.val,
       loading: false,
       footerProps: {
-        "items-per-page-options": [5, 10, 25, -1],
+        "items-per-page-options": [5, 10, 25],
         "show-first-last-page": true,
+        "show-current-page": true,
+        "items-per-page-text": '',
       },
       options: {},
+      imageSrc:"https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ"
     };
   },
   computed:{
-    searchable(){
-        if(this.field.add == true || this.field.filter == true || this.field.search == true ){
-            return true;
-        }
-        return false;
-    }
+
   },
   watch: {
       search: function(){
@@ -231,6 +259,9 @@ export default {
             //     this.loading = false;
             // }
         }
+    },
+    'd.selected':function(){
+      this.$observable.fire(this.field.name+"_"+"selected",this.d.selected)
     }
   },
   methods: {
@@ -441,7 +472,35 @@ export default {
   margin-top: 6px;
   margin-bottom: 6px;
 }
-
+.thumbnail{
+  max-width:40px;
+  height: auto;
+}
+.thumbnail:hover{
+  max-width:150px;
+  position: absolute;
+  z-index: 99;
+  height: auto;
+}
+.decision-btn {
+  display: flex;
+  align-items: center;
+  background-color: rgba(7, 104, 159, 0.05);
+  margin: 10px;
+  height: 40px;
+  padding: 10px;
+  justify-content: center;
+  border-radius: 5px;
+  color: #0278ae;
+  cursor:pointer;
+}
+.decision-btn i {
+  margin-left: 10px;
+}
+.decision-btn-title {
+  white-space: nowrap;
+  overflow: hidden;
+}
 /* .dropDown-menu {
   background: #96969f !important;
 } */

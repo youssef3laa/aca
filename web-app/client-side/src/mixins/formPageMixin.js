@@ -3,10 +3,11 @@ import router from "../router";
 
 export default {
     methods: {
-        loadForm: function (formName,callBack) {
+        loadForm: function (formName,callBack,appBuilder) {
             http.get("/user/form/"+formName)
                 .then((response) => {
-                    this.$refs.appBuilder.setAppData(response.data.data.app);
+                    if(appBuilder) this.$refs[appBuilder].setAppData(response.data.data.app);
+                    else this.$refs.appBuilder.setAppData(response.data.data.app);
                     if(callBack){
                         callBack();
                     }
@@ -91,6 +92,17 @@ export default {
                 console.log(error);
             }
         },
+        getTasks: function (publish) {
+            http.get("workflow/human/tasks").then((response) => {
+              console.log(response);
+              var data = JSON.parse(response.data.data);
+              console.log(data);
+              this.$observable.fire(publish, {
+                type: "modelUpdate",
+                model: data,
+              });
+            });
+          },
         checkParallelTasksFinished: async function(requestId){
             try {
                 let response = await http.get("parallel/finished/" + requestId);

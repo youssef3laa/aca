@@ -1,5 +1,6 @@
 package com.asset.appwork.model;
 
+import com.asset.appwork.enums.GroupType;
 import com.asset.appwork.mixin.GroupPlatformMixIn;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +27,9 @@ import java.sql.ResultSet;
 public class Group extends BaseIdentity {
     @Column(name = "GroupCode")
     String groupCode;
+    @Column(name = "Type")
+    @Enumerated(EnumType.STRING)
+    GroupType type;
     @Column(name = "Head")
     Boolean isHeadRole;
     @Column(name = "Vice")
@@ -66,6 +70,14 @@ public class Group extends BaseIdentity {
 
     public void setGroupCode(String groupCode) {
         this.groupCode = groupCode;
+    }
+
+    public GroupType getType() {
+        return type;
+    }
+
+    public void setType(GroupType type) {
+        this.type = type;
     }
 
     public Boolean getIsHeadRole() {

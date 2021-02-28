@@ -18,5 +18,6 @@ public interface LookupRepository extends GenericRepository<Lookup, Long> {
     @Query("select L from Lookup L inner join Lookup parent on (L.categoryId = parent.Id) where parent.category = :category and (L.arValue like %:search% or L.stringKey like %:search%)")
     Page<Lookup> findCategoryValues(String category, String search, Pageable pageable);
 
+    @Query("select L from Lookup L where L.type = :type and (L.arValue like %:arValue% or L.category like %:category%)")
     Page<Lookup> findByTypeAndArValueContainsOrCategoryContains(Integer type, String arValue, String category, Pageable pageable);
 }

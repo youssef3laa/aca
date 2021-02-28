@@ -83,20 +83,25 @@ h1 {
 import TheNavbar from './modules/core-module/components/the-nav-bar'
 import SystemUser from './config/user'
 import Vue from 'vue'
+import homePageMixin from "./modules/admin-module/mixins/homePageMixin";
+
 // import dynamicView from './components/DynamicView'
 
 export default {
   components: { TheNavbar },
+  mixins: [homePageMixin],
   methods: {
-    syncUser: function() {
+    syncUser: async function() {
       var systemUser = localStorage.getItem('user')
       Vue.prototype.$user = new SystemUser()
 
       if (systemUser) Vue.prototype.$user.create(JSON.parse(systemUser))
+
+      await this.appendHomeRoutes()
     },
   },
-  created: function() {
-    this.syncUser()
+  created: async function() {
+    await this.syncUser()
     console.log("App This", this)
   },
 }

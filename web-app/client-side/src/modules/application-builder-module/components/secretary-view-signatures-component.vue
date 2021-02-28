@@ -3,10 +3,16 @@
     <v-container>
       <v-row>
         <v-col class="padding-left" cols="5">
-          <AppBuilder ref="appBuilder" :app="app" />
+          <AppBuilder ref="tableAppBuilder" :app="app" />
         </v-col>
         <v-col class="no-padding" cols="7">
-          <AppBuilder ref="appBuilder1" :app="app1" />
+          <AppBuilder v-show="itemIsSelected" ref="appBuilder" :app="app1" />
+            <div class="empty-form" v-show="!itemIsSelected">
+            <div>
+            <v-img width="300px" src="../../../assets/documents.svg"></v-img>
+            <span>قم باختيار وارد لعرضة وعرض والتأشيرات</span>
+            </div>
+          </div>
         </v-col>
       </v-row>
     </v-container>
@@ -14,20 +20,52 @@
 </template>
 
 <script>
-import http from "../../core-module/services/http"
+import http from "../../core-module/services/http";
+import formPageMixin from "../../../mixins/formPageMixin";
+
 export default {
   components: {
     AppBuilder: () => import("../builders/app-builder"),
   },
-  mounted() {
-    console.log(JSON.stringify(this.app));
-    console.log(JSON.stringify(this.app1));
-    this.loadForm("secretary-incoming-signatures-table","appBuilder");
-    this.loadForm("secretary-incoming-signatures-form","appBuilder1");
+  mixins: [formPageMixin],
 
+  mounted() {
+    this.loadForm("secretary-incoming-signatures-table", "tableAppBuilder");
+    this.loadForm("secretary-incoming-signatures-form", "appBuilder");
+
+    this.getTasks("signatures");
+
+    this.$observable.subscribe("signaturesTable_selected", async (selected) => {
+      console.log(selected);
+
+      if (selected.length !=0) {
+        this.itemIsSelected = true;
+        let requestData = await this.readRequest(
+          selected[selected.length - 1].TaskData.ApplicationData
+            .ACA_ProcessRouting_InputSchemaFragment.requestId
+        );
+
+        console.log(requestData);
+        this.$refs.appBuilder.setModelData("mainData", {
+          followUpNumber:
+            selected[selected.length - 1].TaskData.ApplicationData
+              .ACA_ProcessRouting_InputSchemaFragment.requestNumber,
+          followUpDate: requestData.requestDate,
+          nextFollowUpDate: requestData.requestDate,
+        });
+      }
+      else{
+        this.itemIsSelected=false;
+      }
+    });
   },
   methods: {
-    loadForm: function(formName,appBuilder, callBack) {
+        submit(){
+      this.selected.forEach((item)=>{
+        this.inputSchemaArray.push(item.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragments)
+      })
+    },
+    loadForm: function(formName, appBuilder, callBack) {
       http
         .get("/user/form/" + formName)
         .then((response) => {
@@ -41,16 +79,24 @@ export default {
   },
   data() {
     return {
-  
       taskList: [{ title: "إنشاء وارد جديد" }, { title: "تسجيل موضوع" }],
-      app:{},
-      app1:{}
+      app: {},
+      app1: {},
+      selected:[],
+      inputSchemaArray:[],
+      itemIsSelected: false,
     };
   },
 };
 </script>
 
 <style scoped>
+.empty-form{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+}
 .no-padding {
   padding: 0px !important;
 }

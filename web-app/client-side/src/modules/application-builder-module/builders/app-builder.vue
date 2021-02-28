@@ -94,6 +94,7 @@ export default {
       }
     },
 
+
     getModelData: function(key) {
       if (!this.positions[key]) this.findKey(key)
       let form = this.appData.pages.page[this.positions[key][0]].sections.sec[
@@ -144,7 +145,10 @@ export default {
       if (!this.positions[key]) this.findKey(key)
       this.appData.pages.tabs[this.positions[key][0]].show = show
     },
-
+    setTabValue: function(key,value) {
+      if (!this.positions[key]) this.findKey(key)
+      this.appData.pages.tabs[this.positions[key][0]].value = value
+    },
     appendForm: function(key, obj) {
       if (!this.positions[key]) this.findKey(key)
       this.appData.pages.page[this.positions[key][0]].sections.sec[

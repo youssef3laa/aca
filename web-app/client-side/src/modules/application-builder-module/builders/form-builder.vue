@@ -65,8 +65,9 @@ import ProcessStatusControl from '../components/process-status-control'
 import SaveProcessComponent from '../components/save-process-component'
 import SecretaryViewSignaturesComponent from '../components/secretary-view-signatures-component'
 import InboxComponent from '../components/inbox-component'
-import ImageComponent from '../components/image-component'
-import MemoView from '../components/memo-view'
+import ImageComponent from "../components/image-component"
+import ActionsTopComponent from "../components/actions-top-component"
+import BarcodeComponent from "../components/barcode-component"
 
 export default {
   name: 'FormBuilder',
@@ -103,7 +104,8 @@ export default {
     SecretaryViewSignaturesComponent,
     InboxComponent,
     ImageComponent,
-    MemoView,
+    ActionsTopComponent,
+    BarcodeComponent,
   },
   data() {
     return {
