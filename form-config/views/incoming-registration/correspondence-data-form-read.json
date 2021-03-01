@@ -3,28 +3,30 @@
     "inputs": [
         {
             "type": "InputComponent",
-            "label": "subject",
-            "name": "subject",
+            "label": "incomingNumber",
+            "name": "incomingNumber",
             "col": "4"
         },
         {
             "type": "InputComponent",
+            "label": "subject",
+            "name": "subject",
+            "col": "4"
+        },
+    
+        {
+            "type": "InputComponent",
             "label": "confidentiality",
-            "name": "confidentiality",
+            "name": "confidentialityTxt",
             "col": "4"
         },
         {
             "type": "InputComponent",
             "label": "priorityLevel",
-            "name": "priorityLevel",
+            "name": "priorityLevelTxt",
             "col": "4"
         },
-        {
-            "type": "InputComponent",
-            "label": "incomingNumber",
-            "name": "incomingNumber",
-            "col": "4"
-        },
+    
         {
             "type": "InputComponent",
             "label": "incomingDate",
@@ -34,13 +36,13 @@
         {
             "type": "InputComponent",
             "label": "incomingFrom",
-            "name": "incomingFrom",
+            "name": "incomingFromTxt",
             "col": "4"
         },
         {
             "type": "InputComponent",
             "label": "incomingType",
-            "name": "incomingType",
+            "name": "incomingTypeTxt",
             "col": "4"
         },
         {
@@ -58,13 +60,13 @@
         {
             "type": "InputComponent",
             "label": "jobType",
-            "name": "jobType",
+            "name": "jobTypeTxt",
             "col": "4"
         },
         {
             "type": "InputComponent",
             "label": "taskType",
-            "name": "taskType",
+            "name": "taskTypeTxt",
             "col": "4"
         },
         {
@@ -108,6 +110,12 @@
         "numberOfAttachments": "",
         "attachmentsDescription": "",
         "constraint": "",
-        "topicSummary": ""
+        "topicSummary": "",
+        "confidentialityTxt":"",
+        "priorityLevelTxt":"",
+        "incomingFromTxt":"",
+        "incomingTypeTxt":"",
+        "jobTypeTxt":"",
+        "taskTypeTxt":""
     }
 }

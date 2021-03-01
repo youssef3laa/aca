@@ -23,7 +23,7 @@ public class ApprovalHistoryService {
 
     @Transactional
     public List<ApprovalHistory> addDisplayNameToApprovals(List<ApprovalHistory> approvals) {
-        approvals.stream().forEach(approvalHistory -> {
+        approvals.forEach(approvalHistory -> {
             try {
                 if (approvalHistory.getUserCN() != null) {
                     if (approvalHistory.getUserCN().contains("users")) {
@@ -63,7 +63,7 @@ public class ApprovalHistoryService {
     }
 
     public void updateReceiveDate(Long id) throws AppworkException {
-        Optional<ApprovalHistory> approvalHistory = approvalHistoryRepository.findById(id);
+        Optional<ApprovalHistory> approvalHistory = approvalHistoryRepository.findTopByRequestIdOrderByIdDesc(id);
         if (approvalHistory.isPresent()) {
             approvalHistory.get().setReceiveDate(new Date());
             approvalHistoryRepository.save(approvalHistory.get());

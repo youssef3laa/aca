@@ -88,21 +88,6 @@ export default {
             });
             this.$observable.subscribe("addInquiryModal_addModal", async (obj) => {
                 console.log(obj);
-                // obj.obj.inquiryId = this.inquiryId;
-                // this.inquiryId++;
-                // this.inquiryData.push(Object.assign({}, obj.obj));
-                //
-                // this.$refs.appBuilder.setModelData("inquiryTable", {
-                //     inquiryTable: this.inquiryTable(this.inquiryData),
-                // });
-
-                // let inquiryTableModel= this.$refs.appBuilder.getModelData("inquiryTable");
-                // inquiryTableModel.inquiryTable.data.push(obj)
-                //refresh table
-
-                // , {
-                //         inquiryTable: this.inquiryTable(this.inquiryData),
-                //     }
                 let objToBeCreated = {
                     birthDate: obj.obj.birthDate,
                     birthPlace: obj.obj.birthPlace,
@@ -153,19 +138,12 @@ export default {
                 } catch (e) {
                     console.log(e);
                 }
-                // this.inquiryData = this.inquiryData.filter((inquiry) => {
-                //     return inquiry.inquiryId != data.item.inquiryId;
-                // });
-                //
-                // this.$refs.appBuilder.setModelData("inquiryTable", {
-                //     inquiryTable: this.inquiryTable(this.inquiryData),
-                // });
+
             });
         },
         formLoaded: function () {
             this.$refs.appBuilder.setModelData("mainData",
                 {
-                    incomingNumber: this.request.requestNumber,
                     maxDate: new Date().toISOString().split("T")[0]
                 }
             )
@@ -217,7 +195,6 @@ export default {
 
         },
         submit: async function () {
-            let isInitiating = false;
             let vueThis = this;
             let attacmhnetComponentModel = this.$refs.appBuilder.getModelData("AttachmentComponent");
             if (!attacmhnetComponentModel.attachment.validity) {
@@ -238,11 +215,12 @@ export default {
 
             let returnedTargetMainData = Object.assign({}, mainData);
             console.log(mainData, returnedTargetMainData);
-            returnedTargetMainData.confidentiality = returnedTargetMainData.confidentiality.value.value
-            returnedTargetMainData.incomingType = returnedTargetMainData.incomingType.value.value
-            returnedTargetMainData.jobType = returnedTargetMainData.jobType.value.value
-            returnedTargetMainData.priorityLevel = returnedTargetMainData.priorityLevel.value.value
-            returnedTargetMainData.taskType = returnedTargetMainData.taskType.value.value
+            returnedTargetMainData.confidentiality = returnedTargetMainData.confidentiality?.value.value
+            returnedTargetMainData.incomingType = returnedTargetMainData.incomingType?.value.value
+            returnedTargetMainData.jobType = returnedTargetMainData.jobType.value?.value
+            returnedTargetMainData.priorityLevel = returnedTargetMainData.priorityLevel?.value.value
+            returnedTargetMainData.taskType = returnedTargetMainData.taskType.value?.value
+            returnedTargetMainData.incomingFrom = returnedTargetMainData.incomingFrom?.value.value
             returnedTargetMainData.requestEntityId = this.request.id;
             returnedTargetMainData.id = this.incomingRegistration.id;
 
@@ -284,8 +262,6 @@ export default {
                 }
                 console.log("Data", data)
 
-                if (!isInitiating) {
-                    isInitiating = true;
                     try {
                         let initiationResponse = await this.initiateCaseProcess(data);
                         console.log(initiationResponse);
@@ -296,9 +272,7 @@ export default {
                         }, () => router.push({name: 'HomePage'}).then(r => console.log(r)));
                     } catch (e) {
                         console.error(e);
-                        isInitiating = false;
                     }
-                }
 
 
             }

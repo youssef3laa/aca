@@ -45,24 +45,26 @@ public class IncomingRegistrationService {
 
     public IncomingRegistration addLookupToIncomingRegistration(IncomingRegistration incomingRegistration) {
         Optional<Lookup> confidentiality = lookupRepository.findByCategoryAndKey("confidentialityType", incomingRegistration.getConfidentiality());
-        confidentiality.ifPresent(lookup -> incomingRegistration.setConfidentiality(lookup.getArValue()));
+        confidentiality.ifPresent(lookup -> incomingRegistration.setConfidentialityTxt(lookup.getArValue()));
 
         Optional<Lookup> incomingType = lookupRepository.findByCategoryAndKey("incomingType", incomingRegistration.getIncomingType());
-        incomingType.ifPresent(lookup -> incomingRegistration.setIncomingType(lookup.getArValue()));
+        incomingType.ifPresent(lookup -> incomingRegistration.setIncomingTypeTxt(lookup.getArValue()));
 
         Optional<Lookup> jobType = lookupRepository.findByCategoryAndKey("jobType", incomingRegistration.getJobType());
-        jobType.ifPresent(lookup -> incomingRegistration.setJobType(lookup.getArValue()));
+        jobType.ifPresent(lookup -> incomingRegistration.setJobTypeTxt(lookup.getArValue()));
 
         Optional<Lookup> priorityLevel = lookupRepository.findByCategoryAndKey("priority", incomingRegistration.getPriorityLevel());
-        priorityLevel.ifPresent(lookup -> incomingRegistration.setPriorityLevel(lookup.getArValue()));
+        priorityLevel.ifPresent(lookup -> incomingRegistration.setPriorityLevelTxt(lookup.getArValue()));
 
         Optional<Lookup> taskType = lookupRepository.findByCategoryAndKey("taskType", incomingRegistration.getTaskType());
-        taskType.ifPresent(lookup -> incomingRegistration.setTaskType(lookup.getArValue()));
+        taskType.ifPresent(lookup -> incomingRegistration.setTaskTypeTxt(lookup.getArValue()));
+        Optional<Lookup> incomingFrom = lookupRepository.findByCategoryAndKey("incomingSources", incomingRegistration.getIncomingFrom());
+        incomingFrom.ifPresent(lookup -> incomingRegistration.setIncomingFromTxt(lookup.getArValue()));
 
         Optional<String> responsibleEntityGehaz = Optional.ofNullable(incomingRegistration.getResponsibleEntityGehaz());
         responsibleEntityGehaz.ifPresent(element -> {
             try {
-                incomingRegistration.setResponsibleEntityGehaz(orgChartService.getUnitByName(element).getNameAr());
+                incomingRegistration.setResponsibleEntityGehazTxt(orgChartService.getUnitByName(element).getNameAr());
             } catch (AppworkException e) {
                 e.printStackTrace();
                 log.error(e.getMessage());
@@ -72,7 +74,7 @@ public class IncomingRegistrationService {
         Optional<String> responsibleEntityKeta3 = Optional.ofNullable(incomingRegistration.getResponsibleEntityketa3());
         responsibleEntityKeta3.ifPresent(element -> {
             try {
-                incomingRegistration.setResponsibleEntityketa3(orgChartService.getUnitByName(element).getNameAr());
+                incomingRegistration.setResponsibleEntityKeta3Txt(orgChartService.getUnitByName(element).getNameAr());
             } catch (AppworkException e) {
                 e.printStackTrace();
                 log.error(e.getMessage());
@@ -82,7 +84,7 @@ public class IncomingRegistrationService {
         Optional<String> responsibleEntityEdara = Optional.ofNullable(incomingRegistration.getResponsibleEntityEdara());
         responsibleEntityEdara.ifPresent(element -> {
             try {
-                incomingRegistration.setResponsibleEntityEdara(orgChartService.getUnitByName(element).getNameAr());
+                incomingRegistration.setResponsibleEntityEdaraTxt(orgChartService.getUnitByName(element).getNameAr());
             } catch (AppworkException e) {
                 e.printStackTrace();
                 log.error(e.getMessage());

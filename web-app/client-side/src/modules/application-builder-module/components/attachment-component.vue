@@ -272,7 +272,7 @@
 import draggable from 'vuedraggable'
 import IframeComponent from '../components/iframe-component'
 import attachmentMixin from '@/mixins/attachmentMixin'
-import { Pane, Splitpanes } from 'splitpanes'
+import {Pane, Splitpanes} from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import formPageMixin from '@/mixins/formPageMixin'
 import FileVersionsModalComponent from '@/modules/application-builder-module/components/file-versions-modal-component'
@@ -406,6 +406,15 @@ export default {
         this.valid = newVal.length > 0
       },
     },
+      valid: {
+          handler: function (newVal) {
+              this.$emit('update', {
+                  name: this.field.name,
+                  key: "validity",
+                  value: newVal
+              })
+          }
+      },
   },
 }
 </script>

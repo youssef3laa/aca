@@ -2,18 +2,10 @@
     "key": "outcomingData",
     "inputs": [
         {
-            "type": "InputComponent",
-            "label": "outcomingNumber",
-            "name": "outcomingNumber",
-            "readonly": true,
-            "col": "4"
-        },
-        {
-            "type": "InputComponent",
+            "type": "DatePickerComponent",
             "label": "outcomingDate",
             "name": "outcomingDate",
             "readonly": true,
-            "rule": "required",
             "col": "4"
         },
         {

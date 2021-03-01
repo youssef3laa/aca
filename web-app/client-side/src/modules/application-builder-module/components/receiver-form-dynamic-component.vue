@@ -10,11 +10,11 @@
 </template>
 
 <script>
-    import AutocompleteComponent from './autocomplete-component'
-    import userMixin from "../../../mixins/userMixin"
-    import orgChartMixin from "../../../mixins/orgChartMixin";
+import AutocompleteComponent from './autocomplete-component'
+import userMixin from "../../../mixins/userMixin"
+import orgChartMixin from "../../../mixins/orgChartMixin";
 
-    export default {
+export default {
         components: {AutocompleteComponent},
         mixins: [userMixin,orgChartMixin],
         props: ["val","field"],
@@ -120,8 +120,8 @@
                 url = url.replace(/\$group/, this.userDetails.groups[0].groupCode)
                 url = url.replace(/\$unit/, this.userDetails.groups[0].unit.unitCode)
 
-                url = url.replace(/\$parentGroup/, this.parent.groupCode)
-                url = url.replace(/\$parentUnit/, this.parent.unit.unitCode)
+                url = url.replace(/\$parentGroup/, this.parent?.groupCode)
+                url = url.replace(/\$parentUnit/, this.parent?.unit?.unitCode)
 
                 url = url.replace(/\$\d+/,code)
                 return url

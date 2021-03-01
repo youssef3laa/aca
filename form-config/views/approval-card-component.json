@@ -7,6 +7,28 @@
         }
     ],
     "model": {
-        "approval": {}
+        "approval": {
+            "fields": [
+                "comment"
+            ],
+            "receiver": {
+                "types": [
+                    "single",
+                    "multiple"
+                ],
+                "inputs": [
+                    {
+                        "name": "theGroup",
+                        "url": "org/unit/$unit/down/all/unitTypeCode/GRP",
+                        "type": "unit"
+                    },
+                    {
+                        "name": "theMember",
+                        "url": "org/group/findByUnitCodes/$1",
+                        "type": "group"
+                    }
+                ]
+            }
+        }
     }
 }

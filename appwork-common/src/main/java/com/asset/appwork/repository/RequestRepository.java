@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface RequestRepository extends GenericRepository<RequestEntity, Long> {
 
-    @Query("select count(r.requestDate) from RequestEntity r where year(r.requestDate) = :year")
+    @Query("select count(r.requestDate) from RequestEntity r where year(r.requestDate) = :year and ( r.status !='created' and r.status != 'draft' )")
     Long countByRequestDate(Integer year);
     //
     // get by specific request status and get older date  from source incoming only

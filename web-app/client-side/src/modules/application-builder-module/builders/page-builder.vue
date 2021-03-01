@@ -39,8 +39,8 @@ export default {
   },
   props: ['page', 'tabkey'],
   created() {
-    console.log(this.page.sections)
-    this.$observable.subscribe(this.tabkey, (tabId) => {
+    // console.log(this.page.sections.sec[0].forms[0])
+this.$observable.subscribe(this.tabkey, (tabId) => {
       console.log(tabId)
       this.tabId = tabId
     })
