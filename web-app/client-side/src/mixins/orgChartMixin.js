@@ -35,7 +35,7 @@ export default {
                 let response = await http.get("org/group/findByUnitCodes/"+unitCode)
                 if (response.data.data instanceof Array && response.data.data.length > 0){
                     for(let key in response.data.data) {
-                        if(response.data.data[key].isHeadRole){
+                        if(response.data.data[key].type === "HEAD"){
                             return response.data.data[key]
                         }
                     }

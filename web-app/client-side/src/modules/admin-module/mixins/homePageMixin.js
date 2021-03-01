@@ -18,8 +18,8 @@ export default {
                 if(userDetails.groups[0]){
                     let group = userDetails.groups[0]
                     let unitCode = userDetails.groups[0].unit.unitCode
-                    if(unitCode == "COC" && group.isHeadRole) homeComponent = HomePageSecretary
-                    else if((unitCode == "TVS" || unitCode == "TCS" || unitCode == "TVA" || unitCode == "TCA") && group.isHeadRole) homeComponent = HomePageTechnicalOfficeHead
+                    if(unitCode == "COC" && group.type === "HEAD") homeComponent = HomePageSecretary
+                    else if((unitCode == "TVS" || unitCode == "TCS" || unitCode == "TVA" || unitCode == "TCA") && group.type === "HEAD") homeComponent = HomePageTechnicalOfficeHead
                 }
                 console.log(router)
                 router.addRoutes([{

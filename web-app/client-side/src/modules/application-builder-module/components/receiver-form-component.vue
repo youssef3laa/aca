@@ -418,7 +418,7 @@
                     this.direction = newVal.direction
                     this.handleReadOnlyReceiver(this.userDetails.groups[0].unit.unitCode,
                         this.userDetails.groups[0].unit.unitTypeCode,
-                        this.userDetails.groups[0].isHeadRole)
+                        this.userDetails.groups[0].type === "HEAD")
                 }
                 if(newVal.minimumLevel){
                     this.minimumLevel = newVal.minimumLevel
@@ -436,7 +436,7 @@
                 if(this.direction){
                     this.handleReadOnlyReceiver(this.userDetails.groups[0].unit.unitCode,
                                             this.userDetails.groups[0].unit.unitTypeCode,
-                                            this.userDetails.groups[0].isHeadRole)
+                                            this.userDetails.groups[0].type === "HEAD")
                 }
                 this.parent = await this.getParentDetails()
                 await this.onValueChange()
