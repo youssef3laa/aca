@@ -3,6 +3,7 @@ package com.asset.appwork.util;
 import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.model.Group;
 import com.asset.appwork.model.User;
 import com.asset.appwork.repository.MemoValuesRepository;
 import com.asset.appwork.repository.MemosRepository;
@@ -16,10 +17,7 @@ import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.NumberingDefinitionsPart;
 import org.docx4j.wml.Text;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Attribute;
-import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -76,19 +74,26 @@ public class Docx {
                 }
 
                 Document doc = Jsoup.parse(value);
-//                user.getGroup().stream().forEach(s ->
-//                {
-//                    System.out.println(s.getGroupCode());
-//                });
+
+                Optional<Group> group = user.getGroup().stream().findFirst();
+                String groupCode = "";
+                if(group.isPresent())
+                {
+                    groupCode = group.get().getGroupCode();
+                }
 
                 String signature = "<img src=\"https://i.ibb.co/h94n9bR/signature.png\"></img>";
-                String name = "<span>Mohamed Mohamed</span>";
+                String name = "<span>" + reverseString(user.getDisplayName()) + "</span>";
                 try {
-                    doc.select("#MCMsignature").first().removeAttr("hidden").append(signature);
-                    doc.select("#MCMname").first().removeAttr("hidden").append(name);
+                    doc.select("#" + groupCode + "signature").first().removeAttr("hidden").append(signature);
+                    doc.select("#" + groupCode + "name").first().removeAttr("hidden").append(name);
                 }
                 catch (NullPointerException e)
-                {}
+                {
+                    e.printStackTrace();
+                    log.error("Docx: " + e.getMessage());
+                    throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
+                }
                 value = doc.toString();
 
                 if (value.contains("<img"))
@@ -131,6 +136,17 @@ public class Docx {
             log.error("Docx: " + e.getMessage());
             throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public String reverseString(String str)
+    {
+        String[] words = str.split(" ");
+        String reversedString = "";
+        for (int i = words.length - 1; i >= 0; i--)
+        {
+            reversedString += words[i] + " ";
+        }
+        return reversedString;
     }
 
     public String importDocxToJson(String fileName) throws AppworkException {
