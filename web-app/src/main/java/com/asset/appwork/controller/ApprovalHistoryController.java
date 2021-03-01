@@ -79,7 +79,7 @@ public class ApprovalHistoryController {
 
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-            Page<ApprovalHistory> histories = historyRepository.findByRequestIdOrderByApprovalDateAsc(requestId, PageRequest.of(pageNumber, pageSize));
+            Page<ApprovalHistory> histories = historyRepository.findByRequestIdOrderByApprovalDateAsc(Long.valueOf(requestId), PageRequest.of(pageNumber, pageSize));
             if(histories.isEmpty()) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
 
             respBuilder.info("totalCount", histories.getTotalElements());

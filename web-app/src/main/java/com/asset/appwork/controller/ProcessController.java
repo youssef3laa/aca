@@ -103,7 +103,7 @@ public class ProcessController {
             Long linkIncomingEntityId = entity.create(linkIncoming);
 
 
-            String generatedRequestNumber = requestEntityService.generateRequestNumber(account);
+            String generatedRequestNumber = requestEntityService.generateRequestNumber();
             RequestEntity requestEntity = new RequestEntity();
             requestEntity.setEntityId(String.valueOf(linkIncomingEntityId));
             requestEntity.setEntityName("ACA_Entity_linkIncoming");

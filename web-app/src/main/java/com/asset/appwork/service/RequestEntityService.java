@@ -1,6 +1,5 @@
 package com.asset.appwork.service;
 
-import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.Group;
@@ -50,7 +49,7 @@ public class RequestEntityService extends GenericService{
         return requestRepository.save(requestEntity);
     }
 
-    public String generateRequestNumber(Account account) throws AppworkException {
+    public String generateRequestNumber() throws AppworkException {
         try {
             Date date = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy");

@@ -18,8 +18,8 @@ import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.util.ReflectionUtil;
 import com.asset.appwork.util.SystemUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -230,11 +232,7 @@ public class ModuleRouting {
                     nextComponent, nextConfig, nextReadonlyCompnent, nextSubBP, nextRouter);
 
             addUserToRequest(outputSchema, account);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            log.error("ModuleRouting: "+ e.getMessage());
-            throw new AppworkException(e.getMessage(),ResponseCode.MODULE_ROUTING_FAILURE);
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             log.error("ModuleRouting: "+ e.getMessage());
             throw new AppworkException(e.getMessage(),ResponseCode.MODULE_ROUTING_FAILURE);
@@ -282,7 +280,7 @@ public class ModuleRouting {
     private <T> String handleRequestModificationCase(T outputSchema, RoutingConfig routingConfig, String currentStepId, String parentHistoryId){
         String step = getIdFromNextSteps(routingConfig, currentStepId, requestModificationString);
         if(!step.isEmpty()){
-            ((OutputSchema) outputSchema).setParentHistoryId(parentHistoryId);
+//            ((OutputSchema) outputSchema).setParentHistoryId(parentHistoryId);
             return step;
         }
         else {

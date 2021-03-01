@@ -22,9 +22,9 @@ export default {
                 console.error(error);
             }
         },
-        claimTask: async function (taskId , approvalId) {
+        claimTask: async function (taskId , requestId) {
             try{
-                let response = await http.post('/workflow/task/claim', { taskId: taskId,  approvalId: approvalId } );
+                let response = await http.post('/workflow/task/claim', {taskId, requestId});
                 console.log("ClaimTask Response:", response);
             } catch (error){
                 console.error(error)

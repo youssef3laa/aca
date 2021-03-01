@@ -1,7 +1,6 @@
 package com.asset.appwork.otds;
 
 import com.asset.appwork.dto.Account;
-import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.util.Http;
 import com.asset.appwork.util.SystemUtil;
@@ -28,157 +27,199 @@ public final class Otds {
         return this.partition;
     }
 
-    public static <T> String login(Environment env, T data) throws JsonProcessingException {
+    public static <T> String login(Environment env, T data) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setData(data.toString())
                 .post(SystemUtil.generateOtdsAPIBaseUrl(env) + API.LOGIN.getUrl());
+        String response = http.getResponse();
+        if (http.getStatusCode() != 200)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
         return SystemUtil.readJSONField(http.getResponse(), "ticket");
     }
 
-    public <T> String consolidate(T data) {
+    public <T> String consolidate(T data) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .post(this.apiBaseUrl + API.CONSOLIDATION_CONSOLIDATE.getUrl());
 
-        return http.getResponse();
+        String response = http.getResponse();
+        if (http.getStatusCode() != 201)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
-    public <T> String createGroup(T data) {
+    public <T> String createGroup(T data) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .post(this.apiBaseUrl + API.GROUPS_CREATE.getUrl());
 
-        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        String response = new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        if (http.getStatusCode() != 201)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public String deleteGroupByGroupName(String roleName) {
+    public String deleteGroupByGroupName(String roleName) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .delete(this.apiBaseUrl + String.format(API.GROUPS_DELETE.getUrl(), URLEncoder.encode(roleName, StandardCharsets.UTF_8.name())));
-        return http.getResponse();
+
+        String response = http.getResponse();
+        if (http.getStatusCode() != 204)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public <T> String updateGroupByGroupName(String oldGroupName, T data) {
+    public <T> String updateGroupByGroupName(String oldGroupName, T data) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .put(this.apiBaseUrl + String.format(API.GROUPS_UPDATE.getUrl(), URLEncoder.encode(oldGroupName + "@" + this.partition, StandardCharsets.UTF_8.name())));
-        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+
+        String response = new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        if (http.getStatusCode() != 200)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public String getAllGroups() {
+    public String getAllGroups() throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + String.format(API.GROUPS_GET_ALL.getUrl(), URLEncoder.encode(String.format("where_partition_name=%s", this.partition), StandardCharsets.UTF_8.name())));
 
-        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        String response = new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        if (http.getStatusCode() != 200)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public String getGroupByGroupName(String roleName) {
+    public String getGroupByGroupName(String roleName) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + String.format(API.GROUPS_GET.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
-        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+
+        String response = new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        if (http.getStatusCode() != 200)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public String getMembersAssignedToGroupByGroupName(String roleName) {
+    public String getMembersAssignedToGroupByGroupName(String roleName) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + String.format(API.GROUPS_GET_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
-        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        String response = new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        if (http.getStatusCode() != 200)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public <T> String assignMembersToGroup(String roleName, T data) {
+    public <T> String assignMembersToGroup(String roleName, T data) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .post(this.apiBaseUrl + String.format(API.GROUPS_ASSIGN_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
-        return http.getResponse();
+        String response = http.getResponse();
+        if (http.getStatusCode() != 204)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public <T> String setMembersToGroup(String roleName, T data) {
+    public <T> String setMembersToGroup(String roleName, T data) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .put(this.apiBaseUrl + String.format(API.GROUPS_ASSIGN_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
-        return http.getResponse();
+        String response = http.getResponse();
+        if (http.getStatusCode() != 204)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public <T> String unAssignMembersFromGroup(String roleName, T data) {
+    public <T> String unAssignMembersFromGroup(String roleName, T data) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .post(this.apiBaseUrl + String.format(API.GROUPS_UNASSIGN_MEMBERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
-        return http.getResponse();
+        String response = http.getResponse();
+        if (http.getStatusCode() != 204)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public <T> String getGroupsInGroup(String roleName, T data) {
+    public <T> String getGroupsInGroup(String roleName, T data) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .post(this.apiBaseUrl + String.format(API.GROUPS_GET_GROUPS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
-        return http.getResponse();
+        String response = http.getResponse();
+        if (http.getStatusCode() != 200)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public <T> String unAssignGroupsFromGroup(String roleName, T data) {
-        Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
-                .setHeader("OTDSTicket", this.account.getTicket())
-                .setData(data.toString())
-                .post(this.apiBaseUrl + String.format(API.GROUPS_UNASSIGN_GROUPS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
-
-        return http.getResponse();
-    }
-
-    @SneakyThrows(UnsupportedEncodingException.class)
-    public String getUsersAssignedToGroupByGroupId(String roleName) {
+    public String getUsersAssignedToGroupByGroupId(String roleName) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + String.format(API.GROUPS_GET_USERS.getUrl(), URLEncoder.encode(roleName + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
-        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        String response = new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        if (http.getStatusCode() != 200)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
-    public <T> String resetPassword(String userId, T data) {
+    public <T> String resetPassword(String userId, T data) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .put(this.apiBaseUrl + String.format(API.USERS_RESET_PASSWORD.getUrl(), userId));
-        return http.getResponse();
+
+        String response = http.getResponse();
+        if (http.getStatusCode() != 204)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
-    public <T> String createUser(T data) throws JsonProcessingException {
+    public <T> String createUser(T data) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .post(this.apiBaseUrl + API.USERS_CREATE.getUrl());
 
-        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        String response = new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        if (http.getStatusCode() != 201)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public String getAllUsers() {
+    public String getAllUsers() throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + API.USERS_GET_ALL.getUrl() + "?" + URLEncoder.encode(String.format("where_partition_name=%s", this.partition), StandardCharsets.UTF_8.name()));
 
-        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        String response = new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        if (http.getStatusCode() != 200)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
@@ -186,8 +227,9 @@ public final class Otds {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + String.format(API.USERS_GET.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
+
         String response = new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-        if(http.getStatusCode() != 200)
+        if (http.getStatusCode() != 200)
             throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
         return response;
     }
@@ -198,27 +240,35 @@ public final class Otds {
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .put(this.apiBaseUrl + String.format(API.USERS_UPDATE.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
+
         String response = new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-        if(http.getStatusCode() != 200)
+        if (http.getStatusCode() != 200)
             throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
         return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public String deleteUserByUserId(String userId) {
+    public String deleteUserByUserId(String userId) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .delete(this.apiBaseUrl + String.format(API.USERS_DELETE.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
-        return http.getResponse();
+
+        String response = http.getResponse();
+        if (http.getStatusCode() != 204)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
-    public String getAllGroupsAssignedToUserByUserName(String username) {
+    public String getAllGroupsAssignedToUserByUserName(String username) throws JsonProcessingException, AppworkException {
         Http http = new Http().setContentType(Http.ContentType.JSON_REQUEST)
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .get(this.apiBaseUrl + String.format(API.USERS_GET_GROUPS.getUrl(), URLEncoder.encode(username + "@" + this.partition, StandardCharsets.UTF_8.name())));
 
-        return new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        String response = new String(http.getResponse().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        if (http.getStatusCode() != 200)
+            throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
+        return response;
     }
 
     @SneakyThrows(UnsupportedEncodingException.class)
@@ -227,8 +277,9 @@ public final class Otds {
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .post(this.apiBaseUrl + String.format(API.USERS_ASSIGN_GROUP.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
+
         String response = http.getResponse();
-        if(http.getStatusCode() != 204)
+        if (http.getStatusCode() != 204)
             throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
         return response;
     }
@@ -239,8 +290,9 @@ public final class Otds {
                 .setHeader("OTDSTicket", this.account.getTicket())
                 .setData(data.toString())
                 .post(this.apiBaseUrl + String.format(API.USERS_UNASSIGN_GROUP.getUrl(), URLEncoder.encode(userId, StandardCharsets.UTF_8.name())));
+
         String response = http.getResponse();
-        if(http.getStatusCode() != 204)
+        if (http.getStatusCode() != 204)
             throw new AppworkException(SystemUtil.readJSONField(response, "error"), SystemUtil.getResponseCodeFromInt(http.getStatusCode()));
         return response;
     }
@@ -271,6 +323,7 @@ public final class Otds {
         USERS_UPDATE("/users/%s");
 
         private final String url;
+
         API(String url) {
             this.url = url;
         }

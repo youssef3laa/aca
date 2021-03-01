@@ -1,12 +1,14 @@
 package com.asset.appwork.dto;
 
 import com.asset.appwork.util.SystemUtil;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
 
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PrimaryMemberDto {
     private long id;
     private String userCN;

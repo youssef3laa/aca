@@ -4,28 +4,31 @@
         {
             "type": "InputComponent",
             "label": "theAgency",
-            "name": "responsibleEntityGehaz",
-            "readonly":true,
+            "name": "responsibleEntityGehazTxt",
+            "readonly": true,
             "col": "4"
         },
         {
             "type": "InputComponent",
             "label": "theSector",
-            "name": "responsibleEntityketa3",
-            "readonly":true,
+            "name": "responsibleEntityKeta3Txt",
+            "readonly": true,
             "col": "4"
         },
         {
             "type": "InputComponent",
             "label": "theAdminOffice",
-            "name": "responsibleEntityEdara",
-            "readonly":true,
+            "name": "responsibleEntityEdaraTxt",
+            "readonly": true,
             "col": "4"
         }
     ],
     "model": {
         "responsibleEntityEdara": "",
         "responsibleEntityGehaz": "",
-        "responsibleEntityketa3": ""
+        "responsibleEntityketa3": "",
+        "responsibleEntityEdaraTxt": "",
+        "responsibleEntityGehazTxt": "",
+        "responsibleEntityKeta3Txt": ""
     }
 }

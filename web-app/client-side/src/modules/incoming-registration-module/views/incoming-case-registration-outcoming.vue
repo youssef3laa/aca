@@ -6,14 +6,14 @@
 </template>
 
 <script>
-    import AppBuilder from "../../application-builder-module/builders/app-builder";
-    import formPageMixin from "../../../mixins/formPageMixin";
-    import historyMixin from "../../history-module/mixin/historyMixin";
-    import incomingRegistrationMixin from "../mixins/incomig-registration-mixin";
-    import outcomingMixin from "../mixins/outcoming-mixin";
-    import opinionsMixin from "../../../mixins/opinionsMixin";
+import AppBuilder from "../../application-builder-module/builders/app-builder";
+import formPageMixin from "../../../mixins/formPageMixin";
+import historyMixin from "../../history-module/mixin/historyMixin";
+import incomingRegistrationMixin from "../mixins/incomig-registration-mixin";
+import outcomingMixin from "../mixins/outcoming-mixin";
+import opinionsMixin from "../../../mixins/opinionsMixin";
 
-    export default {
+export default {
         name: "incoming-case-registration-outcoming",
         mixins: [formPageMixin, historyMixin, incomingRegistrationMixin, opinionsMixin, outcomingMixin],
         components: {AppBuilder},
@@ -29,7 +29,7 @@
         async created(){
             let taskData = await this.getTaskData(this.taskId)
             this.inputSchema = taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment
-            await this.claimTask(this.taskId, this.inputSchema.parentHistoryId)
+            await this.claimTask(this.taskId, this.inputSchema.requestId)
             this.loadForm(this.inputSchema.config, this.formLoaded)
             this.$observable.subscribe("complete-step", this.submit)
             this.$observable.subscribe("outcomingIssueChange", (data) => {
@@ -65,7 +65,7 @@
 
                 this.outcoming = await this.getOutcoming()
                 this.$refs.appBuilder.setModelData("outcomingData",{
-                    outcomingNumber: this.outcoming.outcomingNumber,
+                    // outcomingNumber: this.outcoming.outcomingNumber,
                     outcomingDate: new Date().toISOString().split("T")[0]
                 })
             },
