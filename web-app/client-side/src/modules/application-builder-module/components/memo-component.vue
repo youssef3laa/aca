@@ -57,7 +57,6 @@
         </v-container>
       </pane>
     </splitpanes>
-    <v-btn @click="triggerSubmit">Submit</v-btn>
   </div>
 </template>
 
@@ -67,8 +66,9 @@ import memoComponentMixin from '../../../mixins/memoComponentMixin'
 import formPageMixin from '../../../mixins/formPageMixin'
 import ShowAttachmentComponent from './show-attachment-component'
 import IframeComponent from '../components/iframe-component'
-import { Splitpanes, Pane } from 'splitpanes'
+import {Pane, Splitpanes} from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
+
 export default {
   components: {
     AppBuilder: () => import('../builders/app-builder'),
@@ -96,7 +96,11 @@ export default {
       }
 
       // this.loadForm(this.selected, this.fillForm("722454"));
-    })
+    });
+
+      this.$observable.subscribe("memoCreate", async (callback) => {
+          if (callback) callback(await this.triggerSubmit());
+      })
   },
   data() {
     return {
@@ -155,6 +159,9 @@ export default {
 
     async triggerSubmit() {
       var formKeys = this.$refs.appBuilder.getFormKeyByPageKey('memoPage')
+      if(formKeys instanceof  Array && formKeys.length===0){
+        return  false;
+      }
       this.richText = {}
       formKeys.forEach((element) => {
         var data = this.$refs.appBuilder.getModelData(element)
@@ -170,8 +177,9 @@ export default {
         values: this.richText,
       }
 
-      await this.setMemoData(data)
-      this.$observable.fire('refreshHorizontalAttachmentFiles')
+      await this.setMemoData(data);
+      this.$observable.fire("refreshHorizontalAttachmentFiles");
+      return true;
     },
   },
   watch: {

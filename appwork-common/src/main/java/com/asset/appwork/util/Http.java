@@ -82,6 +82,8 @@ public class Http {
 
         try {
             statusCode = this.client.executeMethod(method);
+            //TODO change to @getResponseBodyAsStream
+            //https://hc.apache.org/httpclient-legacy/apidocs/org/apache/commons/httpclient/HttpMethod.html#getResponseBodyAsStream()
             response = method.getResponseBodyAsString();
             if (method.getStatusCode() > 299) isSuccess = false;
 

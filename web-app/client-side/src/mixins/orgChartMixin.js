@@ -5,6 +5,8 @@ export default {
         getParentDetails: async function(){
             try {
                 let response = await http.get("org/group/up")
+                console.log(response)
+                console.log(response.data.data)
                 if (response.data.data instanceof Array && response.data.data.length > 0){
                     return response.data.data[0]
                 }else if (response.data.data.name) {

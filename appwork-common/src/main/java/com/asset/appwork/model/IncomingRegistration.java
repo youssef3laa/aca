@@ -37,7 +37,6 @@ public class IncomingRegistration {
     String responsibleEntityGehaz;
     String responsibleEntityketa3;
     String topicSummary;
-    //    String transferTo;
     String confidentiality;
     String incomingType;
     String jobType;
@@ -45,11 +44,33 @@ public class IncomingRegistration {
     String taskType;
     Long outcomingId;
 
-    @Transient
     Long requestEntityId;
 
+
+    @Transient
+
+    String confidentialityTxt;
+    @Transient
+    String incomingTypeTxt;
+    @Transient
+    String jobTypeTxt;
+    @Transient
+    String priorityLevelTxt;
+    @Transient
+    String taskTypeTxt;
+    @Transient
+    String incomingFromTxt;
+    @Transient
+    String responsibleEntityGehazTxt;
+    @Transient
+    String responsibleEntityKeta3Txt;
+    @Transient
+    String responsibleEntityEdaraTxt;
+
+
+
     @OneToOne
-    @JoinColumn(name = "requestEntityId")
+    @JoinColumn(name = "requestEntityId",insertable = false,updatable = false)
     RequestEntity requestEntity;
 
     public String toString() {
@@ -57,6 +78,15 @@ public class IncomingRegistration {
         JsonNode tree = objectMapper.valueToTree(this);
         ((ObjectNode) tree).remove("requestEntity");
         ((ObjectNode) tree).remove("id");
+        ((ObjectNode) tree).remove("confidentialityTxt");
+        ((ObjectNode) tree).remove("incomingTypeTxt");
+        ((ObjectNode) tree).remove("jobTypeTxt");
+        ((ObjectNode) tree).remove("priorityLevelTxt");
+        ((ObjectNode) tree).remove("taskTypeTxt");
+        ((ObjectNode) tree).remove("incomingFromTxt");
+        ((ObjectNode) tree).remove("responsibleEntityGehazTxt");
+        ((ObjectNode) tree).remove("responsibleEntityKeta3Txt");
+        ((ObjectNode) tree).remove("responsibleEntityEdaraTxt");
         if (requestEntity != null)
             ((ObjectNode) tree).put("requestEntityId", requestEntity.getId());
         return SystemUtil.writeObjectIntoString(tree);

@@ -27,7 +27,7 @@
             "col": "4"
         },
         {
-            "type": "InputComponent",
+            "type": "AutoCompleteComponent",
             "label": "incomingFrom",
             "name": "incomingFrom",
             "rule": "required",
@@ -106,6 +106,9 @@
         },
         "taskType": {
             "url": "lookup/get/category/taskType"
+        },
+        "incomingFrom":{
+            "url": "lookup/get/category/incomingSources"
         },
         "maxDate": null
     }
