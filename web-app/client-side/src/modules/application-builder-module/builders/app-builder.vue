@@ -93,8 +93,6 @@ export default {
         }
       }
     },
-
-
     getModelData: function(key) {
       if (!this.positions[key]) this.findKey(key)
       let form = this.appData.pages.page[this.positions[key][0]].sections.sec[

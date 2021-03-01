@@ -199,5 +199,7 @@
   "presidentDirections":"توجيهات رئيس الجمهورية",
   "situationEstimate":"تقدير الموقف",
   "proposals":"المقترحات",
-  "viceOpinion":"رأي السيد النائب"
+  "viceOpinion":"رأي السيد النائب",
+  "backToManagement": "إرجاع للإدارة",
+  "sendToCertification": "إرسال للتصديق"
 }

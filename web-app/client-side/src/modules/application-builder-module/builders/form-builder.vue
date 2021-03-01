@@ -172,29 +172,13 @@ export default {
   },
   methods: {
     updateText: async function(data) {
-      // console.log(data)
-
       if (data.name && data.value !== undefined) {
         if (data.key) {
           this.forms.model[data.name][data.key] = data.value
         } else this.forms.model[data.name] = data.value
       }
-
-      if (this.forms.model)
-        this.forms.model['_valid'] = !this.$refs[this.forms.key]['_data'].flags
-          .invalid
-      // if (this.forms.key)
-      //   this.forms.model['_key'] = this.forms.key;
-
-      // console.log(this.$refs[this.forms.key].errors[data.name])
-      // console.log(this.$refs[this.forms.key]['_data'].flags)
-      // this.$refs[this.forms.key].validateWithInfo().then((val)=> console.log(val))
-      // let res =
-      //         await this.$refs.observer.validate()
-      // console.log(res)
       if (data.type == 'ButtonComponent' && data.publish) {
         if (data.modalId) {
-          // console.log(data.modalId)
           this.$observable.fire(data.publish, {
             type: 'ButtonComponent',
             action: data.action,
@@ -214,66 +198,25 @@ export default {
         })
       }
     },
-    validateModel: function(key) {
-      if (this.forms.key == key) {
-        return !this.$refs[this.forms.key]['_data'].flags.invalid
-      }
-    },
-    saveValue: function() {},
   },
   props: ['forms', 'model'],
   watch: {
     model: function(newVal) {
       this.formModel = newVal
     },
-    forms: {
-      immediate: true,
-      handler(newVal) {
-        if (newVal && newVal.key) {
-          this.$observable.subscribe(
-            'validate-' + newVal.key + '-model',
-            async () => {
-              return !this.$refs[this.forms.key]['_data'].flags.invalid
-            }
-          )
-        }
-      },
-    },
   },
-  created() {
-    // this.forms.model['_valid'] = !this.$refs[this.forms.key]['_data'].flags
-    //   .invalid
-    console.log(this.forms)
-    console.log(this.$refs[this.forms.key])
-
-    // console.log(this.model)
-    // var self = this
-    // if (this.forms.subscribe) {
-    //   // console.log('subscribe')
-    //   this.$observable.subscribe(this.forms.subscribe, function(data) {
-    //     if (data.type == 'modelUpdate') {
-    //       var keys = Object.keys(data.model)
-    //       // keys.forEach((key, index) => {
-    //         // console.log(index)
-    //       keys.forEach((key) => {
-    //         self.formModel[key] = data.model[key]
-    //       })
-    //       self.formModel.serial_num = data.model.serial_num
-    //     }
-    //     // console.log(data)
-    //   })
-    // }
-    // this.$observable.subscribe("validateModel", async (key)=>{
-    //   if(this.$refs[key])
-    //     this.forms.model['_valid'] =  await this.$refs[key].validate()
-    // })
+  mounted() {
+    this.$watch(
+      () => {
+        return this.$refs[this.forms.key].flags
+      },
+      (val) => {
+        this.forms.model['_valid'] = val.invalid
+      }
+    )
   },
   computed: {
     showField: function() {
-      // let inputs = []
-      // for(let i = 0; i<this.forms.length; i++){
-      //   inputs.push(this.forms[i].inputs)
-      // }
       return this.forms.inputs.filter(
         (i) => (i.show && i.show != false) || i.show == undefined
       )

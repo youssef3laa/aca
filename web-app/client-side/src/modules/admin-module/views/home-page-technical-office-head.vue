@@ -48,7 +48,6 @@
     import chartsMixin from "../../../mixins/chartsMixin";
     import Charts from "../../application-builder-module/components/charts-component";
     import OfficeGroudHeadInbox from "../../application-builder-module/components/office-group-head-inbox"
-    import http from "../../core-module/services/http";
     import userMixin from '../../../mixins/userMixin'
     import Topbar from "../../application-builder-module/components/topbar-component";
     export default {
@@ -75,19 +74,6 @@
             }
         },
         methods: {
-
-            getTasks: function () {
-                http.get("workflow/human/tasks").then((response) => {
-                    console.log(response);
-                    var data = JSON.parse(response.data.data);
-                    console.log(data);
-                    this.$observable.fire("tasks", {
-                        type: "modelUpdate",
-                        model: data,
-                    });
-                });
-            },
-
         },
 
         data() {

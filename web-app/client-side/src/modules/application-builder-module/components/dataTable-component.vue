@@ -28,7 +28,7 @@
       :sort-by="field.sortBy"
       :sort-desc="field.sortDesc"
       :headers="d.headers"
-      :items="d.data"
+      :items="filteredItems"
       v-model="d.selected"
       :options.sync="options"
       :server-items-length="d.url ? totalItems : -1"
@@ -193,6 +193,7 @@ export default {
     return {
       search: "",
       expanded: [],
+
       totalItems: this.val.data.length,
       d: this.val,
       loading: false,
@@ -207,9 +208,20 @@ export default {
     };
   },
   computed:{
-
+    filteredItems: function(){
+          return this.d.data.filter((item)=>{
+            let filterVal = true
+            for(let index in this.d.filter){
+              filterVal = filterVal && this.getProperty(item, this.d.filter[index].property).includes(this.d.filter[index].value)
+            }
+            return filterVal
+          })
+        }
   },
   watch: {
+    'd.filter': function(){
+      this.filteredItems()
+    },
       search: function(){
           this.getDataFromApi({ page: 1, itemsPerPage: 10 })
       },
@@ -260,12 +272,12 @@ export default {
             // }
         }
     },
+
     'd.selected':function(){
       this.$observable.fire(this.field.name+"_"+"selected",this.d.selected)
     }
   },
   methods: {
-
     updateData: function(){
       if(this.d.data instanceof Array){
         for(let item in this.d.data){
@@ -447,7 +459,7 @@ export default {
       })
   },
   mounted() {
-    // console.log(this.d);
+    console.log(this.d);
     if (this.d.headers) {
       this.translateHeaders();
     }

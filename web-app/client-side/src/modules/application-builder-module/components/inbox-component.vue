@@ -77,7 +77,7 @@
             fillInbox: function () {
                 http.get('workflow/human/tasks').then((response) => {
                     console.log(response)
-                    let data = JSON.parse(response.data.data)
+                    let data = response.data.data
                     console.log(data)
 
                     let approvals = [];
@@ -86,28 +86,27 @@
                     let assignments = [];
                     let internalMessages = [];
 
-                    for (let key in data.data) {
-                        data.data[key].DeliveryDate = new Date(data.data[key].DeliveryDate).toLocaleString()
-                        switch (data.data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.caseType) {
+                    for (let key in data) {
+                        switch (data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.caseType) {
                             case "modification":
-                                modifications.push(data.data[key])
+                                modifications.push(data[key])
                                 break
                             case "opinion":
-                                opinions.push(data.data[key])
+                                opinions.push(data[key])
                                 break
                             case "assignment":
-                                assignments.push(data.data[key])
+                                assignments.push(data[key])
                                 break
                             case "internalMessage":
-                                internalMessages.push(data.data[key])
+                                internalMessages.push(data[key])
                                 break
                             default:
-                                approvals.push(data.data[key])
+                                approvals.push(data[key])
                         }
                     }
                     console.log(data)
 
-                    this.sidebarItems[0].notifications = data.data.length
+                    this.sidebarItems[0].notifications = data.length
 
                     this.$refs.inbox.setTabValue("forApprovalTab", approvals.length + "")
                     this.$refs.inbox.setModelData("forApprovalTable", {taskTable: {data: approvals}});
