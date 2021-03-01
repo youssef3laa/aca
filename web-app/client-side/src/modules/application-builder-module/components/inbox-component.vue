@@ -87,6 +87,10 @@
                     let internalMessages = [];
 
                     for (let key in data) {
+                        if(!data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.caseType) {
+                            approvals.push(data[key])
+                            continue
+                        }
                         switch (data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.caseType) {
                             case "modification":
                                 modifications.push(data[key])

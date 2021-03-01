@@ -113,6 +113,10 @@ export default {
         let fromCertifications = [];
 
         for (let key in data) {
+          if(!data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.caseType) {
+            fromAdmins.push(data[key])
+            continue
+          }
           switch (data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.caseType) {
             case "certificationTechnicalOffice":
               fromCertifications.push(data[key])
