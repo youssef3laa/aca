@@ -1,6 +1,7 @@
 package com.asset.appwork.service;
 
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.enums.GroupType;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.*;
@@ -59,8 +60,6 @@ public class OrgChartService {
         Group group = new Group();
         group.setName("U" + createdUnit.getName());
 //        group.setGroupCode(group.getName());
-//        group.setIsHeadRole(false);
-//        group.setIsViceRole(false);
         createGroup(account, group.toString());
         return createdUnit;
     }
@@ -369,23 +368,23 @@ public class OrgChartService {
         boolean headHasUsers = false;
         boolean viceHeadHasUsers = false;
 
-        if (siblings.stream().anyMatch(Group::getIsHeadRole))
-            headHasUsers = !userRepository.findByGroup(siblings.stream().filter(Group::getIsHeadRole).collect(Collectors.toList()).get(0)).isEmpty();
-        if (siblings.stream().anyMatch(Group::getIsViceRole))
-            viceHeadHasUsers = !userRepository.findByGroup(siblings.stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0)).isEmpty();
-        if (viceHeadHasUsers && (!group.getIsHeadRole() && !group.getIsViceRole()))
-            return siblings.stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0);
+        if (siblings.stream().anyMatch(gp -> gp.getType() == GroupType.HEAD))
+            headHasUsers = !userRepository.findByGroup(siblings.stream().filter(gp -> gp.getType() == GroupType.HEAD).collect(Collectors.toList()).get(0)).isEmpty();
+        if (siblings.stream().anyMatch(gp -> gp.getType() == GroupType.VICE))
+            viceHeadHasUsers = !userRepository.findByGroup(siblings.stream().filter(gp -> gp.getType() == GroupType.VICE).collect(Collectors.toList()).get(0)).isEmpty();
+        if (viceHeadHasUsers && (!(group.getType() == GroupType.HEAD) && !(group.getType() == GroupType.VICE)))
+            return siblings.stream().filter(gp -> gp.getType() == GroupType.VICE).collect(Collectors.toList()).get(0);
 
-        if (headHasUsers && ((!viceHeadHasUsers && !group.getIsHeadRole()) || (!group.getIsHeadRole() && group.getIsViceRole()))) {
-            return siblings.stream().filter(Group::getIsHeadRole).collect(Collectors.toList()).get(0);
+        if (headHasUsers && ((!viceHeadHasUsers && !(group.getType() == GroupType.HEAD)) || (!(group.getType() == GroupType.HEAD) && (group.getType() == GroupType.VICE)))) {
+            return siblings.stream().filter(gp -> gp.getType() == GroupType.HEAD).collect(Collectors.toList()).get(0);
         }
         return unitRepository.findByChild(group.getUnit())
                 .flatMap(parentUnit -> {
                     try {
                         List<Group> parentGroups = groupRepository.findByUnit(parentUnit);
-                        if (parentGroups.stream().anyMatch(Group::getIsHeadRole))
-                            return Optional.of(parentGroups.stream().filter(Group::getIsHeadRole).collect(Collectors.toList()).get(0));
-                        return Optional.of(getGroupParent(parentGroups.stream().filter(Group::getIsViceRole).collect(Collectors.toList()).get(0).getName()));
+                        if (parentGroups.stream().anyMatch(gp -> gp.getType() == GroupType.HEAD))
+                            return Optional.of(parentGroups.stream().filter(gp -> gp.getType() == GroupType.HEAD).collect(Collectors.toList()).get(0));
+                        return Optional.of(getGroupParent(parentGroups.stream().filter(gp -> gp.getType() == GroupType.VICE).collect(Collectors.toList()).get(0).getName()));
                     } catch (AppworkException e) {
                         log.error(e.getMessage());
                         e.printStackTrace();
@@ -488,7 +487,7 @@ public class OrgChartService {
             position = getPositionByName(oldGroupCode);
             position.setName(group.getName());
             position.setDescription(group.getDescription());
-            position.setIsLead(group.getIsHeadRole());
+            position.setIsLead(group.getType() == GroupType.HEAD);
             position.setUnit(group.getUnit());
             positionRepository.save(position);
 //            updatePosition(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), position.getId(), position.toPlatformString());
@@ -496,7 +495,7 @@ public class OrgChartService {
             position = new Position();
             position.setName(group.getName());
             position.setDescription(group.getDescription());
-            position.setIsLead(group.getIsHeadRole());
+            position.setIsLead(group.getType() == GroupType.HEAD);
             createPosition(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), position.toPlatformString());
         }
     }
@@ -512,7 +511,7 @@ public class OrgChartService {
             position = getPositionByName(oldGroupCode);
             position.setName(group.getName());
             position.setDescription(group.getDescription());
-            position.setIsLead(group.getIsHeadRole());
+            position.setIsLead(group.getType() == GroupType.HEAD);
             position.setUnit(group.getUnit());
             positionRepository.save(position);
 //            updatePosition(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), position.getId(), position.toPlatformString());
@@ -520,7 +519,7 @@ public class OrgChartService {
             position = new Position();
             position.setName(group.getName());
             position.setDescription(group.getDescription());
-            position.setIsLead(group.getIsHeadRole());
+            position.setIsLead(group.getType() == GroupType.HEAD);
             createPosition(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), position.toPlatformString());
         }
     }

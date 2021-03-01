@@ -30,10 +30,6 @@ public class Group extends BaseIdentity {
     @Column(name = "Type")
     @Enumerated(EnumType.STRING)
     GroupType type;
-    @Column(name = "Head")
-    Boolean isHeadRole;
-    @Column(name = "Vice")
-    Boolean isViceRole;
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinColumn(
             name = "Unit_Id",
@@ -78,22 +74,6 @@ public class Group extends BaseIdentity {
 
     public void setType(GroupType type) {
         this.type = type;
-    }
-
-    public Boolean getIsHeadRole() {
-        return isHeadRole;
-    }
-
-    public void setIsHeadRole(Boolean headRole) {
-        isHeadRole = headRole;
-    }
-
-    public Boolean getIsViceRole() {
-        return isViceRole;
-    }
-
-    public void setIsViceRole(Boolean viceRole) {
-        isViceRole = viceRole;
     }
 
     public Unit getUnit() {

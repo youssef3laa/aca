@@ -36,12 +36,6 @@ public abstract class GroupPlatformMixIn {
     @Enumerated(EnumType.STRING)
     @JsonProperty("Type")
     GroupType type;
-    @JsonAlias({"isHeadRole", "Head"})
-    @JsonProperty("Head")
-    Boolean isHeadRole;
-    @JsonAlias({"isViceRole", "Vice"})
-    @JsonProperty("Vice")
-    Boolean isViceRole;
     @JsonIgnore
     Unit unit;
     @JsonIgnore

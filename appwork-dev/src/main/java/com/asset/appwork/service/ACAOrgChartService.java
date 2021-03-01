@@ -285,7 +285,6 @@ public class ACAOrgChartService {
         group.setGroupCode(getGroupLevelByType(type) + unit.getUnitCode());
         switch (type) {
             case HEAD:
-                group.setIsHeadRole(true);
                 group.setNameAr("رئيس " + unit.getNameAr());
                 break;
             case VICE:
