@@ -43,7 +43,6 @@ export default {
       app: {
         pages: {
           key: "tabtest",
-
           tabs: [
             {
               key: "tab1",
@@ -54,8 +53,8 @@ export default {
             },
 
             {
-              key: "tab3",
-              id: "3",
+              key: "tab2",
+              id: "2",
               name: "collapse",
               icon: "fas fa-paperclip",
             },
@@ -67,23 +66,23 @@ export default {
                 key: "tabtest",
                 tabs: [
                   {
-                    key: "tab5",
-                    id: "5",
+                    key: "subTab1",
+                    id: "1",
                     isActive: true,
                     name: "mainData",
                   },
                   {
-                    key: "tab6",
-                    id: "6",
+                    key: "subTab2",
+                    id: "2",
                     name: "supervisorLevels/technicalOffice",
                   },
                   {
-                    key: "tab2",
-                    id: "2",
+                    key: "subTab3",
+                    id: "3",
                     name: "attachments",
                   },
                   {
-                    key: "tab4",
+                    key: "subTab4",
                     id: "4",
                     name: "COCDecision",
                     icon: "",
@@ -91,270 +90,132 @@ export default {
                 ],
                 sec: [
                   {
+                    isNestedTab: true,
                     key: "subjectTab",
-                    tabId: "5",
+                    tabId: "1",
                     isTab: true,
-                    type: "collapseSection",
-                    display: "block",
-                    isCard: true,
-                    name: "subject",
-                    show: true,
-                    forms: [
-                      {
-                        key: "form1",
-                        publish: "form1Change",
-                        inputs: [
-                          {
-                            type: "TextComponent",
-                            label: "notes",
-                            name: "notes",
-                            col: "12",
-                          },
-                        ],
-                        model: {
-                          notes: "كلام كلام",
-                        },
-                      },
-                    ],
-                  },
-                  {
-                    key: "subjectSummaryTab",
-                    tabId: "5",
-                    isTab: true,
-                    type: "collapseSection",
-                    display: "block",
-                    isCard: true,
-                    name: "subjectSummary",
-                    show: true,
-                    forms: [
-                      {
-                        key: "subjectSummaryfrom",
-                        inputs: [
-                          {
-                            type: "TextComponent",
-                            label: "notes",
-                            name: "notes",
-                            col: "12",
-                          },
-                        ],
-                        model: {
-                          notes: "كلام كلام",
-                        },
-                      },
-                    ],
-                  },
-                  {
-                    key: "presidentDirectionsTab",
-                    tabId: "5",
-                    isTab: true,
-                    type: "collapseSection",
-                    display: "block",
-                    isCard: true,
-                    name: "presidentDirections",
-                    show: true,
-                    forms: [
-                      {
-                        key: "presidentDirectionsForm",
-                        inputs: [
-                          {
-                            type: "TextComponent",
-                            label: "notes",
-                            name: "notes",
-                            col: "12",
-                          },
-                        ],
-                        model: {
-                          notes: "كلام كلام",
-                        },
-                      },
-                    ],
-                  },
-                  {
-                    key: "situationEstimateTab",
-                    tabId: "5",
-                    isTab: true,
-                    type: "collapseSection",
-                    display: "block",
-                    isCard: true,
-                    name: "situationEstimate",
-                    show: true,
-                    forms: [
-                      {
-                        key: "situationEstimateForm",
-                        inputs: [
-                          {
-                            type: "TextComponent",
-                            label: "notes",
-                            name: "notes",
-                            col: "12",
-                          },
-                        ],
-                        model: {
-                          notes: "كلام كلام",
-                        },
-                      },
-                    ],
-                  },
-
-                  {
-                    key: "proposalsTab",
-                    tabId: "5",
-                    isTab: true,
-                    type: "collapseSection",
-                    display: "block",
-                    isCard: true,
-                    name: "proposals",
-                    show: true,
-                    forms: [
-                      {
-                        key: "proposalsForm",
-                        inputs: [
-                          {
-                            type: "TextComponent",
-                            label: "notes",
-                            name: "notes",
-                            col: "12",
-                          },
-                        ],
-                        model: {
-                          notes: "كلام كلام",
-                        },
-                      },
-                    ],
-                  },
-                  {
-                    key: "opinionTab",
-                    tabId: "5",
-                    isTab: true,
-                    type: "collapseSection",
-                    display: "block",
-                    isCard: true,
-                    name: "opinion",
-                    show: true,
-                    forms: [
-                      {
-                        key: "opinionForm",
-                        inputs: [
-                          {
-                            type: "TextComponent",
-                            label: "notes",
-                            name: "notes",
-                            col: "12",
-                          },
-                        ],
-                        model: {
-                          notes: "كلام كلام",
-                        },
-                      },
-                    ],
-                  },
-                  {
-                    key: "viceOpinionTab",
-                    tabId: "5",
-                    isTab: true,
-                    type: "collapseSection",
-                    display: "block",
-                    isCard: true,
-                    name: "viceOpinion",
-                    show: true,
-                    forms: [
-                      {
-                        key: "viceOpinionForm",
-                        publish: "form1Change",
-                        inputs: [
-                          {
-                            type: "TextComponent",
-                            label: "notes",
-                            name: "notes",
-                            col: "12",
-                          },
-                        ],
-                        model: {
-                          notes: "كلام كلام",
-                        },
-                      },
-                    ],
-                  },
-                  {
-                    key: "section2",
-                    type: "Resizable",
-                    tabId: "2",
-                    isTab: true,
-                    isCard: true,
-                    display: "none",
-                    forms: [
-                      {
-                        resizable: {
-                          forms: [
-                            {
-                              key: "iframeObj",
-                              background: "white",
-                              inputs: [
-                                {
-                                  type: "IframeComponent",
-                                  name: "iframeObj",
-                                  col: 12,
-                                },
-                              ],
-                              model: {
-                                iframeObj: {
-                                  src: "",
-                                },
-                              },
-                            },
-                            {
-                              background: "white",
-                              inputs: [
-                                {
-                                  type: "InputFileComponent",
-                                  name: "inputFile",
-                                  col: 12,
-                                },
-                              ],
-                              model: {
-                                inputFile: "",
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                  },
-                  {
-                    key: "section3",
-                    tabId: "3",
-                    isTab: true,
-                    isCard: true,
-                    display: "none",
-                    type: "CollapseSection",
-                    name: "النص",
-                    forms: [
-                      {
-                        key: "richtext",
-                        inputs: [
-                          {
-                            type: "richtextComponent",
-                            name: "richtext",
-                            col: 12,
-                          },
-                        ],
-                        model: {
-                          richtext: "<p></p>",
-                        },
-                      },
-                    ],
-                  },
-                  {
-                    key: "section4",
-                    tabId: "4",
-                    isTab: true,
-                    isCard: true,
-                    isCanvas: true,
-                    // visibility: 'hidden',
                     type: "DefaultSection",
+                    display: "block",
+                    isCard: true,
+                    show: true,
                     forms: [
                       {
+                        type: "collapse",
+                        name: "subject",
+
+                        key: "subjectForm",
+                        tabId: "1",
+                        display: "block",
+                        isTab: true,
+
+                        inputs: [
+                          {
+                            type: "TextComponent",
+                            label: "notes",
+                            name: "notes",
+                            col: "12",
+                          },
+                        ],
+                        model: {
+                          notes: "كلام كلام",
+                        },
+                      },
+                      {
+                        name: "subjectSummary",
+                        type: "collapse",
+                        key: "subjectSummaryfrom",
+                        tabId: "1",
+
+                        inputs: [
+                          {
+                            type: "TextComponent",
+                            label: "notes",
+                            name: "notes",
+                            col: "12",
+                          },
+                        ],
+                        model: {
+                          notes: "كلام كلام",
+                        },
+                      },
+                      {
+                        name: "presidentDirections",
+                        type: "collapse",
+                        key: "presidentDirectionsForm",
+                        tabId: "1",
+
+                        inputs: [
+                          {
+                            type: "TextComponent",
+                            label: "notes",
+                            name: "notes",
+                            col: "12",
+                          },
+                        ],
+                        model: {
+                          notes: "كلام كلام",
+                        },
+                      },
+                      {
+                        name: "situationEstimate",
+                        type: "collapse",
+                        key: "situationEstimateForm",
+                        tabId: "1",
+
+                        inputs: [
+                          {
+                            type: "TextComponent",
+                            label: "notes",
+                            name: "notes",
+                            col: "12",
+                          },
+                        ],
+                        model: {
+                          notes: "كلام كلام",
+                        },
+                      },
+                      {
+                        name: "opinion",
+                        type: "collapse",
+                        key: "opinionForm",
+                        tabId: "1",
+
+                        inputs: [
+                          {
+                            type: "TextComponent",
+                            label: "notes",
+                            name: "notes",
+                            col: "12",
+                          },
+                        ],
+                        model: {
+                          notes: "كلام كلام",
+                        },
+                      },
+                      {
+                        name: "viceOpinion",
+                        type: "collapse",
+                        key: "viceOpinionForm",
+                        tabId: "1",
+
+                        inputs: [
+                          {
+                            type: "TextComponent",
+                            label: "notes",
+                            name: "notes",
+                            col: "12",
+                          },
+                        ],
+                        model: {
+                          notes: "كلام كلام",
+                        },
+                      },
+                      // Signatures
+                      {
+                        tabId: "4",
                         key: "signature",
+                        display: "block",
+                        isTab: true,
                         inputs: [
                           {
                             type: "SignatureComponent",
@@ -365,6 +226,25 @@ export default {
                         ],
                         model: {
                           signature: { requestId: "" },
+                        },
+                      },
+
+                      {
+                        tabId: "3",
+                        key: "attachments",
+                        display: "block",
+                        isTab: true,
+                        inputs: [
+                          {
+                            type: "AttachmentComponent",
+                            name: "attachment",
+                            col: 12,
+                          },
+                        ],
+                        model: {
+                          attachment: {
+                            readonly: true,
+                          },
                         },
                       },
                     ],
@@ -444,13 +324,12 @@ export default {
   mounted: function() {
     // this.loadForm("subjects", this.fillSubjects, "subjects")
     // this.loadForm("outbox", this.fillOutbox, "outbox")
-
-    this.$observable.subscribe("taskTable_view", (item) => {
-      this.viewTask(item);
-    });
-    this.$observable.subscribe("outboxTable_view", (item) => {
-      this.viewSentTask(item);
-    });
+    // this.$observable.subscribe("taskTable_view", (item) => {
+    //   this.viewTask(item);
+    // });
+    // this.$observable.subscribe("outboxTable_view", (item) => {
+    //   this.viewSentTask(item);
+    // });
   },
 };
 </script>

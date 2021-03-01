@@ -70,7 +70,7 @@ export default {
 .v-expansion-panels {
   border: thin solid rgba(0, 0, 0, 0.12);
 }
-.v-expansion-panel--active > .v-expansion-panel-header {
+.v-expansion-panel > .v-expansion-panel-header {
   color: #0278ae !important;
   font-size: 18px;
 }
