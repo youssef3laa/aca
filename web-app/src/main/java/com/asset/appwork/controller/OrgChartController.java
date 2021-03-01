@@ -177,11 +177,18 @@ public class OrgChartController {
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
-            Account account = tokenService.get(token);
-            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            orgChartService.addSubUnitToUnit(account, id, subUnitId);
-            respBuilder.info("infoMessage", "Sub Unit added Successfully");
-            respBuilder.status(ResponseCode.SUCCESS);
+            try {
+                Account account = tokenService.get(token);
+                if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+                orgChartService.addSubUnitToUnit(account, id, subUnitId);
+                respBuilder.info("infoMessage", "Sub Unit added Successfully");
+                respBuilder.status(ResponseCode.SUCCESS);
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -199,11 +206,18 @@ public class OrgChartController {
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
-            Account account = tokenService.get(token);
-            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            orgChartService.addSubUnitToUnit(account, code, subUnitCode);
-            respBuilder.info("infoMessage", "Sub Unit added Successfully");
-            respBuilder.status(ResponseCode.SUCCESS);
+            try {
+                Account account = tokenService.get(token);
+                if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+                orgChartService.addSubUnitToUnit(account, code, subUnitCode);
+                respBuilder.info("infoMessage", "Sub Unit added Successfully");
+                respBuilder.status(ResponseCode.SUCCESS);
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -817,11 +831,18 @@ public class OrgChartController {
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
-            Account account = tokenService.get(token);
-            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            orgChartService.updateGroupUnitRelation(account, groupId, oldGroupCode, props);
-            respBuilder.info("infoMessage", "Relation added Successfully");
-            respBuilder.status(ResponseCode.SUCCESS);
+            try {
+                Account account = tokenService.get(token);
+                if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+                orgChartService.updateGroupUnitRelation(account, groupId, oldGroupCode, props);
+                respBuilder.info("infoMessage", "Relation added Successfully");
+                respBuilder.status(ResponseCode.SUCCESS);
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -840,11 +861,18 @@ public class OrgChartController {
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
-            Account account = tokenService.get(token);
-            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            orgChartService.updateGroupUnitRelationByCodes(account, oldGroupCode, groupCode, unitCode);
-            respBuilder.info("infoMessage", "Relation added Successfully");
-            respBuilder.status(ResponseCode.SUCCESS);
+            try {
+                Account account = tokenService.get(token);
+                if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+                orgChartService.updateGroupUnitRelationByCodes(account, oldGroupCode, groupCode, unitCode);
+                respBuilder.info("infoMessage", "Relation added Successfully");
+                respBuilder.status(ResponseCode.SUCCESS);
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -862,11 +890,18 @@ public class OrgChartController {
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
-            Account account = tokenService.get(token);
-            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            orgChartService.addSubGroupToUnitGroup(account, unitCode, subGroupCode);
-            respBuilder.info("infoMessage", "Sub Group added Successfully");
-            respBuilder.status(ResponseCode.SUCCESS);
+            try {
+                Account account = tokenService.get(token);
+                if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+                orgChartService.addSubGroupToUnitGroup(account, unitCode, subGroupCode);
+                respBuilder.info("infoMessage", "Sub Group added Successfully");
+                respBuilder.status(ResponseCode.SUCCESS);
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -883,11 +918,18 @@ public class OrgChartController {
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
-            Account account = tokenService.get(token);
-            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            orgChartService.deleteGroup(account, id);
-            respBuilder.info("infoMessage", "Deleted Successfully");
-            respBuilder.status(ResponseCode.SUCCESS);
+            try {
+                Account account = tokenService.get(token);
+                if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+                orgChartService.deleteGroup(account, id);
+                respBuilder.info("infoMessage", "Deleted Successfully");
+                respBuilder.status(ResponseCode.SUCCESS);
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -1046,11 +1088,18 @@ public class OrgChartController {
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
-            Account account = tokenService.get(token);
-            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            orgChartService.deleteUser(account, id);
-            respBuilder.info("infoMessage", "Deleted Successfully");
-            respBuilder.status(ResponseCode.SUCCESS);
+            try {
+                Account account = tokenService.get(token);
+                if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+                orgChartService.deleteUser(account, id);
+                respBuilder.info("infoMessage", "Deleted Successfully");
+                respBuilder.status(ResponseCode.SUCCESS);
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();

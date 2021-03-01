@@ -94,7 +94,7 @@ public class OrgChartService {
             children.forEach(child -> {
                 try {
                     addSubUnitToUnit(account, parent.get(0).getId(), child.getId());
-                } catch (AppworkException e) {
+                } catch (AppworkException | JsonProcessingException e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
                 }
@@ -102,7 +102,7 @@ public class OrgChartService {
 
             deleteGroup(account, getGroupByName("U" + unit.getName(), true).getId());
             unitRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException | JsonProcessingException e) {
             throw new AppworkException("No Unit of Id " + id.toString() + " exists", ResponseCode.DELETE_ENTITY_FAILURE);
         }
     }
@@ -152,7 +152,7 @@ public class OrgChartService {
 //        return unitRepository.getUnitParentsRecursivelyFilteredByUnitTypeCode(childUnitCode, unitTypeCode, PageRequest.of(page, size, Sort.by("id));
 //    }
 
-    public void addSubUnitToUnit(Account account, Long id, Long subUnitId) throws AppworkException {
+    public void addSubUnitToUnit(Account account, Long id, Long subUnitId) throws AppworkException, JsonProcessingException {
         Unit unit = getUnit(subUnitId);
         List<Unit> oldParent = (List<Unit>) unit.getParent();
         unit.setParent(new ArrayList<>(List.of(getUnit(id))));
@@ -166,7 +166,7 @@ public class OrgChartService {
         addSubGroupToGroup(account, parentUnitGroup.getId(), childUnitGroup.getId());
     }
 
-    public void addSubUnitToUnit(Account account, String unitName, String subUnitName) throws AppworkException {
+    public void addSubUnitToUnit(Account account, String unitName, String subUnitName) throws AppworkException, JsonProcessingException {
         Long id = getUnitByName(unitName).getId();
         Long subUnitId = getUnitByName(subUnitName).getId();
 
@@ -447,7 +447,7 @@ public class OrgChartService {
         return getGroupByName(name);
     }
 
-    public Group updateGroup(Account account, Long id, String props) throws AppworkException {
+    public Group updateGroup(Account account, Long id, String props) throws AppworkException, JsonProcessingException {
         Group group = getGroup(id);
 
         if (SystemUtil.isFieldInJson(props, "name")) {
@@ -474,7 +474,7 @@ public class OrgChartService {
         return getGroup(id);
     }
 
-    public void updateGroupUnitRelation(Account account, Long id, String oldGroupCode, String props) throws AppworkException {
+    public void updateGroupUnitRelation(Account account, Long id, String oldGroupCode, String props) throws AppworkException, JsonProcessingException {
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group")
                 .addRelation(id, "Unit", props);
         Group group = getGroup(id);
@@ -500,7 +500,7 @@ public class OrgChartService {
         }
     }
 
-    public void updateGroupUnitRelation(Account account, Group group, String oldGroupCode, String props) throws AppworkException {
+    public void updateGroupUnitRelation(Account account, Group group, String oldGroupCode, String props) throws AppworkException, JsonProcessingException {
         new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group")
                 .addRelation(group.getId(), "Unit", props);
 
@@ -524,20 +524,20 @@ public class OrgChartService {
         }
     }
 
-    public void updateGroupUnitRelationByCodes(Account account, String oldGroupCode, String groupCode, String unitCode) throws AppworkException {
+    public void updateGroupUnitRelationByCodes(Account account, String oldGroupCode, String groupCode, String unitCode) throws AppworkException, JsonProcessingException {
         String props = new Member.TargetId(getUnitByName(unitCode).getId()).toString();
         //TODO: Could need to remove groupCodeCouldBeNull
         updateGroupUnitRelation(account, getGroupByName(groupCode, true).getId(), oldGroupCode, props);
     }
 
-    public void deleteGroup(Account account, Long id) throws AppworkException {
+    public void deleteGroup(Account account, Long id) throws AppworkException, JsonProcessingException {
         Group group = getGroup(id);
         positionRepository.deleteByName(group.getName());
         new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
                 .deleteGroupByGroupName(group.getName());
     }
 
-    public void addSubGroupToGroup(Account account, Long id, Long subGroupId) throws AppworkException {
+    public void addSubGroupToGroup(Account account, Long id, Long subGroupId) throws AppworkException, JsonProcessingException {
 //        Group parentGroup = getGroupByName(getUnit(id).getName(), true);
         Group parentGroup = getGroup(id);
         Group childGroup = getGroup(subGroupId);
@@ -551,19 +551,19 @@ public class OrgChartService {
 
     }
 
-    public void addSubGroupToGroup(Account account, String code, String subGroupCode) throws AppworkException {
+    public void addSubGroupToGroup(Account account, String code, String subGroupCode) throws AppworkException, JsonProcessingException {
         addSubGroupToGroup(account, getGroupByName(code).getId(), getGroupByName(subGroupCode).getId());
     }
 
-    public void addSubGroupToUnitGroup(Account account, String unitCode, String subGroupCode) throws AppworkException {
+    public void addSubGroupToUnitGroup(Account account, String unitCode, String subGroupCode) throws AppworkException, JsonProcessingException {
         addSubGroupToGroup(account, getGroupByName("U" + unitCode, true).getId(), getGroupByName(subGroupCode, true).getId());
     }
 
-    public void addSubGroupToUnitGroup(Account account, Long unitId, Long subGroupId) throws AppworkException {
+    public void addSubGroupToUnitGroup(Account account, Long unitId, Long subGroupId) throws AppworkException, JsonProcessingException {
         addSubGroupToGroup(account, getGroupByName("U" + getUnit(unitId).getName(), true).getId(), subGroupId);
     }
 
-    public void removeSubGroupsFromGroup(Account account, Long groupId) throws AppworkException {
+    public void removeSubGroupsFromGroup(Account account, Long groupId) throws AppworkException, JsonProcessingException {
         String props = new Member.StringList(
                 Collections.emptyList()
         ).toString();
@@ -572,7 +572,7 @@ public class OrgChartService {
                 .setMembersToGroup(getGroup(groupId).getName(), props);
     }
 
-    public void removeSubGroupsFromGroup(Account account, String groupCode) throws AppworkException {
+    public void removeSubGroupsFromGroup(Account account, String groupCode) throws AppworkException, JsonProcessingException {
         // TODO: Fix the removal of all sub groups
         String props = new Member.StringList(
                 Collections.emptyList()
@@ -660,7 +660,7 @@ public class OrgChartService {
 
     }
 
-    public void deleteUser(Account account, Long id) throws AppworkException {
+    public void deleteUser(Account account, Long id) throws AppworkException, JsonProcessingException {
         User user = getUser(id);
         Person person = user.getPerson();
         getAssignmentByPerson(person).forEach(assignment -> {
@@ -694,7 +694,7 @@ public class OrgChartService {
         user.getGroup().forEach(group -> groupCodes.add(group.getGroupCode()));
         otds.unassignUserToGroupsByUserId(userId, new Member.StringList(groupCodes));
 
-        if(groupCodes.size() > 0) {
+        if (groupCodes.size() > 0) {
             Person person = user.getPerson();
             getAssignmentByPerson(person).forEach(assignment -> {
                 try {
