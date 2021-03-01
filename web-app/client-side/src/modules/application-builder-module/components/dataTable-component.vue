@@ -365,9 +365,9 @@ export default {
               return
             }
             // eslint-disable-next-line no-prototype-builtins
-            let dataToBePopulated = response.data.data.hasOwnProperty("content") ? response.data.data.content : response.data.data ? response.data.data : [];
+            let dataToBePopulated = response?.data?.data?.hasOwnProperty("content") ? response.data.data.content : response.data.data ? response.data.data : [];
             // eslint-disable-next-line no-prototype-builtins
-            this.totalItems = (response.data.metaInfo !== undefined&&response.data.metaInfo.hasOwnProperty("totalCount")) ? response.data.metaInfo.totalCount : response.data.data.totalElements;
+            this.totalItems = (response.data.metaInfo !== undefined&&response.data.metaInfo.hasOwnProperty("totalCount")) ? response.data.metaInfo.totalCount : response?.data?.data?.totalElements;
             // console.log(this.totalItems);
             this.d.data = dataToBePopulated;
             if (dataToBePopulated && dataToBePopulated.length > 0) {

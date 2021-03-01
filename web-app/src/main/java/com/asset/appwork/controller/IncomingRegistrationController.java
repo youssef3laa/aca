@@ -83,9 +83,10 @@ public class IncomingRegistrationController {
 
             RequestEntity requestEntity = requestEntityService.getRequestEntityById(requestEntityId);
             IncomingRegistration incomingRegistration = new IncomingRegistration();
-            incomingRegistration.setRequestEntity(requestEntity);
+//            incomingRegistration.setRequestEntity(requestEntity);
             if (requestEntity.getEntityId() == null) {
                 Entity entity = new Entity(account, SystemUtil.generateRestAPIBaseUrl(environment, environment.getProperty("aca.general.solution")), IncomingRegistration.table);
+                incomingRegistration.setRequestEntityId(requestEntityId);
                 Long incomingRegistrationEntityId = entity.create(incomingRegistration);
                 incomingRegistration.setId(incomingRegistrationEntityId);
                 requestEntity.setEntityId(String.valueOf(incomingRegistrationEntityId));
@@ -129,7 +130,13 @@ public class IncomingRegistrationController {
 //            entity = new Entity(account, restAPIBaseUrl, IncomingRegistration.table);
 
             request.incomingRegistration.setJobEntityId(caseId.toString());
+//            request.incomingRegistration.setRequestEntityId(Long.valueOf(request.outputSchema.getRequestId()));
 //            Long incomingId = entity.create(request.incomingRegistration);
+
+            RequestEntity requestEntity=requestEntityService.getRequestEntityById(Long.valueOf(request.outputSchema.getRequestId()));
+
+            request.incomingRegistration.setIncomingNumber(requestEntity.getRequestNumber());
+            request.incomingRegistration.setRequestEntityId(Long.valueOf(request.outputSchema.getRequestId()));
             incomingRegistrationService.updateIncomingEntity(request.getIncomingRegistration());
 
             requestEntityService.updateRequest(request.outputSchema,

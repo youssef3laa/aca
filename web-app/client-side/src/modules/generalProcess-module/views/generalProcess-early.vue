@@ -5,11 +5,11 @@
 </template>
 
 <script>
-    import formPageMixin from "../../../mixins/formPageMixin";
-    import AppBuilder from "../../application-builder-module/builders/app-builder";
-    import historyMixin from "../../history-module/mixin/historyMixin";
+import formPageMixin from "../../../mixins/formPageMixin";
+import AppBuilder from "../../application-builder-module/builders/app-builder";
+import historyMixin from "../../history-module/mixin/historyMixin";
 
-    export default {
+export default {
         name: "generalProcess-early",
         mixins: [formPageMixin, historyMixin],
         components: {
@@ -28,7 +28,7 @@
             this.taskId = this.$route.params.taskId;
             this.taskData = await this.getTaskData(this.taskId);
             this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;
-            await this.claimTask(this.taskId, this.inputSchema.parentHistoryId)
+            await this.claimTask(this.taskId, this.inputSchema.requestId)
             this.loadForm(this.inputSchema.config, this.fillForm);
 
             this.$observable.subscribe("complete-step", this.submit);

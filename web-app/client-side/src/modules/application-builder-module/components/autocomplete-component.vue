@@ -58,33 +58,33 @@ export default {
             this.loading = false;
             return
           }
-          const res = response.data.data.map((element) => {
-            let obj = {};
-            if (element["cn"]) {
-              obj = {
-                name: element['nameAr'],
-                value: element['cn'],
-                text: element['nameAr'],
-                code: element['groupCode'],
-                object: element,
-              };
-            } else if (element["unitCode"]) {
-              obj = {
-                value: element['unitCode'],
-                text: element['nameAr'],
-                object: element,
-              };
-            } else {
-              obj = {
-                value: element["key"],
-                  //TODO hanlde enValue
-                text: element["arValue"],
-                object: element,
-              };
-            }
-            return obj;
+            response.data.data = response.data.data instanceof Array ? response.data.data : [].concat(response.data.data);
+            this.items.list = response.data.data.map((element) => {
+              let obj;
+              if (element["cn"]) {
+                  obj = {
+                      name: element['nameAr'],
+                      value: element['cn'],
+                      text: element['nameAr'],
+                      code: element['groupCode'],
+                      object: element,
+                  };
+              } else if (element["unitCode"]) {
+                  obj = {
+                      value: element['unitCode'],
+                      text: element['nameAr'],
+                      object: element,
+                  };
+              } else {
+                  obj = {
+                      value: element["key"],
+                      //TODO hanlde enValue
+                      text: element["arValue"],
+                      object: element,
+                  };
+              }
+              return obj;
           });
-          this.items.list = res;
           // console.log(this.items.list)
 
           if (this.val.default) {

@@ -12,14 +12,14 @@
 
 <script>
 
-    import router from "../../../router";
-    import http from "../../core-module/services/http";
-    import "splitpanes/dist/splitpanes.css";
-    import {Splitpanes, Pane} from "splitpanes";
-    import AppBuilder from "../builders/app-builder"
-    import Sidebar from "../../application-builder-module/components/sidebar-component";
-    import formPageMixin from "../../../mixins/formPageMixin"
-    // import Topbar from "../../application-builder-module/components/topbar-component"
+import router from "../../../router";
+import http from "../../core-module/services/http";
+import "splitpanes/dist/splitpanes.css";
+import {Pane, Splitpanes} from "splitpanes";
+import AppBuilder from "../builders/app-builder"
+import Sidebar from "../../application-builder-module/components/sidebar-component";
+import formPageMixin from "../../../mixins/formPageMixin"
+// import Topbar from "../../application-builder-module/components/topbar-component"
 
     export default {
         mixins: [formPageMixin],
@@ -87,7 +87,7 @@
                     let internalMessages = [];
 
                     for (let key in data) {
-                        switch (data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.caseType) {
+                        switch (data[key].TaskData.ApplicationData?.ACA_ProcessRouting_InputSchemaFragment?.caseType) {
                             case "modification":
                                 modifications.push(data[key])
                                 break

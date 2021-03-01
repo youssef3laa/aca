@@ -25,7 +25,7 @@ public class ApprovalHistory {
     String stepId;
     String parent;
     String readonlyComponent;
-    String requestId;
+    Long requestId;
     String requestNumber;
     String receiverCN;
     @Transient

@@ -71,7 +71,7 @@ public class RequestController {
             Entity entity = new Entity(account, restAPIBaseUrl, "ACA_Entity_request");
 
             RequestEntity request = new RequestEntity();
-            request.setRequestNumber(requestEntityService.generateRequestNumber(account));
+            request.setRequestNumber(requestEntityService.generateRequestNumber());
             request.setStatus("created");
             request.setRequestDate(new Date());
 

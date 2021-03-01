@@ -5,12 +5,12 @@ import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.Unit;
+import com.asset.appwork.platform.soap.Workflow;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.ApprovalHistoryService;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.service.UserService;
 import com.asset.appwork.util.SystemUtil;
-import com.asset.appwork.platform.soap.Workflow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -144,7 +144,7 @@ public class WorkflowController {
                     String taskState = SystemUtil.readJSONField(response, "State");
                     if (taskState != null) {
                         if (!taskState.equals("ASSIGNED")) {
-                            approvalHistoryService.updateReceiveDate(Long.parseLong(request.approvalId));
+                            approvalHistoryService.updateReceiveDate(Long.parseLong(request.requestId));
                             response = cordysService.sendRequest(account, workflow.claimTask(account.getSAMLart(), request.taskId));
                         } else {
                             response = "Task is already claimed.";
@@ -196,6 +196,6 @@ public class WorkflowController {
     @Data
     private static class Request {
         String taskId;
-        String approvalId;
+        String requestId;
     }
 }

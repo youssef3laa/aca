@@ -1,11 +1,9 @@
 package com.asset.appwork.service;
 
-import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.Lookup;
 import com.asset.appwork.model.Outcoming;
-import com.asset.appwork.model.User;
 import com.asset.appwork.repository.LookupRepository;
 import com.asset.appwork.repository.OutcomingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 
@@ -26,14 +25,13 @@ public class OutcomingService {
     @Autowired
     LookupRepository lookupRepository;
 
-    public String generateRequestNumber(Account account) throws AppworkException {
+    public String generateRequestNumber() throws AppworkException {
         try {
-            User user = orgChartService.getLoggedInUser(account);
             Date date = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
             date = sdf.parse(sdf.format(date));
-            long count = outcomingRepository.countByOutcomingDate(date) + 1;
-            return sdf.format(date) + "-" + user.getId() + "-" + count + "-OUT";
+            long count = outcomingRepository.countByOutcomingDate(Calendar.getInstance().get(Calendar.YEAR)) + 1;
+            return count + "/" + sdf.format(date);
         } catch (ParseException e) {
             throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         }

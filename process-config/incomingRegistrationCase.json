@@ -14,9 +14,37 @@
             "config": "incoming-case-registration-comment",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "direction": "down",
-                "fields": ["comment"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "comment"
+                ],
+                "receiver": {
+                    "types": [
+                        "single",
+                        "multiple"
+                    ],
+                    "inputs": [
+                        {
+                            "name": "theSector",
+                            "url": "org/unit/$unit/down/all/unitTypeCode/SCT",
+                            "type": "unit"
+                        },
+                        {
+                            "name": "theAdminOffice",
+                            "url": "org/unit/$1/down/all/unitTypeCode/ADM,OFC",
+                            "type": "unit"
+                        },
+                        {
+                            "name": "theGroup",
+                            "url": "org/unit/$2/down/all/unitTypeCode/GRP",
+                            "type": "unit"
+                        },
+                        {
+                            "name": "theMember",
+                            "url": "org/group/findByUnitCodes/$3",
+                            "type": "group"
+                        }
+                    ]
+                }
             },
             "nextStep": {
                 "SCT": "headOfSectorComment",
@@ -31,9 +59,32 @@
             "config": "incoming-case-registration-comment",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "direction": "down",
-                "fields": ["comment"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "comment"
+                ],
+                "receiver": {
+                    "types": [
+                        "single",
+                        "multiple"
+                    ],
+                    "inputs": [
+                        {
+                            "name": "theAdminOffice",
+                            "url": "org/unit/$unit/down/all/unitTypeCode/ADM,OFC",
+                            "type": "unit"
+                        },
+                        {
+                            "name": "theGroup",
+                            "url": "org/unit/$1/down/all/unitTypeCode/GRP",
+                            "type": "unit"
+                        },
+                        {
+                            "name": "theMember",
+                            "url": "org/group/findByUnitCodes/$2",
+                            "type": "group"
+                        }
+                    ]
+                }
             },
             "nextStep": {
                 "ADM": "headOfOfficeComment",
@@ -47,13 +98,31 @@
             "config": "incoming-case-registration-comment",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "direction": "down",
-                "fields": ["comment"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "comment"
+                ],
+                "receiver": {
+                    "types": [
+                        "single",
+                        "multiple"
+                    ],
+                    "inputs": [
+                        {
+                            "name": "theGroup",
+                            "url": "org/unit/$unit/down/all/unitTypeCode/GRP",
+                            "type": "unit"
+                        },
+                        {
+                            "name": "theMember",
+                            "url": "org/group/findByUnitCodes/$1",
+                            "type": "group"
+                        }
+                    ]
+                }
             },
             "nextStep": {
                 "GRP": "headOfGroupComment",
-                "comment": "memberMemoCreate"
+                "send": "memberMemoCreate"
             }
         },
         "headOfGroupComment": {
@@ -61,12 +130,25 @@
             "config": "incoming-case-registration-comment",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "direction": "down",
-                "fields": ["comment"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "comment"
+                ],
+                "receiver": {
+                    "types": [
+                        "single",
+                        "multiple"
+                    ],
+                    "inputs": [
+                        {
+                            "name": "theMember",
+                            "url": "org/group/findByUnitCodes/$unit",
+                            "type": "group"
+                        }
+                    ]
+                }
             },
             "nextStep": {
-                "comment": "memberMemoCreate"
+                "send": "memberMemoCreate"
             }
         },
         "memberMemoCreate": {
@@ -74,12 +156,24 @@
             "config": "incoming-case-registration-memo-create",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "direction": "up",
-                "fields": ["comment"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "comment"
+                ],
+                "receiver": {
+                    "types": [
+                        "single"
+                    ],
+                    "inputs": [
+                        {
+                            "name": "theGroup",
+                            "url": "org/group/$group/up",
+                            "type": "unit"
+                        }
+                    ]
+                }
             },
             "nextStep": {
-                "memorandumCreate": "headOfGroupApproval"
+                "send": "headOfGroupApproval"
             }
         },
         "headOfGroupApproval": {
@@ -87,14 +181,49 @@
             "config": "incoming-case-registration-approval",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "fields": ["comment", "opinion"],
-                "decisions": ["approve","requestModification","reject"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "comment",
+                    "opinion"
+                ],
+                "decisions": [
+                    {
+                        "name": "approve",
+                        "label": "request-approve",
+                        "types": [
+                            "single"
+                        ],
+                        "inputs": [
+                            {
+                                "name": "theAdminOffice",
+                                "url": "org/unit/$unit/up/all/unitTypeCode/ADM,OFC",
+                                "type": "unit"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "requestModification",
+                        "label": "request-modification"
+                    },
+                    {
+                        "name": "requestRedirection",
+                        "label": "request-redirection",
+                        "types": [
+                            "single",
+                            "multiple"
+                        ],
+                        "inputs": [
+                            {
+                                "name": "theGroup",
+                                "url": "org/unit/$parentUnit/down/all/unitTypeCode/GRP",
+                                "type": "unit"
+                            }
+                        ]
+                    }
+                ]
             },
             "nextStep": {
                 "approve": "headOfOfficeApproval",
-                "requestModification": "memberMemoCreate",
-                "reject": "end"
+                "redirect": "headOfGroupApproval"
             }
         },
         "headOfOfficeApproval": {
@@ -102,14 +231,58 @@
             "config": "incoming-case-registration-approval",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "fields": ["comment", "opinion"],
-                "decisions": ["approve","requestModification","reject"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "comment",
+                    "opinion"
+                ],
+                "decisions": [
+                    {
+                        "name": "approve",
+                        "label": "request-approve",
+                        "types": [
+                            {
+                                "name": "headOfSector",
+                                "label": "head-of-sector",
+                                "assignedCN": "headOfSectorAssignedCN"
+                            },
+                            {
+                                "name": "viceHeadOfSector",
+                                "label": "vice-head-of-sector",
+                                "assignedCN": "viceHeadOfSectorAssignedCN"
+                            },
+                            {
+                                "name": "assistantToHeadOfSector",
+                                "label": "assistant-to-head-of-sector",
+                                "assignedCN": "assistantToHeadOfSectorAssignedCN"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "requestModification",
+                        "label": "request-modification"
+                    },
+                    {
+                        "name": "requestRedirection",
+                        "label": "request-redirection",
+                        "types": [
+                            "single",
+                            "multiple"
+                        ],
+                        "inputs": [
+                            {
+                                "name": "theOfficeAdmin",
+                                "url": "org/unit/$parentUnit/down/all/unitTypeCode/ADM,OFC",
+                                "type": "unit"
+                            }
+                        ]
+                    }
+                ]
             },
             "nextStep": {
-                "approve": "headOfSectorApproval",
-                "requestModification": "memberMemoCreate",
-                "reject": "end"
+                "headOfSector":"headOfSectorApproval",
+                "viceHeadOfSector":"",
+                "assistantToHeadOfSector":"",
+                "redirect": "headOfOfficeApproval"
             }
         },
         "headOfSectorApproval": {
@@ -117,15 +290,58 @@
             "config": "incoming-case-registration-approval",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "fields": ["comment", "opinion"],
-                "decisions": ["approve","redirect","requestModification","reject"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "comment",
+                    "opinion"
+                ],
+                "decisions": [
+                    {
+                        "name": "approve",
+                        "label": "request-approve",
+                        "types": [
+                            {
+                                "name": "headOfAgency",
+                                "label": "head-of-agency",
+                                "assignedCN": "headOfAgencyAssignedCN"
+                            },
+                            {
+                                "name": "viceHeadOfAgency",
+                                "label": "vice-head-of-agency",
+                                "assignedCN": "viceHeadOfAgencyAssignedCN"
+                            },
+                            {
+                                "name": "assistantToHeadOfAgency",
+                                "label": "assistant-to-head-of-agency",
+                                "assignedCN": "assistantToHeadOfAgencyAssignedCN"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "requestModification",
+                        "label": "request-modification"
+                    },
+                    {
+                        "name": "requestRedirection",
+                        "label": "request-redirection",
+                        "types": [
+                            "single",
+                            "multiple"
+                        ],
+                        "inputs": [
+                            {
+                                "name": "theSector",
+                                "url": "org/unit/$parentUnit/down/all/unitTypeCode/SCT",
+                                "type": "unit"
+                            }
+                        ]
+                    }
+                ]
             },
             "nextStep": {
-                "approve": "headOfAgencyApproval",
-                "redirect": "headOfSectorComment",
-                "requestModification": "memberMemoCreate",
-                "reject": "end"
+                "headOfAgency":"headOfAgencyApproval",
+                "viceHeadOfAgency":"",
+                "assistantToHeadOfAgency":"",
+                "redirect": "headOfSectorApproval"
             }
         },
         "headOfAgencyApproval": {
@@ -133,30 +349,87 @@
             "config": "incoming-case-registration-approval",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "fields": ["comment", "opinion"],
-                "decisions": ["vice","approve","requestModification","reject"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "comment",
+                    "opinion"
+                ],
+                "decisions": [
+                    {
+                        "name": "approve",
+                        "label": "request-approve",
+                        "types": [
+                            {
+                                "name": "goToPresident",
+                                "label": "head-of-chairmanOfCommission",
+                                "assignedCN": "headOfChairmanOfCommissionAssignedCN"
+                            },
+                            {
+                                "name": "goToVice",
+                                "label": "vice-head-of-chairmanOfCommission",
+                                "assignedCN": "viceHeadOfChairmanOfCommissionAssignedCN"
+                            },
+                            {
+                                "name": "goToAssistant",
+                                "label": "assistant-to-head-of-chairmanOfCommission",
+                                "assignedCN": "assistantToHeadOfChairmanOfCommissionAssignedCN"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "requestModification",
+                        "label": "request-modification"
+                    },
+                    {
+                        "name": "requestRedirection",
+                        "label": "request-redirection",
+                        "types": [
+                            "single",
+                            "multiple"
+                        ],
+                        "inputs": [
+                            {
+                                "name": "theAgency",
+                                "url": "org/unit/$parentUnit/down/all/unitTypeCode/AGN",
+                                "type": "unit"
+                            }
+                        ]
+                    }
+                ]
             },
             "nextStep": {
-                "vice": "headOfADMVice",
-                "approve": "outcomingCreation",
-                "requestModification": "memberMemoCreate",
-                "reject": "end"
+                "goToVice": "viceSecretary",
+                "goToPresident": "presidentSecretary",
+                "goToAssistant": "",
+                "redirect": "headOfAgencyApproval"
             }
         },
-        "headOfADMVice": {
+        "viceSecretary": {
             "component": "incomingCaseRegistration-approval",
             "config": "incoming-case-registration-approval",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "fields": ["comment", "opinion"],
-                "decisions": ["approve","requestModification","reject"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "comment"
+                ]
             },
             "nextStep": {
-                "approve": "headOfSECVice",
-                "requestModification": "memberMemoCreate",
-                "reject": "end"
+                "send": "headOfGRPVice"
+            }
+        },
+        "headOfGRPVice": {
+            "component": "incomingCaseRegistration-approval",
+            "config": "incoming-case-registration-approval",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": [
+                    "opinion",
+                    "comment"
+                    
+                ]
+            },
+            "nextStep": {
+                "submitForConfirmation": "headOfSECVice",
+                "sendToAdminstration": "memberMemoCreate"
             }
         },
         "headOfSECVice": {
@@ -164,14 +437,15 @@
             "config": "incoming-case-registration-approval",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "fields": ["comment", "opinion"],
-                "decisions": ["approve","requestModification","reject"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "opinion",
+                    "comment"
+                    
+                ]
             },
             "nextStep": {
-                "approve": "vicePresident",
-                "requestModification": "memberMemoCreate",
-                "reject": "end"
+                "sendToVicePresident": "vicePresident",
+                "sendToHeadOfGRPVice": "headOfGRPVice"
             }
         },
         "vicePresident": {
@@ -179,67 +453,40 @@
             "config": "incoming-case-registration-signature",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "fields": ["comment", "opinion"]
+                "fields": [
+                    "comment"
+                ]
             },
             "nextStep": {
-                "comment": "viceSecretary"
+                "send": "viceSecretaryAgain"
             }
         },
-        "viceSecretary": {
-            "component": "incomingCaseRegistration-signature",
-            "config": "incoming-case-registration-signature",
+        "viceSecretaryAgain": {
+            "component": "incomingCaseRegistration-signature-enter",
+            "config": "incoming-case-registration-signature-enter",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "fields": ["comment", "opinion"],
-                "decisions": ["president","approve","requestModification","reject"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "comment"
+                ]
             },
             "nextStep": {
-                "president": "headOfADMPresident",
-                "approve": "outcomingCreation",
-                "requestModification": "memberMemoCreate",
-                "reject": "end"
+                "send": "headOfSCTPViceAgain"
             }
         },
-        "headOfADMPresident": {
-            "component": "incomingCaseRegistration-signature",
-            "config": "incoming-case-registration-signature",
+        "headOfSCTPViceAgain": {
+            "component": "incomingCaseRegistration-approval",
+            "config": "incoming-case-registration-approval",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "fields": ["comment", "opinion"],
-                "decisions": ["approve","requestModification","reject"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "comment",
+                    "opinion"
+                ]
             },
             "nextStep": {
-                "approve": "headOfSECPresident",
-                "requestModification": "memberMemoCreate",
-                "reject": "end"
-            }
-        },
-        "headOfSECPresident": {
-            "component": "incomingCaseRegistration-signature",
-            "config": "incoming-case-registration-signature",
-            "readonlyComponent": "incomingCaseRegistration-read",
-            "router": {
-                "fields": ["comment", "opinion"],
-                "decisions": ["approve","requestModification","reject"],
-                "receiverTypes": ["single"]
-            },
-            "nextStep": {
-                "approve": "president",
-                "requestModification": "memberMemoCreate",
-                "reject": "end"
-            }
-        },
-        "president": {
-            "component": "incomingCaseRegistration-signature",
-            "config": "incoming-case-registration-signature",
-            "readonlyComponent": "incomingCaseRegistration-read",
-            "router": {
-                "fields": ["comment", "opinion"]
-            },
-            "nextStep": {
-                "comment": "presidentSecretary"
+                "sendBackToVicePresident": "vicePresident",
+                "sendToPresident": "presidentSecretary"
             }
         },
         "presidentSecretary": {
@@ -247,14 +494,140 @@
             "config": "incoming-case-registration-signature",
             "readonlyComponent": "incomingCaseRegistration-read",
             "router": {
-                "fields": ["comment", "opinion"],
-                "decisions": ["approve","requestModification","reject"],
-                "receiverTypes": ["single"]
+                "fields": [
+                    "comment"
+                ]
+            },
+            "nextStep": {
+                "send": "headOfGRPPresident"
+            }
+        },
+        "headOfGRPPresident": {
+            "component": "incomingCaseRegistration-signature",
+            "config": "incoming-case-registration-signature",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": [
+                    "comment",
+                    "opinion"
+                ]
+            },
+            "nextStep": {
+                "submitForConfirmation": "headOfSECPresident",
+                "sendToAdminstration": "memberMemoCreate"
+            }
+        },
+        "headOfSECPresident": {
+            "component": "incomingCaseRegistration-signature",
+            "config": "incoming-case-registration-signature",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": [
+                    "comment",
+                    "opinion"
+                ]
+            },
+            "nextStep": {
+                "sendBackToGRPPresident": "headOfGRPPresident",
+                "sendToPresident": "president"
+            }
+        },
+        "president": {
+            "component": "incomingCaseRegistration-signature",
+            "config": "incoming-case-registration-signature",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": [
+                    "comment"
+                ]
+            },
+            "nextStep": {
+                "send": "presidentSecretaryAgain"
+            }
+        },
+        "presidentSecretaryAgain": {
+            "component": "incomingCaseRegistration-signature-enter",
+            "config": "incoming-case-registration-signature-enter",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": [
+                    "comment"
+                ]
+            },
+            "nextStep": {
+                "send": "headOfSECPresidentAgain"
+            }
+        },
+        "headOfSECPresidentAgain": {
+            "component": "incomingCaseRegistration-signature",
+            "config": "incoming-case-registration-signature",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": [
+                    "comment",
+                    "opinion"
+                ]
+            },
+            "nextStep": {
+                "sendBackToPresident": "president",
+                "sendToVicePresident": "vicePresident",
+                "sendToGRPPresident": "headOfGRPPresidentAgain"
+            }
+        },
+        "headOfGRPPresidentAgain": {
+            "component": "incomingCaseRegistration-signature",
+            "config": "incoming-case-registration-signature",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": [
+                    "comment",
+                    "opinion"
+                ]
+            },
+            "nextStep": {
+                "sendToResponsibleAdministration": "responsibleAdministrationBeforeOutcoming",
+                "sendToOtherAdminstration": "",
+                "sendBackForConfirmation": "",
+                "tempSave": ""
+            }
+        },
+        "responsibleAdministrationBeforeOutcoming": {
+            "component": "incomingCaseRegistration-signature",
+            "config": "incoming-case-registration-signature",
+            "readonlyComponent": "incomingCaseRegistration-read",
+            "router": {
+                "fields": [
+                    "comment"
+                ],
+                "decisions": [
+                    {
+                        "name": "approve",
+                        "label": "request-approve"
+                    },
+                    {
+                        "name": "requestModification",
+                        "label": "request-modification"
+                    },
+                    {
+                        "name": "requestRedirection",
+                        "label": "request-redirection",
+                        "types": [
+                            "single"
+                        ],
+                        "inputs": [
+                            {
+                                "name": "theAdminOffice",
+                                "url": "org/unit/$parentUnit/down/all/unitTypeCode/ADM,OFC",
+                                "type": "unit"
+                            }
+                        ]
+                    }
+                ]
             },
             "nextStep": {
                 "approve": "outcomingCreation",
-                "requestModification": "memberMemoCreate",
-                "reject": "end"
+                "requestModification": "",
+                "requestRedirection": ""
             }
         },
         "outcomingCreation": {
