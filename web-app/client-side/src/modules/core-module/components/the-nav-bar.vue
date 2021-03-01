@@ -57,7 +57,7 @@
           </v-menu>
         </div>
         <p style="float:left; margin: 4px;">
-          <span style="font: normal 18px/22px Neo Sans Arabic; opacity: 1;">{{user.details.userId}}</span> <br>
+          <span style="font: normal 18px/22px Neo Sans Arabic; opacity: 1;">{{user.details.displayName}}</span> <br>
           <span style="font: normal 12px/15px Neo Sans Arabic; color: #9E9E9E; opacity: 1;"> إدارة المعلومات</span>
         </p> 
       </div>

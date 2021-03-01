@@ -133,6 +133,24 @@ export default {
 
                 })
                 .catch((error) => console.error(error));
+        },
+        completeMultipleSteps: function(data,callBack){
+            http.post("/process/multiple/complete", data)
+                .then((response) => {
+                    console.log(response);
+                    // alert("Step Complete!");
+
+                    this.$refs.alertComponent._alertSuccess({
+                        type: "success",
+                        message: "actionHasBeenSentSuccessfully"
+                    }, () => {
+                        if(callBack){
+                            callBack()
+                        }
+                    });
+                    
+                })
+                .catch((error) => console.error(error));
         }
     }
 }

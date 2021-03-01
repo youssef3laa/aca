@@ -37,6 +37,7 @@
       :search="search"
       :show-expand="!!(d.subTable || d.subHeaders)"
       :show-select="field.select"
+      :single-select="field.singleSelect"
       :item-key="d.key"
       color="blue"
       class="elevation-1"
