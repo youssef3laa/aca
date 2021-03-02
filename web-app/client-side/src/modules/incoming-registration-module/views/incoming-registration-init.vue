@@ -196,22 +196,22 @@ export default {
         },
         submit: async function () {
             let vueThis = this;
-            let attacmhnetComponentModel = this.$refs.appBuilder.getModelData("AttachmentComponent");
-            if (!attacmhnetComponentModel.attachment.validity) {
-                this.$refs.alertComponent._alertSuccess({
-                    type: "error",
-                    "message": this.$t("pleaseAddAtLeastOneAttachment")
-                });
-                return;
-            }
+            // let attacmhnetComponentModel = this.$refs.appBuilder.getModelData("AttachmentComponent");
+            // if (!attacmhnetComponentModel.attachment.validity) {
+            //     this.$refs.alertComponent._alertSuccess({
+            //         type: "error",
+            //         "message": this.$t("pleaseAddAtLeastOneAttachment")
+            //     });
+            //     return;
+            // }
             let mainData = this.$refs.appBuilder.getModelData("mainData");
-            if (!(mainData._valid)) {
-                this.$refs.alertComponent._alertSuccess({
-                    type: "error",
-                    "message": this.$t("pleaseFillRequiredFields")
-                });
-                return;
-            }
+            // if (!(mainData._valid)) {
+            //     this.$refs.alertComponent._alertSuccess({
+            //         type: "error",
+            //         "message": this.$t("pleaseFillRequiredFields")
+            //     });
+            //     return;
+            // }
 
             let returnedTargetMainData = Object.assign({}, mainData);
             console.log(mainData, returnedTargetMainData);
@@ -227,10 +227,10 @@ export default {
 
             if (returnedTargetMainData.jobType == 1) {
                 let approvalCard = this.$refs.appBuilder.getModelData("approvalForm")
-                if (!approvalCard._valid) {
-                    this.$refs.alertComponent._alertSuccess({type: "error", message: "pleaseFillRequiredFields"})
-                    return;
-                }
+                // if (!approvalCard._valid) {
+                //     this.$refs.alertComponent._alertSuccess({type: "error", message: "pleaseFillRequiredFields"})
+                //     return;
+                // }
                 console.log(approvalCard)
                 returnedTargetMainData.responsibleEntityGehaz = approvalCard.approval.values[0]?.unitCode;
                 if (approvalCard.approval.values[1])
