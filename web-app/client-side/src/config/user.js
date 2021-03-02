@@ -3,6 +3,8 @@ export default class User {
     password = null;
     organization = 'mod';
     SAMLart = null;
+    details = null;
+    cn = null;
 
     create(json){
         for (const [key, value] of Object.entries(json)) {
@@ -25,12 +27,20 @@ export default class User {
     getSAMLart() {
       return this.SAMLart;
     }
+    setDetails(details){
+        this.details = details;
+    }
+    setCN(cn){
+        this.cn = cn;
+    }
     toJson(){
         return  {
             username: this.username,
             password: this.password,
             organization: this.organization,
-            SAMLart: this.SAMLart
+            SAMLart: this.SAMLart,
+            details: this.details,
+            cn: this.cn
         }
     }   
     toString(){
@@ -38,7 +48,9 @@ export default class User {
             username: this.username,
             password: this.password,
             organization: this.organization,
-            SAMLart: this.SAMLart
+            SAMLart: this.SAMLart,
+            details: this.details,
+            cn: this.cn
         })
     }
 }

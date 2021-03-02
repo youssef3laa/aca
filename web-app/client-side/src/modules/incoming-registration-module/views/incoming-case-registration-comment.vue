@@ -19,21 +19,26 @@ export default {
             return {
                 taskId: this.$route.params.taskId,
                 inputSchema: {},
-                app: {}
+                app: {},
+                routerObj:{}
             }
         },
         async created(){
             let taskData = await this.getTaskData(this.taskId)
             this.inputSchema = taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment
-            await this.claimTask(this.taskId, this.inputSchema.parentHistoryId)
+
+
+            console.log("inputSchema:",this.inputSchema )
+            await this.claimTask(this.taskId, this.inputSchema.requestId)
             this.loadForm(this.inputSchema.config, this.formLoaded)
             this.$observable.subscribe("complete-step", this.submit)
         },
         methods: {
-            formLoaded: async function(){
+            formLoaded: async function () {
                 this.$refs.appBuilder.disableSection("mainData");
                 this.$refs.appBuilder.disableSection("caseData");
-                this.$refs.appBuilder.setModelData("approvalForm", {approval: this.inputSchema.router})
+                console.log("stringify",JSON.stringify(this.routerObj));
+                this.$refs.appBuilder.setModelData("approvalForm", {approval:this.inputSchema.router })
                 this.$refs.appBuilder.setModelData("historyTable", {historyTable: this.createHistoryTableModel(this.inputSchema.requestId)})
 
                 let incomingRegistration = await this.readIncomingRegistration(this.inputSchema.entityId)
@@ -41,11 +46,12 @@ export default {
                 let incomingCase = await this.readIncomingCase(incomingRegistration.jobEntityId)
                 this.$refs.appBuilder.setModelData("caseData", incomingCase)
 
-                this.$refs.appBuilder.setModelData("responsibleEntityForm",incomingRegistration )
+                this.$refs.appBuilder.setModelData("responsibleEntityForm", incomingRegistration)
 
             },
             submit: function(){
                 let approvalCard = this.$refs.appBuilder.getModelData("approvalForm");
+                console.log(approvalCard);
 
                 this.completeStep({
                     taskId: this.taskId,
@@ -53,11 +59,11 @@ export default {
                     stepId: this.inputSchema.stepId,
                     process: this.inputSchema.process,
                     parentHistoryId: this.inputSchema.parentHistoryId,
-                    code: approvalCard.approval.code,
-                    assignedCN: approvalCard.approval.assignedCN,
+                    code: approvalCard.approval.selected.code,
+                    assignedCN: approvalCard.approval.selected.assignedCN,
                     decision: approvalCard.approval.decision,
-                    comment: approvalCard.approval.comment,
-                    receiverType: approvalCard.approval.receiverType
+                    comment: approvalCard.approval.inputs.comment,
+                    receiverType: approvalCard.approval.selected.type
                 })
             }
         }

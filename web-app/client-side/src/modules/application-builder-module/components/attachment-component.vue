@@ -137,10 +137,12 @@
                 >
                   <div class="row pa-1" style="height: 100px">
                     <v-col :cols="1" style="align-self: center">
-                      <v-icon style="float:left; color: #D5D5D5" size="20"
+                      <v-icon
+                        style="float:left; color: #D5D5D5 margin:1px"
+                        size="15"
                         >fas fa-ellipsis-v</v-icon
                       >
-                      <v-icon style="float:left; color: #D5D5D5" size="20"
+                      <v-icon style="float:left; color: #D5D5D5" size="15"
                         >fas fa-ellipsis-v</v-icon
                       >
                     </v-col>
@@ -270,7 +272,7 @@
 import draggable from 'vuedraggable'
 import IframeComponent from '../components/iframe-component'
 import attachmentMixin from '@/mixins/attachmentMixin'
-import { Pane, Splitpanes } from 'splitpanes'
+import {Pane, Splitpanes} from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import formPageMixin from '@/mixins/formPageMixin'
 import FileVersionsModalComponent from '@/modules/application-builder-module/components/file-versions-modal-component'
@@ -404,6 +406,15 @@ export default {
         this.valid = newVal.length > 0
       },
     },
+      valid: {
+          handler: function (newVal) {
+              this.$emit('update', {
+                  name: this.field.name,
+                  key: "validity",
+                  value: newVal
+              })
+          }
+      },
   },
 }
 </script>

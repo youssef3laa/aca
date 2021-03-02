@@ -25,8 +25,10 @@
     </v-row>
 
     <v-data-table
+      :sort-by="field.sortBy"
+      :sort-desc="field.sortDesc"
       :headers="d.headers"
-      :items="d.data"
+      :items="filteredItems"
       v-model="d.selected"
       :options.sync="options"
       :server-items-length="d.url ? totalItems : -1"
@@ -35,6 +37,7 @@
       :search="search"
       :show-expand="!!(d.subTable || d.subHeaders)"
       :show-select="field.select"
+      :single-select="field.singleSelect"
       :item-key="d.key"
       color="blue"
       class="elevation-1"
@@ -152,7 +155,7 @@
           v-model="item[field.selectable]"
 
         ></v-checkbox>
-        <!-- <span>{{item}}</span> -->
+<!--         <span>{{item}}</span>-->
       </template>
             <!-- <template  v-for="(selectable,index) in field.selectables" v-slot:[`item.${selectable}`]="{ item }">
         <v-simple-checkbox
@@ -191,21 +194,35 @@ export default {
     return {
       search: "",
       expanded: [],
+
       totalItems: this.val.data.length,
       d: this.val,
       loading: false,
       footerProps: {
-        "items-per-page-options": [5, 10, 25, -1],
+        "items-per-page-options": [5, 10, 25],
         "show-first-last-page": true,
+        "show-current-page": true,
+        "items-per-page-text": '',
       },
       options: {},
       imageSrc:"https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ"
     };
   },
   computed:{
-
+    filteredItems: function(){
+          return this.d.data.filter((item)=>{
+            let filterVal = true
+            for(let index in this.d.filter){
+              filterVal = filterVal && this.getProperty(item, this.d.filter[index].property).includes(this.d.filter[index].value)
+            }
+            return filterVal
+          })
+        }
   },
   watch: {
+    'd.filter': function(){
+      this.filteredItems()
+    },
       search: function(){
           this.getDataFromApi({ page: 1, itemsPerPage: 10 })
       },
@@ -256,12 +273,12 @@ export default {
             // }
         }
     },
+
     'd.selected':function(){
       this.$observable.fire(this.field.name+"_"+"selected",this.d.selected)
     }
   },
   methods: {
-
     updateData: function(){
       if(this.d.data instanceof Array){
         for(let item in this.d.data){
@@ -348,9 +365,9 @@ export default {
               return
             }
             // eslint-disable-next-line no-prototype-builtins
-            let dataToBePopulated = response.data.data.hasOwnProperty("content") ? response.data.data.content : response.data.data ? response.data.data : [];
+            let dataToBePopulated = response?.data?.data?.hasOwnProperty("content") ? response.data.data.content : response.data.data ? response.data.data : [];
             // eslint-disable-next-line no-prototype-builtins
-            this.totalItems = (response.data.metaInfo !== undefined&&response.data.metaInfo.hasOwnProperty("totalCount")) ? response.data.metaInfo.totalCount : response.data.data.totalElements;
+            this.totalItems = (response.data.metaInfo !== undefined&&response.data.metaInfo.hasOwnProperty("totalCount")) ? response.data.metaInfo.totalCount : response?.data?.data?.totalElements;
             // console.log(this.totalItems);
             this.d.data = dataToBePopulated;
             if (dataToBePopulated && dataToBePopulated.length > 0) {
@@ -443,7 +460,7 @@ export default {
       })
   },
   mounted() {
-    // console.log(this.d);
+    console.log(this.d);
     if (this.d.headers) {
       this.translateHeaders();
     }

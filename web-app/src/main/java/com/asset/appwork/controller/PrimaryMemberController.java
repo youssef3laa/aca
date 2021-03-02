@@ -27,7 +27,7 @@ public class PrimaryMemberController {
 
     @PostMapping
     public ResponseEntity<AppResponse<PrimaryMemberDto>> createPrimaryMember(@RequestHeader("X-Auth-Token") String token,
-                                                                          @RequestBody PrimaryMemberDto primaryMember) {
+                                                                             @RequestBody PrimaryMemberDto primaryMember) {
         AppResponse.ResponseBuilder<PrimaryMemberDto> responseBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
@@ -35,6 +35,22 @@ public class PrimaryMemberController {
             responseBuilder.data(primaryMemberService.createPrimaryMember(account, primaryMember));
         } catch (AppworkException e) {
             e.printStackTrace();
+            responseBuilder.status(e.getCode());
+        }
+        return responseBuilder.build().getResponseEntity();
+    }
+
+    @GetMapping("default")
+    public ResponseEntity<AppResponse<PrimaryMemberDto>> getDefaultPrimaryMember(@RequestHeader("X-Auth-Token") String token,
+                                                                                 PrimaryMemberDto primaryMember) {
+        AppResponse.ResponseBuilder<PrimaryMemberDto> responseBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
+            responseBuilder.data(primaryMemberService.findFirstPrimaryMember(primaryMember));
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
             responseBuilder.status(e.getCode());
         }
         return responseBuilder.build().getResponseEntity();

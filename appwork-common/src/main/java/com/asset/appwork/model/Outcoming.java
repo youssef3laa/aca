@@ -3,13 +3,11 @@ package com.asset.appwork.model;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Date;
 
 @Data
@@ -17,7 +15,7 @@ import java.util.Date;
 @Table(name = "AssetGeneralACAACA_Entity_Outcoming_Data")
 public class Outcoming {
     @JsonIgnore
-    public static String table = "ACA_Entity_Otucoming_Data";
+    public final static String TABLE = "ACA_Entity_Outcoming_Data";
 
     @Id
     Long Id;

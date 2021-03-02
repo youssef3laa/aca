@@ -4,6 +4,7 @@ import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.model.User;
 import com.asset.appwork.orgchart.UserManagement;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.AppBuilderService;
@@ -101,12 +102,16 @@ public class UserController {
         }
         return responseBuilder.build().getResponseEntity();
     }
+    @Transactional
     @PostMapping("/login")
     public ResponseEntity<AppResponse<String>> login(@RequestBody Account account) {
 
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
         try {
              userManagement.create(account);
+            User user = orgChartService.getLoggedInUser(account);
+            respBuilder.info("user", user);
+            respBuilder.info("cn", user.getCN());
             respBuilder.data(tokenService.generate(account));
         } catch (JsonProcessingException e) {
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);

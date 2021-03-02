@@ -1,7 +1,61 @@
 <template>
   <v-container>
     <validation-observer :ref="forms.key">
-      <v-row>
+      <span v-if="forms.type == 'collapse'">
+        <v-expansion-panels
+          style="position:relative; width: 100%;
+    display: block;"
+          v-model="panel"
+          multiple
+        >
+          <v-expansion-panel>
+            <v-expansion-panel-header>
+              <v-row no-gutters>
+                <v-col cols="4">
+                  <span>{{ $t(forms.name) }}</span>
+                  <span class="line"></span>
+                </v-col>
+                <v-col cols="8" class="text--secondary"> </v-col>
+              </v-row>
+              <template v-slot:actions>
+                <!--                    <v-icon color="error">-->
+                <!--                      mdi-arrow-collapse-down-->
+                <!--                    </v-icon>-->
+              </template>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-row>
+                <!-- <div v-for="(field, key) in forms" :key="key"> -->
+                <!--v-if="field.show && field.show != false"-->
+                <v-col
+                  v-for="(field, i) in showField"
+                  :key="i"
+                  :cols="field.col"
+                  :md="field.col"
+                >
+                  <component
+                    v-if="formModel"
+                    :is="field.type"
+                    :field="field"
+                    :val="formModel[field.name]"
+                    :model="formModel"
+                    v-on:update="updateText"
+                  ></component>
+
+                  <component
+                    v-else
+                    :is="field.type"
+                    :field="field"
+                    v-on:update="updateText"
+                  ></component>
+                </v-col>
+                <!-- </div> -->
+              </v-row>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </span>
+      <v-row v-else>
         <!-- <div v-for="(field, key) in forms" :key="key"> -->
         <!--v-if="field.show && field.show != false"-->
         <v-col
@@ -65,10 +119,10 @@ import ProcessStatusControl from '../components/process-status-control'
 import SaveProcessComponent from '../components/save-process-component'
 import SecretaryViewSignaturesComponent from '../components/secretary-view-signatures-component'
 import InboxComponent from '../components/inbox-component'
-import ImageComponent from "../components/image-component"
-import ActionsTopComponent from "../components/actions-top-component"
-import BarcodeComponent from "../components/barcode-component"
-
+import ImageComponent from '../components/image-component'
+import ActionsTopComponent from '../components/actions-top-component'
+import BarcodeComponent from '../components/barcode-component'
+import TextComponent from "../components/text-component"
 export default {
   name: 'FormBuilder',
   components: {
@@ -106,6 +160,7 @@ export default {
     ImageComponent,
     ActionsTopComponent,
     BarcodeComponent,
+    TextComponent,
   },
   data() {
     return {
@@ -117,29 +172,13 @@ export default {
   },
   methods: {
     updateText: async function(data) {
-      // console.log(data)
-
-        if (data.name && (data.value!==undefined)) {
-            if (data.key) {
-                this.forms.model[data.name][data.key] = data.value;
-            } else this.forms.model[data.name] = data.value
-        }
-
-      if (this.forms.model)
-        this.forms.model['_valid'] = !this.$refs[this.forms.key]['_data'].flags
-          .invalid
-      // if (this.forms.key)
-      //   this.forms.model['_key'] = this.forms.key;
-
-      // console.log(this.$refs[this.forms.key].errors[data.name])
-      // console.log(this.$refs[this.forms.key]['_data'].flags)
-      // this.$refs[this.forms.key].validateWithInfo().then((val)=> console.log(val))
-      // let res =
-      //         await this.$refs.observer.validate()
-      // console.log(res)
+      if (data.name && data.value !== undefined) {
+        if (data.key) {
+          this.forms.model[data.name][data.key] = data.value
+        } else this.forms.model[data.name] = data.value
+      }
       if (data.type == 'ButtonComponent' && data.publish) {
         if (data.modalId) {
-          // console.log(data.modalId)
           this.$observable.fire(data.publish, {
             type: 'ButtonComponent',
             action: data.action,
@@ -159,7 +198,6 @@ export default {
         })
       }
     },
-    saveValue: function() {},
   },
   props: ['forms', 'model'],
   watch: {
@@ -167,36 +205,18 @@ export default {
       this.formModel = newVal
     },
   },
-  created() {
-    console.log(this.forms)
-    // console.log(this.model)
-    // var self = this
-    // if (this.forms.subscribe) {
-    //   // console.log('subscribe')
-    //   this.$observable.subscribe(this.forms.subscribe, function(data) {
-    //     if (data.type == 'modelUpdate') {
-    //       var keys = Object.keys(data.model)
-    //       // keys.forEach((key, index) => {
-    //         // console.log(index)
-    //       keys.forEach((key) => {
-    //         self.formModel[key] = data.model[key]
-    //       })
-    //       self.formModel.serial_num = data.model.serial_num
-    //     }
-    //     // console.log(data)
-    //   })
-    // }
-    // this.$observable.subscribe("validateModel", async (key)=>{
-    //   if(this.$refs[key])
-    //     this.forms.model['_valid'] =  await this.$refs[key].validate()
-    // })
+  mounted() {
+    this.$watch(
+      () => {
+        return this.$refs[this.forms.key].flags
+      },
+      (val) => {
+        this.forms.model['_valid'] = val.invalid
+      }
+    )
   },
   computed: {
     showField: function() {
-      // let inputs = []
-      // for(let i = 0; i<this.forms.length; i++){
-      //   inputs.push(this.forms[i].inputs)
-      // }
       return this.forms.inputs.filter(
         (i) => (i.show && i.show != false) || i.show == undefined
       )
@@ -205,4 +225,6 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+
+</style>

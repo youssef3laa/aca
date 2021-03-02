@@ -29,7 +29,7 @@ export default {
         async created(){
             let taskData = await this.getTaskData(this.taskId)
             this.inputSchema = taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment
-            await this.claimTask(this.taskId, this.inputSchema.parentHistoryId)
+            await this.claimTask(this.taskId, this.inputSchema.requestId)
             this.loadForm(this.inputSchema.config, this.formLoaded)
             this.$observable.subscribe("complete-step", this.submit)
             this.$observable.subscribe("searchIncoming", (data) => { this.getRequestEntities(data) })
@@ -112,19 +112,30 @@ export default {
             },
             submit: function(){
                 let approvalCard = this.$refs.appBuilder.getModelData("approvalForm");
-
-                this.completeStep({
-                    taskId: this.taskId,
-                    requestId: this.inputSchema.requestId,
-                    stepId: this.inputSchema.stepId,
-                    process: this.inputSchema.process,
-                    parentHistoryId: this.inputSchema.parentHistoryId,
-                    code: approvalCard.approval.code,
-                    assignedCN: approvalCard.approval.assignedCN,
-                    decision: "memorandumCreate",
-                    comment: approvalCard.approval.comment,
-                    receiverType: approvalCard.approval.receiverType
+                console.log(approvalCard);
+                this.$observable.fire("memoCreate", (memoCreationState) => {
+                    console.log(memoCreationState);
+                    if (!memoCreationState) {
+                        this.$refs.alertComponent._alertSuccess({
+                            type: "error",
+                            message: "errorInMemoCreation"
+                        });
+                        return;
+                    }
+                    this.completeStep({
+                        taskId: this.taskId,
+                        requestId: this.inputSchema.requestId,
+                        stepId: this.inputSchema.stepId,
+                        process: this.inputSchema.process,
+                        parentHistoryId: this.inputSchema.parentHistoryId,
+                        code: approvalCard.approval.selected.code,
+                        assignedCN: approvalCard.approval.selected.assignedCN,
+                        decision: approvalCard.approval.decision,
+                        comment: approvalCard.approval.inputs.comment,
+                        receiverType: approvalCard.approval.selected.type
+                    })
                 })
+
             }
         }
     }

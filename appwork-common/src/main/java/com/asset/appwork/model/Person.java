@@ -1,5 +1,6 @@
 package com.asset.appwork.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
@@ -8,6 +9,7 @@ import java.util.Optional;
 
 @Entity(name = "Person")
 @Table(name = "OpenTextEntityIdentityComponentsPerson")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Person {
     @Id
     @Column(name = "Id")
@@ -53,7 +55,7 @@ public class Person {
     }
 
     public String getTitle() {
-        return Optional.ofNullable(title).orElse("");
+        return title;
     }
 
     public void setTitle(String title) {
@@ -61,7 +63,7 @@ public class Person {
     }
 
     public String getFirstName() {
-        return Optional.ofNullable(firstName).orElse("");
+        return firstName;
     }
 
     public void setFirstName(String firstName) {
@@ -69,7 +71,7 @@ public class Person {
     }
 
     public String getMiddleName() {
-        return Optional.ofNullable(middleName).orElse("");
+        return middleName;
     }
 
     public void setMiddleName(String middleName) {
@@ -77,7 +79,7 @@ public class Person {
     }
 
     public String getLastName() {
-        return Optional.ofNullable(lastName).orElse("");
+        return lastName;
     }
 
     public void setLastName(String lastName) {
@@ -85,7 +87,7 @@ public class Person {
     }
 
     public String getEmail() {
-        return Optional.ofNullable(email).orElse("");
+        return email;
     }
 
     public void setEmail(String email) {
@@ -93,7 +95,7 @@ public class Person {
     }
 
     public String getPhone() {
-        return Optional.ofNullable(phone).orElse("");
+        return phone;
     }
 
     public void setPhone(String phone) {
@@ -101,7 +103,7 @@ public class Person {
     }
 
     public String getMobile() {
-        return Optional.ofNullable(mobile).orElse("");
+        return mobile;
     }
 
     public void setMobile(String mobile) {
@@ -109,7 +111,7 @@ public class Person {
     }
 
     public String getNotes() {
-        return Optional.ofNullable(notes).orElse("");
+        return notes;
     }
 
     public void setNotes(String notes) {

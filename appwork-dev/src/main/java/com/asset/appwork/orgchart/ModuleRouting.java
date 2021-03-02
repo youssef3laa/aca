@@ -18,8 +18,8 @@ import com.asset.appwork.schema.OutputSchema;
 import com.asset.appwork.service.OrgChartService;
 import com.asset.appwork.util.ReflectionUtil;
 import com.asset.appwork.util.SystemUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -62,6 +64,7 @@ public class ModuleRouting {
     static class StepConfig<T> {
         Boolean addApproval = true;
         Router router = new Router();
+        String type = "";
         String component = "" , config = "" , readonlyComponent = "";
         String subBP = "";
         HashMap<String, String> nextStep = new HashMap<>();
@@ -180,6 +183,7 @@ public class ModuleRouting {
                     nextStep = handleRedirectCase(routingConfig, currentStepId[0], codeSelected[0]);
                     break;
                 case requestModificationString:
+//                    nextType = "modification";
                     nextStep = handleRequestModificationCase(outputSchema, routingConfig, currentStepId[0], parentHistoryId[0]);
                     break;
                 case parallelString:
@@ -210,6 +214,7 @@ public class ModuleRouting {
                     nextComponent = routingConfig.getSteps().get(nextStep).getComponent();
                     nextConfig = routingConfig.getSteps().get(nextStep).getConfig();
                     nextReadonlyCompnent = routingConfig.getSteps().get(nextStep).getReadonlyComponent();
+//                    if(nextType.isEmpty()) nextType = routingConfig.getSteps().get(nextStep).getType();
                 }else{
                     throw new AppworkException(ResponseCode.MODULE_ROUTING_INPUTS_ERROR);
                 }
@@ -227,11 +232,7 @@ public class ModuleRouting {
                     nextComponent, nextConfig, nextReadonlyCompnent, nextSubBP, nextRouter);
 
             addUserToRequest(outputSchema, account);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            log.error("ModuleRouting: "+ e.getMessage());
-            throw new AppworkException(e.getMessage(),ResponseCode.MODULE_ROUTING_FAILURE);
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             log.error("ModuleRouting: "+ e.getMessage());
             throw new AppworkException(e.getMessage(),ResponseCode.MODULE_ROUTING_FAILURE);
@@ -279,7 +280,7 @@ public class ModuleRouting {
     private <T> String handleRequestModificationCase(T outputSchema, RoutingConfig routingConfig, String currentStepId, String parentHistoryId){
         String step = getIdFromNextSteps(routingConfig, currentStepId, requestModificationString);
         if(!step.isEmpty()){
-            ((OutputSchema) outputSchema).setParentHistoryId(parentHistoryId);
+//            ((OutputSchema) outputSchema).setParentHistoryId(parentHistoryId);
             return step;
         }
         else {
@@ -326,6 +327,7 @@ public class ModuleRouting {
         ((OutputSchema) outputSchema).setReadonlyComponent(nextReadonlyComponent);
         ((OutputSchema) outputSchema).setSubBP(nextSubBP);
         ((OutputSchema) outputSchema).setRouter(nextRouter);
+//        ((OutputSchema) outputSchema).setCaseType(nextType);
     }
 
     private <T> void updateOutputSchemaAssignees(T outputSchema, String stepId,

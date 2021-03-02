@@ -26,7 +26,7 @@
         >
           {{$t('cancel')}}
         </v-btn>
-        <v-btn class="modalAddButton" @click="submitModal">
+        <v-btn class="modalAddButton" @click="submitModal" :disabled="isActive">
           <span style="color:#ecf3f7">{{$t(modalAction)}}</span>
         </v-btn>
       </v-card-actions>
@@ -44,10 +44,16 @@ export default {
   },
   data() {
     return {
+      form: this.formData,
       dialog: this.dialogState,
       modalWidth: this.width,
       modalAction: 'add'
     }
+  },
+  computed: {
+    isActive: function() {
+      return !this.formData.model._valid
+    },
   },
   methods: {
     submitModal: function() {
@@ -76,7 +82,12 @@ export default {
     // console.log(this.formData.forms[0])
     // console.log(this.val)
   },
-
+  watch: {
+    formData: function(newVal) {
+      // this.val = newVal
+      this.form = newVal
+    },
+  },
   props: {
     formData: Object,
     width: {

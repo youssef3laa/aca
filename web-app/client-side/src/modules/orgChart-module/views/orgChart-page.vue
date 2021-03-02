@@ -212,20 +212,6 @@ export default {
                             col: '4',
                             rule: 'required',
                           },
-                          // {
-                          //   type: "CheckboxComponent",
-                          //   label: "Head role",
-                          //   name: "isHeadRole",
-                          //   col: "4",
-                          //   rule: "required",
-                          // },
-                          // {
-                          //   type: "CheckboxComponent",
-                          //   label: "Vice role",
-                          //   name: "isViceRole",
-                          //   col: "4",
-                          //   rule: "required",
-                          // },
                         ],
                         model: {
                           id: '',
@@ -234,8 +220,7 @@ export default {
                           nameEn: '',
                           nameAr: '',
                           groupCode: '',
-                          isHeadRole: '',
-                          isViceRole: '',
+                          type: '',
                           unitCode: '',
                         },
                       },
@@ -272,20 +257,6 @@ export default {
                             col: '4',
                             rule: 'required',
                           },
-                          // {
-                          //   type: "CheckboxComponent",
-                          //   label: "Head role",
-                          //   name: "isHeadRole",
-                          //   col: "4",
-                          //   rule: "required",
-                          // },
-                          // {
-                          //   type: "CheckboxComponent",
-                          //   label: "Vice role",
-                          //   name: "isViceRole",
-                          //   col: "4",
-                          //   rule: "required",
-                          // },
                         ],
                         model: {
                           id: '',
@@ -294,8 +265,7 @@ export default {
                           nameEn: '',
                           nameAr: '',
                           groupCode: '',
-                          isHeadRole: '',
-                          isViceRole: '',
+                          type: '',
                           unitCode: '',
                         },
                       },
@@ -663,8 +633,7 @@ export default {
           "nameEn": item.nameEn,
           "nameAr": item.nameAr,
           "groupCode": item.groupCode,
-          // "isHeadRole": item.isHeadRole,
-          // "isViceRole": item.isViceRole,
+          // "type": item.type,
           "unitCode": item.unitCode,
         }
         http.post("/org/group/create", item).then(() => {
@@ -689,8 +658,7 @@ export default {
           "nameEn": item.nameEn,
           "nameAr": item.nameAr,
           "groupCode": item.groupCode,
-          // "isHeadRole": item.isHeadRole,
-          // "isViceRole": item.isViceRole,
+          // "type": item.type,
           "unitCode": item.unitCode,
         }
 

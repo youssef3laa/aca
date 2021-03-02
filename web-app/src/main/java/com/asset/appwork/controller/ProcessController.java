@@ -30,6 +30,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/process")
@@ -102,7 +103,7 @@ public class ProcessController {
             Long linkIncomingEntityId = entity.create(linkIncoming);
 
 
-            String generatedRequestNumber = requestEntityService.generateRequestNumber(account);
+            String generatedRequestNumber = requestEntityService.generateRequestNumber();
             RequestEntity requestEntity = new RequestEntity();
             requestEntity.setEntityId(String.valueOf(linkIncomingEntityId));
             requestEntity.setEntityName("ACA_Entity_linkIncoming");
@@ -151,6 +152,30 @@ public class ProcessController {
 
             String response = moduleRouting.goToNext(outputSchema, account, cordysUrl);
             respBuilder.data(response);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        }
+
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @PostMapping("/multiple/complete")
+    public ResponseEntity<AppResponse<String>> complete(@RequestHeader("X-Auth-Token") String token, @RequestBody List<OutputSchema> outputSchema) {
+        AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            String cordysUrl = cordysService.getCordysUrl();
+
+            outputSchema.stream().forEach((schema) -> {
+                try{
+                    moduleRouting.goToNext(schema, account, cordysUrl);
+                }catch (AppworkException e){
+                    throw new RuntimeException(e.getMessage());
+                }
+            });
+            respBuilder.data("done");
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());

@@ -40,7 +40,7 @@ export default {
       }
     });
     this.taskId = this.$route.params.taskId;
-    this.claimTask(this.taskId);
+    await this.claimTask(this.taskId, this.inputSchema.requestId);
 
     this.taskData = await this.getTaskData(this.taskId);
     this.inputSchema = this.taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment;

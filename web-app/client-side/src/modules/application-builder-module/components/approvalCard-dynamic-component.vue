@@ -66,14 +66,14 @@
 </template>
 
 <script>
-    import TextareaComponent from "./textarea-component"
-    import RadioGroupComponent from "./radio-group-component";
-    import userMixin from "../../../mixins/userMixin";
-    import MultipleAssigneeComponent from "./multiple-assignee-component";
-    import orgChartMixin from "../../../mixins/orgChartMixin";
-    import ReceiverFormDynamicComponent from "./receiver-form-dynamic-component";
+import TextareaComponent from "./textarea-component"
+import RadioGroupComponent from "./radio-group-component";
+import userMixin from "../../../mixins/userMixin";
+import MultipleAssigneeComponent from "./multiple-assignee-component";
+import orgChartMixin from "../../../mixins/orgChartMixin";
+import ReceiverFormDynamicComponent from "./receiver-form-dynamic-component";
 
-    export default {
+export default {
         components: {
             ReceiverFormDynamicComponent,
             MultipleAssigneeComponent, RadioGroupComponent, TextareaComponent},
@@ -256,7 +256,9 @@
             }
         },
         async mounted() {
-            if(!(this.d.fields instanceof Array)) this.d.fields = [this.d.fields]
+            console.log(this.d);
+            this.d.fields= this.d.fields instanceof Array?this.d.fields:[].concat(this.d.fields);
+            // if(!(this.d.fields instanceof Array)) this.d.fields = [this.d.fields]
             this.inputs = this.getFieldsOptions(this.d.fields)
             this.decisions = this.getDecisionOptions(this.d.decisions)
             if(this.d.receiver){

@@ -1,13 +1,17 @@
 <template>
   <div id="app">
     <AlertComponent ref="alertComponent"></AlertComponent>
-    <v-card v-if="readonly != true" style="margin: 0px 0px 40px 0px; border-radius: 6px">
+    <v-card
+      v-if="readonly != true"
+      style="margin: 0px 0px 40px 0px; border-radius: 6px"
+    >
       <div class="container">
         <v-alert outlined type="info" prominent icon="mdi-draw">
           <p style="font-size: 16px; color: black">
-            <span style="font-size: 20px; color: #609ec1"> {{$t('signature')}} </span
+            <span style="font-size: 20px; color: #609ec1">
+              {{ $t("signature") }} </span
             ><br />
-            <span v-t="'this-field-for-notes'"></span> {{displayName}}
+            <span v-t="'this-field-for-notes'"></span> {{ displayName }}
           </p>
         </v-alert>
         <!-- <h3>التأشيرة</h3> -->
@@ -21,25 +25,40 @@
           />
         </div>
         <v-row style="padding: 10px">
-          <v-btn text color="#07689F" style="background-color: #f2f7fa; margin: 10px"  @click="clear">{{$t("clear")}}</v-btn>
-          <v-btn text color="#07689F" style="background-color: #f2f7fa; margin: 10px"  @click="undo">{{$t("cancel")}}</v-btn>
-          <v-btn text color="#07689F" style="background-color: #f2f7fa; margin: 10px"  @click="save">{{$t("save")}}</v-btn>
+          <v-btn
+            text
+            color="#07689F"
+            style="background-color: #f2f7fa; margin: 10px"
+            @click="clear"
+            >{{ $t("clear") }}</v-btn
+          >
+          <v-btn
+            text
+            color="#07689F"
+            style="background-color: #f2f7fa; margin: 10px"
+            @click="undo"
+            >{{ $t("cancel") }}</v-btn
+          >
+          <v-btn
+            text
+            color="#07689F"
+            style="background-color: #f2f7fa; margin: 10px"
+            @click="save"
+            >{{ $t("save") }}</v-btn
+          >
         </v-row>
       </div>
     </v-card>
-    <v-card style="border-radius: 6px">
+    <v-card v-if="oldSignatures" style="border-radius: 6px">
       <v-overlay :absolute="true" :value="loading">
-        <v-progress-circular
-                indeterminate
-                size="64"
-        ></v-progress-circular>
+        <v-progress-circular indeterminate size="64"></v-progress-circular>
       </v-overlay>
       <div class="container">
         <!-- <h3>التأشيرات السابقة</h3> -->
         <v-alert outlined type="info" prominent icon="mdi-draw">
           <p style="font-size: 16px; color: black">
             <span style="font-size: 20px; color: #609ec1">
-              {{$t('oldSignatures')}}
+              {{ $t("oldSignatures") }}
             </span>
           </p>
         </v-alert>
@@ -69,7 +88,7 @@
                   style="border: 2px solid #e9e9e9; height: 150px"
                 ></v-img>
                 <v-card-text style="border-top: 2px solid #e9e9e9">{{
-                  signature.date.split('T')[0]
+                  signature.date.split("T")[0]
                 }}</v-card-text>
               </v-card>
             </v-slide-item>
@@ -81,16 +100,15 @@
 </template>
 
 <script>
-import signatureMixin from '../mixin/signatureMixin'
+import signatureMixin from "../mixin/signatureMixin";
 import userMixin from "../../../mixins/userMixin";
 
 export default {
   data() {
     return {
       options: {
-        penColor: 'black',
+        penColor: "black",
         onBegin: () => {
-          
           this.$refs.signaturePad.resizeCanvas();
         },
         // backgroundColor: 'rgb(255, 255, 255)'
@@ -101,83 +119,91 @@ export default {
       selected: null,
       folderId: null,
       loading: false,
-      displayName: null
-    }
+      displayName: null,
+    };
   },
   mixins: [signatureMixin, userMixin],
-  props: ['requestId', 'readonly'],
+  props: ["requestId", "readonly","field"],
   methods: {
     undo() {
-      this.$refs.signaturePad.undoSignature()
+      this.$refs.signaturePad.undoSignature();
     },
     async save() {
-      const { isEmpty, data } = this.$refs.signaturePad.saveSignature()
-      console.log(isEmpty)
+      const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
+      console.log(isEmpty);
       // console.log(data);
 
-      await this.uploadToCS(data, this.folderId)
-      this.$refs.alertComponent._alertSuccess({message:"saveSignatureSuccess"})
-      await this.reload()
+      await this.uploadToCS(data, this.folderId);
+      this.$refs.alertComponent._alertSuccess({
+        message: "saveSignatureSuccess",
+      });
+      await this.reload();
     },
     change() {
       this.options = {
-        penColor: '#00f',
-      }
+        penColor: "#00f",
+      };
     },
     resume() {
       this.options = {
-        penColor: '#c0f',
-      }
+        penColor: "#c0f",
+      };
     },
     clear() {
-      this.$refs.signaturePad.clearSignature()
+      this.$refs.signaturePad.clearSignature();
     },
     reload: async function() {
-      this.loading = true
-      if (!this.folderId) return
-      const subNodes = await this.getSubNodes(this.folderId)
+      this.loading = true;
+      if (!this.folderId) return;
+      const subNodes = await this.getSubNodes(this.folderId);
 
       // Download thumbnails signatures
-      this.signatures = []
-      this.signatures = await this.thumbnail(subNodes)
-      this.loading = false
+      this.signatures = [];
+      this.signatures = await this.thumbnail(subNodes);
+      this.loading = false;
     },
     initialize: async function() {
-      if (!this.requestId) return
+      if (!this.requestId) return;
       let folder = await this.createFolder(
         this.signaturesContainer,
         this.requestId
-      )
-      this.folderId = folder.properties.id
+      );
+      this.folderId = folder.properties.id;
 
       // List all signatures attached to request id
-      await this.reload()
+      await this.reload();
     },
   },
   async created() {
     // Return folder id
-    await this.initialize()
+    await this.initialize();
   },
   watch: {
     requestId: function() {
-      this.initialize()
+      this.initialize();
     },
   },
   computed: {
     selectedUrl: function() {
-      if (!this.selected) return
-      return this.selected.replace('&verNum=1&verType=otthumb&pageNum=1', '')
+      if (!this.selected) return;
+      return this.selected.replace("&verNum=1&verType=otthumb&pageNum=1", "");
+    },
+    oldSignatures: function() {
+      if (Object.prototype.hasOwnProperty.call(this.field, "oldSignatures")) {
+        return this.field.oldSignatures;
+      }
+      return true;
     },
   },
   async mounted() {
-    let userDetails = await this.getUserDetails()
-    this.displayName = userDetails.displayName
-    this.$observable.subscribe('resizeCanvas', () => {
-      console.log('canvas')
+    let userDetails = await this.getUserDetails();
+    this.displayName = userDetails.displayName;
+    this.$observable.subscribe("resizeCanvas", () => {
+      console.log("canvas");
       this.clear();
-    })
+    });
   },
-}
+};
 </script>
 
 <style>

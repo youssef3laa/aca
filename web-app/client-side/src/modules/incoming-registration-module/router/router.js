@@ -6,6 +6,7 @@ import incomingCaseRegistrationMemoSignature from '../views/incoming-case-regist
 import incomingCaseRegistrationMemoOutcoming from '../views/incoming-case-registration-outcoming'
 import incomingCaseRegistrationMemoPerformance from '../views/incoming-case-registration-performance'
 import incomingCaseRegistrationRead from '../views/incoming-case-registration-read'
+import incomingCaseRegistrationSignatureEnter from '../views/incomingCaseRegistration-signature-enter'
 
 const routes = [
     {
@@ -32,6 +33,11 @@ const routes = [
         path: '/case/incoming-case-registration-signature/:taskId/',
         name: 'incomingCaseRegistration-signature',
         component: incomingCaseRegistrationMemoSignature
+    },
+    {
+        path: '/case/incoming-case-registration-signature-enter/:taskId/',
+        name: 'incomingCaseRegistration-signature-enter',
+        component: incomingCaseRegistrationSignatureEnter
     },
     {
         path: '/case/incoming-case-registration-outcoming/:taskId/',

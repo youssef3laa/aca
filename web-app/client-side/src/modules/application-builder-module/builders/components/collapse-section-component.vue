@@ -23,7 +23,7 @@
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <span v-for="formData in section.forms" :key="formData.id">
-            <FormBuilder :forms="formData" :model="formData.model" />
+            <FormBuilder ref="formBuild" :forms="formData" :model="formData.model" />
           </span>
         </v-expansion-panel-content>
       </v-expansion-panel>
@@ -43,6 +43,11 @@ export default {
   },
   mounted() {
     console.log(this.formData)
+  },
+  methods: {
+    validateModel: function(key){
+      return this.$refs.formBuild.validateModel(key);
+    },
   },
   props: ['formData', 'section'],
 }
@@ -65,7 +70,7 @@ export default {
 .v-expansion-panels {
   border: thin solid rgba(0, 0, 0, 0.12);
 }
-.v-expansion-panel--active > .v-expansion-panel-header {
+.v-expansion-panel > .v-expansion-panel-header {
   color: #0278ae !important;
   font-size: 18px;
 }

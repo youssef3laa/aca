@@ -1,14 +1,14 @@
 {
-    "key": "memorandumForm",
-    "inputs": [
-        {
-            "type": "MemoComponent",
-            "name": "memorandum",
-            "label": "memorandumType",
-            "col": 12
-        }
-    ],
-    "model": {
-        "memorandum": {"requestId": ""}
+  "key": "memorandumForm",
+  "inputs": [
+    {
+      "type": "MemoComponent",
+      "name": "memorandum",
+      "label": "memorandumType",
+      "col": 12
     }
+  ],
+  "model": {
+    "memorandum": { "requestId": "", "title": "test", "date": "24-02-2021" }
+  }
 }

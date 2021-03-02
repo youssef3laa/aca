@@ -78,7 +78,7 @@ public class BaseIdentity {
     }
 
     public String getDescription() {
-        return Optional.ofNullable(description).orElse("");
+        return description;
     }
 
     public void setDescription(String description) {

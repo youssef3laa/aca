@@ -23,9 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Optional;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/outcoming")
@@ -60,7 +57,7 @@ public class OutcomingController {
 
     @GetMapping("/read/{outcomingId}")
     public ResponseEntity<AppResponse<Outcoming>> getRequestById(@RequestHeader("X-Auth-Token") String token,
-                                                                     @PathVariable Long outcomingId){
+                                                                 @PathVariable Long outcomingId) {
         AppResponse.ResponseBuilder<Outcoming> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
@@ -81,17 +78,13 @@ public class OutcomingController {
         try {
             Account account = tokenService.get(token);
             if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
-            String restAPIBaseUrl = SystemUtil.generateRestAPIBaseUrl(environment, "AssetGeneralACA");
-            Entity entity = new Entity(account, restAPIBaseUrl, "ACA_Entity_Outcoming_Data");
-
+            String restAPIBaseUrl = SystemUtil.generateRestAPIBaseUrl(environment, environment.getProperty("aca.general.solution"));
+            Entity entity = new Entity(account, restAPIBaseUrl, Outcoming.TABLE);
             Outcoming outcoming = new Outcoming();
-            outcoming.setOutcomingNumber(outcomingService.generateRequestNumber(account));
-            outcoming.setOutcomingDate(new Date());
-
             Long outcomingId = entity.create(outcoming);
-            Outcoming requestOptional = outcomingService.findById(outcomingId);
-
-            respBuilder.data(requestOptional);
+            outcoming.setId(outcomingId);
+//            Outcoming requestOptional = outcomingService.findById(outcomingId);
+            respBuilder.data(outcoming);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
@@ -108,11 +101,10 @@ public class OutcomingController {
             Account account = tokenService.get(token);
             if (account == null) throw new AppworkException(ResponseCode.UNAUTHORIZED);
 
+            request.outcoming.setOutcomingNumber(outcomingService.generateRequestNumber());
             outcomingRepository.save(request.outcoming);
             incomingRegistrationService.updateWithOutcomingId(request.registrationId, request.outcoming.getId());
-
             String cordysUrl = cordysService.getCordysUrl();
-
             String response = moduleRouting.goToNext(request.outputSchema, account, cordysUrl);
             respBuilder.data(response);
         } catch (AppworkException e) {

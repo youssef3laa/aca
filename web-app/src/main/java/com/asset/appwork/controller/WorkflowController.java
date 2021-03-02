@@ -4,13 +4,18 @@ import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
+import com.asset.appwork.model.Unit;
+import com.asset.appwork.platform.soap.Workflow;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.ApprovalHistoryService;
 import com.asset.appwork.service.CordysService;
+import com.asset.appwork.service.UserService;
 import com.asset.appwork.util.SystemUtil;
-import com.asset.appwork.platform.soap.Workflow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +24,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Optional;
 
 /**
  * Created by karim on 11/4/20.
@@ -34,36 +44,59 @@ public class WorkflowController {
     CordysService cordysService;
     @Autowired
     ApprovalHistoryService approvalHistoryService;
+    @Autowired
+    UserService userService;
 
+    @Transactional
     @GetMapping("/human/tasks")
-    public ResponseEntity<AppResponse<String>> getHumanTask(@RequestHeader("X-Auth-Token") String token) {
-        AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
+    public ResponseEntity<AppResponse<JsonNode>> getHumanTask(@RequestHeader("X-Auth-Token") String token) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Workflow workflow = new Workflow();
             Account account = tokenService.get(token);
+            ObjectMapper objectMapper = new ObjectMapper();
             if (account != null) {
                 String response = cordysService.sendRequest(account, workflow.getHumanTasks());
                 Document document = SystemUtil.convertStringToXMLDocument(response);
                 NodeList tasks = document.getElementsByTagName("NOTF_TASK_INSTANCE");
-                String data = "{\n" +
-                        "\"data\": [\n";
+                ArrayNode arrayNode = objectMapper.createArrayNode();
                 if (tasks.getLength() > 0) {
                     for (int i = 0; i < tasks.getLength(); i++) {
-                        data += SystemUtil.convertDocumentNodetoJSON(tasks.item(i)) + ",\n";
+                        JsonNode jsonNode = SystemUtil.convertDocumentNodeToJsonNode(tasks.item(i));
+
+                        Optional<Unit> senderUnit = userService.getUnitByCN(jsonNode.get("Sender").get("").textValue());
+                        if(senderUnit.isPresent()){
+                            ((ObjectNode) jsonNode.get("Sender")).put("unit", senderUnit.get().getNameAr());
+                        }else{
+                            ((ObjectNode) jsonNode.get("Sender")).put("unit", "");
+                        }
+
+                        Optional<Unit> assigneeUnit = userService.getUnitByCN(jsonNode.get("Target").get("").textValue());
+                        if(assigneeUnit.isPresent()){
+                            ((ObjectNode) jsonNode.get("Target")).put("unit", assigneeUnit.get().getNameAr());
+                        }else{
+                            ((ObjectNode) jsonNode.get("Target")).put("unit", "");
+
+                        }
+
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                        Date deliveryDate = simpleDateFormat.parse(jsonNode.get("DeliveryDate").textValue());
+                        simpleDateFormat.applyPattern("yyyy-MM-dd , hh:mm:ss a");
+                        ((ObjectNode) jsonNode).put("DeliveryDate", simpleDateFormat.format(deliveryDate));
+
+                        arrayNode.add(jsonNode);
                     }
-                    data = data.substring(0, data.length() - 2);
                 }
-                data += "]\n}";
-                respBuilder.data(data);
+
+                respBuilder.data(arrayNode);
             }
-        } catch (JsonProcessingException e) {
+
+        } catch (ParseException | IOException e) {
             e.printStackTrace();
             respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return respBuilder.build().getResponseEntity();
     }
@@ -111,7 +144,7 @@ public class WorkflowController {
                     String taskState = SystemUtil.readJSONField(response, "State");
                     if (taskState != null) {
                         if (!taskState.equals("ASSIGNED")) {
-                            approvalHistoryService.updateReceiveDate(Long.parseLong(request.approvalId));
+                            approvalHistoryService.updateReceiveDate(Long.parseLong(request.requestId));
                             response = cordysService.sendRequest(account, workflow.claimTask(account.getSAMLart(), request.taskId));
                         } else {
                             response = "Task is already claimed.";
@@ -163,6 +196,6 @@ public class WorkflowController {
     @Data
     private static class Request {
         String taskId;
-        String approvalId;
+        String requestId;
     }
 }

@@ -9,6 +9,7 @@
     <span v-if="appData && appData.pages ">
       <div v-for="(page, key) in appData.pages.page" :key="key">
         <PageBuilder
+          ref="pageBuild"
           :page="page"
           v-on:modelChange="dataChange"
           :tabkey="appData.pages.key"
@@ -22,6 +23,7 @@
 import PageBuilder from './page-builder'
 import TitleComponent from './components/title-component'
 import TabBuilder from './tab-builder'
+
 export default {
   name: 'AppBuilder',
   components: { PageBuilder, TitleComponent, TabBuilder },
@@ -32,6 +34,10 @@ export default {
     }
   },
   methods: {
+    validateModel: function(key){
+      if(this.$refs.pageBuild)
+        return this.$refs.pageBuild.validateModel(key);
+    },
     dataChange: function(model) {
       console.log('App Builder')
       console.log(model)
@@ -88,7 +94,6 @@ export default {
         }
       }
     },
-
     getModelData: function(key) {
       if (!this.positions[key]) this.findKey(key)
       let form = this.appData.pages.page[this.positions[key][0]].sections.sec[
@@ -110,9 +115,23 @@ export default {
       if (form.hasOwnProperty('resizable'))
         form = form.resizable.forms[this.positions[key][3]]
       for (let property in obj) {
-        form.model[property] = obj[property]
+          // eslint-disable-next-line no-prototype-builtins
+          if (form.model.hasOwnProperty(property))
+              form.model[property] = obj[property]
       }
     },
+      setSectionValue:function (key, obj) {
+          if (!this.positions[key]) this.findKey(key);
+          let section = this.appData.pages.page[this.positions[key][0]].sections.sec[
+              this.positions[key][1]
+              ];
+
+          for (let property in obj) {
+              // eslint-disable-next-line no-prototype-builtins
+              if (section.hasOwnProperty(property))
+                  section[property] = obj[property]
+          }
+      },
     setFieldData: function(key, name, obj) {
       if (!this.positions[key]) this.findKey(key)
       let form = this.appData.pages.page[this.positions[key][0]].sections.sec[
@@ -139,7 +158,10 @@ export default {
       if (!this.positions[key]) this.findKey(key)
       this.appData.pages.tabs[this.positions[key][0]].show = show
     },
-
+    setTabValue: function(key,value) {
+      if (!this.positions[key]) this.findKey(key)
+      this.appData.pages.tabs[this.positions[key][0]].value = value
+    },
     appendForm: function(key, obj) {
       if (!this.positions[key]) this.findKey(key)
       this.appData.pages.page[this.positions[key][0]].sections.sec[
@@ -203,7 +225,7 @@ export default {
 
     getFormKeyByPageKey: function(pageKey) {
       var result = []
-      for (let i = 0; i < this.appData.pages.page.length; i++) {
+      for (let i = 0; i < this.appData?.pages?.page?.length; i++) {
         var page = this.appData.pages.page[i]
         if (page.key != pageKey) continue
         if (page.sections) {

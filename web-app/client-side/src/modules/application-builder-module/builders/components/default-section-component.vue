@@ -1,7 +1,7 @@
 <template>
   <span>
     <!-- <span v-for="(form, index) in formData" :key="index"> -->
-      <FormBuilder :forms="formData" :model="formData.model" />
+      <FormBuilder ref="formBuild" :forms="formData" :model="formData.model" />
     <!-- </span> -->
   </span>
 </template>
@@ -16,5 +16,9 @@ export default {
   mounted() {
     console.log(this.formData)
   },
+  validateModel: function(key){
+    if(this.formData.key == key)
+      return this.$refs.formBuild.validateModel(key);
+  }
 }
 </script>

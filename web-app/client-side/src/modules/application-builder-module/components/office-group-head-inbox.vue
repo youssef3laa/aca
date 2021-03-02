@@ -1,242 +1,280 @@
 <template>
   <div style="width:100%">
-    <Topbar :val="{ tasks: taskList }"></Topbar>
-
     <v-container>
       <AppBuilder ref="appBuilder" :app="app" />
+      <AlertComponent ref="alertComponent"></AlertComponent>
     </v-container>
   </div>
 </template>
 
 <script>
-import Topbar from "../../application-builder-module/components/topbar-component";
 import formPageMixin from "../../../mixins/formPageMixin";
+import orgChartMixin from "../../../mixins/orgChartMixin";
+import router from "../../../router";
+import http from "../../core-module/services/http";
+
 export default {
   components: {
     AppBuilder: () => import("../builders/app-builder"),
-    Topbar,
   },
-  mixins: [formPageMixin],
-  mounted() {
-    // this.loadForm("secertary-inbox");
-    this.$observable.subscribe("secertaryOutgoing_selected", (selected) => {
-      console.log(selected);
-      if (selected.length != 0) {
-        this.$refs.appBuilder.setFieldData("outgoing", "actionTopComponent", {
-          show: true,
-        });
-      } else {
-        this.$refs.appBuilder.setFieldData("outgoing", "actionTopComponent", {
-          show: false,
-        });
-      }
-    });
-    this.$observable.subscribe("subjectHeadOfOfficeGroup", (text) => {
-      console.log(text);
-      this.$observable.fire("outgoing",{type:'modelUpdate',model:{data:[
-                              {
-                                requestNumber: "Frozen Yogurt",
-                                incomingDate: "159",
-                                subject: "6.0",
-                                management: "24",
-                                importance: true,
-                                chairmanOfCommisionSignature:
-                                  "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-                                viceChairmanOfCommisionSignature:
-                                  "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-                              },]}})
-    });
-    this.$observable.subscribe("incomingNumberHeadOfOfficeGroup", (text) => {
-      console.log(text);
-    });
-  },
+  mixins: [formPageMixin, orgChartMixin],
   data() {
     return {
-      app: {
-        pages: {
-          key: "officeGroupHeadInboxPage",
-          tabs: [
-            {
-              key: "outgoingTab",
-              id: "1",
-              isActive: "true",
-              name: "sentFromManagement",
-              icon: "fas fa-copy",
-            },
-            {
-              key: "signaturesTab",
-              id: "2",
-              name: "sentFromCertification",
-              icon: "fas fa-pen-alt",
-            },
-            {
-              key: "temporarilySavedForModificationTab",
-              id: "3",
-              name: "temporarilySavedForModification",
-              icon: "fas fa-save",
-            },
-          ],
-          page: [
-            {
-              key: "page1",
-              sections: {
-                tabs: [],
-                sec: [
-                  {
-                    key: "section 1",
-                    tabId: 1,
-                    isTab: true,
-                    type: "DefaultSection",
-                    display: "block",
-                    isCard: true,
-                    forms: [
-                      {
-                        key: "outgoing",
-                        inputs: [
-                          {
-                            type: "ActionsTopComponent",
-                            name: "actionTopComponent",
-                            show: false,
-                            col: 6,
-                          },
-                          {
-                            type: "InputComponent",
-                            label: "subject",
-                            name: "subject",
-                            readonly: false,
-                            publish: "subjectHeadOfOfficeGroup",
-                            col: 3,
-                          },
-                          {
-                            type: "InputComponent",
-                            label: "incomingNumber",
-                            name: "incomingNumber",
-                            readonly: false,
-                            publish: "incomingNumberHeadOfOfficeGroup",
-                            col: 3,
-                          },
-
-                          {
-                            type: "DataTableComponent",
-                            name: "secertaryOutgoing",
-                            actions: ["view"],
-                            subscribe: "outgoing",
-                            select: true,
-                            col: 12,
-                            images: [
-                              "chairmanOfCommisionSignature",
-                              "viceChairmanOfCommisionSignature",
-                            ],
-                            selectable: "importance",
-                          },
-                        ],
-                        model: {
-                          actionTopComponent: [
-                            {
-                              title: "backToCertification",
-                              icon: "fas fa-undo",
-                              publish: "backToCertification",
-                            },
-                            {
-                              title: "temporarySave",
-                              icon: "far fa-save",
-                              publish: "backToCertification",
-                            },
-                            {
-                              title: "send",
-                              icon: "far fa-paper-plane",
-                              publish: "backToCertification",
-                            },
-                            {
-                              title: "sendToAnotherManagement",
-                              icon: "far fa-save",
-                              publish: "backToCertification",
-                            },
-                          ],
-
-                          secertaryOutgoing: {
-                            url: null,
-                            key: "requestNumber",
-                            headers: [
-                              {
-                                text: "requestNumber",
-                                value: "requestNumber",
-                              },
-                              { text: "incomingDate", value: "incomingDate" },
-                              {
-                                text: "subject",
-                                value: "subject",
-                              },
-                              {
-                                text: "section/management",
-                                value: "management",
-                              },
-                              {
-                                text: "chairmanOfCommisionSignature",
-                                value: "chairmanOfCommisionSignature",
-                              },
-                              {
-                                text: "viceChairmanOfCommisionSignature",
-                                value: "viceChairmanOfCommisionSignature",
-                              },
-                              {
-                                text: "importantAndImmediate",
-                                value: "importance",
-                              },
-                              {
-                                text: "",
-                                value: "action",
-                                sortable: false,
-                              },
-                            ],
-                            data: [
-                              {
-                                requestNumber: "Frozen Yogurt",
-                                incomingDate: "159",
-                                subject: "6.0",
-                                management: "24",
-                                importance: true,
-                                chairmanOfCommisionSignature:
-                                  "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-                                viceChairmanOfCommisionSignature:
-                                  "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-                              },
-                              {
-                                requestNumber: "soba3 kofta",
-                                incomingDate: "159",
-                                subject: "4.0",
-                                management: "24",
-                                importance: false,
-                                chairmanOfCommisionSignature:
-                                  "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-                                viceChairmanOfCommisionSignature:
-                                  "https://i.picsum.photos/id/11/500/300.jpg?hmac=X_37MM-ameg7HWL6TKJT2h_5_rGle7IGN_CUdEDxsAQ",
-                              },
-                            ],
-                          },
-                        },
-                      },
-                    ],
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      },
+      selected: [],
+      selectedCertfication: [],
+      inputSchemaArray: [],
+      app: {},
       taskList: [{ title: "إنشاء وارد جديد" }, { title: "تسجيل موضوع" }],
+      sentFromManagementFilter: [
+        {
+          property:
+            "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.subject",
+          value: "",
+        },
+        {
+          property:
+            "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestNumber",
+          value: "",
+        },
+      ],
     };
+  },
+  mounted() {
+    this.loadForm("office-group-head-inbox", this.formLoaded);
+    this.certificationTopActionsSubscriptions();
+    this.managementTopActionsSubscriptions();
+    this.$observable.subscribe("technicalTasksTable_view", (item) => {
+      this.viewTask(item);
+    });
+    this.$observable.subscribe(
+      "technicalTasksTableCertification_selected",
+      (selected) => {
+        this.selectedCertfication = selected;
+        console.log(this.selected);
+        if (this.selectedCertfication.length != 0) {
+          this.$refs.appBuilder.setFieldData(
+            "sentFromCertification",
+            "actionTopComponent",
+            {
+              show: true,
+            }
+          );
+        } else {
+          this.$refs.appBuilder.setFieldData(
+            "sentFromCertification",
+            "actionTopComponent",
+            {
+              show: false,
+            }
+          );
+        }
+      }
+    );
+    this.$observable.subscribe("technicalTasksTable_selected", (selected) => {
+      this.selected = selected;
+      console.log(this.selected);
+      if (this.selected.length != 0) {
+        this.$refs.appBuilder.setFieldData(
+          "sentFromManagement",
+          "actionTopComponent",
+          {
+            show: true,
+          }
+        );
+      } else {
+        this.$refs.appBuilder.setFieldData(
+          "sentFromManagement",
+          "actionTopComponent",
+          {
+            show: false,
+          }
+        );
+      }
+    });
+
+    this.$observable.subscribe("subjectHeadOfOfficeGroup", (text) => {
+      this.sentFromManagementFilter[0].value = text;
+
+      this.$observable.fire("technicalTasks", {
+        type: "modelUpdate",
+        model: {
+          filter: this.sentFromManagementFilter,
+        },
+      });
+    });
+    this.$observable.subscribe("incomingNumberHeadOfOfficeGroup", (text) => {
+      this.sentFromManagementFilter[1].value = text;
+
+      this.$observable.fire("technicalTasks", {
+        type: "modelUpdate",
+        model: {
+          filter: this.sentFromManagementFilter,
+        },
+      });
+    });
+  },
+  methods: {
+    formLoaded() {
+      http.get("workflow/human/tasks").then((response) => {
+        console.log(response);
+        let data = response.data.data;
+
+        let fromAdmins = [];
+        let fromCertifications = [];
+
+        for (let key in data) {
+          if(!data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.caseType) {
+            fromAdmins.push(data[key])
+            continue
+          }
+          switch (data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.caseType) {
+            case "certificationTechnicalOffice":
+              fromCertifications.push(data[key]);
+              break;
+            default:
+              // "sentFromAdministratorsTechnicalOffice"
+              fromAdmins.push(data[key]);
+          }
+        }
+
+        this.$refs.appBuilder.setTabValue(
+          "sentFromManagementTab",
+          fromAdmins.length + ""
+        );
+        this.$observable.fire("technicalTasks", {
+          type: "modelUpdate",
+          model: { data: fromAdmins },
+        });
+
+        this.$refs.appBuilder.setTabValue(
+          "signaturesTab",
+          fromCertifications.length + ""
+        );
+        this.$observable.fire("technicalTasksCertifications", {
+          type: "modelUpdate",
+          model: { data: fromCertifications },
+        });
+      });
+    },
+    submit() {
+      this.selected.forEach((item) => {
+        this.inputSchemaArray.push(
+          item.taskData.TaskData.ApplicationData
+            .ACA_ProcessRouting_InputSchemaFragments
+        );
+      });
+    },
+    viewTask(item) {
+      try {
+        let taskId = item.item.TaskId,
+          page =
+            item.item.TaskData.ApplicationData
+              .ACA_ProcessRouting_InputSchemaFragment.component;
+        router.push({
+          name: page,
+          params: { taskId: taskId },
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    certificationTopActionsSubscriptions() {
+      this.$observable.subscribe("sendToAnotherManagement", () => {
+        console.log("sendToAnotherManagement");
+      });
+      this.$observable.subscribe("backToCertification", () => {
+        console.log("backToCertification");
+      });
+      this.$observable.subscribe("ManagementtemporarySave", () => {
+        console.log("ManagementtemporarySave");
+      });
+      this.$observable.subscribe("send", () => {
+        console.log("send");
+        let outschemaArray = [];
+       
+        this.selected.forEach(async (task) => {
+          let inputSchema =
+            task.TaskData.ApplicationData
+              .ACA_ProcessRouting_InputSchemaFragment;
+          let requestData = await this.readRequest(inputSchema.requestId);
+          let entity = await this.readEntity(
+            requestData.entityName,
+            requestData.entityId
+          );
+          if (entity.responsibleEntityEdara) {
+            let group = await this.getHeadRoleByUnitCode(
+              entity.responsibleEntityEdara
+            );
+            let assignedCN =
+              "cn=" +
+              group.groupCode +
+              ",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+            let obj = {
+              taskId: task.TaskId,
+              requestId: inputSchema.requestId,
+              stepId: inputSchema.stepId,
+              process: inputSchema.process,
+              parentHistoryId: inputSchema.parentHistoryId,
+              assignedCN: assignedCN,
+              decision: "approve",
+              receiverType: "single",
+            };
+            outschemaArray.push(obj);
+          }
+        });
+        this.completeMultipleSteps(outschemaArray, this.formLoaded);
+      });
+    },
+    managementTopActionsSubscriptions() {
+      this.$observable.subscribe("backToManagement", () => {
+        console.log("backToManagement");
+      });
+      this.$observable.subscribe("temporarySave", () => {
+        console.log("temporarySave");
+      });
+
+      this.$observable.subscribe("sendToCertification", async () => {
+        console.log("sendToCertification");
+        let outschemaArray = [];
+        let unitCode = this.$user.details.groups[0].unit.unitCode;
+        let assignedCN = "";
+        if (unitCode == "TVA") {
+          //haga
+          let group = await this.getHeadRoleByUnitCode("TVS");
+          assignedCN =
+            "cn=" +
+            group.groupCode +
+            ",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+        } else {
+          //haga Tanya
+          let group = await this.getHeadRoleByUnitCode("TCS");
+          assignedCN =
+            "cn=" +
+            group.groupCode +
+            ",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+        }
+
+        this.selected.forEach((task) => {
+          let inputSchema =
+            task.TaskData.ApplicationData
+              .ACA_ProcessRouting_InputSchemaFragment;
+          let obj = {
+            taskId: task.TaskId,
+            requestId: inputSchema.requestId,
+            stepId: inputSchema.stepId,
+            process: inputSchema.process,
+            parentHistoryId: inputSchema.parentHistoryId,
+            assignedCN: assignedCN,
+            decision: "approve",
+            receiverType: "single",
+          };
+          outschemaArray.push(obj);
+        });
+        this.completeMultipleSteps(outschemaArray, this.formLoaded);
+        console.log(outschemaArray);
+        console.log(this.selected);
+      });
+    },
   },
 };
 </script>
-
-<style scoped>
-.no-padding {
-  padding: 0px !important;
-}
-.padding-left {
-  padding: 0px !important;
-  padding-left: 1px !important;
-  border-left: 1px solid #d1d1d1 !important;
-}
-</style>

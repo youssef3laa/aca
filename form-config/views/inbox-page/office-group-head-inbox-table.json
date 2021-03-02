@@ -1,0 +1,42 @@
+{
+    "url": null,
+    "key": "TaskId",
+    "selected":[],
+    "headers": [
+      {
+        "text": "requestNumber",
+        "value": "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestNumber"
+      },
+      {
+        "text": "incomingDate",
+        "value": "DeliveryDate"
+      },
+      {
+        "text": "subject",
+        "value": "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.subject"
+      },
+      {
+        "text": "section/management",
+        "value": "Sender.unit"
+      },
+      {
+        "text": "chairmanOfCommisionSignature",
+        "value": "chairmanOfCommisionSignature"
+      },
+      {
+        "text": "viceChairmanOfCommisionSignature",
+        "value": "viceChairmanOfCommisionSignature"
+      },
+      {
+        "text": "importantAndImmediate",
+        "translate": false,
+        "value": "importance"
+      },
+      {
+        "text": "",
+        "value": "action",
+        "sortable": false
+      }
+    ],
+    "data": []
+  }

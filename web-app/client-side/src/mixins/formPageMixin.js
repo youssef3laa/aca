@@ -3,10 +3,11 @@ import router from "../router";
 
 export default {
     methods: {
-        loadForm: function (formName,callBack) {
+        loadForm: function (formName,callBack,appBuilder) {
             http.get("/user/form/"+formName)
                 .then((response) => {
-                    this.$refs.appBuilder.setAppData(response.data.data.app);
+                    if(appBuilder) this.$refs[appBuilder].setAppData(response.data.data.app);
+                    else this.$refs.appBuilder.setAppData(response.data.data.app);
                     if(callBack){
                         callBack();
                     }
@@ -21,9 +22,9 @@ export default {
                 console.error(error);
             }
         },
-        claimTask: async function (taskId , approvalId) {
+        claimTask: async function (taskId , requestId) {
             try{
-                let response = await http.post('/workflow/task/claim', { taskId: taskId,  approvalId: approvalId } );
+                let response = await http.post('/workflow/task/claim', {taskId, requestId});
                 console.log("ClaimTask Response:", response);
             } catch (error){
                 console.error(error)
@@ -91,6 +92,15 @@ export default {
                 console.log(error);
             }
         },
+        getTasks: function (publish) {
+            http.get("workflow/human/tasks").then((response) => {
+              var data = response.data.data;
+              this.$observable.fire(publish, {
+                type: "modelUpdate",
+                model: data,
+              });
+            });
+          },
         checkParallelTasksFinished: async function(requestId){
             try {
                 let response = await http.get("parallel/finished/" + requestId);
@@ -121,6 +131,24 @@ export default {
                         message: "actionHasBeenSentSuccessfully"
                     }, () => router.push({name: 'HomePage'}).then(r => console.log(r)));
 
+                })
+                .catch((error) => console.error(error));
+        },
+        completeMultipleSteps: function(data,callBack){
+            http.post("/process/multiple/complete", data)
+                .then((response) => {
+                    console.log(response);
+                    // alert("Step Complete!");
+
+                    this.$refs.alertComponent._alertSuccess({
+                        type: "success",
+                        message: "actionHasBeenSentSuccessfully"
+                    }, () => {
+                        if(callBack){
+                            callBack()
+                        }
+                    });
+                    
                 })
                 .catch((error) => console.error(error));
         }
