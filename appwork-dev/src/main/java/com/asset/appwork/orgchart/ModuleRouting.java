@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -68,6 +69,7 @@ public class ModuleRouting {
         String component = "" , config = "" , readonlyComponent = "";
         String subBP = "";
         HashMap<String, String> nextStep = new HashMap<>();
+        HashMap<String, List<String>> nextPhase = new HashMap<>();
         HashMap<String, T> extraData = new HashMap<>();
     }
 
@@ -164,41 +166,47 @@ public class ModuleRouting {
             ((OutputSchema) outputSchema).setParentHistoryId(null);
 
             if(codeSelected[0].isEmpty() && decision[0].isEmpty()){
-                throw new AppworkException(ResponseCode.MODULE_ROUTING_INPUTS_ERROR);
+                if(!routingConfig.getSteps().get(currentStepId[0]).getNextPhase().isEmpty()){
+                    nextStep = currentStepId[0];
+                }else{
+                    throw new AppworkException(ResponseCode.MODULE_ROUTING_INPUTS_ERROR);
+                }
             }
 
-            decision[0] = getDecisionString(decision[0]);
+            if(nextStep.isEmpty()){
+                decision[0] = getDecisionString(decision[0]);
 
-            if(receiverType[0].equals(multipleString)) {
-                nextSubBP = "ACA_SubBP_multipleUnits";
-                handleParallelTasks(outputSchema, routingConfig, currentStepId[0], multipleString);
-                decision[0] = multipleResponsibleString;
-            }
+                if(receiverType[0].equals(multipleString)) {
+                    nextSubBP = "ACA_SubBP_multipleUnits";
+                    handleParallelTasks(outputSchema, routingConfig, currentStepId[0], multipleString);
+                    decision[0] = multipleResponsibleString;
+                }
 
-            switch (decision[0]) {
-                case approveString:
-                    nextStep = handleApprovalCase(routingConfig, currentStepId[0], codeSelected[0]);
-                    break;
-                case redirectString:
-                    nextStep = handleRedirectCase(routingConfig, currentStepId[0], codeSelected[0]);
-                    break;
-                case requestModificationString:
-//                    nextType = "modification";
-                    nextStep = handleRequestModificationCase(outputSchema, routingConfig, currentStepId[0], parentHistoryId[0]);
-                    break;
-                case parallelString:
-                    nextSubBP = "ACA_SubBP_parallelTasks";
-                    nextStep = handleParallelTasks(outputSchema, routingConfig, currentStepId[0], parallelString);
-                    break;
-                case commentString:
-                    nextStep = handleCommentCase(routingConfig, currentStepId[0], codeSelected[0]);
-                    break;
-                case rejectString:
-                    nextStep = breakString;
-                    break;
-                default:
-                    nextStep = handleDefaultCase(routingConfig, currentStepId[0], codeSelected[0], decision[0]);
-                    break;
+                switch (decision[0]) {
+                    case approveString:
+                        nextStep = handleApprovalCase(routingConfig, currentStepId[0], codeSelected[0]);
+                        break;
+                    case redirectString:
+                        nextStep = handleRedirectCase(routingConfig, currentStepId[0], codeSelected[0]);
+                        break;
+                    case requestModificationString:
+    //                    nextType = "modification";
+                        nextStep = handleRequestModificationCase(outputSchema, routingConfig, currentStepId[0], parentHistoryId[0]);
+                        break;
+                    case parallelString:
+                        nextSubBP = "ACA_SubBP_parallelTasks";
+                        nextStep = handleParallelTasks(outputSchema, routingConfig, currentStepId[0], parallelString);
+                        break;
+                    case commentString:
+                        nextStep = handleCommentCase(routingConfig, currentStepId[0], codeSelected[0]);
+                        break;
+                    case rejectString:
+                        nextStep = breakString;
+                        break;
+                    default:
+                        nextStep = handleDefaultCase(routingConfig, currentStepId[0], codeSelected[0], decision[0]);
+                        break;
+                }
             }
 
             if(nextStep.isEmpty()){
@@ -280,12 +288,13 @@ public class ModuleRouting {
     private <T> String handleRequestModificationCase(T outputSchema, RoutingConfig routingConfig, String currentStepId, String parentHistoryId){
         String step = getIdFromNextSteps(routingConfig, currentStepId, requestModificationString);
         if(!step.isEmpty()){
+            if(step.equals(currentStepId)){
+                return calculateFromApprovalHistory(outputSchema, parentHistoryId);
+            }
 //            ((OutputSchema) outputSchema).setParentHistoryId(parentHistoryId);
             return step;
         }
-        else {
-            return calculateFromApprovalHistory(outputSchema, parentHistoryId);
-        }
+        return calculateFromApprovalHistory(outputSchema, parentHistoryId);
     }
 
     private String handleDefaultCase(RoutingConfig routingConfig, String currentStepId, String codeSelected, String decision){
@@ -312,7 +321,15 @@ public class ModuleRouting {
     }
 
     private String getIdFromNextSteps(RoutingConfig routingConfig, String currentStepId, String inputCase){
-        if (routingConfig.getSteps().get(currentStepId).getNextStep().containsKey(inputCase) ) {
+        if(!routingConfig.getSteps().get(currentStepId).getNextPhase().isEmpty()){
+            for(Object key: routingConfig.getSteps().get(currentStepId).getNextPhase().keySet()) {
+                String keyString = (String)key;
+                if(((List<String>)routingConfig.getSteps().get(currentStepId).getNextPhase().get(keyString)).contains(inputCase)){
+                    return keyString;
+                }
+            }
+            return currentStepId;
+        }else if (routingConfig.getSteps().get(currentStepId).getNextStep().containsKey(inputCase) ) {
             return routingConfig.getSteps().get(currentStepId).getNextStep().get(inputCase).toString();
         }
         return "";
