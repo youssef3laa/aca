@@ -213,6 +213,16 @@
   "addSuccess": "تم إضافة البيانات بنجاح",
   "systemError": "لقد حدث خطأ بالنظام",
 
+  "subjects":"الموضوعات",
+  "outgoingMemos":"المذكرات الصادرة",
+  "supervisorLevels/technicalOffice":"رأي المستويات الإشرافية / المكتب الفني",
+  "presidentDirections":"توجيهات رئيس الجمهورية",
+  "situationEstimate":"تقدير الموقف",
+  "proposals":"المقترحات",
+  "viceOpinion":"رأي السيد النائب",
   "backToManagement": "إرجاع للإدارة",
-  "sendToCertification": "إرسال للتصديق"
+  "sendToCertification": "إرسال للتصديق",
+  "chairmanApproval":"تصديق رئيس الهيئة",
+  "charimanSignatureText":"نصّ تأشيرة السيد رئيس الهيئة",
+  "viceSignatureText":"نصّ تأشيرة السيد نائب رئيس الهيئة"
 }

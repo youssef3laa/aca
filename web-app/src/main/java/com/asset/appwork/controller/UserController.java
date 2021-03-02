@@ -102,6 +102,7 @@ public class UserController {
         }
         return responseBuilder.build().getResponseEntity();
     }
+    @Transactional
     @PostMapping("/login")
     public ResponseEntity<AppResponse<String>> login(@RequestBody Account account) {
 
@@ -109,7 +110,7 @@ public class UserController {
         try {
              userManagement.create(account);
             User user = orgChartService.getLoggedInUser(account);
-            respBuilder.info("user", user.getPerson());
+            respBuilder.info("user", user);
             respBuilder.info("cn", user.getCN());
             respBuilder.data(tokenService.generate(account));
         } catch (JsonProcessingException e) {
