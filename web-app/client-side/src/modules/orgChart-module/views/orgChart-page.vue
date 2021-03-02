@@ -71,18 +71,18 @@ export default {
                         inputs: [
                           {
                             type: 'InputComponent',
-                            label: 'Arabic name',
+                            label: 'Name',
                             name: 'nameAr',
                             col: '4',
                             rule: 'required',
                           },
-                          {
-                            type: 'InputComponent',
-                            label: 'English name',
-                            name: 'nameEn',
-                            col: '4',
-                            rule: 'required',
-                          },
+                          // {
+                          //   type: 'InputComponent',
+                          //   label: 'English name',
+                          //   name: 'nameEn',
+                          //   col: '4',
+                          //   rule: 'required',
+                          // },
                           {
                             type: 'InputComponent',
                             label: 'Unit type code',
@@ -107,7 +107,7 @@ export default {
                         ],
                         model: {
                           nameAr: '',
-                          nameEn: '',
+                          // nameEn: '',
                           unitTypeCode: '',
                           unitCode: '',
                           parentCode: '',
@@ -127,18 +127,18 @@ export default {
                           },
                           {
                             type: 'InputComponent',
-                            label: 'Arabic name',
+                            label: 'Name',
                             name: 'nameAr',
                             col: '4',
                             rule: 'required',
                           },
-                          {
-                            type: 'InputComponent',
-                            label: 'English name',
-                            name: 'nameEn',
-                            col: '4',
-                            rule: 'required',
-                          },
+                          // {
+                          //   type: 'InputComponent',
+                          //   label: 'English name',
+                          //   name: 'nameEn',
+                          //   col: '4',
+                          //   rule: 'required',
+                          // },
                           {
                             type: 'InputComponent',
                             label: 'Unit type code',
@@ -165,7 +165,7 @@ export default {
                           id: '',
                           name: '',
                           nameAr: '',
-                          nameEn: '',
+                          // nameEn: '',
                           unitTypeCode: '',
                           unitCode: '',
                           parentCode: '',
@@ -186,18 +186,18 @@ export default {
                         inputs: [
                           {
                             type: 'InputComponent',
-                            label: 'Arabic name',
+                            label: 'Name',
                             name: 'nameAr',
                             col: '4',
                             rule: 'required',
                           },
-                          {
-                            type: 'InputComponent',
-                            label: 'English name',
-                            name: 'nameEn',
-                            col: '4',
-                            rule: 'required',
-                          },
+                          // {
+                          //   type: 'InputComponent',
+                          //   label: 'English name',
+                          //   name: 'nameEn',
+                          //   col: '4',
+                          //   rule: 'required',
+                          // },
                           {
                             type: 'InputComponent',
                             label: 'Role code',
@@ -217,7 +217,7 @@ export default {
                           id: '',
                           name: '',
                           description: '',
-                          nameEn: '',
+                          // nameEn: '',
                           nameAr: '',
                           groupCode: '',
                           type: '',
@@ -231,18 +231,18 @@ export default {
                         inputs: [
                           {
                             type: 'InputComponent',
-                            label: 'Arabic name',
+                            label: 'Name',
                             name: 'nameAr',
                             col: '4',
                             rule: 'required',
                           },
-                          {
-                            type: 'InputComponent',
-                            label: 'English name',
-                            name: 'nameEn',
-                            col: '4',
-                            rule: 'required',
-                          },
+                          // {
+                          //   type: 'InputComponent',
+                          //   label: 'English name',
+                          //   name: 'nameEn',
+                          //   col: '4',
+                          //   rule: 'required',
+                          // },
                           {
                             type: 'InputComponent',
                             label: 'Role code',
@@ -262,7 +262,7 @@ export default {
                           id: '',
                           name: '',
                           description: '',
-                          nameEn: '',
+                          // nameEn: '',
                           nameAr: '',
                           groupCode: '',
                           type: '',
@@ -395,13 +395,13 @@ export default {
                                 value: 'name',
                               },
                               {
-                                text: 'Name ar',
+                                text: 'Name',
                                 value: 'nameAr',
                               },
-                              {
-                                text: 'Name en',
-                                value: 'nameEn',
-                              },
+                              // {
+                              //   text: 'Name en',
+                              //   value: 'nameEn',
+                              // },
                               {
                                 text: 'Unit type code',
                                 value: 'unitTypeCode',
@@ -452,13 +452,13 @@ export default {
                                 value: 'name',
                               },
                               {
-                                text: 'Name ar',
+                                text: 'Name',
                                 value: 'nameAr',
                               },
-                              {
-                                text: 'Name en',
-                                value: 'nameEn',
-                              },
+                              // {
+                              //   text: 'Name en',
+                              //   value: 'nameEn',
+                              // },
                               {
                                 text: 'Role code',
                                 value: 'groupCode',

@@ -356,4 +356,14 @@ public class ACAOrgChartService {
 
         return orgChartService.getUserByUserId(internalUser.getUserId());
     }
+
+
+    public Group createGroupOfUnit(Account account, String unitCode, GroupType type) throws AppworkException, JsonProcessingException {
+        Unit unit = orgChartService.getUnitByName(unitCode);
+        Group group = orgChartService.createGroup(account, generateGroupByTypeAndUnit(type, unit).toString());
+        orgChartService.addSubGroupToUnitGroup(account, unit.getName(), group.getName());
+        orgChartService.updateGroupUnitRelationByCodes(account, group.getName(), group.getName(), unit.getName());
+
+        return group;
+    }
 }
