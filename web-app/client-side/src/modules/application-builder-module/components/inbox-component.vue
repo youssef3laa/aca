@@ -151,4 +151,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.row{
+margin-top: 0px;
+}
+</style>
