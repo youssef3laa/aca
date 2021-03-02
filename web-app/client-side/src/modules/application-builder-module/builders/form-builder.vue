@@ -123,6 +123,7 @@ import ImageComponent from '../components/image-component'
 import ActionsTopComponent from '../components/actions-top-component'
 import BarcodeComponent from '../components/barcode-component'
 import TextComponent from "../components/text-component"
+import PaginationComponent from "../components/pagination-component"
 export default {
   name: 'FormBuilder',
   components: {
@@ -161,6 +162,7 @@ export default {
     ActionsTopComponent,
     BarcodeComponent,
     TextComponent,
+    PaginationComponent,
   },
   data() {
     return {

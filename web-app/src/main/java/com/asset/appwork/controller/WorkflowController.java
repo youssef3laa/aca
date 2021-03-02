@@ -65,16 +65,16 @@ public class WorkflowController {
                         JsonNode jsonNode = SystemUtil.convertDocumentNodeToJsonNode(tasks.item(i));
 
                         Optional<Unit> senderUnit = userService.getUnitByCN(jsonNode.get("Sender").get("").textValue());
-                        if(senderUnit.isPresent()){
+                        if (senderUnit.isPresent()) {
                             ((ObjectNode) jsonNode.get("Sender")).put("unit", senderUnit.get().getNameAr());
-                        }else{
+                        } else {
                             ((ObjectNode) jsonNode.get("Sender")).put("unit", "");
                         }
 
                         Optional<Unit> assigneeUnit = userService.getUnitByCN(jsonNode.get("Target").get("").textValue());
-                        if(assigneeUnit.isPresent()){
+                        if (assigneeUnit.isPresent()) {
                             ((ObjectNode) jsonNode.get("Target")).put("unit", assigneeUnit.get().getNameAr());
-                        }else{
+                        } else {
                             ((ObjectNode) jsonNode.get("Target")).put("unit", "");
 
                         }
@@ -144,7 +144,8 @@ public class WorkflowController {
                     String taskState = SystemUtil.readJSONField(response, "State");
                     if (taskState != null) {
                         if (!taskState.equals("ASSIGNED")) {
-                            approvalHistoryService.updateReceiveDate(Long.parseLong(request.requestId));
+                            if (request.requestId != null)
+                                approvalHistoryService.updateReceiveDate(Long.parseLong(request.requestId));
                             response = cordysService.sendRequest(account, workflow.claimTask(account.getSAMLart(), request.taskId));
                         } else {
                             response = "Task is already claimed.";
