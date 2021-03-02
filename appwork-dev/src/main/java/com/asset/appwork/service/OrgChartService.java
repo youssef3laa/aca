@@ -297,7 +297,9 @@ public class OrgChartService {
         } while (counter < 5 && identityRepository.findByName(createdGroupName).isEmpty());
 
         if (identityRepository.findByName(createdGroupName).isEmpty()) {
-            throw new AppworkException("Could not get group: " + SystemUtil.getJsonByPtrExpr(props, "/name"), ResponseCode.UPDATE_ENTITY_FAILURE);
+            new Otds(account, SystemUtil.generateOtdsAPIBaseUrl(env), env.getProperty("otds.partition"))
+                    .deleteGroupByGroupName(createdGroupName);
+            throw new AppworkException("Could not create group", ResponseCode.UPDATE_ENTITY_FAILURE);
         }
 
         Group platformGroupPostUpdate = new Group(identityRepository.findByName(createdGroupName).get());

@@ -10,7 +10,7 @@
         </ShowAttachmentComponent>
       </pane>
       <pane class="bg-white" dir="rtl">
-        <v-row style="padding : 5px;">
+        <v-row class="mb-3" style="padding : 5px;">
           <v-col
             :cols="1"
             style="background : #effaf6; border:1px solid effaf6; border-radius: 6px;text-align: center;height: 100%;

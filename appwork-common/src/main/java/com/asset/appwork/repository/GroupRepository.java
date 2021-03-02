@@ -39,11 +39,11 @@ public interface GroupRepository extends GenericRepository<Group, Long> {
 //    Page<Group> findAll(Pageable pageable);
 
     @Query("SELECT G FROM Group G WHERE G.name LIKE %:searchString% OR G.nameAr LIKE %:searchString% " +
-            "OR G.nameEn LIKE %:searchString% OR G.groupCode LIKE %:searchString%")
+            "OR G.groupCode LIKE %:searchString%")
     List<Group> findAllSearchable(String searchString);
 
     @Query("SELECT G FROM Group G WHERE G.name LIKE %:searchString% OR G.nameAr LIKE %:searchString% " +
-            "OR G.nameEn LIKE %:searchString% OR G.groupCode LIKE %:searchString%")
+            "OR G.groupCode LIKE %:searchString%")
     Page<Group> findAllSearchable(String searchString, Pageable pageable);
 
 //    @Query(value = "{call APPWORKSDB.ACA_ORG_SP_getGroupChildrenRecursivelyFilteredByUnitTypeCode(:groupCode_param, :unitTypeCode_param)}", nativeQuery = true)
