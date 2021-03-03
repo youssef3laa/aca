@@ -2,11 +2,10 @@ package com.asset.appwork.controller;
 
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
-import com.asset.appwork.enums.GroupType;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.response.AppResponse;
-import com.asset.appwork.service.ACAOrgChartService;
+import com.asset.appwork.service.EscalationService;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,34 +15,58 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.io.IOException;
 
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-@RequestMapping("/api/aca/org")
+@RequestMapping("/api/escalation")
 @RestController
 @Slf4j
-public class ACAOrgChartController {
+public class EscalationController {
 
     @Autowired
     TokenService tokenService;
 
     @Autowired
-    ACAOrgChartService orgChartService;
+    EscalationService escalationService;
 
     @Transactional
-    @PostMapping("/unit/create")
-    public ResponseEntity<AppResponse<JsonNode>> createUnit(@RequestHeader("X-Auth-Token") String token,
-                                                            @RequestBody String props,
-                                                            @RequestParam(value = "isRoot") Optional<Boolean> isRoot
+    @PostMapping("/create")
+    public ResponseEntity<AppResponse<JsonNode>> createEscalation(@RequestHeader("X-Auth-Token") String token,
+                                                                  @RequestBody String props
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                orgChartService.createUnit(account, props, isRoot.orElse(false));
-//                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.createUnit(account, props, isRoot.orElse(false)).toString()));
+                respBuilder.data(SystemUtil.convertStringToJsonNode(escalationService.createEscalation(account, props).toString()));
+            } catch (IOException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/read/{id}")
+    public ResponseEntity<AppResponse<JsonNode>> readEscalation(@RequestHeader("X-Auth-Token") String token,
+                                                                @PathVariable Long id
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(escalationService.getEscalation(id).toString()));
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -60,17 +83,17 @@ public class ACAOrgChartController {
     }
 
     @Transactional
-    @PutMapping("/unit/rename")
-    public ResponseEntity<AppResponse<JsonNode>> renameUnit(@RequestHeader("X-Auth-Token") String token,
-                                                            @RequestBody String props
+    @PutMapping("/update/{id}")
+    public ResponseEntity<AppResponse<JsonNode>> updateEscalation(@RequestHeader("X-Auth-Token") String token,
+                                                                  @PathVariable Long id,
+                                                                  @RequestBody String props
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
-                orgChartService.renameUnit(account, props);
-//                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.renameUnit(account, props).toString()));
+                respBuilder.data(SystemUtil.convertStringToJsonNode(escalationService.updateEscalation(id, props).toString()));
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -87,53 +110,17 @@ public class ACAOrgChartController {
     }
 
     @Transactional
-    @PutMapping("/unit/changeParent")
-    public ResponseEntity<AppResponse<JsonNode>> changeUnitParent(@RequestHeader("X-Auth-Token") String token,
-                                                                  @RequestBody String props,
-                                                                  @RequestParam(value = "changeTypeCode") Optional<Boolean> changeTypeCode
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<AppResponse<JsonNode>> deleteEscalation(@RequestHeader("X-Auth-Token") String token,
+                                                                  @PathVariable Long id
     ) {
         AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            try {
-                orgChartService.changeUnitParent(account, props, changeTypeCode.orElse(false));
-//                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.changeUnitParent(account, props, changeTypeCode.orElse(false)).toString()));
-            } catch (JsonProcessingException e) {
-                log.error(e.getMessage());
-                e.printStackTrace();
-                respBuilder.info("errorMessage", e.getMessage());
-                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-            }
-        } catch (AppworkException e) {
-            log.error(e.getMessage());
-            e.printStackTrace();
-            respBuilder.info("errorMessage", e.getMessage());
-            respBuilder.status(e.getCode());
-        }
-        return respBuilder.build().getResponseEntity();
-    }
-
-    @Transactional
-    @PutMapping("/user/update")
-    public ResponseEntity<AppResponse<JsonNode>> updateUser(@RequestHeader("X-Auth-Token") String token,
-                                                            @RequestBody String props,
-                                                            @RequestParam(value = "unitChanged") Optional<Boolean> unitChanged,
-                                                            @RequestParam(value = "revokeTasks") Optional<Boolean> revokeTasks
-    ) {
-        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
-        try {
-            Account account = tokenService.get(token);
-            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            try {
-                orgChartService.updateUser(account, props, unitChanged.orElse(false), revokeTasks.orElse(false));
-//                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.updateUser(account, props, unitChanged.orElse(false), revokeTasks.orElse(false)).toString()));
-            } catch (JsonProcessingException e) {
-                log.error(e.getMessage());
-                e.printStackTrace();
-                respBuilder.info("errorMessage", e.getMessage());
-                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
-            }
+            escalationService.deleteEscalation(id);
+            respBuilder.info("infoMessage", "Deleted Successfully");
+            respBuilder.status(ResponseCode.SUCCESS);
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();

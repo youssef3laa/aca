@@ -17,6 +17,7 @@ import com.asset.appwork.repository.MemosRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.service.OrgChartService;
+import com.asset.appwork.service.UserService;
 import com.asset.appwork.util.Docx;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
@@ -56,6 +58,7 @@ public class MemorandumController {
     @Autowired
     OrgChartService orgChartService;
 
+    @Transactional
     @PostMapping("/create")
     public ResponseEntity<AppResponse<String>> createMemorandum(@RequestHeader("X-Auth-Token") String token, @RequestBody() Memos memo) {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
