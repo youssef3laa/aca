@@ -4,6 +4,7 @@ import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.Group;
+import com.asset.appwork.model.RequestEntity;
 import com.asset.appwork.model.User;
 import com.asset.appwork.repository.MemoValuesRepository;
 import com.asset.appwork.repository.MemosRepository;
@@ -44,7 +45,7 @@ public class Docx {
     @Autowired
     Environment env;
 
-    public File exportJsonToDocx(Memos memo, User user) throws AppworkException {
+    public File exportJsonToDocx(Memos memo, User user, RequestEntity requestEntity) throws AppworkException {
         try {
             WordprocessingMLPackage wordPackage = WordprocessingMLPackage.createPackage();
             NumberingDefinitionsPart ndp = new NumberingDefinitionsPart();
@@ -66,11 +67,17 @@ public class Docx {
                 Object[] memoValuesObjectArray = memoValues.values().toArray();
                 String[] memoValuesStringArray = Arrays.copyOf(memoValuesObjectArray, memoValuesObjectArray.length, String[].class);
                 String value = "";
-                for(int i = 0; i < memoValuesStringArray.length; i++){
-                    memoValuesStringArray[i] = memoValuesStringArray[i].replaceAll("&nbsp;", "");
-                    memoValuesStringArray[i] = memoValuesStringArray[i].replaceAll("-&nbsp;", "");
-                    value += "<p style = 'font-size: 50px; font-weight: bold; text-align:right;'>" + sections.get(i) + "</p>" + "<br>";
-                    value += memoValuesStringArray[i] + "<br>";
+                for(int i = 0; i < memoValuesStringArray.length; i++)
+                {
+                    if(sections.get(i).equals("Header"))
+                    {
+                        value += memoValuesStringArray[i];
+                    }
+                    else
+                    {
+                        value += "<p style = 'font-size: 27px; font-weight: bold; text-align:right;'><u>" + sections.get(i) + "</u></p>";
+                        value += memoValuesStringArray[i];
+                    }
                 }
 
                 Document doc = Jsoup.parse(value);
@@ -82,11 +89,34 @@ public class Docx {
                     groupCode = group.get().getGroupCode();
                 }
 
-                String signature = "<img src=\"https://i.ibb.co/h94n9bR/signature.png\"></img>";
-                String name = "<span>" + reverseString(user.getDisplayName()) + "</span>";
-                try {
-                    doc.select("#" + groupCode + "signature").first().removeAttr("hidden").append(signature);
-                    doc.select("#" + groupCode + "name").first().removeAttr("hidden").append(name);
+                String signature = "https://i.ibb.co/h94n9bR/signature.png";
+                String name = user.getPerson().getTitle() + "/" + user.getDisplayName();
+                try
+                {
+                    if(!doc.select("#" + groupCode + "signatureParagraph").isEmpty())
+                    {
+                        doc.select("#" + groupCode + "signatureParagraph").first().removeAttr("hidden");
+                        doc.select("#" + groupCode + "signatureImage").first().removeAttr("hidden").attr("src", signature);
+                        doc.select("#" + groupCode + "nameParagraph").first().removeAttr("hidden").text(name);
+                    }
+                }
+                catch (NullPointerException e)
+                {
+                    e.printStackTrace();
+                    log.error("Docx: " + e.getMessage());
+                    throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
+                }
+
+                try
+                {
+                    if(!doc.select("#Agency").isEmpty())
+                    {
+                        doc.select("#Agency").first().text("جــــهاز" + " " + user.getPerson().getTitle());
+                        doc.select("#Sector").first().text("قطـــــــــــاع" + " " + user.getPerson().getTitle());
+                        doc.select("#Office").first().text("الإدارة / مكتب" + " " + user.getPerson().getTitle());
+                        doc.select("#Constraint").first().text("القيـــــــد" + ":" + user.getPerson().getTitle() + "/2021");
+                        doc.select("#caseNumber").first().text("من القضية رقم" + " " + user.getPerson().getTitle());
+                    }
                 }
                 catch (NullPointerException e)
                 {
@@ -105,6 +135,8 @@ public class Docx {
                     value = stringBuilder.toString();
                 }
                 value = value.replaceAll("<br>", "<br></br>");
+                value = value.replaceAll("<p> </p>", "");
+                value = value.replaceAll("(?m)^[ \t]*\r?\n", "");
                 wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert(value, null));
 
             } catch (IOException e) {
