@@ -19,11 +19,11 @@ public interface UnitRepository extends GenericRepository<Unit, Long> {
 //    Page<Unit> findAll(Pageable pageable);
 
     @Query("SELECT U FROM Unit U WHERE U.name LIKE %:searchString% OR U.nameAr LIKE %:searchString% " +
-            "OR U.nameEn LIKE %:searchString% OR U.unitTypeCode LIKE %:searchString% OR U.unitCode LIKE %:searchString%")
+            "OR U.unitTypeCode LIKE %:searchString% OR U.unitCode LIKE %:searchString%")
     List<Unit> findAllSearchable(String searchString);
 
     @Query("SELECT U FROM Unit U WHERE U.name LIKE %:searchString% OR U.nameAr LIKE %:searchString% " +
-            "OR U.nameEn LIKE %:searchString% OR U.unitTypeCode LIKE %:searchString% OR U.unitCode LIKE %:searchString%")
+            "OR U.unitTypeCode LIKE %:searchString% OR U.unitCode LIKE %:searchString%")
     Page<Unit> findAllSearchable(String searchString, Pageable pageable);
 
     Optional<Unit> findByName(String name);

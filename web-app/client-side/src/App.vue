@@ -14,6 +14,8 @@
 @import url(http://fonts.googleapis.com/earlyaccess/amiri.css);
 @import url(https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400&display=swap);
 @import url(https://use.fontawesome.com/releases/v5.15.2/css/all.css);
+// @import url("./assets/Sass/app.scss"); 
+
 
 @font-face {
   font-family: 'Neo Sans Arabic Regular';
@@ -78,12 +80,16 @@ h1 {
 .v-data-table > .v-data-table__wrapper tbody tr.v-data-table__expanded__content {
   box-shadow: unset !important;
 }
+// .thead.v-data-table-header{
+//     background-color: $color-gray !important;
+// }
 </style>
 <script>
 import TheNavbar from './modules/core-module/components/the-nav-bar'
 import SystemUser from './config/user'
 import Vue from 'vue'
 import homePageMixin from "./modules/admin-module/mixins/homePageMixin";
+
 
 // import dynamicView from './components/DynamicView'
 
