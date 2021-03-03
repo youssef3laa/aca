@@ -39,24 +39,24 @@
       </v-col>
     </v-row>
     <Topbar :val="{ tasks: taskList }"></Topbar>
-    <SecrtaryInbox></SecrtaryInbox>
+    <COCInbox></COCInbox>
+
   </v-container>
 </template>
 
 <script>
 import chartsMixin from "../../../mixins/chartsMixin";
 import Charts from "../../application-builder-module/components/charts-component";
-import SecrtaryInbox from "../../application-builder-module/components/secretary-inbox-component";
+import COCInbox from "../../application-builder-module/components/chairman-of-comission-inbox"
 import http from "../../core-module/services/http";
 import userMixin from "../../../mixins/userMixin";
 import Topbar from "../../application-builder-module/components/topbar-component";
-
 export default {
-  name: "HomePageSecretary",
+  name: "HomePageCOC",
   components: {
-    SecrtaryInbox,
     Charts,
     Topbar,
+    COCInbox,
   },
   mixins: [chartsMixin, userMixin],
   async mounted() {

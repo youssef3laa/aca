@@ -34,6 +34,10 @@ public interface GroupRepository extends GenericRepository<Group, Long> {
 
     Page<Group> findByUnitIn(Set<Unit> units, Pageable pageable);
 
+    List<Group> findByUnitAndType(Unit unit, GroupType type);
+
+    Page<Group> findByUnitAndType(Unit unit, GroupType type, Pageable pageable);
+
 //    List<Group> findAll();
 //
 //    Page<Group> findAll(Pageable pageable);
