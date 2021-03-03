@@ -150,7 +150,26 @@
             </span>
           </v-card>
           <div id="1" v-if="selectTab.id == 1">
-            <h1>Test 1</h1>
+            <div>
+              <v-container>
+                <v-row>
+                  <v-col :cols="5" class="attachment-iframe" style="margin:5px">
+                    <v-icon
+                      color="#9e9e9e"
+                      style="margin: 10px 10px 0 0; padding: 5px 10px; font-size: 150px"
+                      >mdi-file-document
+                    </v-icon>
+                  </v-col>
+                  <v-col :cols="5" class="attachment-iframe" style="margin:5px">
+                    <v-icon
+                      color="#9e9e9e"
+                      style="margin: 10px 10px 0 0; padding: 5px 10px; font-size: 150px"
+                      >mdi-file-document
+                    </v-icon>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </div>
           </div>
           <div id="2" v-if="selectTab.id == 2">
             <h1>Test 2</h1>
