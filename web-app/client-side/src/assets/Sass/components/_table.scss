@@ -1,0 +1,21 @@
+/*Table*/
+.theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th{
+    background-color:#F1F2F4 !important;
+}
+.theme--light.v-data-table > .v-data-table__wrapper > table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper){
+    background-color: #F9F9F9;
+  
+}
+td.text-start{
+    color: #1A1A2E;
+    font-weight: 600;
+    font-style: inherit;
+    -webkit-font-smoothing: antialiased;
+}
+td.text-start:first-child{
+    border-right: 5px solid #fff;
+}
+.theme--light.v-data-table > .v-data-table__wrapper > table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) td.text-start:first-child{
+    border-right: 5px solid #0278AE;
+}
+/*End-Table*/
