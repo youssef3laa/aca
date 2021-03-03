@@ -2,10 +2,12 @@ package com.asset.appwork.controller;
 
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.enums.GroupType;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.ACAOrgChartService;
+import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
@@ -126,6 +128,33 @@ public class ACAOrgChartController {
             try {
                 orgChartService.updateUser(account, props, unitChanged.orElse(false), revokeTasks.orElse(false));
 //                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.updateUser(account, props, unitChanged.orElse(false), revokeTasks.orElse(false)).toString()));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @PostMapping("/group/create/unit/{unitCode}/type/{type}")
+    public ResponseEntity<AppResponse<JsonNode>> createGroupOfUnit(@RequestHeader("X-Auth-Token") String token,
+                                                                   @PathVariable("unitCode") String unitCode,
+                                                                   @PathVariable("type") GroupType type
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.createGroupOfUnit(account, unitCode, type).toString()));
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
