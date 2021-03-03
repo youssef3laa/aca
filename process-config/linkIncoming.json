@@ -10,18 +10,32 @@
       "component": "linkIncoming-approval",
       "config": "linkIncoming-approve",
       "router": {
-        "direction": "up",
-        "fields": [
-          "comment"
-        ],
-        "decisions": [
-          "approve",
-          "reject",
-          "requestModification"
-        ],
-        "receiverTypes": [
-          "single"
-        ]
+        "fields": ["comment"],
+        "receiver": {
+          "types": ["single", "multiple"],
+          "inputs": [
+            {
+              "name": "theSector",
+              "url": "org/unit/$unit/down/all/unitTypeCode/SCT",
+              "type": "unit"
+            },
+            {
+              "name": "theAdminOffice",
+              "url": "org/unit/$1/down/all/unitTypeCode/ADM,OFC",
+              "type": "unit"
+            },
+            {
+              "name": "theGroup",
+              "url": "org/unit/$2/down/all/unitTypeCode/GRP",
+              "type": "unit"
+            },
+            {
+              "name": "theMember",
+              "url": "org/group/findByUnitCodes/$3",
+              "type": "group"
+            }
+          ]
+        }
       },
       "nextStep": {
         "approve": "headOfAdministrationStep",
@@ -32,18 +46,32 @@
       "component": "linkIncoming-approval",
       "config": "linkIncoming-approve",
       "router": {
-        "direction": "up",
-        "fields": [
-          "comment"
-        ],
-        "decisions": [
-          "approve",
-          "reject",
-          "requestModification"
-        ],
-        "receiverTypes": [
-          "single"
-        ]
+        "fields": ["comment"],
+        "receiver": {
+          "types": ["single", "multiple"],
+          "inputs": [
+            {
+              "name": "theSector",
+              "url": "org/unit/$unit/down/all/unitTypeCode/SCT",
+              "type": "unit"
+            },
+            {
+              "name": "theAdminOffice",
+              "url": "org/unit/$1/down/all/unitTypeCode/ADM,OFC",
+              "type": "unit"
+            },
+            {
+              "name": "theGroup",
+              "url": "org/unit/$2/down/all/unitTypeCode/GRP",
+              "type": "unit"
+            },
+            {
+              "name": "theMember",
+              "url": "org/group/findByUnitCodes/$3",
+              "type": "group"
+            }
+          ]
+        }
       },
       "nextStep": {
         "approve": "headOfSectorStep",
@@ -54,18 +82,32 @@
       "component": "linkIncoming-approval",
       "config": "linkIncoming-approve",
       "router": {
-        "direction": "up",
-        "fields": [
-          "comment"
-        ],
-        "decisions": [
-          "approve",
-          "reject",
-          "requestModification"
-        ],
-        "receiverTypes": [
-          "single"
-        ]
+        "fields": ["comment"],
+        "receiver": {
+          "types": ["single", "multiple"],
+          "inputs": [
+            {
+              "name": "theSector",
+              "url": "org/unit/$unit/down/all/unitTypeCode/SCT",
+              "type": "unit"
+            },
+            {
+              "name": "theAdminOffice",
+              "url": "org/unit/$1/down/all/unitTypeCode/ADM,OFC",
+              "type": "unit"
+            },
+            {
+              "name": "theGroup",
+              "url": "org/unit/$2/down/all/unitTypeCode/GRP",
+              "type": "unit"
+            },
+            {
+              "name": "theMember",
+              "url": "org/group/findByUnitCodes/$3",
+              "type": "group"
+            }
+          ]
+        }
       },
       "nextStep": {
         "approve": "end",
@@ -76,13 +118,32 @@
       "component": "linkIncoming-approval",
       "config": "linkIncoming-approve",
       "router": {
-        "direction": "up",
-        "fields": [
-          "comment"
-        ],
-        "receiverTypes": [
-          "single"
-        ]
+        "fields": ["comment"],
+        "receiver": {
+          "types": ["single", "multiple"],
+          "inputs": [
+            {
+              "name": "theSector",
+              "url": "org/unit/$unit/down/all/unitTypeCode/SCT",
+              "type": "unit"
+            },
+            {
+              "name": "theAdminOffice",
+              "url": "org/unit/$1/down/all/unitTypeCode/ADM,OFC",
+              "type": "unit"
+            },
+            {
+              "name": "theGroup",
+              "url": "org/unit/$2/down/all/unitTypeCode/GRP",
+              "type": "unit"
+            },
+            {
+              "name": "theMember",
+              "url": "org/group/findByUnitCodes/$3",
+              "type": "group"
+            }
+          ]
+        }
       },
       "nextStep": {
         "comment": "headOfGroupStep"

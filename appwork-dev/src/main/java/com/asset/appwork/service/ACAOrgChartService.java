@@ -151,12 +151,6 @@ public class ACAOrgChartService {
         return mapper.writeValueAsString(user);
     }
 
-    public Unit getUnit(String unitTypeCode, String unitCode) throws AppworkException {
-        return unitRepository.findByUnitTypeCodeAndUnitCode(unitTypeCode, unitCode).orElseThrow(
-                () -> new AppworkException(String.format("Could not get Unit of UnitCode: %s and UnitTypeCode: %s", unitCode, unitTypeCode), ResponseCode.READ_ENTITY_FAILURE)
-        );
-    }
-
     public Unit createUnit(Account account, String props, Boolean isRootUnit) throws AppworkException, JsonProcessingException {
         Unit unit = fromACAUnitCreationString(props);
         String newData = unit.getDescription();
@@ -164,7 +158,7 @@ public class ACAOrgChartService {
         Unit createdUnit = orgChartService.createUnit(account, toUnitCreationString(unit));
         if (!isRootUnit) {
             try {
-                orgChartService.addSubUnitToUnit(account, getUnit(newData.split("-")[0], newData.split("-")[1]).getId(), createdUnit.getId());
+                orgChartService.addSubUnitToUnit(account, orgChartService.getUnit(newData.split("-")[0], newData.split("-")[1]).getId(), createdUnit.getId());
             } catch (AppworkException e) {
                 orgChartService.deleteUnit(account, createdUnit.getId());
                 throw new AppworkException(e.getMessage(), e.getCode());
@@ -173,7 +167,7 @@ public class ACAOrgChartService {
 
         for (GroupType groupType : GroupType.values()) {
             try {
-                Group group = orgChartService.createGroup(account, generateGroupByTypeAndUnit(groupType, createdUnit).toString());
+                Group group = orgChartService.createGroup(account, orgChartService.generateGroupByTypeAndUnit(groupType, createdUnit).toString());
                 orgChartService.addSubGroupToUnitGroup(account, createdUnit.getName(), group.getName());
                 orgChartService.updateGroupUnitRelationByCodes(account, group.getName(), group.getName(), createdUnit.getName());
             } catch (AppworkException e) {
@@ -188,7 +182,7 @@ public class ACAOrgChartService {
 
     public Unit renameUnit(Account account, String props) throws AppworkException, JsonProcessingException {
         Unit newUnit = fromACAUnitRenamingString(props);
-        Unit unit = getUnit(newUnit.getUnitTypeCode(), newUnit.getDescription());
+        Unit unit = orgChartService.getUnit(newUnit.getUnitTypeCode(), newUnit.getDescription());
         newUnit.setDescription(null);
 
         // TODO: Check Cached result
@@ -203,15 +197,15 @@ public class ACAOrgChartService {
 
     public Unit changeUnitParentOnly(Account account, String props) throws JsonProcessingException, AppworkException {
         Unit unit = fromACAUnitChangingParentString(props);
-        Unit oldUnit = getUnit(unit.getUnitTypeCode(), unit.getUnitCode());
+        Unit oldUnit = orgChartService.getUnit(unit.getUnitTypeCode(), unit.getUnitCode());
         String newData = unit.getDescription();
         unit.setDescription(null);
         String newParentUnitTypeCode = newData.split("-")[0];
         String newParentUnitCode = newData.split("-")[1];
         String newUnitCode = newData.split("-")[2];
 
-        orgChartService.addSubUnitToUnit(account, getUnit(newParentUnitTypeCode, newParentUnitCode).getId(),
-                getUnit(oldUnit.getUnitTypeCode(), oldUnit.getUnitCode()).getId());
+        orgChartService.addSubUnitToUnit(account, orgChartService.getUnit(newParentUnitTypeCode, newParentUnitCode).getId(),
+                orgChartService.getUnit(oldUnit.getUnitTypeCode(), oldUnit.getUnitCode()).getId());
 
         unit.setUnitCode(newUnitCode);
         return orgChartService.updateUnit(account, oldUnit.getId(), toUnitChangingParentString(unit));
@@ -219,7 +213,7 @@ public class ACAOrgChartService {
 
     public Unit changeUnitParentAndTypeCode(Account account, String props) throws JsonProcessingException, AppworkException {
         Unit unit = fromACAUnitParentAndChangingUnitTypeCodeString(props);
-        Unit oldUnit = getUnit(unit.getUnitTypeCode(), unit.getUnitCode());
+        Unit oldUnit = orgChartService.getUnit(unit.getUnitTypeCode(), unit.getUnitCode());
         String newData = unit.getDescription();
         unit.setDescription(null);
         String newParentUnitTypeCode = newData.split("-")[0];
@@ -231,80 +225,9 @@ public class ACAOrgChartService {
         unit.setUnitCode(newUnitCode);
         Unit updatedUnit = orgChartService.updateUnit(account, oldUnit.getId(), toUnitParentAndChangingUnitTypeCodeString(unit));
 
-        orgChartService.addSubUnitToUnit(account, getUnit(newParentUnitTypeCode, newParentUnitCode).getId(),
-                getUnit(unit.getUnitTypeCode(), unit.getUnitCode()).getId());
+        orgChartService.addSubUnitToUnit(account, orgChartService.getUnit(newParentUnitTypeCode, newParentUnitCode).getId(),
+                orgChartService.getUnit(unit.getUnitTypeCode(), unit.getUnitCode()).getId());
         return updatedUnit;
-    }
-
-    public User getUserByDescription(String description) throws AppworkException {
-        return userRepository.findByDescription(description).orElseThrow(
-                () -> new AppworkException(String.format("Could not get User of Id: %s", description), ResponseCode.READ_ENTITY_FAILURE)
-        );
-    }
-
-    public Group getGroupByUnitTypeCodeAndUnitCodeAndType(String unitTypeCode, String unitCode, GroupType type) throws AppworkException {
-        return groupRepository.findByUnit_UnitTypeCodeAndUnit_UnitCodeAndType(unitTypeCode, unitCode, type).orElseThrow(
-                () -> new AppworkException("Could not get Group", ResponseCode.READ_ENTITY_FAILURE)
-        );
-    }
-
-    public GroupType getGroupTypeByLevel(String level) {
-        switch (level.toUpperCase()) {
-            case "H":
-                return GroupType.HEAD;
-            case "V":
-                return GroupType.VICE;
-            case "A":
-                return GroupType.ASSISTANT;
-            case "S":
-                return GroupType.SECRETARY;
-            default:
-                return GroupType.MEMBER;
-        }
-    }
-
-    public String getGroupLevelByType(GroupType type) {
-        switch (type) {
-            case HEAD:
-                return "H";
-            case VICE:
-                return "V";
-            case ASSISTANT:
-                return "A";
-            case SECRETARY:
-                return "S";
-            default:
-                return "M";
-        }
-    }
-
-    public Group generateGroupByTypeAndUnit(GroupType type, Unit unit) {
-        Group group = new Group();
-        group.setType(type);
-        group.setName(getGroupLevelByType(type) + unit.getName());
-        group.setGroupCode(getGroupLevelByType(type) + unit.getUnitCode());
-        switch (type) {
-            case HEAD:
-                group.setNameAr("رئيس " + unit.getNameAr());
-                break;
-            case VICE:
-                group.setNameAr("نائب رئيس " + unit.getNameAr());
-                break;
-            case ASSISTANT:
-                group.setNameAr("مساعد رئيس " + unit.getNameAr());
-                break;
-            case SECRETARY:
-                group.setNameAr("سكرتارية " + unit.getNameAr());
-                break;
-            default:
-                group.setNameAr("عضو " + unit.getNameAr());
-                break;
-        }
-        return group;
-    }
-
-    public Group getGroupByLevel(String unitTypeCode, String unitCode, String level) throws AppworkException {
-        return getGroupByUnitTypeCodeAndUnitCodeAndType(unitTypeCode, unitCode, getGroupTypeByLevel(level));
     }
 
     public User updateUser(Account account, String props, Boolean unitChanged, Boolean revokeTasks) throws AppworkException, JsonProcessingException {
@@ -315,7 +238,7 @@ public class ACAOrgChartService {
         String newData = user.getPerson().getNotes();
         user.getPerson().setNotes(null);
 
-        User internalUser = getUserByDescription(user.getDescription());
+        User internalUser = orgChartService.getUserByDescription(user.getDescription());
 
         String userResponse = otds.getUserByUserId(internalUser.getUserId());
         Member responseMember = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).readValue(userResponse, Member.class);
@@ -349,21 +272,11 @@ public class ACAOrgChartService {
 
         if (unitChanged) {
             orgChartService.assignUserToGroup(account, internalUser.getUserId(),
-                    getGroupByLevel(
+                    orgChartService.getGroupByLevel(
                             newData.split("-")[1], newData.split("-")[2], newData.split("-")[0]
                     ).getName());
         }
 
         return orgChartService.getUserByUserId(internalUser.getUserId());
-    }
-
-
-    public Group createGroupOfUnit(Account account, String unitCode, GroupType type) throws AppworkException, JsonProcessingException {
-        Unit unit = orgChartService.getUnitByName(unitCode);
-        Group group = orgChartService.createGroup(account, generateGroupByTypeAndUnit(type, unit).toString());
-        orgChartService.addSubGroupToUnitGroup(account, unit.getName(), group.getName());
-        orgChartService.updateGroupUnitRelationByCodes(account, group.getName(), group.getName(), unit.getName());
-
-        return group;
     }
 }

@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -66,7 +67,7 @@ public class ModuleRouting {
         Boolean addApproval = true;
         Router router = new Router();
         String type = "";
-        String component = "" , config = "" , readonlyComponent = "";
+        String component = "", config = "", readonlyComponent = "";
         String subBP = "";
         HashMap<String, String> nextStep = new HashMap<>();
         HashMap<String, List<String>> nextPhase = new HashMap<>();
@@ -74,13 +75,14 @@ public class ModuleRouting {
     }
 
     private <T> RoutingConfig generateRoutingConfig(T outputSchema) throws IOException {
-        String filePath = ((OutputSchema)outputSchema).getProcessFilePath(environment.getProperty("process.config"));
+        String filePath = ((OutputSchema) outputSchema).getProcessFilePath(environment.getProperty("process.config"));
         String config = SystemUtil.readFile(filePath);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(config);
         return objectMapper.convertValue(jsonNode, RoutingConfig.class);
     }
 
+    @Transactional
     public <T> String goToNext(T outputSchema, Account account, String cordysUrl) throws AppworkException {
         String[] currentStepId = {""};
         ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s) -> {
@@ -114,7 +116,7 @@ public class ModuleRouting {
             response = cordysUtil.sendRequest(account, processInitiateMessage);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("ModuleRouting: "+ e.getMessage());
+            log.error("ModuleRouting: " + e.getMessage());
             throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
         }
         return response;
@@ -135,13 +137,13 @@ public class ModuleRouting {
             response = cordysUtil.sendRequest(account, completeWorkflowMessage);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("ModuleRouting: "+ e.getMessage());
+            log.error("ModuleRouting: " + e.getMessage());
             throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
         }
         return response;
     }
 
-    private <T> void calculateNextStep(T outputSchema,Account account) throws AppworkException {
+    private <T> void calculateNextStep(T outputSchema, Account account) throws AppworkException {
         //TODO: Create Setter function in reflection class
         try {
             String nextStep = "", nextComponent = "", nextConfig = "", nextReadonlyCompnent = "", nextSubBP = "";
@@ -149,7 +151,7 @@ public class ModuleRouting {
 
             RoutingConfig routingConfig = generateRoutingConfig(outputSchema);
 
-            String[] currentStepId = {""}, codeSelected = {""}, decision = {""}, parentHistoryId = {""} , receiverType = {""};
+            String[] currentStepId = {""}, codeSelected = {""}, decision = {""}, parentHistoryId = {""}, receiverType = {""};
 
             ReflectionUtil.of(outputSchema).ifPresent("getStepId", (s) -> {
                 currentStepId[0] = (String) s;
@@ -209,21 +211,21 @@ public class ModuleRouting {
                 }
             }
 
-            if(nextStep.isEmpty()){
-                if (!routingConfig.getSteps().get(currentStepId[0]).subBP.isEmpty()){
+            if (nextStep.isEmpty()) {
+                if (!routingConfig.getSteps().get(currentStepId[0]).subBP.isEmpty()) {
                     nextSubBP = routingConfig.getSteps().get(currentStepId[0]).subBP;
                 }
 //                else {
 //                    nextStep = breakString;
 //                }
-            }else if(!nextStep.equals(breakString)){
+            } else if (!nextStep.equals(breakString)) {
                 if (routingConfig.getSteps().containsKey(nextStep)) {
                     nextRouter = routingConfig.getSteps().get(nextStep).getRouter();
                     nextComponent = routingConfig.getSteps().get(nextStep).getComponent();
                     nextConfig = routingConfig.getSteps().get(nextStep).getConfig();
                     nextReadonlyCompnent = routingConfig.getSteps().get(nextStep).getReadonlyComponent();
 //                    if(nextType.isEmpty()) nextType = routingConfig.getSteps().get(nextStep).getType();
-                }else{
+                } else {
                     throw new AppworkException(ResponseCode.MODULE_ROUTING_INPUTS_ERROR);
                 }
 //                String[] assignedCN = {""};
@@ -242,26 +244,26 @@ public class ModuleRouting {
             addUserToRequest(outputSchema, account);
         } catch (IOException e) {
             e.printStackTrace();
-            log.error("ModuleRouting: "+ e.getMessage());
-            throw new AppworkException(e.getMessage(),ResponseCode.MODULE_ROUTING_FAILURE);
+            log.error("ModuleRouting: " + e.getMessage());
+            throw new AppworkException(e.getMessage(), ResponseCode.MODULE_ROUTING_FAILURE);
         }
     }
 
-    private String getDecisionString(String decision){
-        if(decision.contains(requestModificationString)){
+    private String getDecisionString(String decision) {
+        if (decision.contains(requestModificationString)) {
             return requestModificationString;
-        }else if(decision.contains(approveString)){
+        } else if (decision.contains(approveString)) {
             return approveString;
-        }else if(decision.contains(commentString)){
+        } else if (decision.contains(commentString)) {
             return commentString;
-        }else if(decision.contains(rejectString)){
+        } else if (decision.contains(rejectString)) {
             return rejectString;
-        }else {
+        } else {
             return decision;
         }
     }
 
-    private String handleApprovalCase(RoutingConfig routingConfig, String currentStepId, String codeSelected){
+    private String handleApprovalCase(RoutingConfig routingConfig, String currentStepId, String codeSelected) {
         String step = getIdFromNextSteps(routingConfig, currentStepId, codeSelected);
         if (step.isEmpty()) {
             return getIdFromNextSteps(routingConfig, currentStepId, approveString);
@@ -269,7 +271,7 @@ public class ModuleRouting {
         return step;
     }
 
-    private String handleCommentCase(RoutingConfig routingConfig, String currentStepId, String codeSelected){
+    private String handleCommentCase(RoutingConfig routingConfig, String currentStepId, String codeSelected) {
         String step = getIdFromNextSteps(routingConfig, currentStepId, codeSelected);
         if (step.isEmpty()) {
             return getIdFromNextSteps(routingConfig, currentStepId, commentString);
@@ -277,7 +279,7 @@ public class ModuleRouting {
         return step;
     }
 
-    private String handleRedirectCase(RoutingConfig routingConfig, String currentStepId, String codeSelected){
+    private String handleRedirectCase(RoutingConfig routingConfig, String currentStepId, String codeSelected) {
         String step = getIdFromNextSteps(routingConfig, currentStepId, codeSelected);
         if (step.isEmpty()) {
             return getIdFromNextSteps(routingConfig, currentStepId, redirectString);
@@ -285,7 +287,7 @@ public class ModuleRouting {
         return step;
     }
 
-    private <T> String handleRequestModificationCase(T outputSchema, RoutingConfig routingConfig, String currentStepId, String parentHistoryId){
+    private <T> String handleRequestModificationCase(T outputSchema, RoutingConfig routingConfig, String currentStepId, String parentHistoryId) {
         String step = getIdFromNextSteps(routingConfig, currentStepId, requestModificationString);
         if(!step.isEmpty()){
             if(step.equals(currentStepId)){
@@ -297,17 +299,17 @@ public class ModuleRouting {
         return calculateFromApprovalHistory(outputSchema, parentHistoryId);
     }
 
-    private String handleDefaultCase(RoutingConfig routingConfig, String currentStepId, String codeSelected, String decision){
+    private String handleDefaultCase(RoutingConfig routingConfig, String currentStepId, String codeSelected, String decision) {
         String step = getIdFromNextSteps(routingConfig, currentStepId, codeSelected);
-        if(step.isEmpty()){
+        if (step.isEmpty()) {
             return getIdFromNextSteps(routingConfig, currentStepId, decision);
         }
         return step;
     }
 
-    private <T> String handleParallelTasks(T outputSchema, RoutingConfig routingConfig, String currentStepId, String decision){
+    private <T> String handleParallelTasks(T outputSchema, RoutingConfig routingConfig, String currentStepId, String decision) {
         String multipleNextStep = getIdFromNextSteps(routingConfig, currentStepId, decision);
-        if(!multipleNextStep.isEmpty() && !multipleNextStep.equals(breakString)){
+        if (!multipleNextStep.isEmpty() && !multipleNextStep.equals(breakString)) {
             if (routingConfig.getSteps().containsKey(multipleNextStep)) {
                 Router multipleNextRouter = routingConfig.getSteps().get(multipleNextStep).getRouter();
                 String multipleNextComponent = routingConfig.getSteps().get(multipleNextStep).getComponent();
@@ -349,7 +351,7 @@ public class ModuleRouting {
 
     private <T> void updateOutputSchemaAssignees(T outputSchema, String stepId,
                                                  String component, String config, String readonlyComponent,
-                                                 Router router){
+                                                 Router router) {
         Assignees[] assignees = {new Assignees()};
         String[] assignedCN = {""};
         ReflectionUtil.of(outputSchema).ifPresent("getAssignees", (s) -> {
@@ -367,10 +369,10 @@ public class ModuleRouting {
         ((OutputSchema) outputSchema).setAssignees(assignees[0]);
     }
 
-    private <T> void updateOutputSchemaExtraData(T outputSchema, RoutingConfig routingConfig, String currentStep){
-        HashMap<String,T> extraData = new HashMap<>();
+    private <T> void updateOutputSchemaExtraData(T outputSchema, RoutingConfig routingConfig, String currentStep) {
+        HashMap<String, T> extraData = new HashMap<>();
         ReflectionUtil.of(outputSchema).ifPresent("getExtraData", (s) -> {
-            extraData.putAll((HashMap<String,T>) s);
+            extraData.putAll((HashMap<String, T>) s);
         });
         extraData.putAll(routingConfig.getSteps().get(currentStep).getExtraData());
 
@@ -391,21 +393,22 @@ public class ModuleRouting {
         return "";
     }
 
-    private <T> void addUserToRequest(T outputSchema,Account account) throws AppworkException{
+    @Transactional
+    <T> void addUserToRequest(T outputSchema, Account account) throws AppworkException {
         String[] requestId = {""};
         ReflectionUtil.of(outputSchema).ifPresent("getRequestId", (s) -> {
-            requestId[0] = (String)s;
+            requestId[0] = (String) s;
         });
 
-        if(!requestId[0].isEmpty()){
+        if (!requestId[0].isEmpty()) {
             Optional<RequestEntity> request = requestRepository.findById(Long.parseLong(requestId[0]));
-            if(request.isPresent()){
+            if (request.isPresent()) {
                 String users = "";
                 String roles = "";
-                if(request.get().getWorkingUsers() == null){
+                if (request.get().getWorkingUsers() == null) {
                     users += ";";
                     roles += ";";
-                }else{
+                } else {
                     users = request.get().getWorkingUsers();
                     roles = request.get().getWorkingRoles();
                 }
@@ -413,7 +416,7 @@ public class ModuleRouting {
                 Optional<Group> groupData = userData.getGroup().stream().findFirst();
 
                 users += userData.getId() + ";";
-                if(groupData.isPresent()){
+                if (groupData.isPresent()) {
                     roles += groupData.get().getGroupCode() + ";";
                 }
 

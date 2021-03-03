@@ -28,10 +28,17 @@ public interface UserRepository extends GenericRepository<User, Long> {
 
     Optional<User> findByUserId(String userId);
 
+    Optional<User> findByUserIdStartingWith(String userId);
+
     Optional<User> findByDescription(String description);
 
     List<User> findByGroup(Group group);
+
     Page<User> findByGroup(Group group, Pageable pageable);
+
+    List<User> findByGroup_Unit(Unit unit);
+
+    Page<User> findByGroup_Unit(Unit unit, Pageable pageable);
 
     void deleteById(Long id);
 }

@@ -17,6 +17,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -73,6 +74,12 @@ public class OrgChartService {
     public Unit getUnitByName(String code) throws AppworkException {
         return unitRepository.findByName(code).orElseThrow(
                 () -> new AppworkException("Could not get Unit Entity of name " + code, ResponseCode.READ_ENTITY_FAILURE)
+        );
+    }
+
+    public Unit getUnit(String unitTypeCode, String unitCode) throws AppworkException {
+        return unitRepository.findByUnitTypeCodeAndUnitCode(unitTypeCode, unitCode).orElseThrow(
+                () -> new AppworkException(String.format("Could not get Unit of UnitCode: %s and UnitTypeCode: %s", unitCode, unitTypeCode), ResponseCode.READ_ENTITY_FAILURE)
         );
     }
 
@@ -309,6 +316,15 @@ public class OrgChartService {
         return getGroup(platformGroupPostUpdate.getId());
     }
 
+    public Group createGroupOfUnit(Account account, String unitCode, GroupType type) throws AppworkException, JsonProcessingException {
+        Unit unit = getUnitByName(unitCode);
+        Group group = createGroup(account, generateGroupByTypeAndUnit(type, unit).toString());
+        addSubGroupToUnitGroup(account, unit.getName(), group.getName());
+        updateGroupUnitRelationByCodes(account, group.getName(), group.getName(), unit.getName());
+
+        return group;
+    }
+
     public Group getGroup(Long id) throws AppworkException {
         BaseIdentity identity = identityRepository.findById(id).orElseThrow(
                 () -> new AppworkException("Could not get Group Entity of id " + id, ResponseCode.READ_ENTITY_FAILURE)
@@ -364,6 +380,14 @@ public class OrgChartService {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByUnitTypeCodeIn(Arrays.asList(codes.trim().split("\\s*,\\s*")))), PageRequest.of(page, size, Sort.by("id")));
     }
 
+    public List<Group> getGroupsInUnitAndGroupType(Unit unit, GroupType type) {
+        return groupRepository.findByUnitAndType(unit, type);
+    }
+
+    public Page<Group> getGroupsInUnitAndGroupType(Unit unit, GroupType type, int page, int size) {
+        return groupRepository.findByUnitAndType(unit, type, PageRequest.of(page, size, Sort.by("id")));
+    }
+
     public Group getGroupParent(String code) throws AppworkException {
         Group group = getGroupByName(code);
         List<Group> siblings = (List<Group>) group.getUnit().getGroup();
@@ -417,6 +441,71 @@ public class OrgChartService {
 
     public Page<Group> getGroupChildren(String code, int page, int size) throws AppworkException {
         return groupRepository.findByUnitIn(new HashSet<>(unitRepository.findByParent(getGroupByName(code).getUnit())), PageRequest.of(page, size, Sort.by("id")));
+    }
+
+    public Group getGroupByUnitTypeCodeAndUnitCodeAndType(String unitTypeCode, String unitCode, GroupType type) throws AppworkException {
+        return groupRepository.findByUnit_UnitTypeCodeAndUnit_UnitCodeAndType(unitTypeCode, unitCode, type).orElseThrow(
+                () -> new AppworkException("Could not get Group", ResponseCode.READ_ENTITY_FAILURE)
+        );
+    }
+
+    public GroupType getGroupTypeByLevel(String level) {
+        switch (level.toUpperCase()) {
+            case "H":
+                return GroupType.HEAD;
+            case "V":
+                return GroupType.VICE;
+            case "A":
+                return GroupType.ASSISTANT;
+            case "S":
+                return GroupType.SECRETARY;
+            default:
+                return GroupType.MEMBER;
+        }
+    }
+
+    public String getGroupLevelByType(GroupType type) {
+        switch (type) {
+            case HEAD:
+                return "H";
+            case VICE:
+                return "V";
+            case ASSISTANT:
+                return "A";
+            case SECRETARY:
+                return "S";
+            default:
+                return "M";
+        }
+    }
+
+    public Group generateGroupByTypeAndUnit(GroupType type, Unit unit) {
+        Group group = new Group();
+        group.setType(type);
+        group.setName(getGroupLevelByType(type) + unit.getName());
+        group.setGroupCode(getGroupLevelByType(type) + unit.getUnitCode());
+        switch (type) {
+            case HEAD:
+                group.setNameAr("رئيس " + unit.getNameAr());
+                break;
+            case VICE:
+                group.setNameAr("نائب رئيس " + unit.getNameAr());
+                break;
+            case ASSISTANT:
+                group.setNameAr("مساعد رئيس " + unit.getNameAr());
+                break;
+            case SECRETARY:
+                group.setNameAr("سكرتارية " + unit.getNameAr());
+                break;
+            default:
+                group.setNameAr("عضو " + unit.getNameAr());
+                break;
+        }
+        return group;
+    }
+
+    public Group getGroupByLevel(String unitTypeCode, String unitCode, String level) throws AppworkException {
+        return getGroupByUnitTypeCodeAndUnitCodeAndType(unitTypeCode, unitCode, getGroupTypeByLevel(level));
     }
 
     public List<Group> getAllGroups(String searchString) {
@@ -622,8 +711,24 @@ public class OrgChartService {
         );
     }
 
+    public List<User> getUsersInGroup(Group group) {
+        return userRepository.findByGroup(group);
+    }
+
+    public Page<User> getUsersInGroup(Group group, int page, int size) {
+        return userRepository.findByGroup(group, PageRequest.of(page, size, Sort.by("id")));
+    }
+
+    public List<User> getUsersInUnit(Unit unit) {
+        return userRepository.findByGroup_Unit(unit);
+    }
+
+    public Page<User> getUsersInUnit(Unit unit, int page, int size) {
+        return userRepository.findByGroup_Unit(unit, PageRequest.of(page, size, Sort.by("id")));
+    }
+
     public User getLoggedInUser(Account account) throws AppworkException {
-        return getUserByUserId(account.getUsername() + "@" + env.getProperty("otds.partition"));
+        return getUserByUsername(account.getUsername());
     }
 
     public User getUserByUserId(String userId) throws AppworkException {
@@ -633,8 +738,14 @@ public class OrgChartService {
     }
 
     public User getUserByUsername(String username) throws AppworkException {
-        return userRepository.findByUserId(username + "@" + env.getProperty("otds.partition")).orElseThrow(
+        return userRepository.findByUserIdStartingWith(username + "@").orElseThrow(
                 () -> new AppworkException("Could not get User of username " + username, ResponseCode.READ_ENTITY_FAILURE)
+        );
+    }
+
+    public User getUserByDescription(String description) throws AppworkException {
+        return userRepository.findByDescription(description).orElseThrow(
+                () -> new AppworkException(String.format("Could not get User of Id: %s", description), ResponseCode.READ_ENTITY_FAILURE)
         );
     }
 
