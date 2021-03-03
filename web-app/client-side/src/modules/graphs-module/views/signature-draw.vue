@@ -143,20 +143,20 @@
                 v-for="tab in tabs"
                 :key="tab.id"
                 @click="selectedTab(tab)"
-                :class="['tab-btn', { active: selected === tab }]"
+                :class="['tab-btn', { active: selectTab === tab }]"
               >
                 {{ $t(tab.name) }}
               </button>
             </span>
           </v-card>
-          <div id="1">
+          <div id="1" v-if="selectTab.id == 1">
             <h1>Test 1</h1>
           </div>
-          <div id="2">
-            <h1>Test 1</h1>
+          <div id="2" v-if="selectTab.id == 2">
+            <h1>Test 2</h1>
           </div>
-          <div id="3">
-            <h1>Test 1</h1>
+          <div id="3" v-if="selectTab.id == 3">
+            <h1>Test 3</h1>
           </div>
         </v-card>
       </div>
@@ -186,13 +186,13 @@ export default {
         },
         {
           key: 'units',
-          id: '1',
+          id: '2',
           isActive: false,
           name: 'Test 2',
         },
         {
           key: 'units',
-          id: '1',
+          id: '3',
           isActive: false,
           name: 'Test 3',
         },
@@ -208,6 +208,7 @@ export default {
       signaturesContainer: 715948,
       // signatures: [],
       selected: null,
+      selectTab: null,
       folderId: null,
       loading: false,
       displayName: null,
@@ -217,17 +218,24 @@ export default {
   props: ['requestId', 'readonly', 'field'],
   methods: {
     selectedTab: function(tab) {
-      this.selected = tab
-
-      this.$observable.fire(this.tabkey, tab.id)
-
-      if (tab.publish) {
-        if (!(tab.publish instanceof Array)) tab.publish = [tab.publish]
-        for (let key in tab.publish) {
-          this.$observable.fire(tab.publish[key])
+      this.selectTab = tab
+      this.selectTab.isActive = true
+      for (let i = 0; this.tabs && i < this.tabs.length; i++) {
+        this.tabs[i].isActive = false
+        if (this.selectTab.id == this.tabs[i].id) {
+          this.tabs[i].isActive = true
+          this.selectTab.isActive = true
         }
       }
-      console.log('Nested Tab Selected', tab)
+      // this.$observable.fire(this.tabkey, tab.id)
+
+      // if (tab.publish) {
+      //   if (!(tab.publish instanceof Array)) tab.publish = [tab.publish]
+      //   for (let key in tab.publish) {
+      //     this.$observable.fire(tab.publish[key])
+      //   }
+      // }
+      // console.log('Nested Tab Selected', tab)
     },
     undo() {
       this.$refs.signaturePad.undoSignature()
@@ -338,5 +346,15 @@ background-origin: border-box;
 }
 .v-slide-item--active {
   border: 2px solid #2d7fae !important;
+}
+.tab-btn {
+  outline: none;
+}
+.active {
+  /* border-bottom: 3px solid #0278ae !important; */
+  border: 1px solid white;
+  border-radius: 6px;
+  background-color: white;
+  color: #0278ae;
 }
 </style>
