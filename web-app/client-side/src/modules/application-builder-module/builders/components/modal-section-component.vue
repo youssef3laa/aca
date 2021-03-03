@@ -4,7 +4,7 @@
       <v-row>
         <v-col :cols="10">
           <v-card-title class="headline"
-            >{{ $t(formData.modalTitle) }}
+            >{{ $t(form.model.modalTitle) }}
           </v-card-title>
         </v-col>
         <v-col :cols="2">
@@ -24,11 +24,17 @@
           style="color:#07689f;height: 36px !important;background-color: transparent;"
           @click="dialog = false"
         >
-          {{$t('cancel')}}
+          {{ $t('cancel') }}
         </v-btn>
-        <v-btn class="modalAddButton" @click="submitModal" :disabled="isActive">
-          <span style="color:#ecf3f7">{{$t(modalAction)}}</span>
-        </v-btn>
+        <span v-for="(action, index) in form.model.action" :key="index">
+          <v-btn
+            class="modalAddButton"
+            @click="submitModal(action)"
+            style="margin: 10px;"
+          >
+            <span style="color:#ecf3f7;">{{ $t(action) }}</span>
+          </v-btn>
+        </span>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -47,7 +53,7 @@ export default {
       form: this.formData,
       dialog: this.dialogState,
       modalWidth: this.width,
-      modalAction: 'add'
+      modalAction: 'add',
     }
   },
   computed: {
@@ -56,17 +62,20 @@ export default {
     },
   },
   methods: {
-    submitModal: function() {
+    submitModal: function(actionName) {
       if (this.formData.model._valid) {
-        if (this.modalAction == 'edit') {
-          this.$observable.fire(this.formData.modalId + '_updateModal', {
-            obj: this.formData.model,
-          })
-        } else if (this.modalAction == 'add') {
-          this.$observable.fire(this.formData.modalId + '_addModal', {
-            obj: this.formData.model,
-          })
-        }
+        this.$observable.fire(this.formData.modalId + '_' + actionName, {
+          obj: this.formData.model,
+        })
+        // if (this.modalAction == 'edit') {
+        //   this.$observable.fire(this.formData.modalId + '_updateModal', {
+        //     obj: this.formData.model,
+        //   })
+        // } else if (this.modalAction == 'add') {
+        //   this.$observable.fire(this.formData.modalId + '_addModal', {
+        //     obj: this.formData.model,
+        //   })
+        // }
         this.dialog = false
       }
     },
