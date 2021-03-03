@@ -210,10 +210,13 @@ export default {
   mounted() {
     this.$watch(
       () => {
-        return this.$refs[this.forms.key].flags
+        if (this.forms.key) {
+          return this.$refs[this.forms.key].flags
+        } 
+        else return 
       },
       (val) => {
-        this.forms.model['_valid'] = val.invalid
+        this.forms.model['_valid'] = val.valid
       }
     )
   },
@@ -227,6 +230,4 @@ export default {
 }
 </script>
 
-<style>
-
-</style>
+<style></style>
