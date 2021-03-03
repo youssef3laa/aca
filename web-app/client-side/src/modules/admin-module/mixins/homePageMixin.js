@@ -3,6 +3,8 @@ import router from "../../../router";
 import HomePage from "../views/home-page";
 import HomePageSecretary from "../views/home-page-secretary";
 import HomePageTechnicalOfficeHead from "../views/home-page-technical-office-head";
+import HomePageTechnicalOfficeSectorHead from "../views/home-page-technical-office-sector-head";
+
 import HomePageCOC from "../views/home-page-COC"
 export default {
     methods: {
@@ -21,6 +23,7 @@ export default {
                     if(unitCode == "COC" && group.type === "HEAD") homeComponent = HomePageCOC
                     else if(unitCode == "COC"  && group.type === "SECRETARY")homeComponent = HomePageSecretary
                     else if((unitCode == "TVA" || unitCode == "TCA") && group.type === "HEAD") homeComponent = HomePageTechnicalOfficeHead
+                    else if((unitCode == "TVS" || unitCode == "TCS") && group.type === "HEAD") homeComponent = HomePageTechnicalOfficeSectorHead
                 }
                 console.log(router)
                 router.addRoutes([{
