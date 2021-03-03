@@ -4,12 +4,12 @@
       <AppBuilder
         v-show="sidebarItem == 'viewSubjects'"
         ref="subjects"
-        :app="app"
+        :app="subjects"
       />
       <AppBuilder
         v-show="sidebarItem == 'viewSentMemos'"
         ref="outbox"
-        :app="app2"
+        :app="outbox"
       />
     </pane>
     <pane
@@ -37,225 +37,46 @@ export default {
   mixins: [formPageMixin],
   components: { Sidebar, Splitpanes, Pane, AppBuilder },
   props: ["val", "field"],
+  mounted() {
+    console.log("app", JSON.stringify(this.app));
+    this.loadForm("COC-inbox-subjects", this.fillSubjects, "subjects");
+    this.loadForm("COC-outbox", this.fillOutbox, "outbox")
+    this.$observable.subscribe("allSubjectsTable_view", (item) => {
+      this.viewTask(item);
+    });
+    // this.$observable.subscribe("outboxTable_view", (item) => {
+    //   this.viewSentTask(item);
+    // });
+        this.$observable.subscribe(
+      "outboxTable_selected",
+      (selected) => {
+        this.selectedCertfication = selected;
+        console.log(this.selected);
+        if (this.selectedCertfication.length != 0) {
+          this.$refs.appBuilder.setFieldData(
+            "outboxForm",
+            "actionTopComponent",
+            {
+              show: true,
+            }
+          );
+        } else {
+          this.$refs.appBuilder.setFieldData(
+            "outboxForm",
+            "actionTopComponent",
+            {
+              show: false,
+            }
+          );
+        }
+      }
+    );
+  },
   data() {
     return {
       response: [],
-      app: {
-        pages: {
-          key: "tabtest",
-          tabs: [
-            {
-              key: "tab1",
-              id: "1",
-              isActive: true,
-              name: "البيانات الأساسية",
-              icon: "far fa-file-alt",
-            },
-
-            {
-              key: "tab2",
-              id: "2",
-              name: "collapse",
-              icon: "fas fa-paperclip",
-            },
-          ],
-          page: [
-            {
-              key: "page1",
-              sections: {
-                key: "tabtest",
-                tabs: [
-                  {
-                    key: "subTab1",
-                    id: "1",
-                    isActive: true,
-                    name: "mainData",
-                  },
-                  {
-                    key: "subTab2",
-                    id: "2",
-                    name: "supervisorLevels/technicalOffice",
-                  },
-                  {
-                    key: "subTab3",
-                    id: "3",
-                    name: "attachments",
-                  },
-                  {
-                    key: "subTab4",
-                    id: "4",
-                    name: "COCDecision",
-                    icon: "",
-                  },
-                ],
-                sec: [
-                  {
-                    isNestedTab: true,
-                    key: "subjectTab",
-                    tabId: "1",
-                    isTab: true,
-                    type: "DefaultSection",
-                    display: "block",
-                    isCard: true,
-                    show: true,
-                    forms: [
-                      {
-                        type: "collapse",
-                        name: "subject",
-
-                        key: "subjectForm",
-                        tabId: "1",
-                        display: "block",
-                        isTab: true,
-
-                        inputs: [
-                          {
-                            type: "TextComponent",
-                            label: "notes",
-                            name: "notes",
-                            col: "12",
-                          },
-                        ],
-                        model: {
-                          notes: "كلام كلام",
-                        },
-                      },
-                      {
-                        name: "subjectSummary",
-                        type: "collapse",
-                        key: "subjectSummaryfrom",
-                        tabId: "1",
-
-                        inputs: [
-                          {
-                            type: "TextComponent",
-                            label: "notes",
-                            name: "notes",
-                            col: "12",
-                          },
-                        ],
-                        model: {
-                          notes: "كلام كلام",
-                        },
-                      },
-                      {
-                        name: "presidentDirections",
-                        type: "collapse",
-                        key: "presidentDirectionsForm",
-                        tabId: "1",
-
-                        inputs: [
-                          {
-                            type: "TextComponent",
-                            label: "notes",
-                            name: "notes",
-                            col: "12",
-                          },
-                        ],
-                        model: {
-                          notes: "كلام كلام",
-                        },
-                      },
-                      {
-                        name: "situationEstimate",
-                        type: "collapse",
-                        key: "situationEstimateForm",
-                        tabId: "1",
-
-                        inputs: [
-                          {
-                            type: "TextComponent",
-                            label: "notes",
-                            name: "notes",
-                            col: "12",
-                          },
-                        ],
-                        model: {
-                          notes: "كلام كلام",
-                        },
-                      },
-                      {
-                        name: "opinion",
-                        type: "collapse",
-                        key: "opinionForm",
-                        tabId: "1",
-
-                        inputs: [
-                          {
-                            type: "TextComponent",
-                            label: "notes",
-                            name: "notes",
-                            col: "12",
-                          },
-                        ],
-                        model: {
-                          notes: "كلام كلام",
-                        },
-                      },
-                      {
-                        name: "viceOpinion",
-                        type: "collapse",
-                        key: "viceOpinionForm",
-                        tabId: "1",
-
-                        inputs: [
-                          {
-                            type: "TextComponent",
-                            label: "notes",
-                            name: "notes",
-                            col: "12",
-                          },
-                        ],
-                        model: {
-                          notes: "كلام كلام",
-                        },
-                      },
-                      // Signatures
-                      {
-                        tabId: "4",
-                        key: "signature",
-                        display: "block",
-                        isTab: true,
-                        inputs: [
-                          {
-                            type: "SignatureComponent",
-                            name: "signature",
-                            oldSignatures: false,
-                            col: 12,
-                          },
-                        ],
-                        model: {
-                          signature: { requestId: "" },
-                        },
-                      },
-
-                      {
-                        tabId: "3",
-                        key: "attachments",
-                        display: "block",
-                        isTab: true,
-                        inputs: [
-                          {
-                            type: "AttachmentComponent",
-                            name: "attachment",
-                            col: 12,
-                          },
-                        ],
-                        model: {
-                          attachment: {
-                            readonly: true,
-                          },
-                        },
-                      },
-                    ],
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      },
-      app2: {},
+      subjects: {},
+      outbox: {},
       sidebarItem: "viewSubjects",
       sidebarItems: [
         {
@@ -309,6 +130,7 @@ export default {
     },
     fillOutbox: function() {
       http.get("history/user/count").then((response) => {
+        console.log("res",response);
         if (!response.data.data) return;
         this.sidebarItems[1].notifications = response.data.data;
       });
@@ -320,16 +142,6 @@ export default {
         this.sidebarItem = "viewSentMemos";
       }
     },
-  },
-  mounted: function() {
-    // this.loadForm("subjects", this.fillSubjects, "subjects")
-    // this.loadForm("outbox", this.fillOutbox, "outbox")
-    // this.$observable.subscribe("taskTable_view", (item) => {
-    //   this.viewTask(item);
-    // });
-    // this.$observable.subscribe("outboxTable_view", (item) => {
-    //   this.viewSentTask(item);
-    // });
   },
 };
 </script>

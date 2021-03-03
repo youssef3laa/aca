@@ -224,5 +224,16 @@
   "sendToCertification": "إرسال للتصديق",
   "chairmanApproval":"تصديق رئيس الهيئة",
   "charimanSignatureText":"نصّ تأشيرة السيد رئيس الهيئة",
-  "viceSignatureText":"نصّ تأشيرة السيد نائب رئيس الهيئة"
+  "viceSignatureText":"نصّ تأشيرة السيد نائب رئيس الهيئة",
+  "remainingSubjects":"باقي الموضوعات",
+  "technicalOfficeForm":"المكتب الفني",
+  "COCPreviousDecisions":"تأشيرات السيد رئيس الهيئة السابقة",
+  "COCDecision":"قرار رئيس الهيئة",
+  "viceCOCSignature":"تأشيرة السيد النائب",
+  "viceCOCSignatureDate":"تاريخ تأشيرة السيد النائب",
+  "specializedEntityOpinion":"رأي جهة الإختصاص",
+  "opinionDate":"تاريخ الرأي",
+  "memberName":"اسم العضو",
+  "allSubjects":"كل الموضوعات",
+  "memoOpinion":"رأي المذكرة"
 }

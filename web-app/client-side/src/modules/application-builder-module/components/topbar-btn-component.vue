@@ -38,5 +38,6 @@ export default {
   padding: 10px;
   align-items: center !important;
   justify-content: space-around;
+  cursor: pointer;
 }
 </style>
