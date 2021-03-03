@@ -122,7 +122,7 @@ import InboxComponent from '../components/inbox-component'
 import ImageComponent from '../components/image-component'
 import ActionsTopComponent from '../components/actions-top-component'
 import BarcodeComponent from '../components/barcode-component'
-import TextComponent from "../components/text-component"
+import TextComponent from '../components/text-component'
 export default {
   name: 'FormBuilder',
   components: {
@@ -208,10 +208,13 @@ export default {
   mounted() {
     this.$watch(
       () => {
-        return this.$refs[this.forms.key].flags
+        if (this.forms.key) {
+          return this.$refs[this.forms.key].flags
+        } 
+        else return 
       },
       (val) => {
-        this.forms.model['_valid'] = val.invalid
+        this.forms.model['_valid'] = val.valid
       }
     )
   },
@@ -225,6 +228,4 @@ export default {
 }
 </script>
 
-<style>
-
-</style>
+<style></style>
