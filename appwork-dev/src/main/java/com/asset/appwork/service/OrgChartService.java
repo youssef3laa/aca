@@ -55,7 +55,7 @@ public class OrgChartService {
 
     public Unit createUnit(Account account, String props) throws AppworkException, JsonProcessingException {
         Unit createdUnit = getUnit(new Entity(account,
-                SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
+                SystemUtil.generateRestAPIBaseUrl(env, env.getProperty("aca.org_chart.solution")),
                 "OrganizationalUnit").create(Unit.fromString(props).toPlatformString()));
 
         Group group = new Group();
@@ -84,7 +84,7 @@ public class OrgChartService {
     }
 
     public Unit updateUnit(Account account, Long id, String props) throws AppworkException {
-        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
+        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, env.getProperty("aca.org_chart.solution")),
                 "OrganizationalUnit").update(id, Unit.fromString(props).toPlatformString());
         return getUnit(id);
     }
@@ -182,7 +182,7 @@ public class OrgChartService {
 
     public Position createPosition(Account account, Long unitId, String props) throws AppworkException {
         return getPosition(new Entity(account,
-                SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
+                SystemUtil.generateRestAPIBaseUrl(env, env.getProperty("aca.org_chart.solution")),
                 "OrganizationalUnit").createChild(unitId, "Position", Position.fromString(props).toPlatformString()));
     }
 
@@ -203,7 +203,7 @@ public class OrgChartService {
     }
 
     public Position updatePosition(Account account, Long unitId, Long id, String props) throws AppworkException {
-        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
+        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, env.getProperty("aca.org_chart.solution")),
                 "OrganizationalUnit").updateChild(unitId, "Position", id,
                 Position.fromString(props).toPlatformString());
         return getPosition(id);
@@ -311,7 +311,7 @@ public class OrgChartService {
 
         Group platformGroupPostUpdate = new Group(identityRepository.findByName(createdGroupName).get());
 
-        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
+        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, env.getProperty("aca.org_chart.solution")),
                 "Group").update(platformGroupPostUpdate.getId(), Group.fromString(props).toPlatformString());
         return getGroup(platformGroupPostUpdate.getId());
     }
@@ -551,7 +551,7 @@ public class OrgChartService {
         }
 
         Group newGroup = Group.fromString(props);
-        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"),
+        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, env.getProperty("aca.org_chart.solution")),
                 "Group").update(group.getId(), newGroup.toPlatformString());
 
         if (SystemUtil.isFieldInJson(props, "unitCode")) {
@@ -566,7 +566,7 @@ public class OrgChartService {
     }
 
     public void updateGroupUnitRelation(Account account, Long id, String oldGroupCode, String props) throws AppworkException, JsonProcessingException {
-        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group")
+        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, env.getProperty("aca.org_chart.solution")), "Group")
                 .addRelation(id, "Unit", props);
         Group group = getGroup(id);
 
@@ -592,7 +592,7 @@ public class OrgChartService {
     }
 
     public void updateGroupUnitRelation(Account account, Group group, String oldGroupCode, String props) throws AppworkException, JsonProcessingException {
-        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, "AssetOrgACA"), "Group")
+        new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, env.getProperty("aca.org_chart.solution")), "Group")
                 .addRelation(group.getId(), "Unit", props);
 
         addSubGroupToUnitGroup(account, Long.parseLong(SystemUtil.getJsonByPtrExpr(props, "/targetId")), group.getId());
@@ -830,7 +830,7 @@ public class OrgChartService {
         addAssignmentToPersonRelation(account, assignment.getId(), new Member.TargetId(user.getPerson().getId()).toString());
     }
 
-    void deletePerson(Long id) {
+    public void deletePerson(Long id) {
         personRepository.deleteById(id);
     }
 }
