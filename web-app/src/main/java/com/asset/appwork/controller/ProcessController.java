@@ -82,7 +82,7 @@ public class ProcessController {
 //        return respBuilder.build().getResponseEntity();
 //    }
 
-
+    @org.springframework.transaction.annotation.Transactional
     @PostMapping("/initiateLinkedIncoming")
     public ResponseEntity<AppResponse<String>> initiateLinkedIncoming(@RequestHeader("X-Auth-Token") String token,
                                                                       @RequestBody Request requestJson) {
@@ -169,9 +169,9 @@ public class ProcessController {
             String cordysUrl = cordysService.getCordysUrl();
 
             outputSchema.stream().forEach((schema) -> {
-                try{
+                try {
                     moduleRouting.goToNext(schema, account, cordysUrl);
-                }catch (AppworkException e){
+                } catch (AppworkException e) {
                     throw new RuntimeException(e.getMessage());
                 }
             });

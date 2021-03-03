@@ -6,6 +6,7 @@ import com.asset.appwork.model.ApprovalHistory;
 import com.asset.appwork.model.Group;
 import com.asset.appwork.model.User;
 import com.asset.appwork.repository.ApprovalHistoryRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class ApprovalHistoryService {
     @Autowired
     ApprovalHistoryRepository approvalHistoryRepository;
@@ -68,7 +70,8 @@ public class ApprovalHistoryService {
             approvalHistory.get().setReceiveDate(new Date());
             approvalHistoryRepository.save(approvalHistory.get());
         } else {
-            throw new AppworkException(ResponseCode.NO_DATA_SAVED);
+            log.error("can't update receiver date");
+//            throw new AppworkException(ResponseCode.NO_DATA_SAVED);
         }
     }
 }
