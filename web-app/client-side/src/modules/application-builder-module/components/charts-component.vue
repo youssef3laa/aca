@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+
     <v-card class="mx-auto">
      
       <component
@@ -8,7 +8,7 @@
         style="padding: 15px"
       ></component>
     </v-card>
-  </v-container>
+
 </template>
 
 <script>

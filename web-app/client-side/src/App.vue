@@ -14,7 +14,7 @@
 @import url(http://fonts.googleapis.com/earlyaccess/amiri.css);
 @import url(https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400&display=swap);
 @import url(https://use.fontawesome.com/releases/v5.15.2/css/all.css);
-// @import url("./assets/Sass/app.scss"); 
+@import url("./assets/Sass/app.scss"); 
 
 
 @font-face {

@@ -18,4 +18,17 @@ td.text-start:first-child{
 .theme--light.v-data-table > .v-data-table__wrapper > table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) td.text-start:first-child{
     border-right: 5px solid #0278AE;
 }
+.v-data-footer .v-input__control{
+    padding: 0px !important;
+}
+
+.v-input__control{
+    padding: 4px;
+    border-radius: 6px !important;
+    margin-bottom: 20px;
+    border: 1px solid #E0E0E0;
+}
+.v-input__slot:before{
+    border-color: rgb(0 0 0 / 0%);
+}
 /*End-Table*/
