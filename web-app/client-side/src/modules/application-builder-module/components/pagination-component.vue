@@ -66,7 +66,7 @@ export default {
   align-items: center;
   background-color: rgba(7, 104, 159, 0.05);
   margin: 10px;
-  height: 40px;
+  height: 40px  !important;
   padding: 10px;
   min-width: 160px !important;
   justify-content: center;

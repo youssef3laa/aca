@@ -14,7 +14,7 @@ public class Escalation {
     long id;
     @Column(name = "duration")
     Integer duration;
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinColumn(
             name = "JobType_Id",
             referencedColumnName = "Id"

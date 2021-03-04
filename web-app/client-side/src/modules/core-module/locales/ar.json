@@ -235,5 +235,10 @@
   "opinionDate":"تاريخ الرأي",
   "memberName":"اسم العضو",
   "allSubjects":"كل الموضوعات",
-  "memoOpinion":"رأي المذكرة"
+  "memoOpinion":"رأي المذكرة",
+  "technicalOffice":"المكتب الفني",
+  "annualGoals":"الاهداف السنوية",
+  "goalText":"نص الهدف",
+  "addAnnualGoal":"اضافة هدف سنوي",
+  "tradionalWork":"اعمال تقليدية"
 }

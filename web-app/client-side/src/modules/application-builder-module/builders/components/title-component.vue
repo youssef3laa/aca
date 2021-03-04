@@ -1,6 +1,6 @@
 <template>
   <span>
-    <v-row style="height: 80px;">
+    <v-row style="padding-right:12px;padding-left:12px;height: 80px;">
       <v-col>
         <h1>
           <button style="background:transparent; width: 45px; height: 45px"
@@ -15,16 +15,21 @@
           </span>
         </h1>
       </v-col>
-      <v-spacer></v-spacer>
+
       <ActionsComponent :actions="section.actions"></ActionsComponent>
+      <div style="display:flex">
+      <TitleBtnComponent v-if="section.goalButton"></TitleBtnComponent>
+      </div>
     </v-row>
   </span>
 </template>
 
 <script>
 import ActionsComponent from '../../components/actions-component';
+import TitleBtnComponent from '../../components/title-goals-btn-component';
+
 export default {
-  components: {ActionsComponent},
+  components: {ActionsComponent,TitleBtnComponent},
   props: ['section'],
   methods: {
     goBack: function() {

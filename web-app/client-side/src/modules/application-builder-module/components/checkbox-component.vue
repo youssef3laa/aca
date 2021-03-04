@@ -4,7 +4,7 @@
       v-for="(decision, key) in ApprovalCardDecision"
       :key="key"
       :value="decision.value"
-      :label="decision.label"
+      :label="labelTranslate(decision.label)"
       @click="test"
     ></v-checkbox>
   </v-container>
@@ -20,7 +20,11 @@ export default {
       this.decision = newVal
     },
   },
+
   methods: {
+    labelTranslate(label){
+      return this.$t(label)
+    },
     test: function() {
       // if(this.field.publish){
 
