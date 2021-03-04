@@ -54,8 +54,7 @@ export default {
 
         for (let key in data) {
           switch (
-            data[key].TaskData.ApplicationData
-              .ACA_ProcessRouting_InputSchemaFragment.caseType
+            data[key].TaskData.ApplicationData?.ACA_ProcessRouting_InputSchemaFragment?.caseType
           ) {
             case "signatures":
               fromSignatures.push(data[key]);
