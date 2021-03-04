@@ -33,7 +33,7 @@ export default {
     };
   },
   mounted() {
-    this.loadForm("technical-office-sector-head-inbox", this.formLoaded);
+    this.loadForm("office-sector-head-inbox", this.formLoaded);
     this.certificationTopActionsSubscriptions();
     this.managementTopActionsSubscriptions();
     this.$observable.subscribe("technicalTasksTable_view", (item) => {
@@ -113,8 +113,8 @@ export default {
         let fromCertifications = [];
 
         for (let key in data) {
-          switch (data[key].TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.caseType) {
-            case "certificationTechnicalOffice":
+          switch (data[key].TaskData.ApplicationData?.ACA_ProcessRouting_InputSchemaFragment?.caseType) {
+            case "sentFromCertification":
               fromCertifications.push(data[key])
               break
             default: // "sentFromAdministratorsTechnicalOffice"

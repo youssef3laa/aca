@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -81,6 +82,7 @@ public class AppBuilderService {
                       traverseFile((HashMap) l, user);
                   }
                 });
+                Collections.sort(indexes, Collections.reverseOrder());
                 indexes.forEach(index -> ((ArrayList)value).remove((int)index));
             }
         });
