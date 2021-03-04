@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-row>
+    <v-row class="justify-end">
 
       <v-col v-if="field.add == true" :cols="7">
         <button style="padding: 5px; margin: 20px" @click="handlAddButton()">
@@ -13,13 +13,14 @@
           <v-icon>fas fa-filter</v-icon>
         </button>
       </v-col>
-      <v-col  v-if="field.search == true"  :cols="4">
+      <v-col  v-if="field.search == true"  :cols="4" class="table-search">
         <v-text-field
           v-model="search"
           append-icon="mdi-magnify"
           label="بحث"
           single-line
           hide-details
+         
         ></v-text-field>
       </v-col>
     </v-row>
@@ -44,7 +45,6 @@
     >
  
       <template v-slot:item.action="{ item }">
-
         <v-menu offset-y left allow-overflow max-width="300">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -57,6 +57,7 @@
               <v-icon style="font-size: medium"> fas fa-ellipsis-h </v-icon>
             </v-btn>
           </template>
+
           <v-list>
             <v-list-item-group>
               <v-list-item
@@ -117,11 +118,14 @@
         </v-menu>
       </template>
       <template v-slot:expanded-item="{ item }">
+        
 <!--        <v-data-table v-if="d.subItems"-->
 <!--            :headers="d.subHeaders"-->
 <!--            :items="item[d.subItems]">-->
 <!--        </v-data-table>-->
+
         <td :colspan="12" style="padding-bottom: 20px" v-if="d.subTable" >
+          
           <data-table-component
                               :key="item[getProperty(item,d.subTable.value)]"
                               :field="item.subTable_ComponentOptions.field"
@@ -517,4 +521,5 @@ export default {
 /* .dropDown-menu {
   background: #96969f !important;
 } */
+
 </style>

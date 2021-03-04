@@ -1,0 +1,17 @@
+button.tab-btn.active{
+    background-color: rgb(2 120 174 / 0%);
+    border-radius: 0px;
+    color: #1D2936 !important;
+}
+
+button.tab-btn.active  span, button.tab-btn.active .info--text{
+    color: #0278ae !important
+}
+button.tab-btn span, button.tab-btn ,button.tab-btn .info--text{
+    color: #9E9E9E !important;
+}
+
+#inspire .v-input__control{
+  border: 1px solid #9E9E9E;
+  border-radius: 4px;
+ }

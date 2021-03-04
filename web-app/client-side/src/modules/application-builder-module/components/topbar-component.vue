@@ -1,5 +1,5 @@
 <template>
-      <div class="top-bar-wrapper">
+      <div class=" top-bar-wrapper mb-5 mt-2">
       <TasksLists :val="val.tasks"></TasksLists>
       <TopBarBtn :val="{backgroundColor:'#22B07D'}" :field="{label:'advancedSearch',icon:'fas fa-search'}"></TopBarBtn>
       <TopBarBtn :val="{backgroundColor:'#F37121'}" :field="{label:'orgChart',icon:'fas fa-sitemap'}"></TopBarBtn>

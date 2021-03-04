@@ -1,6 +1,8 @@
 /*Table*/
 .theme--light.v-data-table > .v-data-table__wrapper > table > thead > tr:last-child > th{
     background-color:#F1F2F4 !important;
+    border-radius: 0 !important;
+    border: 0 !important;
 }
 .theme--light.v-data-table > .v-data-table__wrapper > table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper){
     background-color: #F9F9F9;
@@ -8,9 +10,15 @@
 }
 td.text-start{
     color: #1A1A2E;
-    font-weight: 600;
     font-style: inherit;
     -webkit-font-smoothing: antialiased;
+    padding: 0 7px 0 7px !important;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 240px;
+    height: 1.2em;
+    white-space: nowrap;
+    font-family: 'Neo Sans Arabic Regular';
 }
 td.text-start:first-child{
     border-right: 5px solid #fff;
@@ -22,13 +30,23 @@ td.text-start:first-child{
     padding: 0 !important;
 }
 
-.v-input__control{
-    padding: 4px;
-    border-radius: 6px !important;
-    margin-bottom: 20px;
-    border: 1px solid #E0E0E0;
-}
+.table-search .v-input__control{
+padding: 4px;
+border-radius: 6px !important;
+margin-bottom: 20px;
+border: 1px solid #E0E0E0;
+} 
 .v-input__slot:before{
     border-color: rgb(0 0 0 / 0%);
 }
+.theme--light.v-text-field > .v-input__control > .v-input__slot:before{
+    display: none;
+}
+.v-text-field > .v-input__control > .v-input__slot:after{
+    display: none;
+}
+.v-application .elevation-1 {
+    box-shadow: none !important;
+}
+
 /*End-Table*/

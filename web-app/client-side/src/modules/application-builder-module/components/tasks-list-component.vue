@@ -1,17 +1,20 @@
 <template>
-  <div class="row task-list-wrapper top-bar">
+  <div class="row top-bar top-bar-list">
+    <div class="task-list-wrapper">
     <div class="task-list-heading">
-      <div class="bolt-icon-wrapper">
-        <i class="fas fa-bolt"></i>
+        <div class="bolt-icon-wrapper">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <span>شريط المهام</span>
       </div>
-      <span>شريط المهام</span>
-    </div>
-    <div ref="taskList" id="task-list">
-      <div  v-for="(task, key) in val" :key="key" class="task">
-        <i class="far fa-edit"></i>
-        <span class="task-name">{{ task.title }}</span>
+      <div ref="taskList" id="task-list">
+        <div  v-for="(task, key) in val" :key="key" class="task">
+          <i class="far fa-edit"></i>
+          <span class="task-name">{{ task.title }}</span>
+        </div>
       </div>
     </div>
+ 
     <div class="scroller-wrapper">
       <v-btn @click="scroll('right','task-list')" class="scroller"> <i class="fas fa-chevron-right"></i> </v-btn>
       <v-btn @click="scroll('left','task-list')" class="scroller"> <i class="fas fa-chevron-left"></i> </v-btn>
@@ -62,7 +65,7 @@ export default {
 
 <style>
 .task-list-heading {
-  display: flex;
+  display: inline-flex;
   height: 100%;
   align-items: center;
   padding-left: 2% ;
@@ -98,17 +101,19 @@ export default {
 .task i {
   margin-left: 10px;
 }
-
-.task-list-wrapper {
-  width: 70%;
-  margin: 10px;
+.top-bar-list{
   align-items: center !important;
   justify-content: space-between;
+  margin: 10px;
+}
+.task-list-wrapper {
+  width: 70%;
+  height: 100%;
 }
 #task-list {
   overflow-x: hidden;
   overflow-y: hidden;
-  display: flex;
+  display: inline-flex;
   max-width: 65%;
 }
 .scroller {

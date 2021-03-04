@@ -16,6 +16,7 @@ $color-gray: #F1F2F4;
 .thead.v-data-table-header{
     background-color: $color-gray !important;
 }
+
 </style>
 <script>
 import router from '../../../router'
