@@ -8,16 +8,12 @@
         "value": "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestNumber"
       },
       {
-        "text": "incomingDate",
-        "value": "DeliveryDate"
-      },
-      {
         "text": "subject",
         "value": "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.subject"
       },
       {
-        "text": "section/management",
-        "value": "Sender.unit"
+        "text": "memoOpinion",
+        "value": "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.memoOpinion"
       },
       {
         "text": "chairmanOfCommisionSignature",
