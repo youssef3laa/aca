@@ -31,7 +31,7 @@ export default {
               id: '1',
               isActive: true,
               name: 'Escalation',
-              icon: 'fas fa-layer-group',
+              icon: 'fas fa-level-up-alt',
             }
           ],
           page: [
@@ -47,110 +47,45 @@ export default {
                     isCard: true,
                     forms: [
                       {
-                        key: 'addUnitModal',
-                        modalId: 'addUnitModal',
-                        modalTitle: 'Add Unit',
+                        key: 'escalationModal',
+                        modalId: 'escalationModal',
+                        modalTitle: 'Edit Escalation',
                         inputs: [
                           {
-                            type: 'InputComponent',
-                            label: 'Name',
-                            name: 'nameAr',
-                            col: '4',
-                            rule: 'required',
-                          },
-                          // {
-                          //   type: 'InputComponent',
-                          //   label: 'English name',
-                          //   name: 'nameEn',
-                          //   col: '4',
-                          //   rule: 'required',
-                          // },
-                          {
-                            type: 'InputComponent',
-                            label: 'Unit type code',
-                            name: 'unitTypeCode',
+                            type: 'AutoCompleteComponent',
+                            label: 'Job type',
+                            name: 'jobType',
                             col: '4',
                             rule: 'required',
                           },
                           {
                             type: 'InputComponent',
-                            label: 'Unit code',
-                            name: 'unitCode',
+                            label: 'Duration',
+                            name: 'duration',
                             col: '4',
                             rule: 'required',
                           },
                           {
                             type: 'InputComponent',
-                            label: 'Parent code',
-                            name: 'parentCode',
+                            label: 'Extension',
+                            name: 'extension',
+                            col: '4',
+                            rule: 'required',
+                          },
+                          {
+                            type: 'AutoCompleteComponent',
+                            label: 'Unit type',
+                            name: 'unitType',
                             col: '4',
                             rule: 'required',
                           },
                         ],
                         model: {
-                          nameAr: '',
-                          // nameEn: '',
-                          unitTypeCode: '',
-                          unitCode: '',
-                          parentCode: '',
-                        },
-                      },
-                      {
-                        key: 'editUnitModal',
-                        modalId: 'editUnitModal',
-                        modalTitle: 'Edit Unit',
-                        inputs: [
-                          {
-                            type: 'InputComponent',
-                            label: 'Internal code',
-                            name: 'name',
-                            col: '4',
-                            readonly: true,
-                          },
-                          {
-                            type: 'InputComponent',
-                            label: 'Name',
-                            name: 'nameAr',
-                            col: '4',
-                            rule: 'required',
-                          },
-                          // {
-                          //   type: 'InputComponent',
-                          //   label: 'English name',
-                          //   name: 'nameEn',
-                          //   col: '4',
-                          //   rule: 'required',
-                          // },
-                          {
-                            type: 'InputComponent',
-                            label: 'Unit type code',
-                            name: 'unitTypeCode',
-                            col: '4',
-                            rule: 'required',
-                          },
-                          {
-                            type: 'InputComponent',
-                            label: 'Unit code',
-                            name: 'unitCode',
-                            col: '4',
-                            rule: 'required',
-                          },
-                          {
-                            type: 'InputComponent',
-                            label: 'Parent code',
-                            name: 'parentCode',
-                            col: '4',
-                            rule: 'required',
-                          },
-                        ],
-                        model: {
-                          id: '',
-                          name: '',
-                          nameAr: '',
-                          // nameEn: '',
-                          unitTypeCode: '',
-                          unitCode: '',
-                          parentCode: '',
+                          action : ['escalationTable_edit'],
+                          jobType: '',
+                          duration: '',
+                          extension: '',
+                          unitType: ''
                         },
                       },
                     ],
@@ -171,35 +106,31 @@ export default {
                             subscribe: 'escalation',
                             col: 12,
                             search: true,
-                            filter: true,
-                            add: true,
+                            filter: false,
+                            add: false,
                             actions: ['edit'],
-                            modalId: 'addEscalationModal',
+                            modalId: 'escalationTable',
                           },
                         ],
                         model: {
                           escalationTable: {
-                            url: 'org/unit/read/list',
+                            url: 'escalation/jobTypes/read/list',
                             headers: [
                               {
-                                text: 'Internal code',
-                                value: 'name',
+                                text: 'Job type',
+                                value: 'jobType.arValue',
                               },
                               {
-                                text: 'Name',
-                                value: 'nameAr',
-                              },
-                              // {
-                              //   text: 'Name en',
-                              //   value: 'nameEn',
-                              // },
-                              {
-                                text: 'Unit type code',
-                                value: 'unitTypeCode',
+                                text: 'Duration',
+                                value: 'duration',
                               },
                               {
-                                text: 'Unit code',
-                                value: 'unitCode',
+                                text: 'Extension',
+                                value: 'extension',
+                              },
+                              {
+                                text: 'Unit type Responsible',
+                                value: 'unitType.arValue',
                               },
                               {
                                 text: '',
@@ -223,68 +154,13 @@ export default {
   },
   methods: {
     handleEvents: function () {
-      // this.$observable.subscribe("addUnitModal_addModal", (obj) => {
-      //   let item = obj.obj;
-      //   delete item._valid;
-      //   item.name = item.unitCode;
-      //   let parentCode = item.parentCode;
-      //   delete item.parentCode;
-      //
-      //   http.post("/org/unit/create", item).then(() => {
-      //     http.put("/org/unit/" + parentCode + "/subUnitWithCode/" + item.name).then(() => {
-      //       alert("Added Successfully");
-      //     }).catch((response) => {
-      //       // alert(response.data.metaInfo.errorMessage);
-      //       alert(response);
-      //     });
-      //   }).catch((response) => {
-      //     // alert(response.data.metaInfo.errorMessage);
-      //     alert(response);
-      //   });
-      // });
-      // this.$observable.subscribe("editUnitModal_updateModal", (obj) => {
-      //   let item = obj.obj;
-      //   let id = item.id;
-      //   let parentCode = item.parentCode;
-      //
-      //   item = {
-      //     "name": item.name,
-      //     "nameAr": item.nameAr,
-      //     "nameEn": item.nameEn,
-      //     "unitTypeCode": item.unitTypeCode,
-      //     "unitCode": item.unitCode,
-      //   }
-      //
-      //   http.put("/org/unit/update/" + id, item).then(() => {
-      //     http.put("/org/unit/" + parentCode + "/subUnitWithCode/" + item.name).then(() => {
-      //       alert("Updated Successfully");
-      //     }).catch((response) => {
-      //       // alert(response.data.metaInfo.errorMessage);
-      //       alert(response);
-      //     });
-      //   }).catch((response) => {
-      //     // alert(response.data.metaInfo.errorMessage);
-      //     alert(response);
-      //   });
-      // });
-      // this.$observable.subscribe("unitsTable_add", () => {
-      //   this.$observable.fire("addUnitModal", {
-      //     action: "add",
-      //   })
-      // });
-      // this.$observable.subscribe("unitsTable_edit", (data) => {
-      //   data.item.parentCode = (data.item.parent.length > 0) ? data.item.parent[0].name : null;
-      //   this.$refs.appBuilder.setModelData("editUnitModal", data.item)
-      //   this.$observable.fire("editUnitModal", {
-      //     action: "edit",
-      //     obj: data.item,
-      //   })
-      // })
-      // this.$observable.subscribe("unitsTable_delete", (data) => {
-      //   http.delete("/org/unit/delete/" + data.item.id).then((response) => {
-      //     alert(response.data.metaInfo.infoMessage);
-      //   });
-      // })
+      this.$observable.subscribe("escalationTable_edit", (obj) => {
+        console.log(obj);
+        // this.$refs.appBuilder.setModelData(key,obj)
+        this.$observable.fire("escalationModal", {
+          action: "edit",
+        })
+      });
     },
   },
 
