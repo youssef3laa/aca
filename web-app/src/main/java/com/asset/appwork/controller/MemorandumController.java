@@ -9,14 +9,17 @@ import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.Memorandum;
+import com.asset.appwork.model.RequestEntity;
 import com.asset.appwork.model.User;
 import com.asset.appwork.model.memoValues;
 import com.asset.appwork.platform.soap.memorandumSOAP;
 import com.asset.appwork.repository.MemoValuesRepository;
 import com.asset.appwork.repository.MemosRepository;
+import com.asset.appwork.repository.RequestRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.service.OrgChartService;
+import com.asset.appwork.service.UserService;
 import com.asset.appwork.util.Docx;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,15 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Bassel on 3/1/2021.
@@ -55,7 +56,10 @@ public class MemorandumController {
     Docx docx;
     @Autowired
     OrgChartService orgChartService;
+    @Autowired
+    RequestRepository requestRepository;
 
+    @Transactional
     @PostMapping("/create")
     public ResponseEntity<AppResponse<String>> createMemorandum(@RequestHeader("X-Auth-Token") String token, @RequestBody() Memos memo) {
         AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
@@ -64,7 +68,12 @@ public class MemorandumController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             User user = orgChartService.getLoggedInUser(account);
 
-            File file = docx.exportJsonToDocx(memo, user);
+            Optional<RequestEntity> requestEntity = requestRepository.findById(Long.parseLong(memo.getRequestId()));
+
+            if(requestEntity.isPresent()){
+
+
+            File file = docx.exportJsonToDocx(memo, user, requestEntity.get());
 
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
 
@@ -123,6 +132,9 @@ public class MemorandumController {
             }
 
             file.delete();
+            } else {
+                throw new AppworkException(ResponseCode.NO_CONTENT);
+            }
 
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
