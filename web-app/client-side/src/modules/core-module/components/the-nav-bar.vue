@@ -18,6 +18,7 @@
         ></v-app-bar-nav-icon>
       </template>
       <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
       <div style="width: 250px">
         <router-link :to="{ name: 'Home' }">
           <v-img

@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div class="container">
     <splitpanes class="default-theme" dir="ltr">
+    
       <pane>
         <ShowAttachmentComponent
           :key="d.requestId"
@@ -37,7 +38,8 @@
             </v-btn></v-col
           >
         </v-row>
-        <v-container v-if="showRichText">
+      <v-row>
+        <v-col :cols="12" v-if="showRichText">
           <AutocompleteComponent
             :field="{ name: field.label }"
             :val="{ value: selected, list: [], url: url }"
@@ -51,11 +53,15 @@
               :app="app"
             />
           </div>
-        </v-container>
-        <v-container v-else>
+        </v-col>
+     
+      
+        <v-col :cols="12" v-else>
           <IframeComponent :val="iframeOjbect" />
-        </v-container>
+        </v-col>
+      </v-row>
       </pane>
+    
     </splitpanes>
   </div>
 </template>

@@ -1,11 +1,12 @@
 <template>
-  <div class="row btn-wrapper top-bar">
+
+  <div class="btn-wrapper top-bar">
  
       <div :style="{'background-color': val.backgroundColor}" class="btn-icon-wrapper">
         <i :class="field.icon"></i>
       </div>
       <span>{{$t(field.label)}}</span>
-    </div>
+  </div>
 
 </template>
 
@@ -39,5 +40,15 @@ export default {
   align-items: center !important;
   justify-content: space-around;
   cursor: pointer;
+}
+.btn-wrapper:last-child{
+  margin-left: 0px;
+}
+.task-list-wrapper:first-child{
+  margin-right: 0px;
+}
+
+.btn-icon-wrapper{
+      margin-left: 5px;
 }
 </style>

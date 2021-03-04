@@ -201,10 +201,7 @@ export default {
             let group = await this.getHeadRoleByUnitCode(
               entity.responsibleEntityEdara
             );
-            let assignedCN =
-              "cn=" +
-              group.groupCode +
-              ",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+            let assignedCN = "cn=" + group.groupCode + ",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
             let obj = {
               taskId: task.TaskId,
               requestId: inputSchema.requestId,
@@ -234,21 +231,15 @@ export default {
         let outschemaArray = [];
         let unitCode = this.$user.details.groups[0].unit.unitCode;
         let assignedCN = "";
+        let group;
         if (unitCode == "TVA") {
-          //haga
-          let group = await this.getHeadRoleByUnitCode("TVS");
-          assignedCN =
-            "cn=" +
-            group.groupCode +
-            ",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+          //Vice
+          group = await this.getHeadRoleByUnitCode("TVS");
         } else {
-          //haga Tanya
-          let group = await this.getHeadRoleByUnitCode("TCS");
-          assignedCN =
-            "cn=" +
-            group.groupCode +
-            ",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+          //Chairman
+          group = await this.getHeadRoleByUnitCode("TCS");
         }
+        assignedCN ="cn=" +group.groupCode +",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
 
         this.selected.forEach((task) => {
           let inputSchema =

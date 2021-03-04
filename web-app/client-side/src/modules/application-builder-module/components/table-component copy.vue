@@ -8,6 +8,15 @@
           </v-icon>
         </template>
       </v-data-table>
+      <v-data-table
+      :headers="headers"
+      :items="desserts"
+      item-key="name"
+      class="elevation-1 filter"
+      :search="search"
+      :custom-filter="filterOnlyCapsText"
+    >
+    </v-data-table>
     </v-card>
   </v-container>
 </template>
