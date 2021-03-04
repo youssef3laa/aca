@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="datatable-component">
     <v-row>
 
       <v-col v-if="field.add == true" :cols="7">
@@ -39,147 +39,12 @@
       :show-select="field.select"
       :single-select="field.singleSelect"
       :item-key="d.key"
+      :item-class="itemRowStyle"
       color="blue"
       class="elevation-1"
     >
  
-      <template v-slot:item.action="{ item }">
-
-        <v-menu offset-y left allow-overflow max-width="300">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              elevation="0"
-              v-bind="attrs"
-              v-on="on"
-              style="min-height: 24px"
-              width="24px"
-            >
-              <v-icon style="font-size: medium"> fas fa-ellipsis-h </v-icon>
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item-group>
-              <v-list-item
-                v-for="(i, index) in field.actions"
-                :key="index"
-                v-on:click="handleAction(item, i)"
-              >
-                <span v-if="i == 'edit'">
-                  <v-list-item-title
-                    style="color: black; font-weight: bold; font-size: small"
-                  >
-                    <v-icon style="color: black; font-size: small"
-                      >far fa-edit</v-icon
-                    >
-                    <span style="margin: 3px"></span>
-                    {{ $t(i) }}
-                  </v-list-item-title>
-                </span>
-
-                <span v-else-if="i == 'delete'">
-                  <v-list-item-title
-                    style="color: black; font-weight: bold; font-size: small"
-                  >
-                    <v-icon style="color: black; font-size: small"
-                      >far fa-trash-alt</v-icon
-                    >
-                    <span style="margin: 3px"></span>
-                    {{ $t(i) }}
-                  </v-list-item-title>
-                </span>
-
-                <span v-else-if="i == 'view'">
-                  <v-list-item-title
-                    style="color: black; font-weight: bold; font-size: small"
-                  >
-                    <v-icon style="color: black; font-size: small"
-                      >fas fa-expand-arrows-alt</v-icon
-                    >
-                    <span style="margin: 3px"></span>
-                    {{ $t(i) }}
-                  </v-list-item-title>
-                </span>
-
-                <span v-else>
-                  <v-list-item-title
-                    style="color: black; font-weight: bold; font-size: small"
-                  >
-                    <v-icon style="color: black; font-size: small">{{
-                      i.icon
-                    }}</v-icon>
-                    <span style="margin: 3px"></span>
-                    {{ $t(i.name) }}
-                  </v-list-item-title>
-                </span>
-              </v-list-item>
-            </v-list-item-group>
-          </v-list>
-        </v-menu>
-      </template>
-      <template v-slot:expanded-item="{ item }">
-<!--        <v-data-table v-if="d.subItems"-->
-<!--            :headers="d.subHeaders"-->
-<!--            :items="item[d.subItems]">-->
-<!--        </v-data-table>-->
-        <td :colspan="12" style="padding-bottom: 20px" v-if="d.subTable" >
-          <data-table-component
-                              :key="item[getProperty(item,d.subTable.value)]"
-                              :field="item.subTable_ComponentOptions.field"
-                              :val="item.subTable_ComponentOptions.val"
-           >
-          </data-table-component>
-        </td>
-
-        <!-- <span v-for="(subHeader,i) in d.subHeaders" :key="i"> -->
-        <td v-else :colspan="12"
-          style="margin:10px" >
-          <div  v-for="(subHeader, i) in d.subHeaders" :key="i">
-            <div class="top-bot-margins" style="color:#9E9E9E">{{ $t(subHeader.text) }}</div>
-
-            <span v-if="isArray(item[subHeader.value])">
-              <div v-for="(val, k) in item[subHeader.value]" :key="k" class="top-bot-margins" >{{ val[subHeader.items]}} </div>
-            </span>
-            
-            <div v-else  class="top-bot-margins" >{{ item[subHeader.value] }} </div>
-          </div>
-        </td>
-
-        
-        <!-- </span> -->
-      </template>
-      <template   v-slot:[`item.${field.selectable}`]="{ item }">
-        <v-checkbox
-           color="#07689F"
-          :ripple="false"
-          :value="false" 
-          v-model="item[field.selectable]"
-
-        ></v-checkbox>
-<!--         <span>{{item}}</span>-->
-      </template>
-            <!-- <template  v-for="(selectable,index) in field.selectables" v-slot:[`item.${selectable}`]="{ item }">
-        <v-simple-checkbox
-         :key="index"
-           color="#07689F"
-          :ripple="false"
-          v-model="item[selectable]"
-        ></v-simple-checkbox>
-        <span
-         :key="index"
-        >{{item}}</span>
-      </template> -->
-       <template v-for="(image,index) in field.images"  v-slot:[`item.${image}`]="{ item }">
-              <v-img :key="index" :src="item[image]" :alt="'signature'" class="thumbnail"></v-img>
-          </template>
-
-
-      <template v-slot:header.data-table-select="{props,on}">
-        <v-simple-checkbox color="#07689F" :ripple="false" v-bind="props" v-on="on"></v-simple-checkbox>
-      </template>
-
-      <template v-slot:item.data-table-select="{isSelected,select}">
-        <v-simple-checkbox color="#07689F" :ripple="false" :value="isSelected" @input="select($event)"></v-simple-checkbox>
-      </template>
+  
     </v-data-table>
 
 
@@ -279,6 +144,11 @@ export default {
     }
   },
   methods: {
+    itemRowStyle: function(item){
+      if(this.val.styleType=="goalsTable" && item.isTraditional){
+        return 'row-item'
+      }
+    },
     updateData: function(){
       if(this.d.data instanceof Array){
         for(let item in this.d.data){
@@ -513,6 +383,9 @@ export default {
 .decision-btn-title {
   white-space: nowrap;
   overflow: hidden;
+}
+.datatable-component /deep/ .row-item td:first-child{
+  border-right:12px solid #C70039 ; 
 }
 /* .dropDown-menu {
   background: #96969f !important;

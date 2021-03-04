@@ -124,6 +124,7 @@ import ActionsTopComponent from '../components/actions-top-component'
 import BarcodeComponent from '../components/barcode-component'
 import TextComponent from "../components/text-component"
 import PaginationComponent from "../components/pagination-component"
+import SingleCheckboxComponent from "../components/single-checkbox"
 export default {
   name: 'FormBuilder',
   components: {
@@ -163,6 +164,7 @@ export default {
     BarcodeComponent,
     TextComponent,
     PaginationComponent,
+    SingleCheckboxComponent,
   },
   data() {
     return {

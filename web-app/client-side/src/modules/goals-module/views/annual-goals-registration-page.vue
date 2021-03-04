@@ -5,20 +5,47 @@
 </template>
 
 <script>
+import formPageMixin from "../../../mixins/formPageMixin";
 import AppBuilder from "../../application-builder-module/builders/app-builder";
+import goalsMixin from "../mixin/goalsMixin";
 export default {
   components: {
     AppBuilder,
   },
-  mounted() {
-    this.handleGoals();
+  mixins: [formPageMixin, goalsMixin],
+  async mounted() {
+    this.handleGoalModal();
+    await this.setAllGoals();
+    await this.setGoalsByYear();
   },
   methods: {
-    handleGoals() {
+    async setGoalsByYear() {
+      this.$observable.subscribe("titleYearSelected", async (year) => {
+        console.log(year);
+        let goals = await this.getGoalsByYear(year);
+        this.$observable.fire("annualGoalsTable", {
+          type: "modelUpdate",
+          model: { data: goals },
+        });
+      });
+    },
+    async setAllGoals() {
+      let goals = await this.getAllGoals();
+      this.$observable.fire("annualGoalsTable", {
+        type: "modelUpdate",
+        model: { data: goals },
+      });
+    },
+    handleGoalModal() {
       this.$observable.subscribe("addGoal", () => {
         this.$observable.fire("addGoalModal", {
           action: "add",
         });
+      });
+      this.$observable.subscribe("addGoalModal_add", () => {
+        let data = this.$refs.appBuilder.getModelData("addGoalModal");
+        console.log(data);
+        this.postGoal(data);
       });
     },
   },
@@ -31,7 +58,7 @@ export default {
             key: "title",
             type: "TitleComponet",
             name: "annualGoals",
-            goalButton:true,
+            goalButton: true,
           },
 
           page: [
@@ -55,7 +82,7 @@ export default {
                             name: "annualGoalsTable",
                             // actions: ["view", "edit", "delete"],
                             subscribe: "annualGoalsTable",
-                            search:true,
+                            search: true,
                             modalId: "addGoalModal",
                             col: 12,
                           },
@@ -63,11 +90,12 @@ export default {
                         model: {
                           annualGoalsTable: {
                             url: null,
+                            styleType:"goalsTable",
                             key: "requestNumber",
                             headers: [
                               {
                                 text: "goalText",
-                                value: "goalText",
+                                value: "goal",
                               },
 
                               // {
@@ -76,16 +104,7 @@ export default {
                               //   sortable: false,
                               // },
                             ],
-                            data: [
-                              {
-                                goalText:
-                                  "هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد هذا النص من مولد النص العربى، حيث يمكنك أن تولد مثل هذا النص أو العديد من النصوص الأخرى إضافة إلى زيادة عدد الحروف التي يولدها التطبيق. إذا كنت تحتاج إلى عدد أكبر من الفقرات يتيح لك مولد النص العربى زيادة عدد الفقرات كما تريد، النص لن يبدو مقسما ولا يحوي أخطاء لغوية، مولد النص العربى مفيد لمصممي المواقع على وجه الخصوص حيث يحتاج العميل فى كثير من الأحيان أن يطلع على صورة حقيقية لتصميم الموقع",
-                              },
-                              {
-                                goalText:
-                                  "هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد هذا النص من مولد النص العربى، حيث يمكنك أن تولد مثل هذا النص أو العديد من النصوص الأخرى إضافة إلى زيادة عدد الحروف التي يولدها التطبيق. إذا كنت تحتاج إلى عدد أكبر من الفقرات يتيح لك مولد النص العربى زيادة عدد الفقرات كما تريد، النص لن يبدو مقسما ولا يحوي أخطاء لغوية، مولد النص العربى مفيد لمصممي المواقع على وجه الخصوص حيث يحتاج العميل فى كثير من الأحيان أن يطلع على صورة حقيقية لتصميم الموقع",
-                              },
-                            ],
+                            data: [],
                           },
                         },
                       },
@@ -104,36 +123,31 @@ export default {
                         inputs: [
                           {
                             type: "DatePickerComponent",
-                            label: "Arabic name",
-                            name: "nameAr",
+                            label: "year",
+                            name: "year",
+                            format: "year",
                             col: "6",
                             rule: "required",
                           },
                           {
                             type: "TextareaComponent",
                             label: "goalText",
-                            name: "goalText",
+                            name: "goal",
                             col: "12",
                             rule: "required",
                           },
                           {
-                            type: "checkboxComponent",
-                            name: "parentCode",
-                            decisions:[{
-                              value:"tradionalWork",
-                              label:"tradionalWork",
-                            }],
+                            type: "SingleCheckboxComponent",
+                            name: "isTraditional",
+                            label: "tradionalWork",
                             col: "4",
-                            rule: "required",
                           },
                         ],
                         model: {
-                          nameAr: "",
-                          nameEn: "",
-                          goalTypeCode: "",
-                          goalCode: "",
-                          parentCode: "",
-                          action:["add"]
+                          year: "",
+                          goal: "",
+                          isTraditional: false,
+                          action: ["add"],
                         },
                       },
                       {
