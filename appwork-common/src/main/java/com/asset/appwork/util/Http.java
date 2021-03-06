@@ -84,7 +84,7 @@ public class Http {
             statusCode = this.client.executeMethod(method);
             //TODO change to @getResponseBodyAsStream
             //https://hc.apache.org/httpclient-legacy/apidocs/org/apache/commons/httpclient/HttpMethod.html#getResponseBodyAsStream()
-            response = method.getResponseBodyAsString();
+            response = SystemUtil.convertInputStreamToString(method.getResponseBodyAsStream());
             if (method.getStatusCode() > 299) isSuccess = false;
 
         } catch (IOException e) {
@@ -122,7 +122,7 @@ public class Http {
 
         try {
             statusCode = this.client.executeMethod(method);
-            response = method.getResponseBodyAsString();
+            response = SystemUtil.convertInputStreamToString(method.getResponseBodyAsStream());
             if (method.getStatusCode() > 299) isSuccess = false;
 
 
@@ -150,7 +150,7 @@ public class Http {
 
             method.setRequestEntity(setRequestEntity());
             statusCode = this.client.executeMethod(method);
-            response = method.getResponseBodyAsString();
+            response = SystemUtil.convertInputStreamToString(method.getResponseBodyAsStream());
             if (method.getStatusCode() > 299) isSuccess = false;
 
         } catch (IOException e) {
@@ -172,7 +172,7 @@ public class Http {
 
             method.setRequestEntity(setRequestEntity());
             statusCode = this.client.executeMethod(method);
-            response = method.getResponseBodyAsString();
+            response = SystemUtil.convertInputStreamToString(method.getResponseBodyAsStream());
             if (method.getStatusCode() > 299) isSuccess = false;
 
         } catch (IOException e) {

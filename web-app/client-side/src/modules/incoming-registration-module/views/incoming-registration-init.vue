@@ -196,22 +196,22 @@ export default {
         },
         submit: async function () {
             let vueThis = this;
-            // let attacmhnetComponentModel = this.$refs.appBuilder.getModelData("AttachmentComponent");
-            // if (!attacmhnetComponentModel.attachment.validity) {
-            //     this.$refs.alertComponent._alertSuccess({
-            //         type: "error",
-            //         "message": this.$t("pleaseAddAtLeastOneAttachment")
-            //     });
-            //     return;
-            // }
+            let attacmhnetComponentModel = this.$refs.appBuilder.getModelData("AttachmentComponent");
+            if (!attacmhnetComponentModel.attachment.validity) {
+                this.$refs.alertComponent._alertSuccess({
+                    type: "error",
+                    "message": this.$t("pleaseAddAtLeastOneAttachment")
+                });
+                return;
+            }
             let mainData = this.$refs.appBuilder.getModelData("mainData");
-            // if (!(mainData._valid)) {
-            //     this.$refs.alertComponent._alertSuccess({
-            //         type: "error",
-            //         "message": this.$t("pleaseFillRequiredFields")
-            //     });
-            //     return;
-            // }
+            if (!(mainData._valid)) {
+                this.$refs.alertComponent._alertSuccess({
+                    type: "error",
+                    "message": this.$t("pleaseFillRequiredFields")
+                });
+                return;
+            }
 
             let returnedTargetMainData = Object.assign({}, mainData);
             console.log(mainData, returnedTargetMainData);

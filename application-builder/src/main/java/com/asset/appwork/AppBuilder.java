@@ -13,9 +13,8 @@ public class AppBuilder {
     }
 
     public StringBuilder retrieveFile(String fileName) throws AppworkException {
-        String nameOfViewFolder = fileName;
 
-        String formPath = rootPath + File.separator + "config" + File.separator + nameOfViewFolder + ".conf";
+        String formPath = rootPath + File.separator + "config" + File.separator + fileName + ".conf";
         StringBuilder fileContent = new StringBuilder();
         try {
             fileContent = readFile(formPath);
@@ -64,7 +63,7 @@ public class AppBuilder {
     }
 
     public void writeFile(String nameOfFile, String fileContent) throws IOException {
-        String rootPath = this.rootPath + File.separator + "output" + File.separator + nameOfFile + ".json";
+        String rootPath = AppBuilder.rootPath + File.separator + "output" + File.separator + nameOfFile + ".json";
         try (FileWriter fr = new FileWriter(rootPath);
              BufferedWriter br = new BufferedWriter(fr)) {
             br.write(fileContent);
