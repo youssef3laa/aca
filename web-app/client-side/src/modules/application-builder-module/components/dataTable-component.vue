@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="datatable-component">
     <v-row class="justify-end">
 
       <v-col v-if="field.add == true" :cols="7">
@@ -40,6 +40,7 @@
       :show-select="field.select"
       :single-select="field.singleSelect"
       :item-key="d.key"
+      :item-class="itemRowStyle"
       color="blue"
       class="elevation-1"
     >
@@ -283,6 +284,11 @@ export default {
     }
   },
   methods: {
+    itemRowStyle: function(item){
+      if(this.val.styleType=="goalsTable" && item.isTraditional){
+        return 'row-item'
+      }
+    },
     updateData: function(){
       if(this.d.data instanceof Array){
         for(let item in this.d.data){
@@ -517,6 +523,9 @@ export default {
 .decision-btn-title {
   white-space: nowrap;
   overflow: hidden;
+}
+.datatable-component /deep/ .row-item td:first-child{
+  border-right:12px solid #C70039 ; 
 }
 /* .dropDown-menu {
   background: #96969f !important;

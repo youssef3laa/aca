@@ -164,8 +164,8 @@ export default {
     },
 
     async triggerSubmit() {
-      var formKeys = this.$refs.appBuilder.getFormKeyByPageKey('memoPage')
-      if(formKeys instanceof  Array && formKeys.length===0){
+      var formKeys = this.$refs?.appBuilder?.getFormKeyByPageKey('memoPage')
+      if(formKeys == undefined ||(formKeys instanceof  Array && formKeys.length===0)){
         return  false;
       }
       this.richText = {}

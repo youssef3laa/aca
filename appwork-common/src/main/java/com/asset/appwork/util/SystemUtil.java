@@ -26,8 +26,12 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Array;
+import java.util.List;
 import java.util.*;
 
 /**
@@ -35,6 +39,20 @@ import java.util.*;
  */
 public class SystemUtil {
 
+    public static BufferedImage resizeImage(Image  originalImage, int targetWidth, int targetHeight) {
+        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics2D = resizedImage.createGraphics();
+        // Increase quality if needed at the expense of speed
+        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        graphics2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+        AffineTransform scaleTransform = AffineTransform.getScaleInstance(
+                targetWidth / (double) originalImage.getWidth(null), targetHeight / (double) originalImage.getHeight(null));
+        graphics2D.drawImage(originalImage, scaleTransform, null);
+//        graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+        graphics2D.dispose();
+        return resizedImage;
+    }
 
     public static Object[] unpackObjectToArrayOfObjects(Object array) {
         Object[] array2 = new Object[Array.getLength(array)];
@@ -279,16 +297,31 @@ public class SystemUtil {
         return fileContent.toString();
     }
 
-    public static Pageable createPageable(Integer page, Integer size){
+    public static Pageable createPageable(Integer page, Integer size) {
         return PageRequest.of(page, size);
     }
 
-    public static Pageable createPageable(Integer page, Integer size, String sortBy, String direction){
-        if(direction.toLowerCase().equals("desc")){
-            return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,sortBy));
-        }else{
-            return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC,sortBy));
+    public static Pageable createPageable(Integer page, Integer size, String sortBy, String direction) {
+        if (direction.equalsIgnoreCase("desc")) {
+            return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy));
+        } else {
+            return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sortBy));
         }
+    }
+
+
+    public static String convertInputStreamToString(InputStream inputStream) throws IOException {
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            StringBuilder buffer = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
+                buffer.append("\n");
+            }
+            return buffer.toString();
+        }
+
     }
 
     public static class FixedUntypedObjectDeserializer extends UntypedObjectDeserializer {

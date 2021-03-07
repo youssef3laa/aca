@@ -1,9 +1,10 @@
 <template>
   <v-container class="px-0" fluid>
     <v-checkbox
-      v-for="(decision, key) in ApprovalCardDecision"
+      v-for="(dec, key) in ApprovalCardDecision"
       :key="key"
-      :value="decision.value"
+      :value="dec.value"
+      v-model="decision"
       :label="labelTranslate(decision.label)"
       @click="test"
     ></v-checkbox>
@@ -36,12 +37,13 @@ export default {
         value: this.decision,
         type: 'inputChange',
       })
+      console.log(this.decision)
     },
   },
   data() {
     return {
       ApprovalCardDecision: this.field.decisions,
-      decision: '',
+      decision: "",
     }
   },
 }
