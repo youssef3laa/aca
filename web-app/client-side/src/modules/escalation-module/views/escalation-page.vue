@@ -2,13 +2,14 @@
   <div>
     <v-container>
       <AppBuilder :app="app" ref="appBuilder"/>
+      <AlertComponent ref="alertComponent"></AlertComponent>
     </v-container>
   </div>
 </template>
 
 <script>
 import AppBuilder from "../../application-builder-module/builders/app-builder"
-// import http from "@/modules/core-module/services/http"
+import http from "@/modules/core-module/services/http"
 
 export default {
   name: "Escalation",
@@ -47,9 +48,8 @@ export default {
                     isCard: true,
                     forms: [
                       {
-                        key: 'escalationModal',
+                        key: 'escalationModalForm',
                         modalId: 'escalationModal',
-                        modalTitle: 'Edit Escalation',
                         inputs: [
                           {
                             type: 'AutoCompleteComponent',
@@ -57,35 +57,40 @@ export default {
                             name: 'jobType',
                             col: '4',
                             rule: 'required',
+                            readonly: true,
                           },
                           {
                             type: 'InputComponent',
+                            inputType: "number",
                             label: 'Duration',
                             name: 'duration',
                             col: '4',
-                            rule: 'required',
+                            rule: 'required|min_value:1',
                           },
                           {
                             type: 'InputComponent',
+                            inputType: "number",
                             label: 'Extension',
                             name: 'extension',
                             col: '4',
-                            rule: 'required',
+                            rule: 'required|min_value:1',
                           },
                           {
                             type: 'AutoCompleteComponent',
-                            label: 'Unit type',
+                            label: 'Unit type to Approve',
                             name: 'unitType',
                             col: '4',
                             rule: 'required',
                           },
                         ],
                         model: {
-                          action : ['escalationTable_edit'],
-                          jobType: '',
+                          action: [],
+                          modalTitle: '',
+                          id: '',
+                          jobType: {},
                           duration: '',
                           extension: '',
-                          unitType: ''
+                          unitType: {}
                         },
                       },
                     ],
@@ -129,7 +134,7 @@ export default {
                                 value: 'extension',
                               },
                               {
-                                text: 'Unit type Responsible',
+                                text: 'Unit type to Approve',
                                 value: 'unitType.arValue',
                               },
                               {
@@ -154,12 +159,76 @@ export default {
   },
   methods: {
     handleEvents: function () {
-      this.$observable.subscribe("escalationTable_edit", (obj) => {
-        console.log(obj);
-        // this.$refs.appBuilder.setModelData(key,obj)
-        this.$observable.fire("escalationModal", {
-          action: "edit",
-        })
+      let self = this;
+      self.$observable.subscribe("escalationTable_edit", function (obj) {
+        let item = obj.item;
+        self.$refs.appBuilder.setModelData("escalationModalForm", {
+          ...item,
+          ...{
+            jobType: {
+              url: 'lookup/get/category/jobType',
+              list: [
+                {
+                  text: (item.jobType !== null) ? item.jobType.arValue : "",
+                  value: (item.jobType !== null) ? item.jobType.key : "",
+                }
+              ],
+              value: (item.jobType !== null) ? item.jobType.key : ""
+            },
+            unitType: {
+              url: 'lookup/get/category/unitType',
+              list: [
+                {
+                  text: (item.unitType !== null) ? item.unitType.arValue : "",
+                  value: (item.unitType !== null) ? item.unitType.key : "",
+                }
+              ],
+              value: (item.unitType !== null) ? item.unitType.key : ""
+            },
+          },
+          ...{
+            modalTitle: "Edit Escalation",
+            action: ["edit",]
+          }
+        });
+        self.$observable.fire("escalationModal");
+      });
+
+      self.$observable.subscribe("escalationModal_edit", function (object) {
+        let obj = object.obj;
+        let item = {
+          duration: parseInt(obj.duration),
+          extension: parseInt(obj.extension),
+          jobType: parseInt(obj.jobType.value),
+          unitType: parseInt(obj.unitType.value)
+        };
+        // item.jobType = (Number.isNaN(item.jobType)? obj.jobType.value.value: item.jobType;
+        item.unitType = (Number.isNaN(item.unitType)) ? obj.unitType.value.value : item.unitType;
+        if (obj.id !== null) {
+          http.put("/escalation/update/" + obj.id, item).then(() => {
+            self.$refs.alertComponent._alertSuccess({
+                  type: "success",
+                  message: "Added Successfully"
+                }, () => {
+                  self.$observable.fire("escalationTable_refresh");
+                }
+            )
+          }).catch((err) => {
+            console.error(err);
+          });
+        } else {
+          http.post("/escalation/create", item).then(() => {
+            self.$refs.alertComponent._alertSuccess({
+                  type: "success",
+                  message: "Edited Successfully"
+                }, () => {
+                  self.$observable.fire("escalationTable_refresh");
+                }
+            )
+          }).catch((err) => {
+            console.error(err);
+          });
+        }
       });
     },
   },

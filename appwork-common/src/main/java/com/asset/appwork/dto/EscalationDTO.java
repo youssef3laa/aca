@@ -24,16 +24,16 @@ public class EscalationDTO {
         this.id = id;
     }
 
-    public String getDuration() {
-        return duration.toString();
+    public Integer getDuration() {
+        return duration;
     }
 
     public void setDuration(Integer duration) {
         this.duration = duration;
     }
 
-    public String getExtension() {
-        return extension.toString();
+    public Integer getExtension() {
+        return extension;
     }
 
     public void setExtension(Integer extension) {
