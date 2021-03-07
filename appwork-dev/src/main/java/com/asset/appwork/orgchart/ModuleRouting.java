@@ -28,10 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -69,17 +66,51 @@ public class ModuleRouting {
         String type = "";
         String component = "", config = "", readonlyComponent = "";
         String subBP = "";
+        List<String> typeCodes = new ArrayList<>();
         HashMap<String, String> nextStep = new HashMap<>();
         HashMap<String, List<String>> nextPhase = new HashMap<>();
         HashMap<String, T> extraData = new HashMap<>();
     }
 
-    private <T> RoutingConfig generateRoutingConfig(T outputSchema) throws IOException {
-        String filePath = ((OutputSchema) outputSchema).getProcessFilePath(environment.getProperty("process.config"));
+    private RoutingConfig generateRoutingConfig(String process) throws IOException {
+        String filePath = environment.getProperty("process.config") + "\\" + process + ".json";
         String config = SystemUtil.readFile(filePath);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(config);
         return objectMapper.convertValue(jsonNode, RoutingConfig.class);
+    }
+
+    private <T> RoutingConfig generateRoutingConfig(T outputSchema) throws IOException {
+        return generateRoutingConfig(((OutputSchema) outputSchema).getProcess());
+    }
+
+    public String getDirection(Long requestId, String userTypeCode, String unitTypeCode) throws AppworkException{
+        try {
+            Optional<RequestEntity> requestEntity = requestRepository.findById(requestId);
+            if(requestEntity.isPresent()){
+                RoutingConfig routingConfig = generateRoutingConfig(requestEntity.get().getProcess());
+                if(routingConfig.getSteps().containsKey(requestEntity.get().getStatus())){
+                    StepConfig stepConfig = routingConfig.getSteps().get(requestEntity.get().getStatus());
+                    if(indexOf(stepConfig.getTypeCodes(),userTypeCode) == indexOf(stepConfig.getTypeCodes(),unitTypeCode)){
+                        return "same";
+                    }else if(indexOf(stepConfig.getTypeCodes(),userTypeCode) < indexOf(stepConfig.getTypeCodes(),unitTypeCode)){
+                        return "down";
+                    }else{
+                        return "up";
+                    }
+                }
+            }
+            throw new AppworkException(ResponseCode.MODULE_ROUTING_FAILURE);
+        }catch (IOException e){
+            throw new AppworkException(e.getMessage(),ResponseCode.MODULE_ROUTING_FAILURE);
+        }
+    }
+
+    private int indexOf(List<String> list,String string){
+        for(int index = 0 ; index <list.size() ; index++){
+            if(list.get(index).contains(string)) return index;
+        }
+        return -1;
     }
 
     @Transactional

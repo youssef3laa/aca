@@ -711,6 +711,15 @@ public class OrgChartService {
         );
     }
 
+    public List<User> getUsersInUnitAndGroupType(Unit unit, GroupType groupType){
+        List<Group> groups = getGroupsInUnitAndGroupType(unit, groupType);
+        List<User> users = new ArrayList<>();
+        groups.stream().forEach(group -> {
+            users.addAll(getUsersInGroup(group));
+        });
+        return users;
+    }
+
     public List<User> getUsersInGroup(Group group) {
         return userRepository.findByGroup(group);
     }

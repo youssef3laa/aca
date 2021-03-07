@@ -34,6 +34,7 @@ public class RequestEntity {
     String workingUsers;
     String workingRoles;
     String priority;
+    String caseType;
     @Transient
     String displayName;
     @Transient
