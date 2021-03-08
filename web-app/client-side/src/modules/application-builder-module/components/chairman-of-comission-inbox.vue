@@ -1,5 +1,6 @@
 <template>
   <splitpanes style="height: auto; direction: ltr" class="default-theme">
+    
     <pane style="direction: rtl">
       <AppBuilder v-show="sidebarItem == 'viewSubjects'" ref="subjects" :app="subjects"/>
       <AppBuilder v-show="sidebarItem == 'viewSentMemos'" ref="outbox" :app="outbox"/>
