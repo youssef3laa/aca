@@ -17,7 +17,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -524,6 +523,15 @@ public class OrgChartService {
 //        return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode);
     }
 
+    public Group getParentGroupOfUnitAndType(Unit unit, GroupType type) throws AppworkException {
+        return getUnitParent(unit.getName()).getGroup().stream().filter(group -> group.getType() == type)
+                .collect(Collectors.toList()).get(0);
+    }
+
+    public Group getChildGroupOfUnitAndType(Unit unit, GroupType type) throws AppworkException {
+        return getUnitChildren(unit.getName()).get(0).getGroup().stream().filter(group -> group.getType() == type)
+                .collect(Collectors.toList()).get(0);
+    }
 //    public Page<Group> getGroupChildrenRecursivelyFilteredByUnitTypeCode(String code, String unitTypeCode, int page, int size) {
 //        return groupRepository.getGroupChildrenRecursivelyFilteredByUnitTypeCode(code, unitTypeCode, PageRequest.of(page, size, Sort.by("id));
 //    }
