@@ -2,19 +2,23 @@ package com.asset.appwork.model;
 
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.Date;
 
+@DynamicUpdate
 @Entity
 @Data
 @Table(name = "AssetGeneralACAACA_Entity_signature")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
 public class Signature {
 

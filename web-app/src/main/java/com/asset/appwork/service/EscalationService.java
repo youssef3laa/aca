@@ -10,27 +10,18 @@ import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.repository.EscalationRepository;
 import com.asset.appwork.repository.LookupRepository;
 import com.asset.appwork.util.SystemUtil;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -48,7 +39,7 @@ public class EscalationService {
     public EscalationDTO createEscalation(Account account, String props) throws AppworkException, JsonProcessingException {
         return getEscalationDTO(
                 new Entity(account, SystemUtil.generateRestAPIBaseUrl(env, env.getProperty("aca.general.solution")), "ACA_Entity_Escalation")
-                .create(props)
+                        .create(props)
         );
     }
 
@@ -91,7 +82,7 @@ public class EscalationService {
         return escalationDTOList;
     }
 
-    public List<EscalationDTO> getAllEscalationJobTypes() throws AppworkException {
+    public List<EscalationDTO> getAllEscalationJobTypes(String search) throws AppworkException {
         List<EscalationDTO> escalationDTOList = new ArrayList<>();
         Page<Lookup> jobTypes = lookupRepository.findCategoryValues("jobType", "", PageRequest.of(0, Integer.MAX_VALUE, Sort.by("id")));
         jobTypes.forEach(jobType -> {
@@ -102,32 +93,40 @@ public class EscalationService {
                 e.printStackTrace();
             }
         });
-        return escalationDTOList;
+        return searchInEscalationDTO(escalationDTOList, search);
     }
 
-//    public Page<Lookup> getAllEscalationJobTypes(int page, int size) throws AppworkException {
-//        Page<Lookup> lookupPage = lookupRepository.findCategoryValues("jobType", "", PageRequest.of(page, size, Sort.by("id")));
-//        lookupPage.getContent().forEach(jobType -> {
-//            AtomicReference<Integer> duration = new AtomicReference<>(0);
-//            escalationRepository.findByJobTypeKey(Integer.parseInt(jobType.getKey())).ifPresent((escalation -> duration.set(escalation.getDuration())));
-//            jobType.setType(duration.get());
-//        });
-//        return lookupPage;
-//    }
+    public Page<EscalationDTO> getAllEscalationJobTypes(String search, int page, int size) throws AppworkException {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
+        Page<Lookup> lookupPage = lookupRepository.findCategoryValues("jobType", "", pageable);
+        List<EscalationDTO> escalationDTOList = new ArrayList<>();
 
-    public Lookup getJobTitleByKey(Integer key) throws AppworkException {
+        lookupPage.getContent().forEach(jobType -> {
+            try {
+                escalationDTOList.add(JobTypeToEscalationDTO(jobType));
+            } catch (AppworkException e) {
+                e.printStackTrace();
+            }
+        });
+
+        return new PageImpl<>(searchInEscalationDTO(
+                escalationDTOList,
+                search), pageable, lookupPage.getTotalElements());
+    }
+
+    private Lookup getJobTitleByKey(Integer key) throws AppworkException {
         return lookupRepository.findByCategoryAndKey("jobType", key.toString()).orElseThrow(
                 () -> new AppworkException("Could not get Lookup Entity of category: jobType and key: " + key, ResponseCode.READ_ENTITY_FAILURE)
         );
     }
 
-    public Lookup getUnitTypeByKey(Integer key) throws AppworkException {
+    private Lookup getUnitTypeByKey(Integer key) throws AppworkException {
         return lookupRepository.findByCategoryAndKey("unitType", key.toString()).orElseThrow(
                 () -> new AppworkException("Could not get Lookup Entity of category: unitType and key: " + key, ResponseCode.READ_ENTITY_FAILURE)
         );
     }
 
-    public EscalationDTO escalationToDTO(Escalation escalation) throws AppworkException {
+    private EscalationDTO escalationToDTO(Escalation escalation) throws AppworkException {
         EscalationDTO escalationDTO = new EscalationDTO();
         escalationDTO.setId(escalation.getId());
         escalationDTO.setDuration(escalation.getDuration());
@@ -137,11 +136,11 @@ public class EscalationService {
         return escalationDTO;
     }
 
-    public EscalationDTO JobTypeToEscalationDTO(Lookup jobType) throws AppworkException {
+    private EscalationDTO JobTypeToEscalationDTO(Lookup jobType) throws AppworkException {
         AtomicReference<EscalationDTO> escalationDTO = new AtomicReference<>();
         Optional<Escalation> escalation = escalationRepository.findByJobType(Integer.parseInt(jobType.getKey()));
 
-        escalation.ifPresentOrElse(esc ->  {
+        escalation.ifPresentOrElse(esc -> {
             try {
                 escalationDTO.set(escalationToDTO(esc));
             } catch (AppworkException e) {
@@ -159,38 +158,21 @@ public class EscalationService {
         return escalationDTO.get();
     }
 
-    public Escalation fromEscalationString(String json) throws JsonProcessingException, AppworkException {
-        ObjectMapper mapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(Escalation.class, new EscalationDeserializer());
-        mapper.registerModule(module);
-        try {
-            return mapper.readValue(json, Escalation.class);
-        } catch (NullPointerException e) {
-            throw new AppworkException("Unknown Properties in JSON", ResponseCode.BAD_REQUEST);
-        }
-    }
-
-    private class EscalationDeserializer extends StdDeserializer<Escalation> {
-
-        public EscalationDeserializer() {
-            this(null);
-        }
-
-        public EscalationDeserializer(Class<?> cls) {
-            super(cls);
-        }
-
-        @SneakyThrows
-        @Override
-        public Escalation deserialize(JsonParser parser, DeserializationContext context) throws IOException {
-            JsonNode root = parser.getCodec().readTree(parser);
-            Escalation escalation = new Escalation();
-            escalation.setDuration(root.get("duration").asInt());
-            escalation.setExtension(root.get("extension").asInt());
-            escalation.setJobType(root.get("jobType").asInt());
-            escalation.setUnitType(root.get("unitType").asInt());
-            return escalation;
-        }
+    private List<EscalationDTO> searchInEscalationDTO(List<EscalationDTO> escalationDTOItems, String search) {
+        return
+                escalationDTOItems.stream().filter(
+                        escalationDTO -> (
+                                escalationDTO.getDuration().toString().contains(search) ||
+                                escalationDTO.getExtension().toString().contains(search) ||
+                                (
+//                                        escalationDTO.getJobType() != null &&
+                                        escalationDTO.getJobType().getArValue().contains(search)
+                                ) ||
+                                (
+                                    escalationDTO.getUnitType() != null &&
+                                    escalationDTO.getUnitType().getArValue().contains(search)
+                                )
+                        )
+                ).collect(Collectors.toList());
     }
 }

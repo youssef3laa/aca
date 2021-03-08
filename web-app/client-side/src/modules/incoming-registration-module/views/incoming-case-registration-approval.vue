@@ -59,7 +59,7 @@ export default {
                     assignedCN = "cn=HVCC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
                     decision = "sendToVicePresident";
                 } else if (this.inputSchema.stepId === "headOfSCTPViceAgain") {
-                    assignedCN = "cn=HTCS,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+                    assignedCN = "cn=SCOC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
                     decision = "sendToPresident";
                 }
                 this.completeStep({
@@ -184,10 +184,10 @@ export default {
                         decision = approvalCard.approval.selected.type;
                         switch (decision) {
                             case "goToVice":
-                                assignedCN = "cn=HTCA,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+                                assignedCN = "cn=SVCC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
                                 break;
                             case "goToPresident":
-                                assignedCN = "cn=HTCA,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+                                assignedCN = "cn=SCOC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
                                 break;
                             case "goToAssistant":
                                 assignedCN = "";

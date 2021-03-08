@@ -24,6 +24,7 @@
         {
             "text": "",
             "value": "action",
+            "align": "end",
             "sortable": false
         }
     ],

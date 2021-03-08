@@ -11,10 +11,11 @@ import formPageMixin from "../../../mixins/formPageMixin";
 import historyMixin from "../../history-module/mixin/historyMixin";
 import incomingRegistrationMixin from "../mixins/incomig-registration-mixin";
 import opinionsMixin from "../../../mixins/opinionsMixin";
+import signatureMixin from "../../graphs-module/mixin/signatureMixin";
 
 export default {
     name: "incomingCaseRegistration-signature-enter",
-    mixins: [formPageMixin, historyMixin, incomingRegistrationMixin, opinionsMixin],
+    mixins: [formPageMixin, historyMixin, incomingRegistrationMixin, opinionsMixin, signatureMixin],
     components: {AppBuilder},
     data() {
         return {
@@ -28,14 +29,29 @@ export default {
         this.inputSchema = taskData.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment
         await this.claimTask(this.taskId, this.inputSchema.requestId)
         this.loadForm(this.inputSchema.config, this.formLoaded)
-        this.$observable.subscribe("complete-step", () => {
+        this.$observable.subscribe("complete-step", async () => {
             let approvalCard = this.$refs.appBuilder.getModelData("approvalForm");
             let assignedCN, decision = approvalCard.approval.decision;
             if (this.inputSchema.stepId === "viceSecretaryAgain") {
                 assignedCN = "cn=HTVS,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+                let signatureFormModelData = this.$refs.appBuilder.getModelData("signatureForm");
+                console.log(signatureFormModelData);
+                await this.updateSignature({
+                    id: this.inputSchema.extraData.signatureEntityId,
+                    viceOrHead: 2,
+                    signatureTxt: signatureFormModelData.signature.signatureTxt
+                }, false)
             } else if (this.inputSchema.stepId === "presidentSecretaryAgain") {
                 assignedCN = "cn=HTCS,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+                let signatureFormModelData = this.$refs.appBuilder.getModelData("signatureForm");
+                console.log(signatureFormModelData);
+                await this.updateSignature({
+                    id: this.inputSchema.extraData.signatureEntityId,
+                    viceOrHead: 1,
+                    signatureTxt: signatureFormModelData.signature.signatureTxt
+                },false);
             }
+            console.log(assignedCN, decision);
             this.completeStep({
                 taskId: this.taskId,
                 requestId: this.inputSchema.requestId,
@@ -79,11 +95,41 @@ export default {
                         "complete"
                     ]
                 })
-            }else if (this.inputSchema.stepId === "presidentSecretaryAgain") {
+
+                console.log({
+                    signature: {
+                        incomingEntityId: this.inputSchema.entityId,
+                        viceOrHead: 2,
+                        requestId: this.inputSchema.requestId,
+                        readonly: true,
+                        enterTxt: true
+                    }
+                });
+                this.$refs.appBuilder.setModelData("signatureForm", {
+                    signature: {
+                        incomingEntityId: this.inputSchema.entityId,
+                        viceOrHead: 2,
+                        requestId: this.inputSchema.requestId,
+                        readonly: true,
+                        signatureTxt: "",
+                        enterTxt: true
+                    }
+                })
+            } else if (this.inputSchema.stepId === "presidentSecretaryAgain") {
                 this.$refs.appBuilder.setSectionValue("actionsSection", {
                     "actions": [
                         "complete"
                     ]
+                })
+                this.$refs.appBuilder.setModelData("signatureForm", {
+                    signature: {
+                        incomingEntityId: this.inputSchema.entityId,
+                        viceOrHead: 1,
+                        requestId: this.inputSchema.requestId,
+                        readonly: true,
+                        signatureTxt: "",
+                        enterTxt: true
+                    }
                 })
             }
 
@@ -93,7 +139,7 @@ export default {
             this.$refs.appBuilder.setModelData("historyTable", {historyTable: this.createHistoryTableModel(this.inputSchema.requestId)})
             this.$refs.appBuilder.setModelData("opinionsTable", {opinionsTable: this.createOpinionTableModel(this.inputSchema.requestId)})
             this.$refs.appBuilder.setModelData("memorandumForm", {memorandum: {requestId: this.inputSchema.requestId}})
-            this.$refs.appBuilder.setModelData("signatureForm", {signature: {requestId: this.inputSchema.requestId}})
+            // this.$refs.appBuilder.setModelData("signatureForm", {signature: {requestId: this.inputSchema.requestId}})
 
             let incomingRegistration = await this.readIncomingRegistration(this.inputSchema.entityId)
             this.$refs.appBuilder.setModelData("mainData", incomingRegistration)

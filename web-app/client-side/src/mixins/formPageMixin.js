@@ -3,35 +3,35 @@ import router from "../router";
 
 export default {
     methods: {
-        loadForm: function (formName,callBack,appBuilder) {
-            http.get("/user/form/"+formName)
+        loadForm: function (formName, callBack, appBuilder) {
+            http.get("/user/form/" + formName)
                 .then((response) => {
-                    if(appBuilder) this.$refs[appBuilder].setAppData(response.data.data.app);
+                    if (appBuilder) this.$refs[appBuilder].setAppData(response.data.data.app);
                     else this.$refs.appBuilder.setAppData(response.data.data.app);
-                    if(callBack){
+                    if (callBack) {
                         callBack();
                     }
                 })
                 .catch((error) => console.error(error));
         },
-        loadView: async function (viewPath){
-            try{
+        loadView: async function (viewPath) {
+            try {
                 let response = await http.get('/user/view?' + new URLSearchParams({key: viewPath}));
                 return response.data.data;
             } catch (error) {
                 console.error(error);
             }
         },
-        claimTask: async function (taskId , requestId) {
-            try{
+        claimTask: async function (taskId, requestId) {
+            try {
                 let response = await http.post('/workflow/task/claim', {taskId, requestId});
                 console.log("ClaimTask Response:", response);
-            } catch (error){
+            } catch (error) {
                 console.error(error)
             }
         },
         getTaskData: async function (taskId) {
-            try{
+            try {
                 let response = await http.get('/workflow/task/data?taskId=' + taskId);
                 console.log("TaskData Response: ", response);
                 return response.data.data.Body.GetTaskResponse.tuple.old.Task;
@@ -39,47 +39,46 @@ export default {
                 console.error(error);
             }
         },
-        getRequest: async function(){
-            if(localStorage.getItem("requestId")){
+        getRequest: async function () {
+            if (localStorage.getItem("requestId")) {
                 console.log(localStorage.getItem("requestId"))
-                let response = await http.get('/request/read/'+ localStorage.getItem("requestId"))
+                let response = await http.get('/request/read/' + localStorage.getItem("requestId"))
                 console.log("Request Response: ", response)
                 return response.data.data
-            }else{
-                try{
+            } else {
+                try {
                     let response = await http.get('/request/create/temp')
                     console.log("Request Response: ", response)
-                    localStorage.setItem("requestId",response.data.data.id)
+                    localStorage.setItem("requestId", response.data.data.id)
                     return response.data.data
                 } catch (error) {
                     console.error(error);
                 }
             }
         },
-        readRequest: async function(requestId) {
-            try{
-                let response = await http.get('/request/read/'+requestId);
+        readRequest: async function (requestId) {
+            try {
+                let response = await http.get('/request/read/' + requestId);
                 return response.data.data;
             } catch (error) {
                 console.error(error);
             }
         },
-        readEntity: async function(entityName, entityId) {
-            try{
-                let response = await http.get('/entity/read?entityName='+ entityName +'&entityId='+entityId);
+        readEntity: async function (entityName, entityId) {
+            try {
+                let response = await http.get('/entity/read?entityName=' + entityName + '&entityId=' + entityId);
                 console.log("EntityData Response: ", response);
                 return response.data.data;
             } catch (error) {
                 console.error(error);
             }
         },
-        getLookupByCategoryAndKey: async function(category,key){
+        getLookupByCategoryAndKey: async function (category, key) {
             try {
                 var response = await http.get("lookup/get/category/" + category + "/key/" + key);
-                console.log("getLookupResponse",response.data);
+                console.log("getLookupResponse", response.data);
                 return response.data.data;
-            }
-            catch (error) {
+            } catch (error) {
                 console.log(error);
             }
         },
@@ -94,14 +93,14 @@ export default {
         },
         getTasks: function (publish) {
             http.get("workflow/human/tasks").then((response) => {
-              var data = response.data.data;
-              this.$observable.fire(publish, {
-                type: "modelUpdate",
-                model: data,
-              });
+                var data = response.data.data;
+                this.$observable.fire(publish, {
+                    type: "modelUpdate",
+                    model: data,
+                });
             });
-          },
-        checkParallelTasksFinished: async function(requestId){
+        },
+        checkParallelTasksFinished: async function (requestId) {
             try {
                 let response = await http.get("parallel/finished/" + requestId);
                 console.log("Parallel Tasks Finished", response.data);
@@ -110,7 +109,7 @@ export default {
                 console.log(error);
             }
         },
-        initiateProcess: function (data){
+        initiateProcess: function (data) {
             http.post("/process/initiate", data)
                 .then((response) => {
                     console.log(response);
@@ -120,7 +119,11 @@ export default {
                 })
                 .catch((error) => console.error(error));
         },
-        completeStep: function(data){
+        completeStep: function (data) {
+            // eslint-disable-next-line no-prototype-builtins
+            if (!(data.hasOwnProperty("extraData"))) {
+                data.extraData = this.inputSchema.extraData;
+            }
             http.post("/process/complete", data)
                 .then((response) => {
                     console.log(response);
@@ -134,7 +137,7 @@ export default {
                 })
                 .catch((error) => console.error(error));
         },
-        completeMultipleSteps: function(data,callBack){
+        completeMultipleSteps: function (data, callBack) {
             http.post("/process/multiple/complete", data)
                 .then((response) => {
                     console.log(response);
@@ -144,11 +147,11 @@ export default {
                         type: "success",
                         message: "actionHasBeenSentSuccessfully"
                     }, () => {
-                        if(callBack){
+                        if (callBack) {
                             callBack()
                         }
                     });
-                    
+
                 })
                 .catch((error) => console.error(error));
         }

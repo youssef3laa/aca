@@ -56,8 +56,14 @@ export default {
                 this.$refs.appBuilder.setModelData("historyTable", {historyTable: this.createHistoryTableModel(this.inputSchema.requestId)})
                 this.$refs.appBuilder.setModelData("opinionsTable", {opinionsTable: this.createOpinionTableModel(this.inputSchema.requestId)})
                 this.$refs.appBuilder.setModelData("memorandumForm", {memorandum: {requestId: this.inputSchema.requestId}})
-                this.$refs.appBuilder.setModelData("signatureForm", {signature: {requestId: this.inputSchema.requestId}})
-
+                this.$refs.appBuilder.setModelData("signatureForm", {
+                    signature: {
+                        incomingEntityId: this.inputSchema.entityId,
+                        readonly: true,
+                        pastSignaturesOnly:true,
+                        requestId: this.inputSchema.requestId
+                    }
+                })
                 let incomingRegistration = await this.readIncomingRegistration(this.inputSchema.entityId)
                 this.$refs.appBuilder.setModelData("mainData", incomingRegistration)
                 let incomingCase = await this.readIncomingCase(incomingRegistration.jobEntityId)

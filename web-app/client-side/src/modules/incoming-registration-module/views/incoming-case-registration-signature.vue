@@ -70,43 +70,95 @@ export default {
         })
         this.$observable.subscribe("send-for-confirmation", () => {
             let approvalCard = this.$refs.appBuilder.getModelData("approvalForm");
-
-            let assignedCN, decision = approvalCard.approval.decision;
-            if (this.inputSchema.stepId === "presidentSecretary") {
-                assignedCN = "cn=HTCA,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
-            } else if (this.inputSchema.stepId === "headOfGRPPresident") {
-                assignedCN = "cn=HTCS,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
-                decision = "submitForConfirmation";
-            } else if (this.inputSchema.stepId === "vicePresident") {
-                assignedCN = "cn=HTCA,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
-            } else if (this.inputSchema.stepId === "headOfSECPresident") {
-                assignedCN = "cn=HCOC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
-                decision = "sendToPresident";
-            } else if (this.inputSchema.stepId === "president") {
-                assignedCN = "cn=HTCA,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
-            }
-            this.completeStep({
+            let shouldCompleteStep = true;
+            // let  decision = approvalCard.approval.decision;
+            let objectToCompleteStepBy = {
                 taskId: this.taskId,
                 requestId: this.inputSchema.requestId,
                 stepId: this.inputSchema.stepId,
                 process: this.inputSchema.process,
                 parentHistoryId: this.inputSchema.parentHistoryId,
                 code: approvalCard.approval.selected.code,
-                assignedCN: assignedCN,
-                decision: decision,
+                // assignedCN: assignedCN,
+                decision: approvalCard.approval.decision,
                 comment: approvalCard.approval.inputs.comment,
                 opinion: approvalCard.approval.inputs.opinion,
+                extraData: this.inputSchema.extraData,
                 receiverType: approvalCard.approval.selected.receiverType
-            })
+            };
+            if (this.inputSchema.stepId === "presidentSecretary") {
+                objectToCompleteStepBy.assignedCN = "cn=HTCA,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+            } else if (this.inputSchema.stepId === "headOfGRPPresident") {
+                objectToCompleteStepBy.assignedCN = "cn=HTCS,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+                objectToCompleteStepBy.decision = "submitForConfirmation";
+            } else if (this.inputSchema.stepId === "vicePresident") {
+                shouldCompleteStep = false;
+                objectToCompleteStepBy.assignedCN = "cn=SVCC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+
+                this.validateAndSaveSignature(({status, signatureEntityId}) => {
+                    if (!status) {
+                        this.$refs.alertComponent._alertSuccess({
+                            type: "error",
+                            message: 'pleaseEnterSignature',
+                        })
+                        return;
+                    }
+                    if (objectToCompleteStepBy.extraData == undefined || objectToCompleteStepBy.extraData == null)
+                        objectToCompleteStepBy.extraData = {signatureEntityId};
+                    else {
+                        objectToCompleteStepBy.extraData.signatureEntityId = signatureEntityId;
+                    }
+                    console.log(objectToCompleteStepBy);
+                    this.completeStep(objectToCompleteStepBy)
+                })
+            } else if (this.inputSchema.stepId === "headOfSECPresident") {
+                objectToCompleteStepBy.assignedCN = "cn=HCOC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+                objectToCompleteStepBy.decision = "sendToPresident";
+            } else if (this.inputSchema.stepId === "president") {
+                shouldCompleteStep = false;
+                objectToCompleteStepBy.assignedCN = "cn=SCOC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+                this.validateAndSaveSignature(({status}) => {
+                    if (!status) {
+                        this.$refs.alertComponent._alertSuccess({
+                            type: "error",
+                            message: 'pleaseEnterSignature',
+                        })
+                        return;
+                    }
+                    this.completeStep(objectToCompleteStepBy)
+                })
+            }
+            if (shouldCompleteStep) {
+                this.completeStep(objectToCompleteStepBy)
+            }
+
         })
     },
     methods: {
+        validateAndSaveSignature: function (callback) {
+            this.$observable.fire("save-signature", {
+                callback: ({status, signatureEntityId}) => {
+                    if (callback) callback({status, signatureEntityId});
+                },
+                signatureEntityId: this.inputSchema?.extraData?.signatureEntityId
+            })
+        },
         formLoaded: async function () {
             if (this.inputSchema.stepId === "presidentSecretary") {
                 this.$refs.appBuilder.setSectionValue("actionsSection", {
                     "actions": [
                         "complete"
                     ]
+                })
+
+                this.$refs.appBuilder.setModelData("signatureForm", {
+                    signature: {
+                        incomingEntityId: this.inputSchema.entityId,
+                        viceOrHead: 2,
+                        readonly: true,
+                        pastSignaturesOnly:true,
+                        requestId: this.inputSchema.requestId
+                    }
                 })
             } else if (this.inputSchema.stepId === "headOfGRPPresident") {
                 this.$refs.appBuilder.setSectionValue("actionsSection", {
@@ -116,11 +168,27 @@ export default {
                         "sendForConfirmation"
                     ]
                 })
+                this.$refs.appBuilder.setModelData("signatureForm", {
+                    signature: {
+                        incomingEntityId: this.inputSchema.entityId,
+                        viceOrHead: 1,
+                        readonly: true,
+                        pastSignaturesOnly: true,
+                        requestId: this.inputSchema.requestId
+                    }
+                })
             } else if (this.inputSchema.stepId === "vicePresident") {
                 this.$refs.appBuilder.setSectionValue("actionsSection", {
                     "actions": [
                         "doneViewing"
                     ]
+                })
+                this.$refs.appBuilder.setModelData("signatureForm", {
+                    signature: {
+                        incomingEntityId: this.inputSchema.entityId,
+                        viceOrHead: 2,
+                        requestId: this.inputSchema.requestId
+                    }
                 })
             } else if (this.inputSchema.stepId === "headOfSECPresident") {
                 this.$refs.appBuilder.setSectionValue("actionsSection", {
@@ -129,11 +197,27 @@ export default {
                         "sendToChairmanOfCommission"
                     ]
                 })
+                this.$refs.appBuilder.setModelData("signatureForm", {
+                    signature: {
+                        incomingEntityId: this.inputSchema.entityId,
+                        viceOrHead: 1,
+                        readonly: true,
+                        pastSignaturesOnly: true,
+                        requestId: this.inputSchema.requestId
+                    }
+                })
             } else if (this.inputSchema.stepId === "president") {
                 this.$refs.appBuilder.setSectionValue("actionsSection", {
                     "actions": [
                         "doneViewing"
                     ]
+                })
+                this.$refs.appBuilder.setModelData("signatureForm", {
+                    signature: {
+                        incomingEntityId: this.inputSchema.entityId,
+                        viceOrHead: 1,
+                        requestId: this.inputSchema.requestId
+                    }
                 })
             } else if (this.inputSchema.stepId === "headOfSECPresidentAgain") {
                 this.$refs.appBuilder.setSectionValue("actionsSection", {
@@ -142,6 +226,15 @@ export default {
                         "sendToVicePresident",
                         "sendToTheTechnicalOffice"
                     ]
+                })
+                this.$refs.appBuilder.setModelData("signatureForm", {
+                    signature: {
+                        incomingEntityId: this.inputSchema.entityId,
+                        viceOrHead: 1,
+                        readonly: true,
+                        pastSignaturesOnly: true,
+                        requestId: this.inputSchema.requestId
+                    }
                 })
             } else if (this.inputSchema.stepId === "headOfGRPPresidentAgain") {
                 this.$refs.appBuilder.setSectionValue("actionsSection", {
@@ -152,6 +245,24 @@ export default {
                         "sendToOtherAdministration"
                     ]
                 })
+                this.$refs.appBuilder.setModelData("signatureForm", {
+                    signature: {
+                        incomingEntityId: this.inputSchema.entityId,
+                        viceOrHead: 1,
+                        readonly: true,
+                        pastSignaturesOnly: true,
+                        requestId: this.inputSchema.requestId
+                    }
+                })
+            } else {
+                this.$refs.appBuilder.setModelData("signatureForm", {
+                    signature: {
+                        incomingEntityId: this.inputSchema.entityId,
+                        readonly: true,
+                        pastSignaturesOnly: true,
+                        requestId: this.inputSchema.requestId
+                    }
+                })
             }
 
             this.$refs.appBuilder.disableSection("mainData");
@@ -160,7 +271,7 @@ export default {
             this.$refs.appBuilder.setModelData("historyTable", {historyTable: this.createHistoryTableModel(this.inputSchema.requestId)})
             this.$refs.appBuilder.setModelData("opinionsTable", {opinionsTable: this.createOpinionTableModel(this.inputSchema.requestId)})
             this.$refs.appBuilder.setModelData("memorandumForm", {memorandum: {requestId: this.inputSchema.requestId}})
-            this.$refs.appBuilder.setModelData("signatureForm", {signature: {requestId: this.inputSchema.requestId}})
+
 
             let incomingRegistration = await this.readIncomingRegistration(this.inputSchema.entityId)
             this.$refs.appBuilder.setModelData("mainData", incomingRegistration)
@@ -218,6 +329,7 @@ export default {
                 code: approvalCard.approval.selected.code,
                 assignedCN: assignedCN,
                 decision: decision,
+                extraData: this.inputSchema.extraData,
                 comment: approvalCard.approval.inputs.comment,
                 opinion: approvalCard.approval.inputs.opinion,
                 receiverType: approvalCard.approval.selected.receiverType
