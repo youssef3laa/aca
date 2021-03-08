@@ -46,7 +46,19 @@
     >
  
       <template v-slot:item.action="{ item }">
-        <v-menu offset-y left allow-overflow max-width="300">
+        <v-btn v-if="field.actions.length == 1"
+                elevation="0"
+                v-bind="attrs"
+                v-on="on"
+                style="min-height: 24px"
+                width="24px"
+                v-on:click="handleAction(item, field.actions[0])">
+          <v-icon v-if="field.actions[0] == 'edit'" style="font-size: medium"> far fa-edit </v-icon>
+          <v-icon v-if="field.actions[0] == 'delete'" style="font-size: medium"> far fa-trash-alt </v-icon>
+          <v-icon v-if="field.actions[0] == 'view'" style="font-size: medium"> fas fa-expand-arrows-alt </v-icon>
+          <v-icon v-else style="font-size: medium"> {{field.actions[0].icon}} </v-icon>
+        </v-btn>
+        <v-menu v-if="field.actions.length > 1" offset-y left allow-overflow max-width="300">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               elevation="0"
