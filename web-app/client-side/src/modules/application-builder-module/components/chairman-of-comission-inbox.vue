@@ -1,6 +1,9 @@
 <template>
   <splitpanes style="height: auto; direction: ltr" class="default-theme">
+    
     <pane style="direction: rtl">
+      <LabelComponent></LabelComponent>
+
       <AppBuilder
         v-show="sidebarItem == 'viewSubjects'"
         ref="subjects"
@@ -31,11 +34,12 @@ import { Splitpanes, Pane } from "splitpanes";
 import AppBuilder from "../builders/app-builder";
 import Sidebar from "../../application-builder-module/components/sidebar-component";
 import formPageMixin from "../../../mixins/formPageMixin";
+import LabelComponent from "./label-component"
 // import Topbar from "../../application-builder-module/components/topbar-component"
 
 export default {
   mixins: [formPageMixin],
-  components: { Sidebar, Splitpanes, Pane, AppBuilder },
+  components: { Sidebar, Splitpanes, Pane, AppBuilder,LabelComponent },
   props: ["val", "field"],
   mounted() {
     console.log("app", JSON.stringify(this.app));
