@@ -19,9 +19,9 @@ export default {
                 if(userDetails.groups[0]){
                     let group = userDetails.groups[0]
                     let unitCode = userDetails.groups[0].unit.unitCode
-                    if(unitCode == "COC" && group.type === "HEAD") homeComponent = HomePageCOC
+                    if((unitCode == "COC" || unitCode == "VCC") && group.type === "HEAD") homeComponent = HomePageCOC
                     else
-                    if((unitCode == "COC" || unitCode == "VCOC")  && group.type === "SECRETARY") homeComponent = HomePageSecretary
+                    if((unitCode == "COC" || unitCode == "VCC")  && group.type === "SECRETARY") homeComponent = HomePageSecretary
                     else if((unitCode == "TVA" || unitCode == "TCA") && group.type === "HEAD") homeComponent = HomePageTechnicalOfficeHead
                     else if((unitCode == "TVS" || unitCode == "TCS") && group.type === "HEAD") homeComponent = HomePageTechnicalOfficeSectorHead
                 }

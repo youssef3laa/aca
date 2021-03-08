@@ -8,10 +8,6 @@
         "value": "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.requestNumber"
       },
       {
-        "text": "incomingDate",
-        "value": "DeliveryDate"
-      },
-      {
         "text": "subject",
         "value": "TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.subject"
       },
@@ -20,12 +16,8 @@
         "value": "Sender.unit"
       },
       {
-        "text": "chairmanOfCommisionSignature",
-        "value": "chairmanOfCommisionSignature"
-      },
-      {
-        "text": "viceChairmanOfCommisionSignature",
-        "value": "viceChairmanOfCommisionSignature"
+        "text": "date",
+        "value": "DeliveryDate"
       },
       {
         "text": "importantAndImmediate",
