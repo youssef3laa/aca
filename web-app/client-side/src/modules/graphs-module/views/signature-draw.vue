@@ -1,9 +1,10 @@
 <template>
     <span>
         <AlertComponent ref="alertComponent"></AlertComponent>
-        <v-card v-if="readonly !== true"
-                :flat="true"
-                style="margin: 0 0 40px 0; border: thin solid rgba(0, 0, 0, 0.12);">
+        <v-card
+            v-if="!pastSignaturesOnly"
+            :flat="true"
+            style="margin: 0 0 40px 0; border: thin solid rgba(0, 0, 0, 0.12);">
             <div class="container">
                 <v-alert icon="mdi-draw"
                          outlined
@@ -12,41 +13,81 @@
                     <p style="font-size: 16px; color: black">
                         <span style="font-size: 20px; color: #609ec1">
                             {{ $t('signature') }} </span><br/>
-                        <span v-t="'this-field-for-notes'"></span> {{ displayName }}
+                        <span v-t="'this-signature-belongs-to'"></span> {{
+                            viceOrHead == 1 ? $t('chairmanOfCommision') : $t('viceChairmanOfCommision')
+                        }}
                     </p>
                 </v-alert>
 
                 <span>
-                   <div class="col-12 mt-2"
-                        style="padding:0 !important; ">
-                    <VueSignaturePad id="signature"
-                                     ref="signaturePad"
-                                     :options="options"
-                                     height="600px"
-                                     width="100%"/>
-                </div>
-                <v-row style="padding: 10px">
-                    <v-btn color="#07689F"
-                           style="background-color: #f2f7fa; margin: 10px"
-                           text
-                           @click="clear">{{ $t('clear') }}
-                    </v-btn>
-                    <v-btn color="#07689F"
-                           style="background-color: #f2f7fa; margin: 10px"
-                           text
-                           @click="undo">{{ $t('cancel') }}
-                    </v-btn>
-                    <v-btn color="#07689F"
-                           style="background-color: #f2f7fa; margin: 10px"
-                           text
-                           @click="save">{{ $t('save') }}
-                    </v-btn>
-                </v-row>
+                    <div class="col-12 mt-2"
+                         style="padding:0 !important; ">
+                        <span v-if="!readonly">
+                             <VueSignaturePad
+                                 id="signature"
+                                 ref="signaturePad"
+                                 :options="options"
+                                 height="600px"
+                                 width="100%"/>
+                        </span>
+
+                        <span v-else>
+
+                            <v-img :src="currentShownSignautre"
+                                   height="600px"
+                                   style="border: 2px solid #aaaaaa;
+                                    border-radius: 5px;"
+                                   width="100%">
+
+                            </v-img>
+                        </span>
+
+                    </div>
+                    <v-row v-if="!readonly" style="padding: 10px;justify-content: center">
+                        <v-btn color="#07689F"
+                               style="background-color: #f2f7fa; margin: 10px"
+                               text
+                               @click="clear">{{ $t('clear') }}
+                        </v-btn>
+                        <v-btn color="#07689F"
+                               style="background-color: #f2f7fa; margin: 10px"
+                               text
+                               @click="undo">{{ $t('cancel') }}
+                        </v-btn>
+                        <!--                    <v-btn color="#07689F"-->
+                        <!--                           style="background-color: #f2f7fa; margin: 10px"-->
+                        <!--                           text-->
+                        <!--                           @click="save">{{ $t('save') }}-->
+                        <!--                    </v-btn>-->
+                    </v-row>
                 </span>
 
             </div>
         </v-card>
-        <v-card :flat="true" style="border-radius: 6px; ">
+        <v-card v-if="enterTxt"
+                outlined>
+            <v-alert icon="far fa-file-alt"
+                     outlined
+                     prominent
+                     style="padding-bottom: 5px"
+                     type="info">
+                <p style="font-size: 16px; color: black">
+                    <span v-t="'signatureText'"
+                          style="font-size: 20px; color: #07689F"></span>
+                    <br/>
+                    <span v-t="'this-field-for-signature'"></span> {{
+                        viceOrHead == 1 ? $t('chairmanOfCommision') : $t('viceChairmanOfCommision')
+                    }}
+                </p>
+            </v-alert>
+            <v-card-text style="padding-top: 0">
+                <textAreaComponent :field="{ name: 'signatureEnter', label: 'signatureText' }"
+                                   @update="onValueChange"></textAreaComponent>
+            </v-card-text>
+        </v-card>
+
+        <v-card :flat="true"
+                style="border-radius: 6px; ">
             <v-overlay :absolute="true"
                        :value="loading">
                 <v-progress-circular indeterminate
@@ -131,41 +172,56 @@
                         <v-container>
                             <v-row style="justify-content: center">
 
-                                <v-col class="attachment-iframe"
-                                       style="margin:1px;height:600px;">
+                                <v-col>
+                                    <div style="margin-bottom: 12px;">تأشيرة السيد رئيس الهيئة</div>
+                                    <div class="attachment-iframe"
+                                         style="height:600px;">
+                                        <div v-if="headImg">
 
-                                    <div v-if="headImg">
+                                            <v-img :src="headImg"
+                                                   alt="headImg"
+                                                   contain
+                                                   height="600"
+                                                   max-width="600"
 
-                                        <img :src="headImg"
-                                             alt="headImg"
-                                             style="height:600px;
-width: 100%;
-                                                   ">
 
+                                            >
+                                            </v-img>
+
+                                        </div>
+
+                                        <v-icon v-else
+                                                color="#9e9e9e"
+                                                style="margin: 10px 10px 0 0; padding: 5px 10px; font-size: 150px;height:600px;max-width: 600px;">
+                                            mdi-file-image-outline
+                                        </v-icon>
                                     </div>
 
-                                    <v-icon v-else
-                                            color="#9e9e9e"
-                                            style="margin: 10px 10px 0 0; padding: 5px 10px; font-size: 150px;height:600px;">
-                                        mdi-file-image-outline
-                                    </v-icon>
                                 </v-col>
 
-                                <v-col class="attachment-iframe"
-                                       style="margin:1px;height:600px;">
+                                <v-col>
+                                    <div style="margin-bottom: 12px;">تأشيرة السيد نائب رئيس الهيئة</div>
 
-                                    <div v-if="viceImg">
-                                        <img :src="viceImg"
-                                             alt="viceImg"
-                                             style="height:600px;
-width: 100%;">
+                                    <div class="attachment-iframe"
+                                         style="height:600px;">
+                                        <div v-if="viceImg">
+
+
+                                            <v-img :src="viceImg"
+                                                   alt="viceImg"
+                                                   contain
+                                                   height="600"
+                                                   max-width="600"
+                                            >
+                                            </v-img>
+                                        </div>
+
+                                        <v-icon v-else
+                                                color="#9e9e9e"
+                                                style="margin: 10px 10px 0 0; padding: 5px 10px; font-size: 150px;height:600px;max-width: 600px;">
+                                            mdi-file-image-outline
+                                        </v-icon>
                                     </div>
-
-                                    <v-icon v-else
-                                            color="#9e9e9e"
-                                            style="margin: 10px 10px 0 0; padding: 5px 10px; font-size: 150px;height:600px;">
-                                        mdi-file-image-outline
-                                    </v-icon>
                                 </v-col>
                             </v-row>
                         </v-container>
@@ -176,15 +232,13 @@ width: 100%;">
                                 :flat="true"
                                 class="mx-auto">
 
-
                             <v-card-subtitle class="v-card__title"
                                              style="color: #9E9E9E">
                                 تأشيرة السيد رئيس الهيئة
                             </v-card-subtitle>
-                            <v-card-text style="color: #1A1A2E" >
-                                {{headTxt}}
+                            <v-card-text style="color: #1A1A2E">
+                                {{ headTxt }}
                             </v-card-text>
-
                         </v-card>
 
                         <v-divider></v-divider>
@@ -196,18 +250,11 @@ width: 100%;">
                                              style="color: #9E9E9E">
                                 تأشيرة السيد نائب رئيس الهيئة
                             </v-card-subtitle>
-
-
                             <v-card-text style="color: #1A1A2E">
-                                {{viceTxt}}
-
+                                {{ viceTxt }}
                             </v-card-text>
-
                         </v-card>
-
-
                     </div>
-
 
                     <div v-if="selectTab.id == 3"
                          id="3">
@@ -224,9 +271,11 @@ width: 100%;">
 import signatureMixin from '../mixin/signatureMixin'
 import userMixin from '../../../mixins/userMixin'
 import OpinionsTable from "../../incoming-registration-module/views/opinions-table";
+import textAreaComponent from "../../application-builder-module/components/textarea-component"
+import debounce from "debounce";
 
 export default {
-    components: {OpinionsTable},
+    components: {OpinionsTable, textAreaComponent},
     data() {
         return {
             signatures: [],
@@ -271,12 +320,23 @@ export default {
             viceImg: null,
             headTxt: null,
             viceTxt: null,
-            displayName: null
+            displayName: null,
+            valid: null,
+            currentShownSignautre: null,
+            initializeDebounce: null
         }
     },
     mixins: [signatureMixin, userMixin],
-    props: ['incomingEntityId', "viceOrHead", "requestId", 'readonly', 'field'],
+    props: ['incomingEntityId', "viceOrHead", "requestId", 'readonly', 'enterTxt', 'pastSignaturesOnly', 'field'],
     methods: {
+        onValueChange: function (obj) {
+            this.$emit('update', {
+                name: this.field.name,
+                value: obj.value,
+                key: "signatureTxt",
+                type: 'inputChange',
+            })
+        },
         selectedTab: function (tab) {
             this.selectTab = tab
             this.selectTab.isActive = true
@@ -292,22 +352,24 @@ export default {
         undo() {
             this.$refs.signaturePad.undoSignature()
         },
+
         async save() {
             const {isEmpty, data} = this.$refs.signaturePad.saveSignature()
             console.log(isEmpty)
 
             try {
-                let createSignatureResponse = await this.createSignature({
+
+                return this.createSignature({
                     data,
                     signatureDate: new Date().toISOString().split("T")[0],
                     viceOrHead: this.viceOrHead,
                     incomingEntityId: this.incomingEntityId
                 });
-                console.log(createSignatureResponse);
-                this.$refs.alertComponent._alertSuccess({
-                    message: 'saveSignatureSuccess',
-                })
-                await this.initializeSignatures();
+                // this.$refs.alertComponent._alertSuccess({
+                //     message: 'saveSignatureSuccess',
+                // }, async () => {
+                //     await this.initializeSignatures();
+                // })
             } catch (e) {
                 this.$refs.alertComponent._alertSuccess({
                     type: "error",
@@ -315,6 +377,15 @@ export default {
                 })
                 console.error(e);
             }
+        },
+        async update(signatureEntityId) {
+            const {isEmpty, data} = this.$refs.signaturePad.saveSignature()
+            console.log(isEmpty);
+            return await this.updateSignature({
+                file: data,
+                id: signatureEntityId,
+                viceOrHead: this.viceOrHead
+            }, true);
         },
         change() {
             this.options = {
@@ -330,10 +401,36 @@ export default {
             this.$refs.signaturePad.clearSignature()
         },
         initializeSignatures: async function () {
+            if (!this.incomingEntityId) return;
             try {
+                let firstSignatureResponse = null;
+                this.loading = true;
                 let getAllSignaturesResponse = await this.getAllSignatures(this.incomingEntityId);
                 this.signatures = getAllSignaturesResponse.data.data;
-                if (this.signatures instanceof Array && this.signatures.length > 0) this.loadSignature(this.signatures[0].id);
+                if (this.signatures instanceof Array && this.signatures.length > 0) {
+                    firstSignatureResponse = await this.loadSignature(this.signatures[0].id);
+                }
+                this.loading = false;
+                if (firstSignatureResponse) {
+                    if (this.readonly) {
+                        if (!this.pastSignaturesOnly) {
+                            let imgKey;
+                            if (this.viceOrHead == 1) {
+                                imgKey = 'signatureHeadImg';
+                            } else if (this.viceOrHead == 2) {
+                                imgKey = 'signatureViceImg';
+                            }
+                            this.currentShownSignautre = "data:image/png;base64," + firstSignatureResponse.data.data[imgKey];
+                            // this.$refs.signaturePad.fromDataURL("data:image/png;base64," + firstSignatureResponse.data.data[imgKey]);
+                            // this.$refs.signaturePad.lockSignaturePad();
+                            // this.$refs.signaturePad.resizeCanvas();
+                            // console.log(this.$refs.signaturePad.);
+                        }
+
+                    }
+                }
+
+
             } catch (e) {
                 console.error(e);
             }
@@ -346,17 +443,24 @@ export default {
                 this.viceImg = readSignatureResponse.data.data.signatureViceImg != null ? base64Start + readSignatureResponse.data.data.signatureViceImg : false;
                 this.headTxt = readSignatureResponse.data.data.signatureHeadTxt != null ? readSignatureResponse.data.data.signatureHeadTxt : false;
                 this.viceTxt = readSignatureResponse.data.data.signatureViceTxt != null ? readSignatureResponse.data.data.signatureViceTxt : false;
-                console.log(readSignatureResponse);
+                return readSignatureResponse;
             } catch (e) {
                 console.error(e);
             }
-        }
+        },
+        // redrawCanvasAfterResize: function () {
+        //     debounce(() => {
+        //         this.$refs.signaturePad.fromDataURL(this.currentShownSignautre)
+        //     }, 50)
+        // }
     },
 
     watch: {
         incomingEntityId: function () {
-            this.initialize()
-        },
+            if (!(this.loading))
+                this.initializeSignatures()
+        }
+
     },
     computed: {
         oldSignatures: function () {
@@ -366,22 +470,54 @@ export default {
             return true
         },
     },
-
+    // created() {
+    //     let vueContext = this;
+    //     window.addEventListener('resize', vueContext.redrawCanvasAfterResize)
+    // },
+    beforeDestroy() {
+        this.initializeDebounce.clear();
+    },
     async mounted() {
+        this.initializeDebounce = debounce(async () => {
+            console.log("initializeDebounce outside");
+            if (!(this.loading)) {
+                console.log("initializeDebounce inside");
+                this.initializeDebounce.clear();
+                await this.initializeSignatures();
+
+            }
+        }, 200);
+        console.log("signature-draw-mounted");
+
         let userDetails = await this.getUserDetails()
         this.displayName = userDetails.displayName
-        this.$observable.subscribe('resizeCanvas', () => {
-            console.log('canvas')
-            this.clear()
-        })
 
         for (let i = 0; this.tabs && i < this.tabs.length; i++) {
             if (this.tabs[i].isActive) {
                 this.selectedTab(this.tabs[i])
             }
         }
-        await this.initializeSignatures();
-    },
+
+
+        this.$observable.subscribe("save-signature", async (obj) => {
+            let status = false, signatureEntityId;
+            if (!(this.$refs.signaturePad.isEmpty())) {
+                if (obj.signatureEntityId) {
+                    let signatureResponse = await this.update(obj.signatureEntityId);
+                    console.log(signatureResponse)
+                } else {
+                    let signatureSaveResponse = await this.save();
+                    console.log("signatureSaveResponse", signatureSaveResponse);
+                    signatureEntityId = signatureSaveResponse.data.data.id;
+                }
+                status = true;
+            }
+            if (obj.callback) obj.callback({status, signatureEntityId});
+        })
+
+        this.$observable.subscribe("refreshSignatures", this.initializeDebounce);
+    }
+    ,
 }
 </script>
 

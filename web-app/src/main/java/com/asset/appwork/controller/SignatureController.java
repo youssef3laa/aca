@@ -9,6 +9,7 @@ import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.Signature;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.SignatureService;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +31,12 @@ public class SignatureController {
     SignatureService signatureService;
 
     @PostMapping
-    public ResponseEntity<AppResponse<String>> createSignature(@RequestHeader("X-Auth-Token") String token, SignatureDto signature) {
-        AppResponse.ResponseBuilder<String> responseBuilder = AppResponse.builder();
+    public ResponseEntity<AppResponse<JsonNode>> createSignature(@RequestHeader("X-Auth-Token") String token, SignatureDto signature) {
+        AppResponse.ResponseBuilder<JsonNode> responseBuilder = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
             if (account == null) return responseBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            signatureService.createSignature(account, signature);
+            responseBuilder.data(signatureService.createSignature(account, signature));
             responseBuilder.status(ResponseCode.SUCCESS);
         } catch (AppworkException e) {
             e.printStackTrace();
@@ -84,6 +85,26 @@ public class SignatureController {
             log.error(e.getMessage());
         }
 
+        return responseBuilder.build().getResponseEntity();
+    }
+
+    @PutMapping
+    public ResponseEntity<AppResponse<String>> updateSignature(@RequestHeader("X-Auth-Token") String token, SignatureDto signatureDto) {
+        AppResponse.ResponseBuilder<String> responseBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return responseBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            signatureService.updateSignature(signatureDto);
+            responseBuilder.status(ResponseCode.SUCCESS);
+        } catch (AppworkException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            responseBuilder.status(e.getCode());
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+
+        }
         return responseBuilder.build().getResponseEntity();
     }
 }

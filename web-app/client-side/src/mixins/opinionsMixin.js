@@ -4,7 +4,6 @@ export default {
         createOpinionTableModel(requestId) {
             return {
                 url: "opinion/"+ requestId,
-                key:"7amada",
                 headers: [
                     {
                         text: "name",
@@ -24,6 +23,7 @@ export default {
                     text:"opinion",
                     value:"opinion"
                 }],
+                key:"id",
                 data: []
             }
         }
