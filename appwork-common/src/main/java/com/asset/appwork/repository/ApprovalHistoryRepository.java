@@ -21,6 +21,6 @@ public interface ApprovalHistoryRepository extends GenericRepository<ApprovalHis
 
     Optional<ApprovalHistory> findTopByRequestIdOrderByIdDesc(Long requestId);
 
-    Page<ApprovalHistory> findByUserCNOrUserCNOrderByApprovalDateAsc(String userCN, String roleCN, Pageable pageable);
+    Page<ApprovalHistory> findByUserCNOrUserCNOrderByApprovalDateDesc(String userCN, String roleCN, Pageable pageable);
     Long countByUserCNOrUserCN(String userCN, String roleCN);
 }

@@ -138,7 +138,7 @@ public class ApprovalHistoryController {
         User user = orgChartService.getLoggedInUser(account);
         Optional<Group> group = user.getGroup().stream().findFirst();
         String groupCn = group.isPresent()? group.get().getCn() :"-1";
-        Page<ApprovalHistory> histories = historyRepository.findByUserCNOrUserCNOrderByApprovalDateAsc(user.getCN(), groupCn, PageRequest.of(pageNumber, pageSize));
+        Page<ApprovalHistory> histories = historyRepository.findByUserCNOrUserCNOrderByApprovalDateDesc(user.getCN(), groupCn, PageRequest.of(pageNumber, pageSize));
 
         if (histories.isEmpty()) return responseBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
 
