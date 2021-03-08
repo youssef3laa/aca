@@ -57,6 +57,10 @@ h1 {
     position: relative;
     bottom: 25px;
   }
+
+  .color-red{
+    color: #900 !important;
+  }
   .v-expansion-panel::before {
     box-shadow: none;
   }

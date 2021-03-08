@@ -51,4 +51,7 @@ export default {
 .btn-icon-wrapper{
       margin-left: 5px;
 }
+.top-bar-list{
+  margin-right: 0 !important;
+}
 </style>
