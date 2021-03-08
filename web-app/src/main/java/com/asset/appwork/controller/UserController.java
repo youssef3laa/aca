@@ -1,5 +1,6 @@
 package com.asset.appwork.controller;
 
+import com.asset.appwork.annotations.Action;
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.ResponseCode;
@@ -102,6 +103,8 @@ public class UserController {
         }
         return responseBuilder.build().getResponseEntity();
     }
+
+    @Action(name = "test")
     @Transactional
     @PostMapping("/login")
     public ResponseEntity<AppResponse<String>> login(@RequestBody Account account) {

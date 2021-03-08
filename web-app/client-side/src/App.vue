@@ -24,6 +24,20 @@
   src: local('Neo Sans Arabic Regular'), url('./assets/fonts/Neo Sans Arabic Regular.woff') format('woff');
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+ 
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .content {
   margin-top: 80px;
 }
@@ -54,8 +68,10 @@ h1 {
   }
   .red--text {
     color: #900 !important;
-    position: relative;
-    bottom: 25px;
+  }
+
+  .color-red{
+    color: #900 !important;
   }
   .v-expansion-panel::before {
     box-shadow: none;

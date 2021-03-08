@@ -8,7 +8,6 @@ import com.asset.appwork.model.AnnualGoals;
 import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.repository.AnnualGoalsRepository;
 import com.asset.appwork.response.AppResponse;
-import com.asset.appwork.service.CordysService;
 import com.asset.appwork.util.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +28,6 @@ import java.util.List;
 public class AnnualGoalsController {
     @Autowired
     TokenService tokenService;
-    @Autowired
-    CordysService cordysService;
     @Autowired
     Environment environment;
     @Autowired

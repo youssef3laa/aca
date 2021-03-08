@@ -199,7 +199,6 @@
   "arValue": "القيمة بالعربية",
   "enValue": "القيمة بالانجليزية",
   "parentId": "الفئة الأم",
-  "sentFromManagement": "المرسل من الادارات",
 
   "sentFromManagement": "المرسل من الادارات",
   "sentFromCertification": "مرسل من التصديق",
@@ -260,5 +259,6 @@
   "incomingFromChairman": "الوارد من السيد رئيس الهيئة",
   "incomingFromVice": "الوارد من السيد نائب رئيس الهيئة",
   "pendingViewChairman": "جاري العرض على السيد رئيس الهيئة",
-  "pendingViewVice": "جاري العرض على السيد نائب رئيس الهيئة"
+  "pendingViewVice": "جاري العرض على السيد نائب رئيس الهيئة",
+  "subjectSource":"مصدر الموضوع"
 }
