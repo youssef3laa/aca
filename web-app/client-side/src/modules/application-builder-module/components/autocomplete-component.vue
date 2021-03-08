@@ -61,7 +61,7 @@ export default {
             response.data.data = response.data.data instanceof Array ? response.data.data : [].concat(response.data.data);
             this.items.list = response.data.data.map((element) => {
               let obj;
-              if (element["cn"]) {
+              if (element["groupCode"]) {
                   obj = {
                       name: element['nameAr'],
                       value: element['cn'],
