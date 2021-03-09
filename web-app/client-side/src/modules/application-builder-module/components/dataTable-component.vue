@@ -48,8 +48,6 @@
       <template v-slot:item.action="{ item }">
         <v-btn v-if="field.actions.length == 1"
                 elevation="0"
-                v-bind="attrs"
-                v-on="on"
                 style="min-height: 24px"
                 width="24px"
                 v-on:click="handleAction(item, field.actions[0])">
