@@ -2,6 +2,7 @@ package com.asset.appwork.service;
 
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.Audit;
 import com.asset.appwork.platform.rest.Entity;
@@ -27,6 +28,8 @@ public class AuditService {
         AppResponse.ResponseBuilder<String> respBuidler = AppResponse.builder();
         try {
             Account account = tokenService.get(token);
+            if (account == null) return respBuidler.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+
             String restAPIBaseUrl = SystemUtil.generateRestAPIBaseUrl(environment, "AssetGeneralACA");
             Entity entity = new Entity(account, restAPIBaseUrl, "ACA_Entity_Audit");
             Long entityId = entity.create(audit);

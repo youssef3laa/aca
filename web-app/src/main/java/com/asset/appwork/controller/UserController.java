@@ -45,6 +45,7 @@ public class UserController {
     @Autowired
     AppBuilderService appBuilderService;
 
+    @Action(name = "get-form", argumentNumber = 1)
     @Transactional
     @GetMapping("/form/{key}")
     public ResponseEntity<AppResponse<JsonNode>> getForm(@RequestHeader("X-Auth-Token") String token,
@@ -78,7 +79,7 @@ public class UserController {
         }
         return responseBuilder.build().getResponseEntity();
     }
-
+    @Action(name = "get-view")
     @GetMapping("/view")
     public ResponseEntity<AppResponse<JsonNode>> getView(@RequestParam("key") String key) {
         AppResponse.ResponseBuilder<JsonNode> responseBuilder = AppResponse.builder();
@@ -104,7 +105,7 @@ public class UserController {
         return responseBuilder.build().getResponseEntity();
     }
 
-    @Action(name = "test")
+    @Action(name = "login")
     @Transactional
     @PostMapping("/login")
     public ResponseEntity<AppResponse<String>> login(@RequestBody Account account) {
@@ -126,7 +127,7 @@ public class UserController {
 
         return respBuilder.build().getResponseEntity();
     }
-
+    @Action(name = "get-logged-user-details")
     @Transactional
     @GetMapping("/details")
     public ResponseEntity<AppResponse<JsonNode>> getLoggedInUserDetails(@RequestHeader("X-Auth-Token") String token)
