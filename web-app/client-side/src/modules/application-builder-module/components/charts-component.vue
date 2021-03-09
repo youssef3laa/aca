@@ -5,7 +5,7 @@
       <component
         :chartdata="chartdata"
         :is="field.chartType"
-        style="padding: 15px"
+        style="height: 300px"
       ></component>
     </v-card>
 

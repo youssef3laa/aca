@@ -77,6 +77,9 @@ h1 {
     box-shadow: none;
   }
 }
+.attachment-iframe{
+  min-height: 600px !important;
+}
 .theme--light.v-label {
   color: rgba(0, 0, 0, 0.6);
 }
@@ -96,9 +99,33 @@ h1 {
 .v-data-table > .v-data-table__wrapper tbody tr.v-data-table__expanded__content {
   box-shadow: unset !important;
 }
+.ql-editor{
+   max-height: 200px !important;
+   min-height: auto !important;
+  overflow-y: auto !important;
+}
 // .thead.v-data-table-header{
 //     background-color: $color-gray !important;
 // }
+/* scroll*/
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+
+::-webkit-scrollbar-thumb {
+  background:  #0278ae; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background:  #1a1a2e; 
+}
+.theme--light.v-icon {
+    color: rgb(213, 213, 213);
+}
 </style>
 <script>
 import TheNavbar from './modules/core-module/components/the-nav-bar'
