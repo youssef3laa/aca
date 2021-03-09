@@ -1,9 +1,7 @@
 <template>
-  <div style="width:100%">
-    <v-container>
+    <div style="width:100%">
       <AppBuilder ref="appBuilder" :app="app" />
-    </v-container>
-  </div>
+    </div>
 </template>
 
 <script>
@@ -18,8 +16,8 @@ export default {
   mixins: [formPageMixin],
   data() {
     return {
-      selected: [],
-      selectedCertfication:[],
+      viewRequestSelected:[],
+      incomingRequestSelected: [],
       inputSchemaArray: [],
       app: {},
       taskList: [{ title: "إنشاء وارد جديد" }, { title: "تسجيل موضوع" }],
@@ -34,74 +32,57 @@ export default {
   },
   mounted() {
     this.loadForm("office-sector-head-inbox", this.formLoaded);
-    this.certificationTopActionsSubscriptions();
-    this.managementTopActionsSubscriptions();
-    this.$observable.subscribe("technicalTasksTable_view", (item) => {
-      this.viewTask(item);
-    });
-    this.$observable.subscribe("technicalTasksTableCertification_selected", (selected) => {
-      this.selectedCertfication = selected;
-      console.log(this.selected);
-      if (this.selectedCertfication.length != 0) {
-        this.$refs.appBuilder.setFieldData(
-          "sentFromCertification",
-          "actionTopComponent",
-          {
-            show: true,
-          }
-        );
+    this.viewRequestTopActionsSubscriptions();
+    this.incomingRequestTopActionsSubscriptions();
+    this.$observable.subscribe("viewRequestTable_view", (item) => {this.viewTask(item);});
+    this.$observable.subscribe("incomingRequestTable_view", (item) => {this.viewTask(item);});
+    this.$observable.subscribe("viewRequestTable_selected", (selected) => {
+      this.viewRequestSelected = selected;
+      let show;
+      if (this.viewRequestSelected.length != 0) {
+        show = true;
       } else {
-        this.$refs.appBuilder.setFieldData(
-          "sentFromCertification",
-          "actionTopComponent",
-          {
-            show: false,
-          }
-        );
+        show = false;
       }
+      this.$refs.appBuilder.setFieldData("viewRequest","actionTopComponent",
+    {
+          show: show
+        }
+      );
     });
-    this.$observable.subscribe("technicalTasksTable_selected", (selected) => {
-      this.selected = selected;
-      console.log(this.selected);
-      if (this.selected.length != 0) {
-        this.$refs.appBuilder.setFieldData(
-                "sentFromManagement",
-                "actionTopComponent",
-                {
-                  show: true,
-                }
-        );
+    this.$observable.subscribe("incomingRequestTable_selected", (selected) => {
+      this.incomingRequestSelected = selected;
+      let show;
+      if (this.incomingRequestSelected.length != 0) {
+        show = true;
       } else {
-        this.$refs.appBuilder.setFieldData(
-                "sentFromManagement",
-                "actionTopComponent",
-                {
-                  show: false,
-                }
-        );
+        show = false;
       }
+      this.$refs.appBuilder.setFieldData("incomingRequest","actionTopComponent",
+    {
+          show: show,
+        }
+      );
     });
 
-    this.$observable.subscribe("subjectHeadOfOfficeGroup", (text) => {
-      this.sentFromManagementFilter[0].value = text
-
-      this.$observable.fire("technicalTasks", {
-        type: "modelUpdate",
-        model: {
-          filter: this.sentFromManagementFilter
-        },
-      });
-    });
-    this.$observable.subscribe("incomingNumberHeadOfOfficeGroup", (text) => {
-      this.sentFromManagementFilter[1].value = text
-
-      this.$observable.fire("technicalTasks", {
-        type: "modelUpdate",
-        model: {
-          filter: this.sentFromManagementFilter
-        },
-      });
-    });
+    // this.$observable.subscribe("subjectHeadOfOfficeGroup", (text) => {
+    //   this.sentFromManagementFilter[0].value = text
+    //   this.$observable.fire("technicalTasks", {
+    //     type: "modelUpdate",
+    //     model: {
+    //       filter: this.sentFromManagementFilter
+    //     },
+    //   });
+    // });
+    // this.$observable.subscribe("incomingNumberHeadOfOfficeGroup", (text) => {
+    //   this.sentFromManagementFilter[1].value = text
+    //   this.$observable.fire("technicalTasks", {
+    //     type: "modelUpdate",
+    //     model: {
+    //       filter: this.sentFromManagementFilter
+    //     },
+    //   });
+    // });
   },
   methods: {
     formLoaded(){
@@ -117,32 +98,22 @@ export default {
             case "sentFromCertification":
               fromCertifications.push(data[key])
               break
-            default: // "sentFromAdministratorsTechnicalOffice"
+            default: // "sentFromAdministrators"
               fromAdmins.push(data[key])
           }
         }
 
-        this.$refs.appBuilder.setTabValue("sentFromManagementTab", fromAdmins.length + "")
+        this.$refs.appBuilder.setTabValue("viewRequestTab", fromAdmins.length + "")
         this.$observable.fire("technicalTasks",{ type: "modelUpdate", model: {data: fromAdmins}});
 
-        this.$refs.appBuilder.setTabValue("signaturesTab", fromCertifications.length + "")
+        this.$refs.appBuilder.setTabValue("incomingTab", fromCertifications.length + "")
         this.$observable.fire("technicalTasksCertifications",{ type: "modelUpdate", model: {data: fromCertifications}});
-      });
-    },
-    submit() {
-      this.selected.forEach((item) => {
-        this.inputSchemaArray.push(
-          item.taskData.TaskData.ApplicationData
-            .ACA_ProcessRouting_InputSchemaFragments
-        );
       });
     },
     viewTask(item) {
       try {
         let taskId = item.item.TaskId,
-          page =
-            item.item.TaskData.ApplicationData
-              .ACA_ProcessRouting_InputSchemaFragment.component;
+        page = item.item.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.component;
         router.push({
           name: page,
           params: { taskId: taskId },
@@ -151,33 +122,35 @@ export default {
         console.error(e);
       }
     },
-    certificationTopActionsSubscriptions() {
-      this.$observable.subscribe("sendToAnotherManagement", () => {
-        console.log("sendToAnotherManagement");
+    viewRequestTopActionsSubscriptions() {
+      this.$observable.subscribe("viewRequest_sendBackToTechnicalOffice", () => {
+        console.log("viewRequest_sendBackToTechnicalOffice");
       });
-      this.$observable.subscribe("backToCertification", () => {
-        console.log("backToCertification");
+      this.$observable.subscribe("viewRequest_sendToChairman", () => {
+        console.log("viewRequest_sendToChairman");
       });
-      this.$observable.subscribe("ManagementtemporarySave", () => {
-        console.log("ManagementtemporarySave");
-      });
-      this.$observable.subscribe("send", () => {
-        console.log("send");
+      this.$observable.subscribe("viewRequest_sendToVice", () => {
+        console.log("viewRequest_sendToVice");
       });
     },
-    managementTopActionsSubscriptions() {
-      this.$observable.subscribe("backToManagement", () => {
-        console.log("backToManagement");
+    incomingRequestTopActionsSubscriptions() {
+      this.$observable.subscribe("incomingRequest_sendBackToChairman", () => {
+        console.log("incomingRequest_sendBackToChairman");
       });
-      this.$observable.subscribe("temporarySave", () => {
-        console.log("temporarySave");
+      this.$observable.subscribe("incomingRequest_sendToVice", () => {
+        console.log("incomingRequest_sendToVice");
+      });
+      this.$observable.subscribe("incomingRequest_sendToTechnicalOffice", () => {
+        console.log("incomingRequest_sendToTechnicalOffice");
       });
 
-      this.$observable.subscribe("sendToCertification", () => {
-        console.log("sendToCertification");
+      this.$observable.subscribe("incomingRequest_sendBackToVice", () => {
+        console.log("incomingRequest_sendBackToVice");
+      });
+      this.$observable.subscribe("incomingRequest_sendToChairman", () => {
+        console.log("incomingRequest_sendToChairman");
       });
     },
-
   },
 };
 </script>

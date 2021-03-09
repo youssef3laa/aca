@@ -69,6 +69,10 @@ h1 {
   .red--text {
     color: #900 !important;
   }
+
+  .color-red{
+    color: #900 !important;
+  }
   .v-expansion-panel::before {
     box-shadow: none;
   }

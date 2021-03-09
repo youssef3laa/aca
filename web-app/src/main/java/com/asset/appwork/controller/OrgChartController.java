@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Locale;
 import java.util.Optional;
 
 
@@ -821,6 +822,34 @@ public class OrgChartController {
                 respBuilder.info("errorMessage", e.getMessage());
                 respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
             }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/group/read/unit/{unitCode}/groupType/{groupType}/direction/{direction}")
+    public ResponseEntity<AppResponse<JsonNode>> getRelatedGroupOfUnitAndTypeAndDirection(@RequestHeader("X-Auth-Token") String token,
+                                                                                          @PathVariable("unitCode") String unitCode,
+                                                                                          @PathVariable("groupType") GroupType groupType,
+                                                                                          @PathVariable("direction") String direction
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            if(direction.equalsIgnoreCase("up"))
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getParentGroupOfUnitAndType(orgChartService.getUnitByName(unitCode), groupType).toString()));
+            else respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getChildGroupOfUnitAndType(orgChartService.getUnitByName(unitCode), groupType).toString()));
+        }  catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
         } catch (AppworkException e) {
             log.error(e.getMessage());
             e.printStackTrace();
