@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ckeditor :editor="editor" @ready="onReady"></ckeditor>
+    <ckeditor :editor="editor" @ready="onReady" v-model="editorData"></ckeditor>
   </div>
 </template>
 <script>
