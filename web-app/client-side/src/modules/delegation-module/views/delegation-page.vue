@@ -10,6 +10,7 @@
 <script>
 import AppBuilder from "../../application-builder-module/builders/app-builder"
 import http from "@/modules/core-module/services/http"
+import { DateTime  } from "luxon";
 
 export default {
   name: "Delegation",
@@ -67,24 +68,24 @@ export default {
                           },
                           {
                             type: 'AutoCompleteComponent',
-                            label: 'Role',
-                            name: 'role',
+                            label: 'Group',
+                            name: 'group',
                             col: '4',
                             rule: 'required',
                           },
                           {
                             type: 'AutoCompleteComponent',
-                            label: 'UserId',
-                            name: 'userId',
+                            label: 'User',
+                            name: 'user',
                             col: '4',
                             rule: 'required',
                             responseValue: 'userId',
-                            responseText: 'details.displayName'
+                            responseText: 'displayName'
                           },
                           {
                             type: 'AutoCompleteComponent',
                             label: 'Delegated to',
-                            name: 'delegatedTo',
+                            name: 'delegatedGroup',
                             col: '4',
                             rule: 'required',
                           },
@@ -95,9 +96,9 @@ export default {
                           id: '',
                           from: '',
                           to: '',
-                          role: {},
-                          userId: {},
-                          delegatedTo: {}
+                          group: {},
+                          user: {},
+                          delegatedGroup: {}
                         },
                       },
                     ],
@@ -137,16 +138,16 @@ export default {
                                 value: 'to',
                               },
                               {
-                                text: 'Role',
-                                value: 'role',
+                                text: 'Group',
+                                value: 'group.nameAr',
                               },
                               {
-                                text: 'UserId',
-                                value: 'userId',
+                                text: 'User',
+                                value: 'user.displayName',
                               },
                               {
                                 text: 'Delegated to',
-                                value: 'delegatedTo',
+                                value: 'delegatedGroup.nameAr',
                               },
                               {
                                 text: 'Active',
@@ -176,17 +177,29 @@ export default {
     handleEvents: function () {
       let self = this;
 
+      // console.log("------------------------------");
+      // console.log(DateTime.local().plus({ days: 1 }).toFormat("yyyy-MM-dd"));
+      // console.log("------------------------------");
+
       self.$observable.subscribe("delegationTable_add", function () {
         self.$refs.appBuilder.setModelData("delegationModalForm", {
+          from: DateTime.local().plus({ days: 1 }).toFormat("yyyy-MM-dd"),
+          to: DateTime.local().plus({ days: 2 }).toFormat("yyyy-MM-dd"),
           ...{
-            role: {
+            group: {
               url: 'org/group/read/list',
+              list: [],
+              value: ""
             },
-            userId: {
+            user: {
               url: 'org/user/read/list',
+              list: [],
+              value: ""
             },
-            delegatedTo: {
+            delegatedGroup: {
               url: 'org/group/read/list',
+              list: [],
+              value: ""
             },
           },
           ...{
@@ -196,31 +209,67 @@ export default {
         });
         self.$observable.fire("delegationModal");
       });
+      self.$observable.subscribe("delegationModal_add", function (object) {
+        let obj = object.obj;
+        console.log(obj);
+        let item = {
+          fromDate: obj.from,
+          toDate: obj.to,
+          role: obj.group.value.object.name,
+          userId: obj.user.value.object.userId,
+          delegatedTo: obj.delegatedGroup.value.object.name,
+          isActive: true
+        };
+        console.log(item);
+        http.post("/delegation/create", item).then(() => {
+          self.$refs.alertComponent._alertSuccess({
+                type: "success",
+                message: "Added Successfully"
+              }, () => {
+                self.$observable.fire("delegationTable_refresh");
+              }
+          )
+        }).catch((err) => {
+          console.error(err);
+        });
+      });
+
 
       self.$observable.subscribe("delegationTable_edit", function (obj) {
         let item = obj.item;
+        console.log(item);
         self.$refs.appBuilder.setModelData("delegationModalForm", {
           ...item,
           ...{
-            jobType: {
-              url: 'lookup/get/category/jobType',
-              list: [
-                {
-                  text: (item.jobType !== null) ? item.jobType.arValue : "",
-                  value: (item.jobType !== null) ? item.jobType.key : "",
-                }
-              ],
-              value: (item.jobType !== null) ? item.jobType.key : ""
+            group: {
+              url: 'org/group/read/list',
+              // list: [
+              //   {
+              //     text: (item.group !== null) ? item.group.nameAr : "",
+              //     value: (item.group !== null) ? item.group.name : "",
+              //   }
+              // ],
+              value: item.group.name
             },
-            unitType: {
-              url: 'lookup/get/category/unitType',
+            user: {
+              url: 'org/user/read/list',
               list: [
                 {
-                  text: (item.unitType !== null) ? item.unitType.arValue : "",
-                  value: (item.unitType !== null) ? item.unitType.key : "",
+                  text: (item.user !== null) ? item.user.displayName : "",
+                  value: (item.user !== null) ? item.user.userId : "",
                 }
               ],
-              value: (item.unitType !== null) ? item.unitType.key : ""
+              value: (item.user !== null) ? item.user.userId : ""
+            },
+            delegatedGroup: {
+              url: 'org/group/read/list',
+              list: [
+                {
+                  text: (item.delegatedGroup !== null) ? item.delegatedGroup.nameAr : "",
+                  value: (item.delegatedGroup !== null) ? item.delegatedGroup.name : "",
+                }
+              ],
+              value: (item.delegatedGroup !== null) ? item.delegatedGroup.name : ""
             },
           },
           ...{
@@ -228,44 +277,53 @@ export default {
             action: ["edit",]
           }
         });
+
+        console.log({
+          ...item,
+          ...{
+            group: {
+              url: 'org/group/read/list',
+              list: [
+                {
+                  text: (item.group !== null) ? item.group.nameAr : "",
+                  value: (item.group !== null) ? item.group.name : "",
+                }
+              ],
+              value: (item.group !== null) ? item.group.name : ""
+            },
+            user: {
+              url: 'org/user/read/list',
+              list: [
+                {
+                  text: (item.user !== null) ? item.user.displayName : "",
+                  value: (item.user !== null) ? item.user.userId : "",
+                }
+              ],
+              value: (item.user !== null) ? item.user.userId : ""
+            },
+            delegatedGroup: {
+              url: 'org/group/read/list',
+              list: [
+                {
+                  text: (item.delegatedGroup !== null) ? item.delegatedGroup.nameAr : "",
+                  value: (item.delegatedGroup !== null) ? item.delegatedGroup.name : "",
+                }
+              ],
+              value: (item.delegatedGroup !== null) ? item.delegatedGroup.name : ""
+            },
+          },
+          ...{
+            modalTitle: "Edit Delegation",
+            action: ["edit",]
+          }
+          })
+
         self.$observable.fire("delegationModal");
       });
 
       self.$observable.subscribe("delegationModal_edit", function (object) {
         let obj = object.obj;
-        let item = {
-          duration: parseInt(obj.duration),
-          extension: parseInt(obj.extension),
-          jobType: parseInt(obj.jobType.value),
-          unitType: parseInt(obj.unitType.value)
-        };
-        // item.jobType = (Number.isNaN(item.jobType)? obj.jobType.value.value: item.jobType;
-        item.unitType = (Number.isNaN(item.unitType)) ? obj.unitType.value.value : item.unitType;
-        if (obj.id !== null) {
-          http.put("/delegation/update/" + obj.id, item).then(() => {
-            self.$refs.alertComponent._alertSuccess({
-                  type: "success",
-                  message: "Added Successfully"
-                }, () => {
-                  self.$observable.fire("delegationTable_refresh");
-                }
-            )
-          }).catch((err) => {
-            console.error(err);
-          });
-        } else {
-          http.post("/delegation/create", item).then(() => {
-            self.$refs.alertComponent._alertSuccess({
-                  type: "success",
-                  message: "Edited Successfully"
-                }, () => {
-                  self.$observable.fire("delegationTable_refresh");
-                }
-            )
-          }).catch((err) => {
-            console.error(err);
-          });
-        }
+        console.log(obj);
       });
     },
   },
