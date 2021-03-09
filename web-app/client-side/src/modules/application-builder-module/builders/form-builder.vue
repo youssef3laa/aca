@@ -126,6 +126,7 @@ import TextComponent from '../components/text-component'
 import PaginationComponent from '../components/pagination-component'
 import SingleCheckboxComponent from '../components/single-checkbox'
 import CKEditor from '../components/ckEditior-component'
+import LabelComponent from '../components/label-component'
 export default {
   name: 'FormBuilder',
   components: {
@@ -167,6 +168,7 @@ export default {
     PaginationComponent,
     SingleCheckboxComponent,
     CKEditor,
+    LabelComponent,
   },
   data() {
     return {
