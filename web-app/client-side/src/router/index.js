@@ -12,11 +12,13 @@ import HistoryRoutes from '../modules/history-module/router/router'
 import correspondenceRoutes from '../modules/correspondence-data-module/router/router'
 import OrgChartRoutes from '../modules/orgChart-module/router/router'
 import EscalationRoutes from '../modules/escalation-module/router/router'
+import DelegationRoutes from '../modules/delegation-module/router/router'
 import observable from "../modules/core-module/lib/vue-sub-lib";
 import linkingRoutes from '../modules/link-incoming-module/router/router'
 import basicSearchRoutes from '../modules/basicSearch-module/router/router'
 import annualGoalsRoutes from '../modules/goals-module/router/router'
-
+import DynamicNotification from '../modules/dynamic-notification-module/router/router'
+import auditRoutes from '../modules/admin-module/router/audit-router'
 
 Vue.use(VueRouter)
 
@@ -50,7 +52,10 @@ allRoutes = allRoutes.concat(
     OrgChartRoutes,
     linkingRoutes,
     EscalationRoutes,
+    DelegationRoutes,
     annualGoalsRoutes,
+    DynamicNotification,
+    auditRoutes,
     basicSearchRoutes, {
         path: '/',
         name: 'Home',

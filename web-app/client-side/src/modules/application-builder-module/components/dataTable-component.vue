@@ -1,7 +1,9 @@
 <template>
   <div class="datatable-component">
     <v-row class="justify-end">
-
+      <v-col v-if="field.topActions == true && d.selected &&d.selected.length !=0" >
+        <ActionsTopComponent :val="d.topActions"></ActionsTopComponent>
+      </v-col>
       <v-col v-if="field.add == true" :cols="7">
         <button style="padding: 5px; margin: 20px" @click="handlAddButton()">
           <v-icon color="info">fas fa-plus</v-icon>
@@ -46,7 +48,17 @@
     >
  
       <template v-slot:item.action="{ item }">
-        <v-menu offset-y left allow-overflow max-width="300">
+        <v-btn v-if="field.actions.length == 1"
+                elevation="0"
+                style="min-height: 24px"
+                width="24px"
+                v-on:click="handleAction(item, field.actions[0])">
+          <v-icon v-if="field.actions[0] == 'edit'" style="font-size: medium"> far fa-edit </v-icon>
+          <v-icon v-if="field.actions[0] == 'delete'" style="font-size: medium"> far fa-trash-alt </v-icon>
+          <v-icon v-if="field.actions[0] == 'view'" style="font-size: medium"> fas fa-expand-arrows-alt </v-icon>
+          <v-icon v-else style="font-size: medium"> {{field.actions[0].icon}} </v-icon>
+        </v-btn>
+        <v-menu v-if="field.actions.length > 1" offset-y left allow-overflow max-width="300">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               elevation="0"
@@ -192,9 +204,10 @@
 </template>
 <script>
 import http from "../../core-module/services/http";
-
+import ActionsTopComponent from "./actions-top-component"
 export default {
   name: "DataTableComponent",
+  components:{ActionsTopComponent},
   data() {
     return {
       search: "",

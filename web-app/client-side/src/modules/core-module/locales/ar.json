@@ -199,7 +199,6 @@
   "arValue": "القيمة بالعربية",
   "enValue": "القيمة بالانجليزية",
   "parentId": "الفئة الأم",
-  "sentFromManagement": "المرسل من الادارات",
 
   "sentFromManagement": "المرسل من الادارات",
   "sentFromCertification": "مرسل من التصديق",
@@ -247,5 +246,22 @@
   "goalText":"نص الهدف",
   "addAnnualGoal":"اضافة هدف سنوي",
   "tradionalWork":"اعمال تقليدية",
-  "subjectSource":"مصدر الموضوع"
+
+  "sendToTechnicalOffice": "إرسال الى للمكتب الفني",
+  "sendBackToTechnicalOffice": "إرجاع للمكتب الفني",
+  "sendToVice": "إرسال الى السيد نائب رئيس الهيئة",
+  "sendBackToVice": "إرجاع للسيد نائب رئيس الهيئة",
+  "sendToChairman": "إرسال الى السيد رئيس الهيئة",
+  "sendBackToChairman": "إرجاع للسيد رئيس الهيئة",
+
+  "viewRequestForChairman": "مطلوب العرض على السيد رئيس الهيئة",
+  "viewRequestForVice": "مطلوب العرض على السيد نائب رئيس الهيئة",
+  "incomingFromChairman": "الوارد من السيد رئيس الهيئة",
+  "incomingFromVice": "الوارد من السيد نائب رئيس الهيئة",
+  "pendingViewChairman": "جاري العرض على السيد رئيس الهيئة",
+  "pendingViewVice": "جاري العرض على السيد نائب رئيس الهيئة",
+  "subjectSource":"مصدر الموضوع",
+  "returnIssuedMemos":"إرجاع المذكرات الصادرة",
+  "action":"النشاط",
+  "responseCode":"رمز الاستجابة"
 }

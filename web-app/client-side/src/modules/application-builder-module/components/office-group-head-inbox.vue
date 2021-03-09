@@ -1,9 +1,7 @@
 <template>
   <div style="width:100%">
-    <v-container>
       <AppBuilder ref="appBuilder" :app="app" />
       <AlertComponent ref="alertComponent"></AlertComponent>
-    </v-container>
   </div>
 </template>
 
@@ -124,11 +122,11 @@ export default {
 
         for (let key in data) {
           switch (data[key].TaskData.ApplicationData?.ACA_ProcessRouting_InputSchemaFragment?.caseType) {
-            case "certificationTechnicalOffice":
+            case "sentFromCertification":
               fromCertifications.push(data[key]);
               break;
             default:
-              // "sentFromAdministratorsTechnicalOffice"
+              // "sentFromAdministrators"
               fromAdmins.push(data[key]);
           }
         }

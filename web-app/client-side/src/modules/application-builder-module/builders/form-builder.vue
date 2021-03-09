@@ -122,10 +122,11 @@ import InboxComponent from '../components/inbox-component'
 import ImageComponent from '../components/image-component'
 import ActionsTopComponent from '../components/actions-top-component'
 import BarcodeComponent from '../components/barcode-component'
-import TextComponent from "../components/text-component"
-import PaginationComponent from "../components/pagination-component"
-import SingleCheckboxComponent from "../components/single-checkbox"
-import LabelComponent from "../components/label-component"
+import TextComponent from '../components/text-component'
+import PaginationComponent from '../components/pagination-component'
+import SingleCheckboxComponent from '../components/single-checkbox'
+import CKEditor from '../components/ckEditior-component'
+import LabelComponent from '../components/label-component'
 export default {
   name: 'FormBuilder',
   components: {
@@ -166,6 +167,7 @@ export default {
     TextComponent,
     PaginationComponent,
     SingleCheckboxComponent,
+    CKEditor,
     LabelComponent,
   },
   data() {
@@ -216,8 +218,7 @@ export default {
       () => {
         if (this.forms.key) {
           return this.$refs[this.forms.key].flags
-        } 
-        else return 
+        } else return
       },
       (val) => {
         this.forms.model['_valid'] = val.valid
