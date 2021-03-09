@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ckeditor :editor="editor" @ready="onReady" ></ckeditor>
+    <ckeditor :editor="editor" @ready="onReady"></ckeditor>
   </div>
 </template>
 <script>
@@ -9,7 +9,7 @@ export default {
   data() {
     return {
       editor: DecoupledEditor,
-      //   editorData: '<p>Content of the editor.</p>',
+      editorData: this.val,
       editorConfig: {
         // The configuration of the editor.
       },
@@ -24,6 +24,13 @@ export default {
           editor.ui.view.toolbar.element,
           editor.ui.getEditableElement()
         )
+    },
+  },
+  props: ['val', 'field'],
+  watch: {
+    val: function(newVal, oldVal) {
+      console.log(oldVal)
+      this.editorData = newVal
     },
   },
 }
