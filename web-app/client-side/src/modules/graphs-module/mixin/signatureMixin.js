@@ -28,6 +28,31 @@ export default {
         },
         getAllSignatures(incomingEntityId) {
             return http.get("/signature/all/" + incomingEntityId);
+        },
+        async updateSignature(signature, updateSignatureImg) {
+
+            // file: data,
+            //     id: signatureEntityId,
+            //     viceOrHead: this.viceOrHead
+            const formData = new FormData();
+
+            if (updateSignatureImg) {
+                const base64ToBlobResponse = await axios({
+                    url: `data:image/png;base64,${signature.file.split(",")[1]}`,
+                    responseType: "blob",
+                });
+                formData.append("file", base64ToBlobResponse.data);
+            }
+
+            // eslint-disable-next-line no-prototype-builtins
+            if (signature.hasOwnProperty("signatureTxt")) {
+                formData.append("signatureTxt", signature.signatureTxt);
+            }
+
+            formData.append("viceOrHead", signature.viceOrHead);
+            formData.append("id", signature.id);
+
+            return http.put("/signature", formData);
         }
 
 

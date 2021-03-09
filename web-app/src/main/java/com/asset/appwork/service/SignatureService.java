@@ -8,6 +8,8 @@ import com.asset.appwork.model.Signature;
 import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.repository.SignatureRepository;
 import com.asset.appwork.util.SystemUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,33 @@ public class SignatureService {
     @Autowired
     SignatureRepository signatureRepository;
 
-    public void createSignature(Account account, SignatureDto signatureDto) throws AppworkException, IOException {
+    public ObjectNode createSignature(Account account, SignatureDto signatureDto) throws AppworkException, IOException {
+
+        Entity entity = new Entity(account,
+                SystemUtil.generateRestAPIBaseUrl(environment, environment.getProperty("aca.general.solution")),
+                Signature.TABLE);
+
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
+        Signature signature = modelMapper.map(signatureDto, Signature.class);
+        String resultFilePath = createSignatureFile(signatureDto);
+        if (signatureDto.getViceOrHead() == 1) {
+            //for head
+            signature.setSignatureHeadImgPath(resultFilePath);
+        } else if (signatureDto.getViceOrHead() == 2) {
+            //for vice
+            signature.setSignatureViceImgPath(resultFilePath);
+        }
+
+        //create imgFile
+        long signatureId = entity.create(signature);
+        log.info("created signature with id: " + signatureId);
+        ObjectNode objectNode = new ObjectMapper().createObjectNode();
+        objectNode.put("id", signatureId);
+        return objectNode;
+    }
+
+    private String createSignatureFile(SignatureDto signatureDto) throws IOException {
 
         long signaturesCount = signatureRepository.countAllByIncomingEntityId(signatureDto.getIncomingEntityId());
 
@@ -63,24 +91,7 @@ public class SignatureService {
             }
         }
 
-        Entity entity = new Entity(account,
-                SystemUtil.generateRestAPIBaseUrl(environment, environment.getProperty("aca.general.solution")),
-                Signature.TABLE);
-
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().setAmbiguityIgnored(true);
-        Signature signature = modelMapper.map(signatureDto, Signature.class);
-        if (signatureDto.getViceOrHead() == 1) {
-            //for head
-            signature.setSignatureHeadImgPath(filePath);
-        } else if (signatureDto.getViceOrHead() == 2) {
-            //for vice
-            signature.setSignatureViceImgPath(filePath);
-        }
-
-        //create imgFile
-        long signatureId = entity.create(signature);
-        log.info("created signature with id: " + signatureId);
+        return filePath;
     }
 
     public List<Signature> getAllSignaturesByIncomingEntityId(long incomingEntityId) {
@@ -113,7 +124,27 @@ public class SignatureService {
         return signatureReadDto;
     }
 
-    public void updateSignatureTxt(long signatureEntityId, int viceOrHead, String text) {
-
+    public void updateSignature(SignatureDto signatureDto) throws IOException {
+        Optional<Signature> signature = signatureRepository.findById(signatureDto.getId());
+        if (signature.isPresent()) {
+            if (signatureDto.getFile() != null) {
+                signatureDto.setSignatureDate(signature.get().getSignatureDate());
+                signatureDto.setIncomingEntityId(signature.get().getIncomingEntityId());
+                String resultFilePath = createSignatureFile(signatureDto);
+                if (signatureDto.getViceOrHead() == 1) {
+                    signature.get().setSignatureHeadImgPath(resultFilePath);
+                } else if (signatureDto.getViceOrHead() == 2) {
+                    signature.get().setSignatureViceImgPath(resultFilePath);
+                }
+            }
+            if (signatureDto.getSignatureTxt() != null) {
+                if (signatureDto.getViceOrHead() == 1) {
+                    signature.get().setSignatureHeadTxt(signatureDto.getSignatureTxt());
+                } else if (signatureDto.getViceOrHead() == 2) {
+                    signature.get().setSignatureViceTxt(signatureDto.getSignatureTxt());
+                }
+            }
+            signatureRepository.save(signature.get());
+        }
     }
 }

@@ -37,17 +37,17 @@ export default {
   },
   methods: {
     selectedTab: function(tab) {
-      this.selected = tab
-
-      this.$observable.fire(this.tabkey, tab.id)
-
-      if (tab.publish) {
-        if (!(tab.publish instanceof Array)) tab.publish = [tab.publish]
-        for (let key in tab.publish) {
-          this.$observable.fire(tab.publish[key])
+        this.selected = tab
+        this.$observable.fire(this.tabkey, tab.id)
+        if (tab.publish) {
+            if (!(tab.publish instanceof Array)) tab.publish = [tab.publish]
+            for (let key in tab.publish) {
+                this.$observable.fire(tab.publish[key])
+            }
         }
-      }
-      console.log('Tab Selected', tab)
+
+
+        console.log('Tab Selected', tab)
 
       // if (this.page) {
       //   for (let i = 0; i < this.page.sections.sec.length; i++) {

@@ -17,6 +17,8 @@ public class SignatureDto {
     // (1) for head and (2) for vice
     private int viceOrHead;
 
+//    private String signatureTxt;
+    private String signatureTxt;
     private long incomingEntityId;
     private MultipartFile file;
 

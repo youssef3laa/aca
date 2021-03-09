@@ -27,6 +27,8 @@
   "sendToTheTechnicalOffice": "إرسال إلى لمكتب الفني",
   "sendBackForConfirmation": "إرجاع للتصديق",
   "sendToOtherAdministration": "إرسال إلى إدارة آخرى",
+  "pleaseEnterSignature": "الرجاء إدخال التأشيرة",
+  "signatureText": "نص التأشيرة",
   "doneViewing": "تم العرض",
   "sendToVicePresident": "إرسال إلى السيد نائب رئيس الهيئة",
   "sendToChairmanOfCommission": "إرسال إلى السيد رئيس الهيئة",
@@ -78,6 +80,10 @@
   "generalProcess": "وارد",
   "this-field-for-notes": "تستخدم هذه المساحة لكتابة ملاحظات",
   "this-field-for-opinion": "تستخدم هذه المساحة لكتابة رأي",
+  "this-field-for-signature": "تستخدم هذه المساحة لكتابة نص تأشيرة",
+  "this-signature-belongs-to": "هذه تأشيرة",
+  "viceChairmanOfCommision": "السيد نائب رئيس الهيئة",
+  "chairmanOfCommision": "السيد رئيس الهيئة",
   "writeHereTypeOfTheFile": "نوع الملف يكتب هنا",
   "writeHereNameOfTheFile": "اسم الملف يكتب هنا",
   "chooseFileToOpenOrShow": "قم بإختيار ملف لإستعراضه أو عرض بياناته",
@@ -193,7 +199,6 @@
   "arValue": "القيمة بالعربية",
   "enValue": "القيمة بالانجليزية",
   "parentId": "الفئة الأم",
-  "sentFromManagement": "المرسل من الادارات",
 
   "sentFromManagement": "المرسل من الادارات",
   "sentFromCertification": "مرسل من التصديق",
@@ -240,5 +245,20 @@
   "annualGoals":"الاهداف السنوية",
   "goalText":"نص الهدف",
   "addAnnualGoal":"اضافة هدف سنوي",
-  "tradionalWork":"اعمال تقليدية"
+  "tradionalWork":"اعمال تقليدية",
+
+  "sendToTechnicalOffice": "إرسال الى للمكتب الفني",
+  "sendBackToTechnicalOffice": "إرجاع للمكتب الفني",
+  "sendToVice": "إرسال الى السيد نائب رئيس الهيئة",
+  "sendBackToVice": "إرجاع للسيد نائب رئيس الهيئة",
+  "sendToChairman": "إرسال الى السيد رئيس الهيئة",
+  "sendBackToChairman": "إرجاع للسيد رئيس الهيئة",
+
+  "viewRequestForChairman": "مطلوب العرض على السيد رئيس الهيئة",
+  "viewRequestForVice": "مطلوب العرض على السيد نائب رئيس الهيئة",
+  "incomingFromChairman": "الوارد من السيد رئيس الهيئة",
+  "incomingFromVice": "الوارد من السيد نائب رئيس الهيئة",
+  "pendingViewChairman": "جاري العرض على السيد رئيس الهيئة",
+  "pendingViewVice": "جاري العرض على السيد نائب رئيس الهيئة",
+  "subjectSource":"مصدر الموضوع"
 }

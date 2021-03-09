@@ -30,7 +30,6 @@ export default {
     created() {
         this.val = {
             url: "opinion/" + this.requestId,
-            key: "test",
             headers: [
                 {
                     text: "name",
@@ -50,6 +49,7 @@ export default {
                 text: "opinion",
                 value: "opinion"
             }],
+            key:"id",
             data: []
         }
     },

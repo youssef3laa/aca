@@ -43,7 +43,7 @@
                    elevation="0"
                    height="52px"
                    @click="sendBackToAdministration">
-                <v-icon color="red">fa fa-undo-alt</v-icon>
+                <v-icon color="#900">mdi-replay</v-icon>
                 <span style="margin: 3px"></span>
                 <span
                     style="font-weight: bold">{{ $t("sendBackToAdministration") }}</span>
@@ -54,7 +54,7 @@
                    elevation="0"
                    height="52px"
                    @click="sendBackToTheTechnicalOffice">
-                <v-icon color="red">fa fa-undo-alt</v-icon>
+                <v-icon color="#900">mdi-replay</v-icon>
                 <span style="margin: 3px"></span>
                 <span
                     style="font-weight: bold">{{ $t("sendBackToTheTechnicalOffice") }}</span>
@@ -65,7 +65,7 @@
                    elevation="0"
                    height="52px"
                    @click="sendBackToVicePresident">
-                <v-icon color="red">fa fa-undo-alt</v-icon>
+                <v-icon color="#900">mdi-replay</v-icon>
                 <span style="margin: 3px"></span>
                 <span
                     style="font-weight: bold">{{ $t("sendBackToVicePresident") }}</span>
@@ -76,7 +76,7 @@
                    elevation="0"
                    height="52px"
                    @click="sendBackToPresident">
-                <v-icon color="red">fa fa-undo-alt</v-icon>
+                <v-icon color="#900">mdi-replay</v-icon>
                 <span style="margin: 3px"></span>
                 <span
                     style="font-weight: bold">{{ $t("sendBackToPresident") }}</span>
@@ -155,7 +155,7 @@
                  elevation="0"
                  height="52px"
                  @click="sendBackForConfirmation">
-            <v-icon color="red">fa fa-undo-alt</v-icon>
+            <v-icon color="#900">mdi-replay</v-icon>
             <span style="margin: 3px"></span>
             <span
                 style="font-weight: bold">{{ $t("sendBackForConfirmation") }}</span>

@@ -63,17 +63,18 @@ export default {
   props: ["val", "field", "model"],
   methods: {
     saveYear: function(date) {
-      if (this.field.format == "year") {
-        this.date = date.toString();
-        this.$refs.menu.save(date);
-        this.$refs.picker.activePicker = "YEAR";
-        this.menu = false;
-        this.datePickerChanged();
-      }
+      if (this.field.format != "year") return;
+
+      this.date = date.toString();
+      this.$refs.menu.save(date);
+      this.$refs.picker.activePicker = "YEAR";
+      this.menu = false;
+      this.datePickerChanged();
     },
     datePickerChanged: function() {
       console.log("datePickerChanged");
-      if(this.field.format=='year') this.date = DateTime.fromISO(this.date).toFormat("yyyy")
+      if (this.field.format == "year")
+        this.date = DateTime.fromISO(this.date).toFormat("yyyy");
       this.$emit("update", {
         name: this.field.name,
         value: this.date,
@@ -91,12 +92,7 @@ export default {
       }
       return DateTime.fromISO(this.date).toFormat("yyyy/MM/dd");
     },
-    datePickerType() {
-      if (this.field.format) {
-        return this.field.format;
-      }
-      return "date";
-    },
+
   },
   watch: {
     menu: function(val) {

@@ -27,6 +27,7 @@ public class ApprovalHistory {
     String readonlyComponent;
     Long requestId;
     String requestNumber;
+    String subject;
     String receiverCN;
     @Transient
     String displayName;

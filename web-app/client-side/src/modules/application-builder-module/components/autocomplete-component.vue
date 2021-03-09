@@ -61,7 +61,7 @@ export default {
             response.data.data = response.data.data instanceof Array ? response.data.data : [].concat(response.data.data);
             this.items.list = response.data.data.map((element) => {
               let obj;
-              if (element["cn"]) {
+              if (element["groupCode"]) {
                   obj = {
                       name: element['nameAr'],
                       value: element['cn'],
@@ -75,13 +75,19 @@ export default {
                       text: element['nameAr'],
                       object: element,
                   };
-              } else {
+              } else if(element["arValue"]) {
                   obj = {
                       value: element["key"],
                       //TODO hanlde enValue
                       text: element["arValue"],
                       object: element,
                   };
+              } else {
+                obj = {
+                  value: this.getProperty(element, this.field.responseValue),
+                  text: this.getProperty(element, this.field.responseText),
+                  object: element,
+                };
               }
               return obj;
           });
@@ -126,6 +132,27 @@ export default {
         },
         type: "autocompleteChange",
       });
+    },
+    getProperty: function(obj, prop){
+      let parts = prop.split(".");
+
+      if (Array.isArray(parts)) {
+        let last = parts.pop(),
+                l = parts.length,
+                i = 1,
+                current = parts[0];
+
+        while (current && (obj = obj[current]) && i < l) {
+          current = parts[i];
+          i++;
+        }
+
+        if (obj) {
+          return obj[last];
+        }
+      } else {
+        throw "parts is not valid array";
+      }
     },
   },
   watch: {

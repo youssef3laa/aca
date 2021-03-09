@@ -1,23 +1,11 @@
 <template>
   <splitpanes style="height: auto; direction: ltr" class="default-theme">
+    
     <pane style="direction: rtl">
-      <AppBuilder
-        v-show="sidebarItem == 'viewSubjects'"
-        ref="subjects"
-        :app="subjects"
-      />
-      <AppBuilder
-        v-show="sidebarItem == 'viewSentMemos'"
-        ref="outbox"
-        :app="outbox"
-      />
+      <AppBuilder v-show="sidebarItem == 'viewSubjects'" ref="subjects" :app="subjects"/>
+      <AppBuilder v-show="sidebarItem == 'viewSentMemos'" ref="outbox" :app="outbox"/>
     </pane>
-    <pane
-      style="height: auto; direction: rtl"
-      max-size="16"
-      min-size="10"
-      size="16"
-    >
+    <pane style="height: auto; direction: rtl" max-size="14" min-size="10" size="14">
       <Sidebar :val="sidebarItems" @btnClicked="updateView"></Sidebar>
     </pane>
   </splitpanes>
@@ -98,9 +86,7 @@ export default {
     viewTask(item) {
       try {
         let taskId = item.item.TaskId,
-          page =
-            item.item.TaskData.ApplicationData
-              .ACA_ProcessRouting_InputSchemaFragment.component;
+        page = item.item.TaskData.ApplicationData.ACA_ProcessRouting_InputSchemaFragment.component;
         router.push({
           name: page,
           params: { taskId: taskId },
@@ -123,16 +109,16 @@ export default {
     },
     fillSubjects: function() {
       http.get("workflow/human/tasks").then((response) => {
-        console.log(response);
-        let data = JSON.parse(response.data.data);
-        console.log(data);
+        let data = response.data.data;
+        this.sidebarItems[0].notifications = data.length;
+        this.$refs.subjects.setTabValue("tab2", data.length + "")
+        this.$refs.subjects.setModelData("allSubjectsForm", {allSubjectsTable: {data: data}});
       });
     },
     fillOutbox: function() {
-      http.get("history/user/count").then((response) => {
-        console.log("res",response);
-        if (!response.data.data) return;
-        this.sidebarItems[1].notifications = response.data.data;
+      http.get('history/user/count').then((response) => {
+        if(!response.data.data) return;
+        this.sidebarItems[1].notifications = response.data.data
       });
     },
     updateView($event) {

@@ -44,7 +44,6 @@ export default {
   mixins: [goalsMixin],
   async mounted() {
     this.items = await this.getYears();
-    this.selectedItem = this.items[0];
   },
   data() {
     return {

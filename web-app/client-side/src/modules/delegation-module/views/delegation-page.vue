@@ -12,7 +12,7 @@ import AppBuilder from "../../application-builder-module/builders/app-builder"
 import http from "@/modules/core-module/services/http"
 
 export default {
-  name: "Escalation",
+  name: "Delegation",
   components: {
     AppBuilder,
   },
@@ -24,15 +24,15 @@ export default {
           title: {
             key: 'title',
             type: 'TitleComponet',
-            name: 'Escalation',
+            name: 'Delegation',
           },
           tabs: [
             {
-              key: 'escalation',
+              key: 'delegation',
               id: '1',
               isActive: true,
-              name: 'Escalation',
-              icon: 'fas fa-level-up-alt',
+              name: 'Delegation',
+              icon: 'fas fa-exchange-alt',
             }
           ],
           page: [
@@ -42,43 +42,49 @@ export default {
                 key: 'page1',
                 sec: [
                   {
-                    key: 'escalationModal',
+                    key: 'delegationModal',
                     type: 'ModalSection',
-                    name: 'escalationModal',
+                    name: 'delegationModal',
                     isCard: true,
                     forms: [
                       {
-                        key: 'escalationModalForm',
-                        modalId: 'escalationModal',
+                        key: 'delegationModalForm',
+                        modalId: 'delegationModal',
                         inputs: [
                           {
+                            type: 'DatePickerComponent',
+                            label: 'From',
+                            name: 'from',
+                            col: '4',
+                            rule: 'required'
+                          },
+                          {
+                            type: 'DatePickerComponent',
+                            label: 'To',
+                            name: 'to',
+                            col: '4',
+                            rule: 'required'
+                          },
+                          {
                             type: 'AutoCompleteComponent',
-                            label: 'Job type',
-                            name: 'jobType',
+                            label: 'Role',
+                            name: 'role',
                             col: '4',
                             rule: 'required',
-                            readonly: true,
-                          },
-                          {
-                            type: 'InputComponent',
-                            inputType: "number",
-                            label: 'Duration',
-                            name: 'duration',
-                            col: '4',
-                            rule: 'required|min_value:1',
-                          },
-                          {
-                            type: 'InputComponent',
-                            inputType: "number",
-                            label: 'Extension',
-                            name: 'extension',
-                            col: '4',
-                            rule: 'required|min_value:1',
                           },
                           {
                             type: 'AutoCompleteComponent',
-                            label: 'Unit type to Approve',
-                            name: 'unitType',
+                            label: 'UserId',
+                            name: 'userId',
+                            col: '4',
+                            rule: 'required',
+                            responseValue: 'userId',
+                            responseText: 'details.displayName'
+                          },
+                          {
+                            type: 'AutoCompleteComponent',
+                            label: 'Delegated to',
+                            name: 'delegatedTo',
                             col: '4',
                             rule: 'required',
                           },
@@ -87,10 +93,11 @@ export default {
                           action: [],
                           modalTitle: '',
                           id: '',
-                          jobType: {},
-                          duration: '',
-                          extension: '',
-                          unitType: {}
+                          from: '',
+                          to: '',
+                          role: {},
+                          userId: {},
+                          delegatedTo: {}
                         },
                       },
                     ],
@@ -107,35 +114,43 @@ export default {
                         inputs: [
                           {
                             type: 'DataTableComponent',
-                            name: 'escalationTable',
-                            subscribe: 'escalation',
+                            name: 'delegationTable',
+                            subscribe: 'delegation',
                             col: 12,
                             search: true,
-                            filter: false,
-                            add: false,
+                            filter: true,
+                            add: true,
                             actions: ['edit'],
-                            modalId: 'escalationTable',
+                            modalId: 'delegationTable',
                           },
                         ],
                         model: {
-                          escalationTable: {
-                            url: 'escalation/jobTypes/read/list',
+                          delegationTable: {
+                            url: 'delegation/read/list',
                             headers: [
                               {
-                                text: 'Job type',
-                                value: 'jobType.arValue',
+                                text: 'From',
+                                value: 'from',
                               },
                               {
-                                text: 'Duration',
-                                value: 'duration',
+                                text: 'To',
+                                value: 'to',
                               },
                               {
-                                text: 'Extension',
-                                value: 'extension',
+                                text: 'Role',
+                                value: 'role',
                               },
                               {
-                                text: 'Unit type to Approve',
-                                value: 'unitType.arValue',
+                                text: 'UserId',
+                                value: 'userId',
+                              },
+                              {
+                                text: 'Delegated to',
+                                value: 'delegatedTo',
+                              },
+                              {
+                                text: 'Active',
+                                value: 'isActive',
                               },
                               {
                                 text: '',
@@ -160,9 +175,31 @@ export default {
   methods: {
     handleEvents: function () {
       let self = this;
-      self.$observable.subscribe("escalationTable_edit", function (obj) {
+
+      self.$observable.subscribe("delegationTable_add", function () {
+        self.$refs.appBuilder.setModelData("delegationModalForm", {
+          ...{
+            role: {
+              url: 'org/group/read/list',
+            },
+            userId: {
+              url: 'org/user/read/list',
+            },
+            delegatedTo: {
+              url: 'org/group/read/list',
+            },
+          },
+          ...{
+            modalTitle: "Add Delegation",
+            action: ["add",]
+          }
+        });
+        self.$observable.fire("delegationModal");
+      });
+
+      self.$observable.subscribe("delegationTable_edit", function (obj) {
         let item = obj.item;
-        self.$refs.appBuilder.setModelData("escalationModalForm", {
+        self.$refs.appBuilder.setModelData("delegationModalForm", {
           ...item,
           ...{
             jobType: {
@@ -187,14 +224,14 @@ export default {
             },
           },
           ...{
-            modalTitle: "Edit Escalation",
+            modalTitle: "Edit Delegation",
             action: ["edit",]
           }
         });
-        self.$observable.fire("escalationModal");
+        self.$observable.fire("delegationModal");
       });
 
-      self.$observable.subscribe("escalationModal_edit", function (object) {
+      self.$observable.subscribe("delegationModal_edit", function (object) {
         let obj = object.obj;
         let item = {
           duration: parseInt(obj.duration),
@@ -205,24 +242,24 @@ export default {
         // item.jobType = (Number.isNaN(item.jobType)? obj.jobType.value.value: item.jobType;
         item.unitType = (Number.isNaN(item.unitType)) ? obj.unitType.value.value : item.unitType;
         if (obj.id !== null) {
-          http.put("/escalation/update/" + obj.id, item).then(() => {
+          http.put("/delegation/update/" + obj.id, item).then(() => {
             self.$refs.alertComponent._alertSuccess({
                   type: "success",
                   message: "Added Successfully"
                 }, () => {
-                  self.$observable.fire("escalationTable_refresh");
+                  self.$observable.fire("delegationTable_refresh");
                 }
             )
           }).catch((err) => {
             console.error(err);
           });
         } else {
-          http.post("/escalation/create", item).then(() => {
+          http.post("/delegation/create", item).then(() => {
             self.$refs.alertComponent._alertSuccess({
                   type: "success",
                   message: "Edited Successfully"
                 }, () => {
-                  self.$observable.fire("escalationTable_refresh");
+                  self.$observable.fire("delegationTable_refresh");
                 }
             )
           }).catch((err) => {
