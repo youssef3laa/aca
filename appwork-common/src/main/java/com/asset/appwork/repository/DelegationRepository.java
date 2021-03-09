@@ -19,13 +19,13 @@ public interface DelegationRepository extends GenericRepository<Delegation, Long
     List<Delegation> findAll();
     Page<Delegation> findAll(Pageable pageable);
 
-    @Query("SELECT D FROM Delegation D WHERE cast(D.from as string) LIKE %:searchString% OR cast(D.to as string) LIKE %:searchString% " +
-            "OR D.role LIKE %:searchString% OR D.userId LIKE %:searchString% OR D.delegatedTo LIKE %:searchString%")
-    List<Delegation> findAllSearchable(String searchString);
+//    @Query("SELECT D FROM Delegation D WHERE cast(D.from as string) LIKE %:searchString% OR cast(D.to as string) LIKE %:searchString% " +
+//            "OR D.role LIKE %:searchString% OR D.userId LIKE %:searchString% OR D.delegatedTo LIKE %:searchString%")
+//    List<Delegation> findAllSearchable(String searchString);
 
-    @Query("SELECT D FROM Delegation D WHERE cast(D.from as string) LIKE %:searchString% OR cast(D.to as string) LIKE %:searchString% " +
-            "OR D.role LIKE %:searchString% OR D.userId LIKE %:searchString% OR D.delegatedTo LIKE %:searchString%")
-    Page<Delegation> findAllSearchable(String searchString, Pageable pageable);
+//    @Query("SELECT D FROM Delegation D WHERE cast(D.from as string) LIKE %:searchString% OR cast(D.to as string) LIKE %:searchString% " +
+//            "OR D.role LIKE %:searchString% OR D.userId LIKE %:searchString% OR D.delegatedTo LIKE %:searchString%")
+//    Page<Delegation> findAllSearchable(String searchString, Pageable pageable);
 
     void deleteById(Long id);
 }

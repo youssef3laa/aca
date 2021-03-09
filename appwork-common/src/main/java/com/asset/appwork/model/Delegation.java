@@ -17,10 +17,10 @@ public class Delegation {
     @Column(name = "Id")
     long id;
     @Column(name = "fromDate")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     Date from;
     @Column(name = "toDate")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     Date to;
     @Column(name = "role")
     String role;
@@ -89,11 +89,11 @@ public class Delegation {
         this.delegatedTo = delegatedTo;
     }
 
-    public Boolean getActive() {
+    public Boolean getIsActive() {
         return isActive;
     }
 
-    public void setActive(Boolean active) {
+    public void setIsActive(Boolean active) {
         isActive = active;
     }
 }
