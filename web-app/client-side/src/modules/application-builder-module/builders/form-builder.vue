@@ -219,7 +219,7 @@ export default {
       () => {
         if (this.forms.key) {
           return this.$refs[this.forms.key].flags
-        } 
+        }
         else
       },
       (val) => {

@@ -70,8 +70,8 @@ export default {
                         nextFollowUpDate: requestData.requestDate,
                     })
 
-                    // let readSignatureResponse = await this.readSignature(inputSchema.extraData.signatureEntityId);
-                    let readSignatureResponse = await this.readSignature("376836");
+                    let readSignatureResponse = await this.readSignature(inputSchema.extraData.signatureEntityId);
+                    // let readSignatureResponse = await this.readSignature("376836");
 
                     console.log("readSignatureResponse", readSignatureResponse)
                     let unitCode = this.$user.details.groups[0].unit.unitCode;
@@ -173,7 +173,7 @@ export default {
                             let model = this.$refs.appBuilder.getModelData("chairmanOfCommisionSignatureForm");
                             signtureText = model.chairmanOfCommisionText;
                             console.log(model);
-                            viceOrHead = 2;
+                            viceOrHead = 1;
                         }
 
                         await this.updateSignature({

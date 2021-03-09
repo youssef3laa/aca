@@ -210,6 +210,33 @@ export default {
       });
       this.$observable.subscribe("incomingRequest_sendToTechnicalOffice", () => {
         console.log("incomingRequest_sendToTechnicalOffice");
+          console.log(this.incomingRequestSelected);
+
+          let outschemaArray = [];
+          let assignedCN = "cn=HTCA,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+          let decision= "sendToGRPPresident";
+          let caseType = "sentFromCertification";
+          console.log(this);
+          this.incomingRequestSelected.forEach((task) => {
+              let inputSchema =
+                  task.TaskData.ApplicationData
+                      .ACA_ProcessRouting_InputSchemaFragment;
+              let obj = {
+                  caseType,
+                  taskId: task.TaskId,
+                  requestId: inputSchema.requestId,
+                  stepId: inputSchema.stepId,
+                  extraData: Object.assign({}, inputSchema.extraData),
+                  process: inputSchema.process,
+                  parentHistoryId: inputSchema.parentHistoryId,
+                  assignedCN: assignedCN,
+                  decision: decision,
+                  receiverType: "single",
+              };
+              outschemaArray.push(obj);
+          });
+          this.completeMultipleSteps(outschemaArray, this.formLoaded);
+          console.log(outschemaArray);
       });
 
       this.$observable.subscribe("incomingRequest_sendBackToVice", () => {
