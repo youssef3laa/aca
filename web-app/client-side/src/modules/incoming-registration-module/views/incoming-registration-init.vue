@@ -29,6 +29,8 @@ export default {
         };
     },
     async mounted() {
+
+        console.log("user details", this.$user);
         this.request = await this.getRequest();
         this.incomingRegistration = await http.post("/incoming/registration/requestEntity/" + this.request.id + "/create");
         this.incomingRegistration = this.incomingRegistration.data.data;
@@ -262,17 +264,17 @@ export default {
                 }
                 console.log("Data", data)
 
-                    try {
-                        let initiationResponse = await this.initiateCaseProcess(data);
-                        console.log(initiationResponse);
-                        localStorage.removeItem("requestId")
-                        vueThis.$refs.alertComponent._alertSuccess({
-                            type: "success",
-                            message: "initiateSuccess"
-                        }, () => router.push({name: 'HomePage'}).then(r => console.log(r)));
-                    } catch (e) {
-                        console.error(e);
-                    }
+                try {
+                    let initiationResponse = await this.initiateCaseProcess(data);
+                    console.log(initiationResponse);
+                    localStorage.removeItem("requestId")
+                    vueThis.$refs.alertComponent._alertSuccess({
+                        type: "success",
+                        message: "initiateSuccess"
+                    }, () => router.push({name: 'HomePage'}).then(r => console.log(r)));
+                } catch (e) {
+                    console.error(e);
+                }
 
 
             }

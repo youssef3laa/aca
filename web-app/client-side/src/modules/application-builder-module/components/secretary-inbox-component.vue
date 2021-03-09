@@ -24,6 +24,7 @@ export default {
   },
   data() {
     return {
+        selectedSubject: {},
       app: {},
       taskList: [{ title: "إنشاء وارد جديد" }, { title: "تسجيل موضوع" }],
     };

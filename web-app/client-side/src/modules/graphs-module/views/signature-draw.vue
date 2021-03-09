@@ -258,8 +258,8 @@
 
                     <div v-if="selectTab.id == 3"
                          id="3">
-                        <opinions-table :requestId="requestId">
-
+                        <opinions-table
+                            :val='opinionsVal'>
                         </opinions-table>
                     </div>
                 </v-card>
@@ -280,6 +280,7 @@ export default {
         return {
             signatures: [],
             panel: [0],
+            opinionsVal: {},
             tabs: [
                 {
                     key: 'signature',
@@ -459,6 +460,32 @@ export default {
         incomingEntityId: function () {
             if (!(this.loading))
                 this.initializeSignatures()
+        },
+        requestId: function () {
+            this.opinionsVal = {
+                url: "opinion/" + this.requestId,
+                headers: [
+                    {
+                        text: "name",
+                        align: "start",
+                        value: "displayName",
+                    },
+                    {
+                        text: "theEntity",
+                        value: "unitName",
+                    },
+                    {
+                        text: "date",
+                        value: "opinionDate",
+                    }
+                ],
+                subHeaders: [{
+                    text: "opinion",
+                    value: "opinion"
+                }],
+                key: "id",
+                data: []
+            }
         }
 
     },
@@ -478,6 +505,11 @@ export default {
         this.initializeDebounce.clear();
     },
     async mounted() {
+        this.$observable.subscribe("clear-signature", async () => {
+            this.clear();
+        })
+
+
         this.initializeDebounce = debounce(async () => {
             console.log("initializeDebounce outside");
             if (!(this.loading)) {
@@ -501,6 +533,7 @@ export default {
 
         this.$observable.subscribe("save-signature", async (obj) => {
             let status = false, signatureEntityId;
+            console.log(this.$refs.signaturePad);
             if (!(this.$refs.signaturePad.isEmpty())) {
                 if (obj.signatureEntityId) {
                     let signatureResponse = await this.update(obj.signatureEntityId);
@@ -516,8 +549,34 @@ export default {
         })
 
         this.$observable.subscribe("refreshSignatures", this.initializeDebounce);
-    }
-    ,
+
+
+        this.opinionsVal = {
+            url: "opinion/" + this.requestId,
+            headers: [
+                {
+                    text: "name",
+                    align: "start",
+                    value: "displayName",
+                },
+                {
+                    text: "theEntity",
+                    value: "unitName",
+                },
+                {
+                    text: "date",
+                    value: "opinionDate",
+                }
+            ],
+            subHeaders: [{
+                text: "opinion",
+                value: "opinion"
+            }],
+            key: "id",
+            data: []
+        }
+
+    },
 }
 </script>
 

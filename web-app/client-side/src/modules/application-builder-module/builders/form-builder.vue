@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import { ValidationObserver } from 'vee-validate'
+import {ValidationObserver} from 'vee-validate'
 import InputComponent from '../components/input-component'
 import ButtonComponent from '../components/button-component'
 import TableComponent from '../components/table-component'
@@ -126,6 +126,8 @@ import TextComponent from "../components/text-component"
 import PaginationComponent from "../components/pagination-component"
 import SingleCheckboxComponent from "../components/single-checkbox"
 import LabelComponent from "../components/label-component"
+import OpinionsTable from "../../incoming-registration-module/views/opinions-table";
+
 export default {
   name: 'FormBuilder',
   components: {
@@ -167,6 +169,7 @@ export default {
     PaginationComponent,
     SingleCheckboxComponent,
     LabelComponent,
+    OpinionsTable,
   },
   data() {
     return {
@@ -217,7 +220,7 @@ export default {
         if (this.forms.key) {
           return this.$refs[this.forms.key].flags
         } 
-        else return 
+        else
       },
       (val) => {
         this.forms.model['_valid'] = val.valid

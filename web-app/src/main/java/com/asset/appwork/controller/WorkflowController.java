@@ -137,7 +137,7 @@ public class WorkflowController {
                 System.out.println(response);
 
                 Document document = SystemUtil.convertStringToXMLDocument(response);
-                Node task = null;
+                Node task;
                 if (document != null) {
                     task = document.getElementsByTagName("Task").item(0);
                     response = SystemUtil.convertDocumentNodetoJSON(task);
@@ -184,11 +184,9 @@ public class WorkflowController {
         } catch (AppworkException e) {
             e.printStackTrace();
             responseBuilder.status(e.getCode());
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-
         } catch (IOException e) {
             e.printStackTrace();
+
         }
         return responseBuilder.build().getResponseEntity();
 

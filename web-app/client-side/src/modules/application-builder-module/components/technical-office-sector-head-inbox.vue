@@ -1,6 +1,8 @@
 <template>
     <div style="width:100%">
-      <AppBuilder ref="appBuilder" :app="app" />
+        <AppBuilder ref="appBuilder" :app="app"/>
+        <AlertComponent ref="alertComponent"></AlertComponent>
+
     </div>
 </template>
 
@@ -53,11 +55,7 @@ export default {
     this.$observable.subscribe("incomingRequestTable_selected", (selected) => {
       this.incomingRequestSelected = selected;
       let show;
-      if (this.incomingRequestSelected.length != 0) {
-        show = true;
-      } else {
-        show = false;
-      }
+      show = this.incomingRequestSelected.length != 0;
       this.$refs.appBuilder.setFieldData("incomingRequest","actionTopComponent",
     {
           show: show,
@@ -128,9 +126,76 @@ export default {
       });
       this.$observable.subscribe("viewRequest_sendToChairman", () => {
         console.log("viewRequest_sendToChairman");
+
+          let outschemaArray = [];
+          let assignedCN = "cn=HCOC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+          let decision = "sendToPresident";
+
+          console.log(this);
+          this.viewRequestSelected.forEach((task) => {
+              let inputSchema =
+                  task.TaskData.ApplicationData
+                      .ACA_ProcessRouting_InputSchemaFragment;
+              let obj = {
+                  taskId: task.TaskId,
+                  requestId: inputSchema.requestId,
+                  stepId: inputSchema.stepId,
+                  extraData: Object.assign({}, inputSchema.extraData),
+                  process: inputSchema.process,
+                  parentHistoryId: inputSchema.parentHistoryId,
+                  assignedCN: assignedCN,
+                  decision: decision,
+                  receiverType: "single",
+              };
+              outschemaArray.push(obj);
+          });
+          this.completeMultipleSteps(outschemaArray, this.formLoaded);
+          console.log(outschemaArray);
       });
       this.$observable.subscribe("viewRequest_sendToVice", () => {
         console.log("viewRequest_sendToVice");
+          let outschemaArray = [];
+          // let unitCode = this.$user.details.groups[0].unit.unitCode;
+          let assignedCN = "";
+          let decision="approve";
+          // let group;
+          let caseType;
+
+          // if (unitCode == "TVA") {
+          //     //Vice
+          //     group = await this.getHeadRoleByUnitCode("TVS");
+          //     decision = "submitForConfirmation";
+          //     caseType = "sentFromAdministrators";
+          // } else {
+          //     //Chairman
+          //     group = await this.getHeadRoleByUnitCode("TCS");
+          // }
+          // assignedCN ="cn=" +group.groupCode +",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+          assignedCN = "cn=HVCC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+          decision="sendToVicePresident";
+          // console.log(this.selected);
+          console.log(this);
+          this.viewRequestSelected.forEach((task) => {
+              let inputSchema =
+                  task.TaskData.ApplicationData
+                      .ACA_ProcessRouting_InputSchemaFragment;
+              let obj = {
+                  caseType,
+                  taskId: task.TaskId,
+                  requestId: inputSchema.requestId,
+                  stepId: inputSchema.stepId,
+                  process: inputSchema.process,
+                  extraData: Object.assign({}, inputSchema.extraData),
+                  parentHistoryId: inputSchema.parentHistoryId,
+                  assignedCN: assignedCN,
+                  decision: decision,
+                  receiverType: "single",
+              };
+              outschemaArray.push(obj);
+          });
+          this.completeMultipleSteps(outschemaArray, this.formLoaded);
+          console.log(outschemaArray);
+          console.log(this.viewRequestSelected);
       });
     },
     incomingRequestTopActionsSubscriptions() {
@@ -139,6 +204,9 @@ export default {
       });
       this.$observable.subscribe("incomingRequest_sendToVice", () => {
         console.log("incomingRequest_sendToVice");
+
+
+
       });
       this.$observable.subscribe("incomingRequest_sendToTechnicalOffice", () => {
         console.log("incomingRequest_sendToTechnicalOffice");
@@ -149,6 +217,38 @@ export default {
       });
       this.$observable.subscribe("incomingRequest_sendToChairman", () => {
         console.log("incomingRequest_sendToChairman");
+          console.log(this.incomingRequestSelected);
+
+
+          let outschemaArray = [];
+          let assignedCN = "";
+          let decision="sendToPresident";
+          let caseType;
+          assignedCN = "cn=SCOC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+          decision = "sendToPresident";
+          caseType = "sentFromAdministrators";
+
+          console.log(this);
+          this.incomingRequestSelected.forEach((task) => {
+              let inputSchema =
+                  task.TaskData.ApplicationData
+                      .ACA_ProcessRouting_InputSchemaFragment;
+              let obj = {
+                  caseType,
+                  taskId: task.TaskId,
+                  requestId: inputSchema.requestId,
+                  stepId: inputSchema.stepId,
+                  extraData: Object.assign({}, inputSchema.extraData),
+                  process: inputSchema.process,
+                  parentHistoryId: inputSchema.parentHistoryId,
+                  assignedCN: assignedCN,
+                  decision: decision,
+                  receiverType: "single",
+              };
+              outschemaArray.push(obj);
+          });
+          this.completeMultipleSteps(outschemaArray, this.formLoaded);
+          console.log(outschemaArray);
       });
     },
   },

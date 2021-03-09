@@ -47,22 +47,27 @@ export default {
             })
             this.$observable.subscribe("send-for-confirmation", () => {
                 let approvalCard = this.$refs.appBuilder.getModelData("approvalForm");
-                let assignedCN, decision;
+                let assignedCN, decision,caseType;
                 if (this.inputSchema.stepId === "presidentSecretary") {
                     assignedCN = "cn=HTCA,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+                    caseType = "sentFromAdministrators";
                 } else if (this.inputSchema.stepId === "headOfGRPPresident") {
                     assignedCN = "cn=HTCS,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
                 } else if (this.inputSchema.stepId === "headOfGRPVice") {
                     assignedCN = "cn=HTVS,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
                     decision = "submitForConfirmation";
+                    caseType="sentFromAdministrators"
                 } else if (this.inputSchema.stepId === "headOfSECVice") {
                     assignedCN = "cn=HVCC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
                     decision = "sendToVicePresident";
+
                 } else if (this.inputSchema.stepId === "headOfSCTPViceAgain") {
                     assignedCN = "cn=SCOC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
                     decision = "sendToPresident";
+                    caseType = "sentFromAdministrators";
                 }
                 this.completeStep({
+                    caseType: caseType,
                     taskId: this.taskId,
                     requestId: this.inputSchema.requestId,
                     stepId: this.inputSchema.stepId,
@@ -141,9 +146,10 @@ export default {
                 //     assignedCN = this.request.initiator
                 // }
                 // if(approvalCard.approval?.selected?.type)
-                let decision = approvalCard.approval.decision;
+                let decision = approvalCard.approval.decision, caseType = "opinion";
                 if (this.inputSchema.stepId === "viceSecretary") {
                     assignedCN = "cn=HTVA,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+                    caseType="sentFromAdministrators";
                 } else if (decision === "approve") {
                     if (this.inputSchema.stepId === "headOfOfficeApproval") {
                         decision = approvalCard.approval.selected.type;
@@ -182,6 +188,7 @@ export default {
                         }
                     } else if (this.inputSchema.stepId === "headOfAgencyApproval") {
                         decision = approvalCard.approval.selected.type;
+                        caseType = "sentFromAdministrators";
                         switch (decision) {
                             case "goToVice":
                                 assignedCN = "cn=SVCC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
@@ -197,12 +204,15 @@ export default {
                         }
 
                     }
+                } else if (decision === "requestModification") {
+                    caseType = "modification";
                 }
 
                 console.log(decision,assignedCN);
 
                 this.completeStep({
                     taskId: this.taskId,
+                    caseType: caseType,
                     requestId: this.inputSchema.requestId,
                     stepId: this.inputSchema.stepId,
                     process: this.inputSchema.process,

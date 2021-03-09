@@ -31,7 +31,7 @@ export default {
         this.loadForm(this.inputSchema.config, this.formLoaded)
         this.$observable.subscribe("complete-step", async () => {
             let approvalCard = this.$refs.appBuilder.getModelData("approvalForm");
-            let assignedCN, decision = approvalCard.approval.decision;
+            let assignedCN, decision = approvalCard.approval.decision, caseType;
             if (this.inputSchema.stepId === "viceSecretaryAgain") {
                 assignedCN = "cn=HTVS,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
                 let signatureFormModelData = this.$refs.appBuilder.getModelData("signatureForm");
@@ -41,6 +41,7 @@ export default {
                     viceOrHead: 2,
                     signatureTxt: signatureFormModelData.signature.signatureTxt
                 }, false)
+                caseType = "sentFromCertification";
             } else if (this.inputSchema.stepId === "presidentSecretaryAgain") {
                 assignedCN = "cn=HTCS,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
                 let signatureFormModelData = this.$refs.appBuilder.getModelData("signatureForm");
@@ -49,11 +50,13 @@ export default {
                     id: this.inputSchema.extraData.signatureEntityId,
                     viceOrHead: 1,
                     signatureTxt: signatureFormModelData.signature.signatureTxt
-                },false);
+                }, false);
+                caseType="sentFromCertification";
             }
             console.log(assignedCN, decision);
             this.completeStep({
                 taskId: this.taskId,
+                caseType: caseType,
                 requestId: this.inputSchema.requestId,
                 stepId: this.inputSchema.stepId,
                 process: this.inputSchema.process,
