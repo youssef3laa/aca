@@ -1,5 +1,6 @@
 package com.asset.appwork.controller;
 
+import com.asset.appwork.annotations.Action;
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
 import com.asset.appwork.enums.GroupType;
@@ -36,6 +37,7 @@ public class OrgChartController {
     @Autowired
     OrgChartService orgChartService;
 
+    @Action(name = "create-unit")
     @Transactional
     @PostMapping("/unit/create")
     public ResponseEntity<AppResponse<JsonNode>> createUnit(@RequestHeader("X-Auth-Token") String token,
@@ -62,6 +64,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Action(name = "read-unit")
     @Transactional
     @GetMapping("/unit/read/{id}")
     public ResponseEntity<AppResponse<JsonNode>> readUnit(@RequestHeader("X-Auth-Token") String token,
@@ -88,6 +91,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Action(name = "update-unit")
     @Transactional
     @PutMapping("/unit/update/{id}")
     public ResponseEntity<AppResponse<JsonNode>> updateUnit(@RequestHeader("X-Auth-Token") String token,
@@ -115,6 +119,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Action(name="delete-unit")
     @Transactional
     @DeleteMapping("/unit/delete/{id}")
     public ResponseEntity<AppResponse<JsonNode>> deleteUnit(@RequestHeader("X-Auth-Token") String token,
@@ -136,6 +141,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Action(name="read-unit-list")
     @Transactional
     @GetMapping("/unit/read/list")
     public ResponseEntity<AppResponse<JsonNode>> readUnitList(@RequestHeader("X-Auth-Token") String token,
@@ -170,6 +176,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @Action(name="add-sub-unit-to-unit")
     @Transactional
     @PutMapping("/unit/{id}/subUnit/{subUnitId}")
     public ResponseEntity<AppResponse<JsonNode>> addSubUnitToUnit(@RequestHeader("X-Auth-Token") String token,
@@ -198,7 +205,7 @@ public class OrgChartController {
         }
         return respBuilder.build().getResponseEntity();
     }
-
+    @Action(name="add-sub-unit-to-unit-codes")
     @Transactional
     @PutMapping("/unit/{code}/subUnitWithCode/{subUnitCode}")
     public ResponseEntity<AppResponse<JsonNode>> addSubUnitToUnitWithCodes(@RequestHeader("X-Auth-Token") String token,
@@ -227,7 +234,7 @@ public class OrgChartController {
         }
         return respBuilder.build().getResponseEntity();
     }
-
+    @Action(name="read-unit-")
     @Transactional
     @GetMapping("/unit/{code}/down/all/unitTypeCode/{unitTypeCode}")
     public ResponseEntity<AppResponse<JsonNode>> readUnitChildrenRecursivelyFilteredByUnitTypeCode(@RequestHeader("X-Auth-Token") String token,

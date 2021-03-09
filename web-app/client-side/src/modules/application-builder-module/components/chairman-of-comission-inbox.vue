@@ -5,7 +5,7 @@
       <AppBuilder v-show="sidebarItem == 'viewSubjects'" ref="subjects" :app="subjects"/>
       <AppBuilder v-show="sidebarItem == 'viewSentMemos'" ref="outbox" :app="outbox"/>
     </pane>
-    <pane style="height: auto; direction: rtl" max-size="14" min-size="10" size="14">
+    <pane style="height: auto; direction: rtl" max-size="18" min-size="10" size="17">
       <Sidebar :val="sidebarItems" @btnClicked="updateView"></Sidebar>
     </pane>
   </splitpanes>

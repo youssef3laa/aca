@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Action {
     public String name() default "";
+    public int argumentNumber() default -1;
 }
