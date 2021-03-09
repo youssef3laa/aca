@@ -55,7 +55,7 @@ public class AnnualGoalsController {
     @GetMapping("/get/all")
     public ResponseEntity<AppResponse<List<AnnualGoals>>> getAnnualGoals(@RequestHeader("X-Auth-Token") String token,
                                                                          @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                                                         @RequestParam(value = "size", required = false, defaultValue = ""+10+"" ) int size
+                                                                         @RequestParam(value = "size", required = false, defaultValue = "100" ) int size
                                                                ){
         AppResponse.ResponseBuilder<List<AnnualGoals>> respBuilder = AppResponse.builder();
         try {
@@ -100,7 +100,7 @@ public class AnnualGoalsController {
     @GetMapping("/get/year")
     public ResponseEntity<AppResponse<List<AnnualGoals>>> getAnnualGoalsByYear(@RequestHeader("X-Auth-Token") String token,
                                                                          @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                                                         @RequestParam(value = "size", required = false, defaultValue = ""+10+"" ) int size,
+                                                                         @RequestParam(value = "size", required = false, defaultValue = ""+100+"" ) int size,
                                                                          @RequestParam Integer year
     ){
         AppResponse.ResponseBuilder<List<AnnualGoals>> respBuilder = AppResponse.builder();

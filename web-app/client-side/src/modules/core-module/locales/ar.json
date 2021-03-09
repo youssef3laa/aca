@@ -260,5 +260,8 @@
   "incomingFromVice": "الوارد من السيد نائب رئيس الهيئة",
   "pendingViewChairman": "جاري العرض على السيد رئيس الهيئة",
   "pendingViewVice": "جاري العرض على السيد نائب رئيس الهيئة",
-  "subjectSource":"مصدر الموضوع"
+  "subjectSource":"مصدر الموضوع",
+  "returnIssuedMemos":"إرجاع المذكرات الصادرة",
+  "action":"النشاط",
+  "responseCode":"رمز الاستجابة"
 }

@@ -21,7 +21,7 @@
             <div
               v-for="(file, index) in filesUploaded"
               :key="index"
-              class="card col-6"
+              class="card col-6 pa-0"
               @dragstart="startDrag($event, file)"
               @dragover.prevent
               @dragenter.prevent

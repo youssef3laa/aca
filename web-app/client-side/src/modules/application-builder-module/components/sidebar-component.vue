@@ -4,8 +4,7 @@
       v-for="(d, key) in val"
       :key="key"
       @click="btnClicked(d.action)"
-        width="90%"
-       color="#07689F" style="justify-content: space-between;margin-bottom: 10px;align-self:center; background-color: #f2f7fa"
+       color="#07689F" style="min-width:90%; justify-content: space-between;margin-bottom: 10px;align-self:center; background-color: #f2f7fa"
     >
       <div class="icon-wrapper">
         <i :class="d.icon"></i>

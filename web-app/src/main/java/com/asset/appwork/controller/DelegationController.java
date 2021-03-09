@@ -2,6 +2,7 @@ package com.asset.appwork.controller;
 
 import com.asset.appwork.config.TokenService;
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.dto.DelegationDTO;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.Delegation;
@@ -146,7 +147,7 @@ public class DelegationController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 if (page.isPresent() && size.isPresent()) {
-                    Page<Delegation> delegationPage = delegationService.getAllDelegationSearchable(search.orElse(""), page.get(), size.get());
+                    Page<DelegationDTO> delegationPage = delegationService.getAllDelegationSearchable(search.orElse(""), page.get(), size.get());
                     respBuilder.data(SystemUtil.convertStringToJsonNode(delegationPage.getContent().toString()));
                     respBuilder.info("totalCount", delegationPage.getTotalElements());
                 } else {

@@ -11,11 +11,11 @@
           <v-expansion-panel>
             <v-expansion-panel-header>
               <v-row no-gutters>
-                <v-col cols="4">
+                <v-col cols="10">
                   <span>{{ $t(forms.name) }}</span>
                   <span class="line"></span>
                 </v-col>
-                <v-col cols="8" class="text--secondary"> </v-col>
+                <v-col cols="2" class="text--secondary"> </v-col>
               </v-row>
               <template v-slot:actions>
                 <!--                    <v-icon color="error">-->
@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import {ValidationObserver} from 'vee-validate'
+import { ValidationObserver } from 'vee-validate'
 import InputComponent from '../components/input-component'
 import ButtonComponent from '../components/button-component'
 import TableComponent from '../components/table-component'
@@ -122,12 +122,12 @@ import InboxComponent from '../components/inbox-component'
 import ImageComponent from '../components/image-component'
 import ActionsTopComponent from '../components/actions-top-component'
 import BarcodeComponent from '../components/barcode-component'
-import TextComponent from "../components/text-component"
-import PaginationComponent from "../components/pagination-component"
-import SingleCheckboxComponent from "../components/single-checkbox"
-import LabelComponent from "../components/label-component"
+import TextComponent from '../components/text-component'
+import PaginationComponent from '../components/pagination-component'
+import SingleCheckboxComponent from '../components/single-checkbox'
+import CKEditor from '../components/ckEditior-component'
+import LabelComponent from '../components/label-component'
 import OpinionsTable from "../../incoming-registration-module/views/opinions-table";
-
 export default {
   name: 'FormBuilder',
   components: {
@@ -168,6 +168,7 @@ export default {
     TextComponent,
     PaginationComponent,
     SingleCheckboxComponent,
+    CKEditor,
     LabelComponent,
     OpinionsTable,
   },
@@ -219,8 +220,7 @@ export default {
       () => {
         if (this.forms.key) {
           return this.$refs[this.forms.key].flags
-        }
-        else
+        } else return
       },
       (val) => {
         this.forms.model['_valid'] = val.valid
