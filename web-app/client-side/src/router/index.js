@@ -17,6 +17,7 @@ import observable from "../modules/core-module/lib/vue-sub-lib";
 import linkingRoutes from '../modules/link-incoming-module/router/router'
 import basicSearchRoutes from '../modules/basicSearch-module/router/router'
 import annualGoalsRoutes from '../modules/goals-module/router/router'
+import DynamicNotification from '../modules/dynamic-notification-module/router/router'
 
 
 Vue.use(VueRouter)
@@ -53,6 +54,7 @@ allRoutes = allRoutes.concat(
     EscalationRoutes,
     DelegationRoutes,
     annualGoalsRoutes,
+    DynamicNotification,
     basicSearchRoutes, {
         path: '/',
         name: 'Home',
