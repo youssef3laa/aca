@@ -35,36 +35,24 @@ export default {
     // this.$observable.subscribe("outboxTable_view", (item) => {
     //   this.viewSentTask(item);
     // });
+
+    this.handleTopAction();
+
         this.$observable.subscribe(
       "outboxTable_selected",
       (selected) => {
-        this.selectedCertfication = selected;
-        console.log(this.selected);
-        if (this.selectedCertfication.length != 0) {
-          this.$refs.appBuilder.setFieldData(
-            "outboxForm",
-            "actionTopComponent",
-            {
-              show: true,
-            }
-          );
-        } else {
-          this.$refs.appBuilder.setFieldData(
-            "outboxForm",
-            "actionTopComponent",
-            {
-              show: false,
-            }
-          );
-        }
+        this.selectedOutbox = selected;
+        console.log(this.selectedOutbox);
       }
     );
+     
   },
   data() {
     return {
       response: [],
       subjects: {},
       outbox: {},
+      selectedOutbox:[],
       sidebarItem: "viewSubjects",
       sidebarItems: [
         {
@@ -83,6 +71,11 @@ export default {
     };
   },
   methods: {
+    handleTopAction(){
+    this.$observable.subscribe("returnIssuedMemos", () => {
+      console.log("returnIssuedMemos Clicked ",this.selectedOutbox);
+    });
+    },
     viewTask(item) {
       try {
         let taskId = item.item.TaskId,
