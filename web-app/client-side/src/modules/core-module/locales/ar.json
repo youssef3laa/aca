@@ -261,5 +261,7 @@
   "pendingViewChairman": "جاري العرض على السيد رئيس الهيئة",
   "pendingViewVice": "جاري العرض على السيد نائب رئيس الهيئة",
   "subjectSource":"مصدر الموضوع",
-  "returnIssuedMemos":"إرجاع المذكرات الصادرة"
+  "returnIssuedMemos":"إرجاع المذكرات الصادرة",
+  "action":"النشاط",
+  "responseCode":"رمز الاستجابة"
 }

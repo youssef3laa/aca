@@ -1,93 +1,25 @@
 <template>
-  <v-container>
-    <AppBuilder ref="appBuilder" :app="app"></AppBuilder>
-  </v-container>
+  <AppBuilder ref="appBuilder" :app="app" />
 </template>
 
 <script>
-import formPageMixin from "../../../mixins/formPageMixin";
 import AppBuilder from "../../application-builder-module/builders/app-builder";
+import formPageMixin from "../../../mixins/formPageMixin";
 
 export default {
-  name: "AuditPage",
-  components: {
-    AppBuilder,
-  },
   mixins: [formPageMixin],
+  components: { AppBuilder },
+  props: ["val", "field"],
+  mounted() {
+    this.loadForm("audit-page", false, "appBuilder");
+  },
   data() {
     return {
-      app: {
-        pages: {
-          key: "auditTablePage",
-          page: [
-            {
-              key: "page1",
-              sections: {
-                sec: [
-                  {
-                    key: "section 1",
-                    type: "DefaultSection",
-                    display: "block",
-                    isCard: true,
-                    forms: [
-                      {
-                        key: "auditForm",
-                        inputs: [
-                          {
-                            type: "DataTableComponent",
-                            name: "auditTable",
-                            add: false,
-                            filter: false,
-                            search: true,
-                            select: false,
-                            actions: ["view"],
-                            subscribe: "secretarySignatures",
-                            col: 12,
-                          },
-                        ],
-                        model: {
-                          outboxTable: {
-                            url: "history/user",
-                            key: "id",
-                            headers: [
-                              {
-                                text: "userCN",
-                                align: "start",
-                                value: "userCN",
-                              },
-                              {
-                                text: "date",
-                                value: "timestamp",
-                              },
-                              {
-                                text: "action",
-                                value: "",
-                              },
-                              {
-                                text: "reponseCode",
-                                value: "",
-                              },
-                            ],
-                            data: [],
-                            search: "",
-                          },
-                        },
-                      },
-                    ],
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      },
+      app: {},
     };
   },
-  mounted() {
- //   this.loadForm("audit-page");
-   this.loadForm("COC-outbox")
-  },
+  methods: {},
 };
 </script>
 
-<style scoped></style>
+<style></style>
