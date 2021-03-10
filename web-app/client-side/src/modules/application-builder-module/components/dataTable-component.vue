@@ -199,6 +199,10 @@
       </template>
     </v-data-table>
 
+    <div v-if="val.styleType=='goalsTable'" class = "footer-categories">
+      <span class="color-block"></span>
+      <span class="category">{{ $t("traditionalWork") }} </span>
+    </div>
 
   </div>
 </template>
@@ -539,6 +543,23 @@ export default {
 }
 .datatable-component /deep/ .row-item td:first-child{
   border-right:12px solid #C70039 ; 
+}
+.datatable-component /deep/ td.text-start{
+  white-space: unset !important;
+}
+.footer-categories{
+  display: flex;
+  position: absolute;
+  bottom:38px;
+}
+.color-block{
+  width:14px;
+  height: 26px;
+  background-color: #C70039;
+}
+.category{
+  color: #C70039;
+  margin-right: 8px;
 }
 /* .dropDown-menu {
   background: #96969f !important;
