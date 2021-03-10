@@ -98,7 +98,8 @@ export default {
                           to: '',
                           group: {},
                           user: {},
-                          delegatedGroup: {}
+                          delegatedGroup: {},
+                          isActive: ''
                         },
                       },
                     ],
@@ -121,7 +122,10 @@ export default {
                             search: true,
                             filter: true,
                             add: true,
-                            actions: ['edit'],
+                            actions: ['edit', {
+                              icon: 'fas fa-retweet',
+                              name: 'changeStatus'
+                            }],
                             modalId: 'delegationTable',
                           },
                         ],
@@ -156,6 +160,7 @@ export default {
                               {
                                 text: '',
                                 value: 'action',
+                                align: 'end'
                               },
                             ],
                             data: [],
@@ -234,7 +239,6 @@ export default {
         });
       });
 
-
       self.$observable.subscribe("delegationTable_edit", function (obj) {
         let item = obj.item;
         console.log(item);
@@ -243,12 +247,12 @@ export default {
           ...{
             group: {
               url: 'org/group/read/list',
-              // list: [
-              //   {
-              //     text: (item.group !== null) ? item.group.nameAr : "",
-              //     value: (item.group !== null) ? item.group.name : "",
-              //   }
-              // ],
+              list: [
+                {
+                  text: (item.group !== null) ? item.group.nameAr : "",
+                  value: (item.group !== null) ? item.group.name : "",
+                }
+              ],
               value: item.group.name
             },
             user: {
@@ -278,52 +282,55 @@ export default {
           }
         });
 
-        console.log({
-          ...item,
-          ...{
-            group: {
-              url: 'org/group/read/list',
-              list: [
-                {
-                  text: (item.group !== null) ? item.group.nameAr : "",
-                  value: (item.group !== null) ? item.group.name : "",
-                }
-              ],
-              value: (item.group !== null) ? item.group.name : ""
-            },
-            user: {
-              url: 'org/user/read/list',
-              list: [
-                {
-                  text: (item.user !== null) ? item.user.displayName : "",
-                  value: (item.user !== null) ? item.user.userId : "",
-                }
-              ],
-              value: (item.user !== null) ? item.user.userId : ""
-            },
-            delegatedGroup: {
-              url: 'org/group/read/list',
-              list: [
-                {
-                  text: (item.delegatedGroup !== null) ? item.delegatedGroup.nameAr : "",
-                  value: (item.delegatedGroup !== null) ? item.delegatedGroup.name : "",
-                }
-              ],
-              value: (item.delegatedGroup !== null) ? item.delegatedGroup.name : ""
-            },
-          },
-          ...{
-            modalTitle: "Edit Delegation",
-            action: ["edit",]
-          }
-          })
-
         self.$observable.fire("delegationModal");
       });
-
       self.$observable.subscribe("delegationModal_edit", function (object) {
         let obj = object.obj;
         console.log(obj);
+        let item = {
+          from: obj.from,
+          to: obj.to,
+          role: (obj.group.value.object !== undefined)? obj.group.value.object.name: obj.group.value,
+          userId: (obj.user.value.object !== undefined)? obj.user.value.object.userId: obj.user.value,
+          delegatedTo: (obj.delegatedGroup.value.object !== undefined)? obj.delegatedGroup.value.object.name: obj.delegatedGroup.value,
+          isActive: obj.isActive
+        };
+        console.log(item);
+        http.put("/delegation/update/" + obj.id, item).then(() => {
+          self.$refs.alertComponent._alertSuccess({
+                type: "success",
+                message: "Updated Successfully"
+              }, () => {
+                self.$observable.fire("delegationTable_refresh");
+              }
+          )
+        }).catch((err) => {
+          console.error(err);
+        });
+      });
+
+      self.$observable.subscribe("delegationTable_changeStatus", function (object) {
+        let obj = object.item;
+        let item = {
+          from: obj.from,
+          to: obj.to,
+          role: obj.group.name,
+          userId: obj.user.userId,
+          delegatedTo: obj.delegatedGroup.name,
+          isActive: (!obj.isActive)
+        };
+
+        http.put("/delegation/update/" + obj.id, item).then(() => {
+          self.$refs.alertComponent._alertSuccess({
+                type: "success",
+                message: "Updated the Status Successfully"
+              }, () => {
+                self.$observable.fire("delegationTable_refresh");
+              }
+          )
+        }).catch((err) => {
+          console.error(err);
+        });
       });
     },
   },

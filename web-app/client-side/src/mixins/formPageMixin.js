@@ -132,7 +132,10 @@ export default {
                     this.$refs.alertComponent._alertSuccess({
                         type: "success",
                         message: "actionHasBeenSentSuccessfully"
-                    }, () => router.push({name: 'HomePage'}).then(r => console.log(r)));
+                    }, () => {
+                        if (this.$route.name != "HomePage")
+                            router.push({name: 'HomePage'}).then(r => console.log(r))
+                    });
 
                 })
                 .catch((error) => console.error(error));

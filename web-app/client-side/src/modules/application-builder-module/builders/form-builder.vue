@@ -127,6 +127,7 @@ import PaginationComponent from '../components/pagination-component'
 import SingleCheckboxComponent from '../components/single-checkbox'
 import CKEditor from '../components/ckEditior-component'
 import LabelComponent from '../components/label-component'
+import OpinionsTable from "../../incoming-registration-module/views/opinions-table";
 export default {
   name: 'FormBuilder',
   components: {
@@ -169,6 +170,7 @@ export default {
     SingleCheckboxComponent,
     CKEditor,
     LabelComponent,
+    OpinionsTable,
   },
   data() {
     return {

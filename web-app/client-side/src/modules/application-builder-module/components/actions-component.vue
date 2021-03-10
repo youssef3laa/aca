@@ -76,7 +76,7 @@
                    elevation="0"
                    height="52px"
                    @click="sendBackToPresident">
-                <v-icon color="#900">mdi-replay</v-icon>
+                <v-icon color="red">mdi-replay</v-icon>
                 <span style="margin: 3px"></span>
                 <span
                     style="font-weight: bold">{{ $t("sendBackToPresident") }}</span>

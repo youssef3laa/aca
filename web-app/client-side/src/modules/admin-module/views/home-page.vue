@@ -52,6 +52,8 @@ import Inbox from "../../application-builder-module/components/inbox-component";
 import http from "../../core-module/services/http";
 import userMixin from '../../../mixins/userMixin'
 import Topbar from "../../application-builder-module/components/topbar-component";
+import router from "../../../router";
+
 export default {
   name: "HomePage",
   components: {
@@ -76,7 +78,7 @@ export default {
     }
   },
   methods: {
-    
+
     getTasks: function () {
       http.get("workflow/human/tasks").then((response) => {
         console.log(response);
@@ -93,8 +95,14 @@ export default {
 
   data() {
     return {
-      taskList: [{ title: "إنشاء وارد جديد" }, { title: "تسجيل موضوع" }],
-      response: [],
+        taskList: [
+            {
+                title: "إنشاء وارد جديد", callback: () => {
+                    router.push({name: "incomingRegistration-init"})
+                }
+            },
+            {title: "تسجيل موضوع"}],
+        response: [],
       chartsLoaded: 0,
       barChartData: {},
       pieChartData: {},

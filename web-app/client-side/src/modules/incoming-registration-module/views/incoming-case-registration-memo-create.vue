@@ -123,6 +123,7 @@ export default {
                         return;
                     }
                     this.completeStep({
+                        caseType: "opinion",
                         taskId: this.taskId,
                         requestId: this.inputSchema.requestId,
                         stepId: this.inputSchema.stepId,

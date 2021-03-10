@@ -8,13 +8,13 @@
         <span>شريط المهام</span>
       </div>
       <div ref="taskList" id="task-list">
-        <div  v-for="(task, key) in val" :key="key" class="task">
+        <div  v-ripple v-for="(task, key) in val" :key="key" class="task" @click="handleTaskCallback(task)">
           <i class="far fa-edit"></i>
           <span class="task-name">{{ task.title }}</span>
         </div>
       </div>
     </div>
- 
+
     <div class="scroller-wrapper">
       <v-btn @click="scroll('right','task-list')" class="scroller"> <i class="fas fa-chevron-right"></i> </v-btn>
       <v-btn @click="scroll('left','task-list')" class="scroller"> <i class="fas fa-chevron-left"></i> </v-btn>
@@ -39,26 +39,32 @@ export default {
     };
   },
   methods: {
-    scroll(direction, content) {
-      let scrollPixels = 180  ;
-      if(direction == 'left') scrollPixels = -scrollPixels;
+      handleTaskCallback: function (task) {
 
-      console.log(scrollPixels);
-      const element = document.getElementById(content);
-      // element.animate({scrollLeft: '=-300'},1000);
-      var scroll = scrollPixels / 10;
+          // eslint-disable-next-line no-prototype-builtins
+          if(task.hasOwnProperty("callback")) task.callback();
 
-      var scrolled = 0;
-      const interval = setInterval(() => {
-        element.scrollLeft += scroll;
-        scrolled += scroll;
-        console.log(scrolled);
-        console.log(scrollPixels);
-        if (Math.round(scrolled) == Math.round(scrollPixels)) {
-          clearInterval(interval);
-        }
-      }, 20);
-    },
+      },
+      scroll(direction, content) {
+          let scrollPixels = 180;
+          if (direction == 'left') scrollPixels = -scrollPixels;
+
+          console.log(scrollPixels);
+          const element = document.getElementById(content);
+          // element.animate({scrollLeft: '=-300'},1000);
+          var scroll = scrollPixels / 10;
+
+          var scrolled = 0;
+          const interval = setInterval(() => {
+              element.scrollLeft += scroll;
+              scrolled += scroll;
+              console.log(scrolled);
+              console.log(scrollPixels);
+              if (Math.round(scrolled) == Math.round(scrollPixels)) {
+                  clearInterval(interval);
+              }
+          }, 20);
+      },
   },
 };
 </script>
@@ -101,6 +107,11 @@ export default {
 .task i {
   margin-left: 10px;
 }
+
+.task:hover {
+    cursor: pointer;
+}
+
 .top-bar-list{
   align-items: center !important;
   justify-content: space-between;

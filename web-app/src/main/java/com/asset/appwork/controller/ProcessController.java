@@ -12,10 +12,7 @@ import com.asset.appwork.platform.rest.Entity;
 import com.asset.appwork.repository.ApprovalHistoryRepository;
 import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.schema.OutputSchema;
-import com.asset.appwork.service.CordysService;
-import com.asset.appwork.service.OrgChartService;
-import com.asset.appwork.service.ProcessService;
-import com.asset.appwork.service.RequestEntityService;
+import com.asset.appwork.service.*;
 import com.asset.appwork.soup.ProcessSOAP;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -55,6 +52,11 @@ public class ProcessController {
     @Autowired
     ProcessService processService;
 
+    @Autowired
+    WorkflowService workflowService;
+
+    @Autowired
+    ApprovalHistoryService approvalHistoryService;
 //    @PostMapping("/initiate")
 //    public ResponseEntity<AppResponse<String>> initiate(@RequestHeader("X-Auth-Token") String token, @RequestBody Request requestJson) {
 //        AppResponse.ResponseBuilder<String> respBuilder = AppResponse.builder();
@@ -168,14 +170,23 @@ public class ProcessController {
             Account account = tokenService.get(token);
             String cordysUrl = cordysService.getCordysUrl();
 
-            outputSchema.stream().forEach((schema) -> {
+            outputSchema.forEach((schema) -> {
                 try {
+                    String taskState = workflowService.getTask(account, schema.getTaskId());
+                    if (!taskState.equals("ASSIGNED")) {
+                        approvalHistoryService.updateReceiveDate(Long.valueOf(schema.getRequestId()));
+                        workflowService.claimTask(account, schema.getTaskId());
+                    }
                     moduleRouting.goToNext(schema, account, cordysUrl);
                 } catch (AppworkException e) {
-                    throw new RuntimeException(e.getMessage());
+                    respBuilder.status(e.getCode());
+                    log.error(e.getMessage());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    log.error(e.getMessage());
                 }
             });
-            respBuilder.data("done");
+            respBuilder.status(ResponseCode.SUCCESS);
         } catch (AppworkException e) {
             e.printStackTrace();
             respBuilder.status(e.getCode());

@@ -245,7 +245,7 @@
   "annualGoals":"الاهداف السنوية",
   "goalText":"نص الهدف",
   "addAnnualGoal":"اضافة هدف سنوي",
-  "tradionalWork":"اعمال تقليدية",
+  "traditionalWork":"اعمال تقليدية",
 
   "sendToTechnicalOffice": "إرسال الى للمكتب الفني",
   "sendBackToTechnicalOffice": "إرجاع للمكتب الفني",
@@ -263,5 +263,6 @@
   "subjectSource":"مصدر الموضوع",
   "returnIssuedMemos":"إرجاع المذكرات الصادرة",
   "action":"النشاط",
-  "responseCode":"رمز الاستجابة"
+  "responseCode":"رمز الاستجابة",
+  "heading":"العنوان"
 }

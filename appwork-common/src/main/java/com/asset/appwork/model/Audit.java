@@ -17,7 +17,7 @@ public class Audit {
     @Id
     private Long Id;
     private String userCN;
-    private String action;
+    private String takenAction;
     private String responseCode;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd , hh:mm:ss a")
     private Date timestamp;

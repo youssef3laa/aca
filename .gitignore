@@ -18,3 +18,5 @@ web-app/target/
 **/*.env
 *.env
 **/.env
+/resources/
+/Temp/

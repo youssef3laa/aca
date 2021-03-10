@@ -97,7 +97,7 @@ public class Interceptor {
                 String userCN = user.getCN();
                 audit.setUserCN(userCN);
                 String responseCode = ((ResponseEntity) object).getStatusCode().toString();
-                audit.setAction(actionName.get());
+                audit.setTakenAction(actionName.get());
                 audit.setResponseCode(responseCode);
                 auditService.createAudit(token.get(), audit);
             } catch (AppworkException e) {

@@ -20,7 +20,7 @@
           </span></template
         ></v-checkbox
       >
-      <v-btn text class="viewed-btn">
+      <v-btn text class="viewed-btn" @click="triggerViewedAction">
         <i class="far fa-edit"></i>
         <span>{{ $t("doneViewing") }}</span>
       </v-btn>
@@ -37,11 +37,15 @@ export default {
     }
   },
   methods: {
-    rightClicked() {
-      this.$$observable.fire("paginationRightClicked");
-    },
-    leftClicked() {
-      this.$$observable.fire("paginationLeftClicked");
+      triggerViewedAction: function () {
+          this.$observable.fire("viewed-done");
+
+      },
+      rightClicked() {
+          this.$observable.fire("paginationRightClicked");
+      },
+      leftClicked() {
+          this.$observable.fire("paginationLeftClicked");
     },
   },
   watch:{
