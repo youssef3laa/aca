@@ -32,13 +32,50 @@
       </div>
       <v-spacer></v-spacer>
       <div>
-        <v-badge :content="messages" :value="messages" color="red" overlap>
-          <v-icon
-            style="float:left; margin: 7px;"
-            v-on:click="goToNotifications"
-            >mdi-bell-outline</v-icon
-          >
-        </v-badge>
+        <v-menu bottom left>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn v-bind="attrs" v-on="on">
+              <v-badge
+                :content="messages"
+                :value="messages"
+                color="red"
+                overlap
+              >
+                <v-icon style="float:left; margin: 7px;"
+                  >mdi-bell-outline</v-icon
+                >
+              </v-badge>
+            </v-btn>
+          </template>
+          <v-card>
+            <v-row
+              v-for="item in notificationsItems"
+              :key="item.NotificationId"
+              class="pl-4 mt-0"
+            >
+              <v-col :cols="9" style="padding : 5px 25px 0 0">
+                <h4>{{ item.Subject }}</h4>
+              </v-col>
+              <v-col :cols="3" style="padding : 5px 25px 0 0">
+                {{ item.DeliveryDate }}
+              </v-col>
+              <v-col>
+                <v-col :cols="12">
+                  <v-list dense>
+                    <v-list-item>
+                      <v-list-item-content>{{
+                        item.NotificationData.ApplicationData
+                          .ACA_DynamicNotification_InputSchemaFragment
+                          .requestStatus
+                      }}</v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-col>
+                <v-divider></v-divider>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-menu>
         <p style="float:left; margin: 7px;">EN</p>
       </div>
       <div
@@ -145,6 +182,7 @@
 <script>
 import config from '../../../config/config'
 import router from '../../../router'
+import http from '../../core-module/services/http'
 
 export default {
   name: 'TheNavbar',
@@ -156,6 +194,7 @@ export default {
       user: this.$user,
       title: config.APP_NAME,
       drawer: false,
+      notificationsItems: [],
       items: [
         { title: 'homePage', icon: 'fas fa-home', route: 'HomePage' },
         {
@@ -198,8 +237,18 @@ export default {
     },
   },
   mounted() {
-    this.$observable.subscribe('notificationCounter', (counter) => {
-      this.messages = counter
+    // this.$observable.subscribe('notificationCounter', (counter) => {
+    //   this.messages = counter
+    // })
+    http.get('notification/get/all').then((response) => {
+      this.notificationsItems = response.data.data
+      console.log(this.notificationsItems)
+      for (let i = 0; i < response.data.data.length; i++) {
+        if (!response.data.data[i].ReadFlag) {
+          this.messages += 1
+          console.log(this.messages)
+        }
+      }
     })
   },
 }
@@ -262,5 +311,27 @@ export default {
 }
 .group-item-title i {
   margin-left: 8px;
+}
+.v-btn .v-btn--contained .theme--light .v-size--default {
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+  background: none;
+}
+.v-btn--contained {
+  box-shadow: none;
+}
+v-menu__content theme--light v-menu__content--fixed menuable__content__active {
+  min-width: 35px;
+  top: 80px;
+  left: 125px;
+  transform-origin: left top;
+  z-index: 9;
+  width: 25%;
 }
 </style>
