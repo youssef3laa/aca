@@ -833,6 +833,41 @@ public class OrgChartController {
     }
 
     @Transactional
+    @GetMapping("/group/read/unit/{unitName}/groupType/{groupType}")
+    public ResponseEntity<AppResponse<JsonNode>> getGroupsByUnitAndGroupType(@RequestHeader("X-Auth-Token") String token,
+                                                                             @PathVariable("unitName") String unitName,
+                                                                             @PathVariable("groupType") GroupType groupType,
+                                                                             @RequestParam(value = "page") Optional<Integer> page,
+                                                                             @RequestParam(value = "size") Optional<Integer> size
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                if (page.isPresent() && size.isPresent()) {
+                    Page<Group> groupPage = orgChartService.getGroupsInUnitAndGroupType(orgChartService.getUnitByName(unitName), groupType, page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(groupPage.getContent().toString()));
+                    respBuilder.info("totalCount", groupPage.getTotalElements());
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getGroupsInUnitAndGroupType(orgChartService.getUnitByName(unitName), groupType).toString()));
+                }
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
     @GetMapping("/group/read/unit/{unitCode}/groupType/{groupType}/direction/{direction}")
     public ResponseEntity<AppResponse<JsonNode>> getRelatedGroupOfUnitAndTypeAndDirection(@RequestHeader("X-Auth-Token") String token,
                                                                                           @PathVariable("unitCode") String unitCode,
