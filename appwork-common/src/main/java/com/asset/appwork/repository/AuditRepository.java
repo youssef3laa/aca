@@ -12,6 +12,6 @@ public interface AuditRepository extends GenericRepository<Audit,Long> {
 
     Page<Audit> findAll(Pageable pageable);
 
-    @Query("SELECT audit FROM Audit audit  WHERE lower(audit.userCN) LIKE %:search% OR lower(audit.action) LIKE %:search% OR lower(audit.responseCode) LIKE %:search%  order by audit.Id desc")
+    @Query("SELECT audit FROM Audit audit  WHERE lower(audit.userCN) LIKE %:search% OR lower(audit.takenAction) LIKE %:search% OR lower(audit.responseCode) LIKE %:search%  order by audit.Id desc")
     Page<Audit> searchAudit(String search, Pageable pageable);
 }
