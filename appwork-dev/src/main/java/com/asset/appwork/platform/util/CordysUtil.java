@@ -1,18 +1,20 @@
 package com.asset.appwork.platform.util;
 
 import com.asset.appwork.dto.Account;
+import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.util.Http;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class CordysUtil {
     String cordysUrl;
-    public CordysUtil(String cordysUrl){
+
+    public CordysUtil(String cordysUrl) {
         this.cordysUrl = cordysUrl;
     }
 
 
-    public String sendRequest(String message){
+    public String sendRequest(String message) {
         Http http = new Http().setContentType(Http.ContentType.XML_REQUEST)
                 .setData(message)
                 .post(cordysUrl);
@@ -22,7 +24,14 @@ public class CordysUtil {
 
     public String sendRequest(Account account, String message) throws JsonProcessingException, AppworkException {
         // @TODO Add URL
-        Http http = new Http().setDoAuthentication(true).setHeader("SAMLart", account.getSAMLart()).setContentType(Http.ContentType.XML_REQUEST).setData(message).post(cordysUrl);
+        Http http = new Http()
+                .setDoAuthentication(true)
+                .setHeader("SAMLart", account.getSAMLart())
+                .setContentType(Http.ContentType.XML_REQUEST)
+                .setData(message)
+                .post(cordysUrl);
+
+        if (!http.isSuccess()) throw new AppworkException(ResponseCode.CORDYS_FAILURE);
         // @TODO re-login
         return http.getResponse();
     }

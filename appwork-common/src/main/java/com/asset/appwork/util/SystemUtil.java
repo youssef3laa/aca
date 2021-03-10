@@ -152,8 +152,7 @@ public class SystemUtil {
             builder = factory.newDocumentBuilder();
 
             //Parse the content to Document object
-            Document doc = builder.parse(new InputSource(new StringReader(data)));
-            return doc;
+            return builder.parse(new InputSource(new StringReader(data)));
         } catch (Exception e) {
             e.printStackTrace();
         }

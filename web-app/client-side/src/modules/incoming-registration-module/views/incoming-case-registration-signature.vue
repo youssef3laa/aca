@@ -48,12 +48,14 @@ export default {
         })
         this.$observable.subscribe("send-to-technical-office", () => {
             let approvalCard = this.$refs.appBuilder.getModelData("approvalForm");
-            let assignedCN, decision = approvalCard.approval.decision;
+            let assignedCN, decision = approvalCard.approval.decision,caseType;
             if (this.inputSchema.stepId === "headOfSECPresidentAgain") {
                 assignedCN = "cn=HTCA,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
                 decision = "sendToGRPPresident";
+                caseType = "sentFromCertification";
             }
             this.completeStep({
+                caseType,
                 taskId: this.taskId,
                 requestId: this.inputSchema.requestId,
                 stepId: this.inputSchema.stepId,
@@ -88,9 +90,11 @@ export default {
             };
             if (this.inputSchema.stepId === "presidentSecretary") {
                 objectToCompleteStepBy.assignedCN = "cn=HTCA,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+                objectToCompleteStepBy.caseType = "sentFromAdministrators";
             } else if (this.inputSchema.stepId === "headOfGRPPresident") {
                 objectToCompleteStepBy.assignedCN = "cn=HTCS,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
                 objectToCompleteStepBy.decision = "submitForConfirmation";
+                objectToCompleteStepBy.caseType = "sentFromAdministrators";
             } else if (this.inputSchema.stepId === "vicePresident") {
                 shouldCompleteStep = false;
                 objectToCompleteStepBy.assignedCN = "cn=SVCC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
@@ -109,6 +113,7 @@ export default {
                         objectToCompleteStepBy.extraData.signatureEntityId = signatureEntityId;
                     }
                     console.log(objectToCompleteStepBy);
+                    objectToCompleteStepBy.caseType = "signatures";
                     this.completeStep(objectToCompleteStepBy)
                 })
             } else if (this.inputSchema.stepId === "headOfSECPresident") {
@@ -117,7 +122,9 @@ export default {
             } else if (this.inputSchema.stepId === "president") {
                 shouldCompleteStep = false;
                 objectToCompleteStepBy.assignedCN = "cn=SCOC,cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
-                this.validateAndSaveSignature(({status}) => {
+
+
+                this.validateAndSaveSignature(({status, signatureEntityId}) => {
                     if (!status) {
                         this.$refs.alertComponent._alertSuccess({
                             type: "error",
@@ -125,8 +132,28 @@ export default {
                         })
                         return;
                     }
+                    if (objectToCompleteStepBy.extraData == undefined || objectToCompleteStepBy.extraData == null)
+                        objectToCompleteStepBy.extraData = {signatureEntityId};
+                    else {
+                        objectToCompleteStepBy.extraData.signatureEntityId = signatureEntityId;
+                    }
+                    console.log(objectToCompleteStepBy);
+                    objectToCompleteStepBy.caseType = "signatures";
                     this.completeStep(objectToCompleteStepBy)
                 })
+
+
+                // this.validateAndSaveSignature(({status}) => {
+                //     if (!status) {
+                //         this.$refs.alertComponent._alertSuccess({
+                //             type: "error",
+                //             message: 'pleaseEnterSignature',
+                //         })
+                //         return;
+                //     }
+                //     objectToCompleteStepBy.caseType = "signatures"
+                //     this.completeStep(objectToCompleteStepBy)
+                // })
             }
             if (shouldCompleteStep) {
                 this.completeStep(objectToCompleteStepBy)
@@ -156,7 +183,7 @@ export default {
                         incomingEntityId: this.inputSchema.entityId,
                         viceOrHead: 2,
                         readonly: true,
-                        pastSignaturesOnly:true,
+                        pastSignaturesOnly: true,
                         requestId: this.inputSchema.requestId
                     }
                 })

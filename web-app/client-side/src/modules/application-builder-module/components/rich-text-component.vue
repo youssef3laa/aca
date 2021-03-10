@@ -13,6 +13,7 @@
         :val="content"
         :field="field"
         @input="updateValue"
+        class="pa-4"
       ></richtextValidateComponent>
       <span class="red--text">{{ errors[0] }}</span>
 
@@ -71,3 +72,9 @@ export default {
   },
 }
 </script>
+<style scoped>
+ .text--secondary{
+   display: none;
+ }
+
+</style>

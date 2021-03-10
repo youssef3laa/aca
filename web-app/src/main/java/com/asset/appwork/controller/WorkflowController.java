@@ -10,6 +10,7 @@ import com.asset.appwork.response.AppResponse;
 import com.asset.appwork.service.ApprovalHistoryService;
 import com.asset.appwork.service.CordysService;
 import com.asset.appwork.service.UserService;
+import com.asset.appwork.service.WorkflowService;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.transaction.Transactional;
@@ -46,6 +46,9 @@ public class WorkflowController {
     ApprovalHistoryService approvalHistoryService;
     @Autowired
     UserService userService;
+
+    @Autowired
+    WorkflowService workflowService;
 
     @Transactional
     @GetMapping("/human/tasks")
@@ -130,34 +133,22 @@ public class WorkflowController {
     public ResponseEntity<AppResponse<String>> claimTask(@RequestHeader("X-Auth-Token") String token, @RequestBody() Request request) {
         AppResponse.ResponseBuilder<String> responseBuilder = AppResponse.builder();
         try {
-            Workflow workflow = new Workflow();
             Account account = tokenService.get(token);
-            if (account != null) {
-                String response = cordysService.sendRequest(account, workflow.getTask(account.getSAMLart(), request.taskId));
-                System.out.println(response);
+            if (account == null) return responseBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
-                Document document = SystemUtil.convertStringToXMLDocument(response);
-                Node task = null;
-                if (document != null) {
-                    task = document.getElementsByTagName("Task").item(0);
-                    response = SystemUtil.convertDocumentNodetoJSON(task);
-                    String taskState = SystemUtil.readJSONField(response, "State");
-                    if (taskState != null) {
-                        if (!taskState.equals("ASSIGNED")) {
-                            if (request.requestId != null)
-                                approvalHistoryService.updateReceiveDate(Long.parseLong(request.requestId));
-                            response = cordysService.sendRequest(account, workflow.claimTask(account.getSAMLart(), request.taskId));
-                        } else {
-                            response = "Task is already claimed.";
-                        }
-                    } else {
-                        throw new AppworkException("Invalid Task State Response", ResponseCode.INTERNAL_SERVER_ERROR);
-                    }
+            String response;
+            String taskState = workflowService.getTask(account, request.taskId);
+            if (taskState != null) {
+                if (!taskState.equals("ASSIGNED")) {
+                    approvalHistoryService.updateReceiveDate(Long.valueOf(request.requestId));
+                    response = workflowService.claimTask(account, request.taskId);
                 } else {
-                    throw new AppworkException("Invalid Task State Response", ResponseCode.INTERNAL_SERVER_ERROR);
+                    response = "Task is already claimed.";
                 }
-                responseBuilder.data(response);
+            } else {
+                throw new AppworkException("Invalid Task State Response", ResponseCode.INTERNAL_SERVER_ERROR);
             }
+            responseBuilder.data(response);
         } catch (AppworkException e) {
             e.printStackTrace();
             responseBuilder.status(e.getCode());
@@ -184,11 +175,9 @@ public class WorkflowController {
         } catch (AppworkException e) {
             e.printStackTrace();
             responseBuilder.status(e.getCode());
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-
         } catch (IOException e) {
             e.printStackTrace();
+
         }
         return responseBuilder.build().getResponseEntity();
 

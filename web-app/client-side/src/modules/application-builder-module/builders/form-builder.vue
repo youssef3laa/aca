@@ -11,11 +11,11 @@
           <v-expansion-panel>
             <v-expansion-panel-header>
               <v-row no-gutters>
-                <v-col cols="4">
+                <v-col cols="10">
                   <span>{{ $t(forms.name) }}</span>
                   <span class="line"></span>
                 </v-col>
-                <v-col cols="8" class="text--secondary"> </v-col>
+                <v-col cols="2" class="text--secondary"> </v-col>
               </v-row>
               <template v-slot:actions>
                 <!--                    <v-icon color="error">-->
@@ -126,6 +126,8 @@ import TextComponent from '../components/text-component'
 import PaginationComponent from '../components/pagination-component'
 import SingleCheckboxComponent from '../components/single-checkbox'
 import CKEditor from '../components/ckEditior-component'
+import LabelComponent from '../components/label-component'
+import OpinionsTable from "../../incoming-registration-module/views/opinions-table";
 export default {
   name: 'FormBuilder',
   components: {
@@ -167,6 +169,8 @@ export default {
     PaginationComponent,
     SingleCheckboxComponent,
     CKEditor,
+    LabelComponent,
+    OpinionsTable,
   },
   data() {
     return {

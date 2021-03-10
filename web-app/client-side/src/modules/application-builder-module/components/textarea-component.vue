@@ -44,8 +44,7 @@ export default {
   },
   props: ['val', 'field'],
   watch: {
-    val: function(newVal, oldVal) {
-      console.log(oldVal)
+    val: function(newVal) {
       this.d = newVal
       this.readonly = this.field.readonly
     },

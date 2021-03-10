@@ -44,6 +44,9 @@ export default {
     this.$observable.subscribe("technicalTasksTable_view", (item) => {
       this.viewTask(item);
     });
+    this.$observable.subscribe("technicalTasksTableCertification_view", (item) => {
+      this.viewTask(item);
+    });
     this.$observable.subscribe(
       "technicalTasksTableCertification_selected",
       (selected) => {
@@ -182,37 +185,40 @@ export default {
       this.$observable.subscribe("ManagementtemporarySave", () => {
         console.log("ManagementtemporarySave");
       });
-      this.$observable.subscribe("send", () => {
+      this.$observable.subscribe("send", async () => {
         console.log("send");
         let outschemaArray = [];
-       
-        this.selected.forEach(async (task) => {
-          let inputSchema =
-            task.TaskData.ApplicationData
-              .ACA_ProcessRouting_InputSchemaFragment;
-          let requestData = await this.readRequest(inputSchema.requestId);
-          let entity = await this.readEntity(
-            requestData.entityName,
-            requestData.entityId
-          );
-          if (entity.responsibleEntityEdara) {
-            let group = await this.getHeadRoleByUnitCode(
-              entity.responsibleEntityEdara
-            );
-            let assignedCN = "cn=" + group.groupCode + ",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
-            let obj = {
-              taskId: task.TaskId,
-              requestId: inputSchema.requestId,
-              stepId: inputSchema.stepId,
-              process: inputSchema.process,
-              parentHistoryId: inputSchema.parentHistoryId,
-              assignedCN: assignedCN,
-              decision: "approve",
-              receiverType: "single",
-            };
-            outschemaArray.push(obj);
+
+          for (const task of this.selectedCertfication){
+              let inputSchema =
+                  task.TaskData.ApplicationData
+                      .ACA_ProcessRouting_InputSchemaFragment;
+              let requestData = await this.readRequest(inputSchema.requestId);
+              let entity = await this.readEntity(
+                  requestData.entityName,
+                  requestData.entityId
+              );
+              if (entity.responsibleEntityEdara) {
+                  let group = await this.getHeadRoleByUnitCode(
+                      entity.responsibleEntityEdara
+                  );
+                  let assignedCN = "cn=" + group.groupCode + ",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
+                  let obj = {
+                      taskId: task.TaskId,
+                      requestId: inputSchema.requestId,
+                      stepId: inputSchema.stepId,
+                      extraData: inputSchema.extraData,
+                      process: inputSchema.process,
+                      parentHistoryId: inputSchema.parentHistoryId,
+                      assignedCN: assignedCN,
+                      decision: "sendToResponsibleAdministration",
+                      receiverType: "single",
+                  };
+                  outschemaArray.push(obj);
+              }
           }
-        });
+
+          console.log(outschemaArray);
         this.completeMultipleSteps(outschemaArray, this.formLoaded);
       });
     },
@@ -229,13 +235,20 @@ export default {
         let outschemaArray = [];
         let unitCode = this.$user.details.groups[0].unit.unitCode;
         let assignedCN = "";
+        let decision="approve";
         let group;
+        let caseType;
+
         if (unitCode == "TVA") {
           //Vice
           group = await this.getHeadRoleByUnitCode("TVS");
+          decision = "submitForConfirmation";
+          caseType = "sentFromAdministrators";
         } else {
           //Chairman
-          group = await this.getHeadRoleByUnitCode("TCS");
+            group = await this.getHeadRoleByUnitCode("TCS");
+            decision = "submitForConfirmation";
+            caseType = "sentFromAdministrators";
         }
         assignedCN ="cn=" +group.groupCode +",cn=organizational roles,o=aca,cn=cordys,cn=defaultInst,o=example.com";
 
@@ -244,13 +257,15 @@ export default {
             task.TaskData.ApplicationData
               .ACA_ProcessRouting_InputSchemaFragment;
           let obj = {
+            caseType,
             taskId: task.TaskId,
+            extraData: Object.assign({}, inputSchema.extraData),
             requestId: inputSchema.requestId,
             stepId: inputSchema.stepId,
             process: inputSchema.process,
             parentHistoryId: inputSchema.parentHistoryId,
             assignedCN: assignedCN,
-            decision: "approve",
+            decision: decision,
             receiverType: "single",
           };
           outschemaArray.push(obj);

@@ -1,7 +1,9 @@
 <template>
   <div class="datatable-component">
     <v-row class="justify-end">
-
+      <v-col v-if="field.topActions == true && d.selected &&d.selected.length !=0" >
+        <ActionsTopComponent :val="d.topActions"></ActionsTopComponent>
+      </v-col>
       <v-col v-if="field.add == true" :cols="7">
         <button style="padding: 5px; margin: 20px" @click="handlAddButton()">
           <v-icon color="info">fas fa-plus</v-icon>
@@ -197,14 +199,19 @@
       </template>
     </v-data-table>
 
+    <div v-if="val.styleType=='goalsTable'" class = "footer-categories">
+      <span class="color-block"></span>
+      <span class="category">{{ $t("traditionalWork") }} </span>
+    </div>
 
   </div>
 </template>
 <script>
 import http from "../../core-module/services/http";
-
+import ActionsTopComponent from "./actions-top-component"
 export default {
   name: "DataTableComponent",
+  components:{ActionsTopComponent},
   data() {
     return {
       search: "",
@@ -536,6 +543,23 @@ export default {
 }
 .datatable-component /deep/ .row-item td:first-child{
   border-right:12px solid #C70039 ; 
+}
+.datatable-component /deep/ td.text-start{
+  white-space: unset !important;
+}
+.footer-categories{
+  display: flex;
+  position: absolute;
+  bottom:38px;
+}
+.color-block{
+  width:14px;
+  height: 26px;
+  background-color: #C70039;
+}
+.category{
+  color: #C70039;
+  margin-right: 8px;
 }
 /* .dropDown-menu {
   background: #96969f !important;

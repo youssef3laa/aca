@@ -53,8 +53,10 @@ export default {
                 let approvalCard = this.$refs.appBuilder.getModelData("approvalForm");
                 console.log(approvalCard);
 
+
                 this.completeStep({
                     taskId: this.taskId,
+                    caseType:"approval",
                     requestId: this.inputSchema.requestId,
                     stepId: this.inputSchema.stepId,
                     process: this.inputSchema.process,

@@ -4,9 +4,11 @@
       @blur="$emit('blur')"
       v-model="content"
       @text-change="updateValue"
+
     ></vue-editor>
   </div>
 </template>
+
 
 <script>
 import { VueEditor } from "vue2-editor";

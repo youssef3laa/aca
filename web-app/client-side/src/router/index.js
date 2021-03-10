@@ -18,7 +18,7 @@ import linkingRoutes from '../modules/link-incoming-module/router/router'
 import basicSearchRoutes from '../modules/basicSearch-module/router/router'
 import annualGoalsRoutes from '../modules/goals-module/router/router'
 import DynamicNotification from '../modules/dynamic-notification-module/router/router'
-
+import auditRoutes from '../modules/admin-module/router/audit-router'
 
 Vue.use(VueRouter)
 
@@ -55,6 +55,7 @@ allRoutes = allRoutes.concat(
     DelegationRoutes,
     annualGoalsRoutes,
     DynamicNotification,
+    auditRoutes,
     basicSearchRoutes, {
         path: '/',
         name: 'Home',

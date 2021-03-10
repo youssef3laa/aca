@@ -1,6 +1,6 @@
 <template>
-    <DataTableComponent :key="field.opinionsTable"
-                        :field="field"
+    <DataTableComponent :key="dataTableField.key"
+                        :field="dataTableField"
                         :val="val">
 
     </DataTableComponent>
@@ -14,47 +14,22 @@ export default {
     name: "opinions-table",
 
     components: {DataTableComponent},
-    props: ["requestId"],
+    props: ["field", "val"],
     data() {
         return {
-            val: {},
-            field: {
-                "key": "opinionsTable",
-                "type": "DataTableComponent",
-                "name": "opinionsTable",
-                "subscribe": "tasks",
-                "col": 12
-            }
+            dataTableField: {}
+
         }
     },
     created() {
-        this.val = {
-            url: "opinion/" + this.requestId,
-            headers: [
-                {
-                    text: "name",
-                    align: "start",
-                    value: "displayName",
-                },
-                {
-                    text: "theEntity",
-                    value: "unitName",
-                },
-                {
-                    text: "date",
-                    value: "opinionDate",
-                }
-            ],
-            subHeaders: [{
-                text: "opinion",
-                value: "opinion"
-            }],
-            key:"id",
-            data: []
+        this.dataTableField = {
+            "type": "DataTableComponent",
+            "key": "id",
+            "name": "opinionsTableComponent",
+            "col": 12
         }
     },
     mounted() {
-
 
     }
 }

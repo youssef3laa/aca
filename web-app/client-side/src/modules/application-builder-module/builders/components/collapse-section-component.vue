@@ -9,11 +9,11 @@
       <v-expansion-panel>
         <v-expansion-panel-header>
           <v-row no-gutters>
-            <v-col cols="4">
+            <v-col cols="8">
               <span>{{ $t(section.name) }}</span>
               <span class="line"></span>
             </v-col>
-            <v-col cols="8" class="text--secondary"> </v-col>
+            <v-col cols="3" class="text--secondary"> </v-col>
           </v-row>
           <template v-slot:actions>
             <!--                    <v-icon color="error">-->
