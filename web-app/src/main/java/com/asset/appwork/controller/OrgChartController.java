@@ -22,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Locale;
 import java.util.Optional;
 
 
@@ -120,7 +119,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @Action(name="delete-unit")
+    @Action(name = "delete-unit")
     @Transactional
     @DeleteMapping("/unit/delete/{id}")
     public ResponseEntity<AppResponse<JsonNode>> deleteUnit(@RequestHeader("X-Auth-Token") String token,
@@ -142,7 +141,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @Action(name="read-unit-list")
+    @Action(name = "read-unit-list")
     @Transactional
     @GetMapping("/unit/read/list")
     public ResponseEntity<AppResponse<JsonNode>> readUnitList(@RequestHeader("X-Auth-Token") String token,
@@ -177,7 +176,7 @@ public class OrgChartController {
         return respBuilder.build().getResponseEntity();
     }
 
-    @Action(name="add-sub-unit-to-unit")
+    @Action(name = "add-sub-unit-to-unit")
     @Transactional
     @PutMapping("/unit/{id}/subUnit/{subUnitId}")
     public ResponseEntity<AppResponse<JsonNode>> addSubUnitToUnit(@RequestHeader("X-Auth-Token") String token,
@@ -206,7 +205,8 @@ public class OrgChartController {
         }
         return respBuilder.build().getResponseEntity();
     }
-    @Action(name="add-sub-unit-to-unit-codes")
+
+    @Action(name = "add-sub-unit-to-unit-codes")
     @Transactional
     @PutMapping("/unit/{code}/subUnitWithCode/{subUnitCode}")
     public ResponseEntity<AppResponse<JsonNode>> addSubUnitToUnitWithCodes(@RequestHeader("X-Auth-Token") String token,
@@ -235,7 +235,8 @@ public class OrgChartController {
         }
         return respBuilder.build().getResponseEntity();
     }
-    @Action(name="read-unit-")
+
+    @Action(name = "read-unit-")
     @Transactional
     @GetMapping("/unit/{code}/down/all/unitTypeCode/{unitTypeCode}")
     public ResponseEntity<AppResponse<JsonNode>> readUnitChildrenRecursivelyFilteredByUnitTypeCode(@RequestHeader("X-Auth-Token") String token,
@@ -842,10 +843,11 @@ public class OrgChartController {
         try {
             Account account = tokenService.get(token);
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
-            if(direction.equalsIgnoreCase("up"))
+            if (direction.equalsIgnoreCase("up"))
                 respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getParentGroupOfUnitAndType(orgChartService.getUnitByName(unitCode), groupType).toString()));
-            else respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getChildGroupOfUnitAndType(orgChartService.getUnitByName(unitCode), groupType).toString()));
-        }  catch (JsonProcessingException e) {
+            else
+                respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getChildGroupOfUnitAndType(orgChartService.getUnitByName(unitCode), groupType).toString()));
+        } catch (JsonProcessingException e) {
             log.error(e.getMessage());
             e.printStackTrace();
             respBuilder.info("errorMessage", e.getMessage());
@@ -1075,6 +1077,40 @@ public class OrgChartController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             try {
                 respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUser(id).toString()));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                respBuilder.info("errorMessage", e.getMessage());
+                respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.info("errorMessage", e.getMessage());
+            respBuilder.status(e.getCode());
+        }
+        return respBuilder.build().getResponseEntity();
+    }
+
+    @Transactional
+    @GetMapping("/user/group/{groupName}")
+    public ResponseEntity<AppResponse<JsonNode>> getUsersInGroup(@RequestHeader("X-Auth-Token") String token,
+                                                                 @PathVariable("groupName") String groupName,
+                                                                 @RequestParam(value = "page") Optional<Integer> page,
+                                                                 @RequestParam(value = "size") Optional<Integer> size
+    ) {
+        AppResponse.ResponseBuilder<JsonNode> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
+            try {
+                if (page.isPresent() && size.isPresent()) {
+                    Page<User> userPage = orgChartService.getUsersInGroup(orgChartService.getGroupByName(groupName), page.get(), size.get());
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(userPage.getContent().toString()));
+                    respBuilder.info("totalCount", userPage.getTotalElements());
+                } else {
+                    respBuilder.data(SystemUtil.convertStringToJsonNode(orgChartService.getUsersInGroup(orgChartService.getGroupByName(groupName)).toString()));
+                }
             } catch (JsonProcessingException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
