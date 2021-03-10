@@ -254,4 +254,10 @@ export default {
     border: 1px solid #f8f8f8;
     border-radius: 4px;
 }
+
+button{
+    font-family: 'Neo Sans Arabic Regular', sans-serif;
+}
+
+
 </style>

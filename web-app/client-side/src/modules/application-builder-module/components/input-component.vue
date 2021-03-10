@@ -87,3 +87,10 @@ export default {
   },
 }
 </script>
+<style>
+
+ .col-md-4{
+   padding: 6px 12px !important;
+ }
+
+</style>

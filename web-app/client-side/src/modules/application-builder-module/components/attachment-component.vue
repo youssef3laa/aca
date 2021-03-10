@@ -189,8 +189,9 @@
                         class="attachment-icon"
                         style="color=#F8F8F8"
                         size="30"
-                        >fas fa-file-word</v-icon
+                        ><!--fas fa-file-pdf--> far fa-file-pdf</v-icon
                       >
+                     <!--fas fa-file-word-->
                     </v-col>
                     <v-col
                       v-else-if="
@@ -245,7 +246,7 @@
                       @click="deleteFile(file)"
                     >
                       <v-icon color="#CD4846" size="20">
-                        fas fa-trash-alt</v-icon
+                        <!--fas fa-trash-alt-->far fa-trash-alt</v-icon
                       >
                     </v-col>
                   </div>

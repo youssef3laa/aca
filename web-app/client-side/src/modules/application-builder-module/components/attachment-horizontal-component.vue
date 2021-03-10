@@ -32,7 +32,7 @@
                 </v-col>
                 <v-col
                   :cols="6"
-                  class="card-name"
+                  class="card-name  cutting-text"
                   style="cursor: pointer"
                   @click="openHorizontalFile( {fileId: file.properties.id })"
                 >
@@ -210,4 +210,16 @@ $font-12: 12px;
   margin-right: auto;
   text-align: center;
 }
+.card.col-6.pa-0{
+  height: 65px;
+}
+.card.col-6.pa-0 .row{
+  justify-content: center;
+}
+.cutting-text{
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 150px;
+  white-space: nowrap;
+}  
 </style>

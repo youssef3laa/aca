@@ -91,7 +91,7 @@ h1 {
   font-size: 26px;
 }
 .top-bar {
-  height: 80px;
+  height: 60px;
   background: white;
   border-radius: 10px;
 }
@@ -129,6 +129,10 @@ h1 {
 .theme--light.v-icon {
     color: rgb(213, 213, 213);
 }
+.col-*{
+  padding: 8px !important;
+}
+
 </style>
 <script>
 import TheNavbar from './modules/core-module/components/the-nav-bar'
