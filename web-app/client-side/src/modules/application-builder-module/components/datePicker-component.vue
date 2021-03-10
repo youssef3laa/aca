@@ -18,11 +18,12 @@
           :value="computedDateFormattedLuxonjs"
           clearable
           color="outline"
+          :disabled="readonly"
           outlined
           readonly
           @click:clear="
-            date = null;
-            datePickerChanged();
+            date = null
+            datePickerChanged()
           "
         >
           <template #label>
@@ -35,8 +36,8 @@
     <v-date-picker
       v-model="date"
       @change="
-        datePickerChanged();
-        menu = false;
+        datePickerChanged()
+        menu = false
       "
       reactive
       :no-title="field.format == 'year'"
@@ -48,94 +49,119 @@
   </v-menu>
 </template>
 <script>
-import { DateTime } from "luxon";
+import { DateTime } from 'luxon'
 
 export default {
   data() {
     return {
-      date: new Date().toISOString().split("T")[0],
+      date: new Date().toISOString().split('T')[0],
       menu: false,
       max: null,
       min: null,
-    };
+      readonly: null,
+    }
   },
 
-  props: ["val", "field", "model"],
+  props: ['val', 'field', 'model'],
   methods: {
     saveYear: function(date) {
-      if (this.field.format != "year") return;
+      if (this.field.format != 'year') return
 
-      this.date = date.toString();
-      this.$refs.menu.save(date);
-      this.$refs.picker.activePicker = "YEAR";
-      this.menu = false;
-      this.datePickerChanged();
+      this.date = date.toString()
+      this.$refs.menu.save(date)
+      this.$refs.picker.activePicker = 'YEAR'
+      this.menu = false
+      this.datePickerChanged()
     },
     datePickerChanged: function() {
-      console.log("datePickerChanged");
-      if (this.field.format == "year")
-        this.date = DateTime.fromISO(this.date).toFormat("yyyy");
-      this.$emit("update", {
+      console.log('datePickerChanged')
+      if (this.field.format == 'year')
+        this.date = DateTime.fromISO(this.date).toFormat('yyyy')
+      this.$emit('update', {
         name: this.field.name,
         value: this.date,
-        type: "datePickerChange",
-      });
+        type: 'datePickerChange',
+      })
     },
   },
   mounted() {
-    this.datePickerChanged();
+    this.datePickerChanged()
   },
   computed: {
     computedDateFormattedLuxonjs() {
-      if (this.field.format == "year") {
-        return DateTime.fromISO(this.date).toFormat("yyyy");
+      if (this.field.format == 'year') {
+        return DateTime.fromISO(this.date).toFormat('yyyy')
       }
-      return DateTime.fromISO(this.date).toFormat("yyyy/MM/dd");
+      return DateTime.fromISO(this.date).toFormat('yyyy/MM/dd')
     },
-
   },
   watch: {
     menu: function(val) {
-      if (this.field.format == "year")
-        val && this.$nextTick(() => (this.$refs.picker.activePicker = "YEAR"));
+      if (this.field.format == 'year')
+        val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'))
     },
-    val: function(newVal) {
-      if (newVal == "" || newVal == undefined || newVal == null)
-        this.date = new Date().toISOString().split("T")[0];
-      else this.date = newVal;
-      if (this.field.max) {
-        this.max = this.model[this.field.max];
-        if (this.max < this.date) {
-          this.date = new Date(this.max).toISOString().split("T")[0];
+    val: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal == '' || newVal == undefined || newVal == null)
+          this.date = new Date().toISOString().split('T')[0]
+        else this.date = newVal
+        if (this.field.max) {
+          this.max = this.model[this.field.max]
+          if (this.max < this.date) {
+            this.date = new Date(this.max).toISOString().split('T')[0]
+          }
         }
-      }
-      if (this.field.min) {
-        this.min = this.model[this.field.min];
-        if (this.min > this.date) {
-          this.date = new Date(this.min).toISOString().split("T")[0];
+        if (this.field.min) {
+          this.min = this.model[this.field.min]
+          if (this.min > this.date) {
+            this.date = new Date(this.min).toISOString().split('T')[0]
+          }
         }
-      }
-      if (this.field.readonly) {
-        this.readonly = this.model[this.field.readonly];
-      }
+        if (this.field.readonly == true || this.field.readonly == false) {
+          this.readonly = this.field.readonly
+        } else if (typeof this.field.readonly == 'undefined') {
+          this.readonly = this.model[this.field.readonly]
+        }
+      },
     },
+    //  function(newVal) {
+    //   if (newVal == "" || newVal == undefined || newVal == null)
+    //     this.date = new Date().toISOString().split("T")[0];
+    //   else this.date = newVal;
+    //   if (this.field.max) {
+    //     this.max = this.model[this.field.max];
+    //     if (this.max < this.date) {
+    //       this.date = new Date(this.max).toISOString().split("T")[0];
+    //     }
+    //   }
+    //   if (this.field.min) {
+    //     this.min = this.model[this.field.min];
+    //     if (this.min > this.date) {
+    //       this.date = new Date(this.min).toISOString().split("T")[0];
+    //     }
+    //   }
+    //   if (this.field.readonly) {
+    //     this.readonly = this.model[this.field.readonly];
+    //   }
+    // },
   },
   created() {
     if (this.field.max) {
-      this.max = this.model[this.field.max];
+      this.max = this.model[this.field.max]
       if (this.max < this.date) {
-        this.date = new Date(this.max).toISOString().split("T")[0];
+        this.date = new Date(this.max).toISOString().split('T')[0]
       }
     }
     if (this.field.min) {
-      this.min = this.model[this.field.min];
+      this.min = this.model[this.field.min]
       if (this.min > this.date) {
-        this.date = new Date(this.min).toISOString().split("T")[0];
+        this.date = new Date(this.min).toISOString().split('T')[0]
       }
     }
     if (this.field.readonly) {
-      this.readonly = this.model[this.field.readonly];
+      this.readonly = this.model[this.field.readonly]
     }
   },
-};
+}
 </script>
