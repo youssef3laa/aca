@@ -10,51 +10,53 @@
         </ShowAttachmentComponent>
       </pane>
       <pane class="bg-white" dir="rtl">
-        <div class="right-pane-top-bar">
+        <div class="right-pane-top-bar" v-if="state == 2 || state == 3">
           <div class="name-number-wrapper">
-          <div class="versions-number">
-            <span style="color:#55c29b">7</span>
-          </div>
-          <div>
-            <span>{{ title }}</span>
-            <div>
-              {{ date }}
+            <div class="versions-number">
+              <span style="color:#55c29b">7</span>
+            </div>
+            <div class="title-date-wrapper">
+              <span>{{ title }}</span>
+              <div>
+                {{ date }}
+              </div>
             </div>
           </div>
-          </div>
-          <div v-if="!showRichText">
+          <div v-if="!showRichText && state == 2">
             <v-btn
+              text
               style="height: 100%; background: #f2f8fb; color: #247aab;float: left;"
-              v-on:click="showRichText = true"
+              v-on:click="loadLatestMemoRichtext"
             >
               <v-icon>mdi-plus</v-icon>
-              تعديل مذكرة العرض
+              {{ $t("editMemo") }}
             </v-btn>
           </div>
-          <div class="save-cancel-wrapper" v-if="showRichText">
+          <div class="save-cancel-wrapper" v-if="showRichText && state == 2">
             <v-btn text class="cancel-btn save-cancel-btn">
               <i class="far fa-times-circle"></i>
               <span>{{ $t("cancel") }}</span>
             </v-btn>
-            <v-btn
-              @click="showRichText = false"
-              text
-              class="save-btn save-cancel-btn"
-            >
+            <v-btn @click="triggerSubmit" text class="save-btn save-cancel-btn">
               <i class="far fa-save"></i>
               <span>{{ $t("save") }}</span>
             </v-btn>
           </div>
         </div>
-        <v-row>
-          <v-col :cols="12" v-if="showRichText">
+        <v-row style="height:700px">
+          <v-col
+            :cols="12"
+            style="padding-top:0px"
+            v-if="state != 3 && showRichText"
+          >
             <AutocompleteComponent
               :field="{ name: field.label }"
               :val="{ value: selected, list: [], url: url }"
+              v-if="state==1"
               @update="changeVal"
             >
             </AutocompleteComponent>
-            <InputComponent :field="inputComponentField" :val="heading">
+            <InputComponent  :field="inputComponentField" :val="heading">
             </InputComponent>
             <div style="max-height: 600px; overflow-y: auto">
               <AppBuilder
@@ -65,7 +67,7 @@
             </div>
           </v-col>
 
-          <v-col :cols="12" v-else>
+          <v-col :cols="12" v-else-if="state != 1" v-show="!showRichText">
             <IframeComponent :val="iframeOjbect" />
           </v-col>
         </v-row>
@@ -83,6 +85,7 @@ import IframeComponent from "../components/iframe-component";
 import { Pane, Splitpanes } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
 import InputComponent from "./input-component";
+import attachmentMixin from "../../../mixins/attachmentMixin";
 export default {
   components: {
     AppBuilder: () => import("../builders/app-builder"),
@@ -93,7 +96,7 @@ export default {
     IframeComponent,
     InputComponent,
   },
-  mixins: [memoComponentMixin, formPageMixin],
+  mixins: [memoComponentMixin, formPageMixin, attachmentMixin],
   async mounted() {
     this.$observable.subscribe("retrieveMemo", async (data) => {
       try {
@@ -118,6 +121,10 @@ export default {
     this.$observable.subscribe("memoCreate", async (callback) => {
       if (callback) callback(await this.triggerSubmit());
     });
+    if (this.state != 1) {
+      this.loadLatestMemoBrava();
+      this.showRichText = false;
+    }
   },
   data() {
     return {
@@ -130,6 +137,7 @@ export default {
         label: "heading",
         readonly: false,
       },
+      state: 2,
       heading: "",
       richText: {},
       memoData: [],
@@ -137,7 +145,7 @@ export default {
       app: {},
       title: "",
       date: "",
-      showRichText: false,
+      showRichText: true,
       placeHolder: true,
       loading: false,
     };
@@ -145,8 +153,21 @@ export default {
   props: ["val", "field"],
 
   methods: {
-    async loadBrava(obj) {
-      await this.openFileInBrava(obj.file, obj.contextObj);
+    async loadLatestMemoBrava() {
+      this.showRichText = false;
+      let data = await this.getLatestMemo(this.d.requestId);
+      this.title = data.jsonId;
+      this.nodeId = data.nodeId;
+      await this.openFileInBrave({ fileId: this.nodeId });
+    },
+
+    async loadLatestMemoRichtext() {
+      this.showRichText = true;
+      var memoType = await this.getMemoJsonId(this.nodeId);
+      let data = await this.getLatestMemo(this.d.requestId);
+      this.nodeId = data.nodeId;
+      this.loadForm(memoType);
+      await this.fillForm(this.nodeId);
     },
     changeVal(event) {
       this.nodeId = null;
@@ -204,6 +225,8 @@ export default {
 
       await this.setMemoData(data);
       this.$observable.fire("refreshHorizontalAttachmentFiles");
+      await this.loadLatestMemoBrava();
+      this.showRichText = false;
       return true;
     },
   },
@@ -256,8 +279,11 @@ export default {
   height: 100%;
   margin-left: 8px;
 }
-.name-number-wrapper{
+.name-number-wrapper {
   display: flex;
-
+}
+.title-date-wrapper{
+  display: flex;
+  align-items: center;
 }
 </style>

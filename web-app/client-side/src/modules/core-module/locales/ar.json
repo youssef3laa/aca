@@ -264,5 +264,6 @@
   "returnIssuedMemos":"إرجاع المذكرات الصادرة",
   "action":"النشاط",
   "responseCode":"رمز الاستجابة",
-  "heading":"العنوان"
+  "heading":"العنوان",
+  "editMemo":"تعديل مذكرة العرض"
 }

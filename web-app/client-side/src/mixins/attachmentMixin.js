@@ -19,7 +19,7 @@ export default {
 
         },
         openFileInBrave: async function ({fileId, verNum}, contextObj) {
-            this.toggleFileSelected(fileId, contextObj);
+            if(contextObj != undefined) this.toggleFileSelected(fileId, contextObj);
             let userToken;
             try {
                 userToken = await Http.post("http://45.240.63.94:8081/otdsws/rest/authentication/credentials", {

@@ -184,5 +184,27 @@ public class MemorandumController {
         return respBuilder.build().getResponseEntity();
     }
 
+    @GetMapping("/latest/{requestId}")
+    public ResponseEntity<AppResponse<Memorandum>> getLatestMemorandumByRequestId(@RequestHeader("X-Auth-Token") String token,
+                                                                 @PathVariable("requestId") String requestId) {
+        AppResponse.ResponseBuilder<Memorandum> respBuilder = AppResponse.builder();
+        try {
+            Account account = tokenService.get(token);
+            if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
 
+            Memorandum s = memosRepository.getTopByRequestIdOrderByIdDesc(requestId);
+            if (s == null) return respBuilder.status(ResponseCode.NO_CONTENT).build().getResponseEntity();
+            respBuilder.data(s);
+
+        } catch (AppworkException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.status(e.getCode());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            respBuilder.status(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
+        return respBuilder.build().getResponseEntity();
+    }
 }
