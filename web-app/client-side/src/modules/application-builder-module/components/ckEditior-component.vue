@@ -1,5 +1,6 @@
 <template>
   <div>
+    <ckeditor style="max-height: 400px !important;" :editor="editor" @input="updateValue" @ready="onReady" v-model="editorData"></ckeditor>
     <ckeditor
       :editor="editor"
       @ready="onReady"
@@ -23,6 +24,14 @@ export default {
     }
   },
   methods: {
+    updateValue(content){
+      this.editorData = content;
+      this.$emit('update', {
+        name: this.field.name,
+        value: this.editorData,
+        type: 'inputChange',
+      })
+    },
     uploader(editor) {
       editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
         return new UploadAdapter(loader)

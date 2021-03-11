@@ -216,4 +216,7 @@ export default {
 .v-select__slot {
   padding: 7px 12px;
 }
+.v-input__control .mdi-close-circle::before{
+  color:#71717d !important;
+}
 </style>

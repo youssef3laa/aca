@@ -263,5 +263,6 @@
   "subjectSource":"مصدر الموضوع",
   "returnIssuedMemos":"إرجاع المذكرات الصادرة",
   "action":"النشاط",
-  "responseCode":"رمز الاستجابة"
+  "responseCode":"رمز الاستجابة",
+  "heading":"العنوان"
 }
