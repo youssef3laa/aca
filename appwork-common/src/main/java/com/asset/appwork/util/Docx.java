@@ -4,29 +4,22 @@ import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
 import com.asset.appwork.model.Group;
-import com.asset.appwork.model.RequestEntity;
+import com.asset.appwork.model.IncomingCase;
+import com.asset.appwork.model.IncomingRegistration;
 import com.asset.appwork.model.User;
 import com.asset.appwork.repository.MemoValuesRepository;
 import com.asset.appwork.repository.MemosRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
-import org.docx4j.convert.in.xhtml.XHTMLImporterImpl;
-import org.docx4j.openpackaging.exceptions.Docx4JException;
-import org.docx4j.openpackaging.exceptions.InvalidFormatException;
-import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
-import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
-import org.docx4j.openpackaging.parts.WordprocessingML.NumberingDefinitionsPart;
-import org.docx4j.wml.Text;
+import org.apache.poi.poifs.filesystem.DirectoryEntry;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -45,165 +38,112 @@ public class Docx {
     @Autowired
     Environment env;
 
-    public File exportJsonToDocx(Memos memo, User user, RequestEntity requestEntity) throws AppworkException {
+    public File memoToDocx(Memos memo, User user, IncomingRegistration incomingRegistration, IncomingCase incomingCase) throws AppworkException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yy HH-mm-ss");
+        Date date = new Date();
+
+        JsonNode jsonNode;
         try {
-            WordprocessingMLPackage wordPackage = WordprocessingMLPackage.createPackage();
-            NumberingDefinitionsPart ndp = new NumberingDefinitionsPart();
-            wordPackage.getMainDocumentPart().addTargetPart(ndp);
-            ndp.unmarshalDefaultNumbering();
-            XHTMLImporterImpl XHTMLImporter = new XHTMLImporterImpl(wordPackage);
-            XHTMLImporter.setHyperlinkStyle("Hyperlink");
-
-            JsonNode jsonNode = null;
-            try {//<iframe src="http://45.240.63.94/otcs/cs.exe?func=brava.bravaviewer&amp;nodeid=730301&amp;viewType=1&amp;OTDSTicket=*OTDSSSO*AXhBQlRqZjBLaThfcEtXdVVqLUo0dmdnQV81UTdFZ3dBUVRxbWRQNF9ZMGZKWXpSdjVLUUg5SGdEdzlDU2lYbUhjem9MS08yQTUxOGx1SkJfbUlEemMzbHhVNHpMcTZpUmFieklLY3JlMWlKdTRxZi1rSm9ZcHJNUWpsYXNQUkdrQjZOcEZXdUJBU0owbkl1YkhUa2JsSHVCbmFiSDMxQWtMbHBRdUtGRFB1ZFlzeWx2eEFGWXVhOHAxZ2k5a2NmT3RjMGNSNTdpTGpEclRDb1p3RXpuZUhtem5ScU9rZ3Q2RHJqbXdIRXZybFpYWkJ6c09BR295VVBieTJpVndfa2VUYVdxUFMxX1N1Ql83NUhwcnNrb3psLUVISC1PbVRPRmVHandBZ2dkczAzelNremdpNHdfZW5VZXZ4aDhiNTV2Z0o4RExVbjVhblQzdm9OeEQ0RmVVOHo0YmNlYTV4MzBWbHFSaXE4bTR4dG5odXR2RnpvcnByM1pKAE4ASgAU6Kg-_nQYvkr-yBVhvvHDzVKVes4AEFqGcE-28Fv5ID3bwyUXiKUAIPtbzpFAz0_64zbZ6K1oisKPpcxifBLPLpD1l5ZAVgxhAAA*" style="border-width: 0px;padding: 0px;margin: 0px;overflow: hidden;width: 100%;height: 1000px;"></iframe>
-                jsonNode = SystemUtil.convertStringToJsonNode(SystemUtil.readFile(System.getProperty("user.dir") + env.getProperty("memosPath") + memo.getJsonId() + ".json"));
-                jsonNode = jsonNode.get("app").get("pages").get("page").get(0).get("sections").get("sec").get(0).get("forms");
-                List<String> sections = new ArrayList<>();
-                for(int i = 0; i < jsonNode.size(); i++){
-                    sections.add(jsonNode.get(i).get("name").asText());
-                }
-
-                HashMap<String, String> memoValues = memo.getValues();
-                Object[] memoValuesObjectArray = memoValues.values().toArray();
-                String[] memoValuesStringArray = Arrays.copyOf(memoValuesObjectArray, memoValuesObjectArray.length, String[].class);
-                String value = "";
-                for(int i = 0; i < memoValuesStringArray.length; i++)
-                {
-                    if(sections.get(i).equals("Header"))
-                    {
-                        value += memoValuesStringArray[i];
-                    }
-                    else
-                    {
-                        value += "<p style = 'font-size: 27px; font-weight: bold; text-align:right;'><u>" + sections.get(i) + "</u></p>";
-                        value += memoValuesStringArray[i];
-                    }
-                }
-
-                Document doc = Jsoup.parse(value);
-
-                Optional<Group> group = user.getGroup().stream().findFirst();
-                String groupCode = "";
-                if(group.isPresent())
-                {
-                    groupCode = group.get().getGroupCode();
-                }
-
-                String signature = "https://i.ibb.co/h94n9bR/signature.png";
-                String name = user.getPerson().getTitle() + "/" + user.getDisplayName();
-                try
-                {
-                    if(!doc.select("#" + groupCode + "signatureParagraph").isEmpty())
-                    {
-                        doc.select("#" + groupCode + "signatureParagraph").first().removeAttr("hidden");
-                        doc.select("#" + groupCode + "signatureImage").first().removeAttr("hidden").attr("src", signature);
-                        doc.select("#" + groupCode + "nameParagraph").first().removeAttr("hidden").text(name);
-                    }
-                }
-                catch (NullPointerException e)
-                {
-                    e.printStackTrace();
-                    log.error("Docx: " + e.getMessage());
-                    throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
-                }
-
-                try
-                {
-                    if(!doc.select("#Agency").isEmpty())
-                    {
-                        doc.select("#Agency").first().text("جــــهاز" + " " + user.getPerson().getTitle());
-                        doc.select("#Sector").first().text("قطـــــــــــاع" + " " + user.getPerson().getTitle());
-                        doc.select("#Office").first().text("الإدارة / مكتب" + " " + user.getPerson().getTitle());
-                        doc.select("#Constraint").first().text("القيـــــــد" + ":" + user.getPerson().getTitle() + "/2021");
-                        doc.select("#caseNumber").first().text("من القضية رقم" + " " + user.getPerson().getTitle());
-                    }
-                }
-                catch (NullPointerException e)
-                {
-                    e.printStackTrace();
-                    log.error("Docx: " + e.getMessage());
-                    throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
-                }
-                value = doc.toString();
-
-                if (value.contains("<img"))
-                {
-                    int imageIndex = value.indexOf("<img");
-                    int imageEndIndex = value.indexOf(">", imageIndex) + 1;
-                    StringBuilder stringBuilder = new StringBuilder(value);
-                    stringBuilder.insert(imageEndIndex, "</img>");
-                    value = stringBuilder.toString();
-                }
-                value = value.replaceAll("<br>", "<br></br>");
-                value = value.replaceAll("<p> </p>", "");
-                value = value.replaceAll("(?m)^[ \t]*\r?\n", "");
-                wordPackage.getMainDocumentPart().getContent().addAll(XHTMLImporter.convert(value, null));
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                log.error("Docx: " + e.getMessage());
+            jsonNode = SystemUtil.convertStringToJsonNode(SystemUtil.readFile(System.getProperty("user.dir") + env.getProperty("memosPath") + memo.getJsonId() + ".json"));
+            jsonNode = jsonNode.get("app").get("pages").get("page").get(0).get("sections").get("sec").get(0).get("forms");
+            List<String> sections = new ArrayList<>();
+            for (int i = 0; i < jsonNode.size(); i++) {
+                sections.add(jsonNode.get(i).get("name").asText());
             }
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy HH-mm-ss");
-            Date date = new Date();
+            HashMap<String, String> memoValues = memo.getValues();
+            Object[] memoValuesObjectArray = memoValues.values().toArray();
+            String[] memoValuesStringArray = Arrays.copyOf(memoValuesObjectArray, memoValuesObjectArray.length, String[].class);
+            StringBuilder value = new StringBuilder();
+            for (int i = 0; i < memoValuesStringArray.length; i++) {
+                if (!sections.get(i).equals("Header")) {
+                    value.append("<p style = 'font-size: 27px; font-weight: bold; text-align:right;'><u>").append(sections.get(i)).append("</u></p>");
+                }
+                value.append(memoValuesStringArray[i]);
+            }
+
+            Document doc = Jsoup.parse(value.toString());
+
+            Optional<Group> group = user.getGroup().stream().findFirst();
+            String groupCode = "";
+            if (group.isPresent()) {
+                groupCode = group.get().getGroupCode();
+            }
+
+            String signature = "https://i.ibb.co/jTMsXYg/signature.png";
+            String name = user.getPerson().getTitle() + "/" + user.getDisplayName();
+            try {
+                if (!doc.select("#" + groupCode + "signatureParagraph").isEmpty()) {
+                    doc.select("#" + groupCode + "signatureParagraph").first();
+                    doc.select("#" + groupCode + "signatureImage").first().attr("src", signature);
+                    doc.select("#" + groupCode + "nameParagraph").first().text(name);
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                log.error("Docx: " + e.getMessage());
+                throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+
+            try {
+                if (!doc.select("#Agency").isEmpty()) {
+                    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Egypt/Cairo"));
+                    calendar.setTime(incomingRegistration.getIncomingDate());
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    int month = calendar.get(Calendar.MONTH);
+                    int year = calendar.get(Calendar.YEAR);
+                    String dateFormat = day + "/" + month + "/" + year;
+                    doc.select("#Agency").first().text(incomingRegistration.getResponsibleEntityGehazTxt());
+                    doc.select("#Sector").first().text(incomingRegistration.getResponsibleEntityKeta3Txt());
+                    doc.select("#Office").first().text(incomingRegistration.getResponsibleEntityEdaraTxt());
+                    doc.select("#Constraint").first().text("القيـــــــد" + ":" + incomingRegistration.getIncomingNumber());
+                    doc.select("#Date").first().text(" " + dateFormat);
+                    doc.select("#caseNumber").first().text("من القضية رقم" + " " + incomingCase.getCaseNumber());
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                log.error("Docx: " + e.getMessage());
+                throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
+            }
+            value = new StringBuilder(doc.toString());
+
+            if (value.toString().contains("<img")) {
+                int imageIndex = value.indexOf("<img");
+                int imageEndIndex = value.indexOf(">", imageIndex) + 1;
+                value.insert(imageEndIndex, "</img>");
+            }
+            if (value.toString().contains("<link")) {
+                int linkIndex = value.indexOf("<link");
+                int linkEndIndex = value.indexOf(">", linkIndex) + 1;
+                value.insert(linkEndIndex, "</link>");
+            }
+
+            String stringValue = value.toString();
+            stringValue = stringValue.replaceAll("<br>", "<br></br>");
+            stringValue = stringValue.replaceAll("<p> </p>", "");
+            stringValue = stringValue.replaceAll("(?m)^[ \t]*\r?\n", "");
+            System.out.println(stringValue);
+
+            POIFSFileSystem poifsFileSystem = new POIFSFileSystem();
+            DirectoryEntry directoryEntry = poifsFileSystem.getRoot();
 
             if (!Files.isDirectory(Paths.get("Temp"))) {
                 File theDir = new File("Temp");
                 theDir.mkdirs();
             }
-            File file = new File("Temp" + File.separator + "Memo" + memo.getRequestId() + " " + dateFormat.format(date) + ".docx");
-            wordPackage.save(file);
-            return file;
 
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
-            log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (Docx4JException e) {
-            e.printStackTrace();
-            log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (JAXBException e) {
-            e.printStackTrace();
-            log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public String reverseString(String str)
-    {
-        String[] words = str.split(" ");
-        String reversedString = "";
-        for (int i = words.length - 1; i >= 0; i--)
-        {
-            reversedString += words[i] + " ";
-        }
-        return reversedString;
-    }
-
-    public String importDocxToJson(String fileName) throws AppworkException {
-        String text = "";
-        try {
-            File file = new File(fileName + ".docx");
-            WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(file);
-            MainDocumentPart mainDocumentPart = wordMLPackage.getMainDocumentPart();
-            String textNodesXPath = "//w:t";
-            List<Object> textNodes = mainDocumentPart.getJAXBNodesViaXPath(textNodesXPath, true);
-            for (Object obj : textNodes) {
-                Text tempText = (Text) ((JAXBElement) obj).getValue();
-                String textValue = tempText.getValue();
-                text.concat(textValue + "/n");
+            OutputStream outputStream = new FileOutputStream("Temp" + File.separator + "Memo" + memo.getRequestId() + " " + simpleDateFormat.format(date) + ".doc");
+            try {
+                InputStream inputStream = new ByteArrayInputStream(stringValue.getBytes());
+                directoryEntry.createDocument("WordDocument", inputStream);
+                poifsFileSystem.writeFilesystem(outputStream);
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            System.out.println(text);
-        } catch (Docx4JException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
-        } catch (JAXBException e) {
-            e.printStackTrace();
-            log.error("Docx: " + e.getMessage());
-            throw new AppworkException(ResponseCode.INTERNAL_SERVER_ERROR);
         }
-        return text;
+        return new File(System.getProperty("user.dir") + File.separator + "Temp" + File.separator + "Memo" + memo.getRequestId() + " " + simpleDateFormat.format(date) + ".doc");
     }
 }
