@@ -48,5 +48,11 @@ border: 1px solid #E0E0E0;
 .v-application .elevation-1 {
     box-shadow: none !important;
 }
+tr.v-data-table__selected td.text-start:first-child{
+    border-right: 5px solid #f5f5f5
+}
+th.text-start:first-child{
+    padding-right: 11px !important;
+}
 
 /*End-Table*/

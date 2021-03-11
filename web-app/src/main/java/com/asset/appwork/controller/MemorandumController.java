@@ -8,18 +8,12 @@ import com.asset.appwork.dto.Document;
 import com.asset.appwork.dto.Memos;
 import com.asset.appwork.enums.ResponseCode;
 import com.asset.appwork.exception.AppworkException;
-import com.asset.appwork.model.Memorandum;
-import com.asset.appwork.model.RequestEntity;
-import com.asset.appwork.model.User;
-import com.asset.appwork.model.memoValues;
+import com.asset.appwork.model.*;
 import com.asset.appwork.platform.soap.memorandumSOAP;
 import com.asset.appwork.repository.MemoValuesRepository;
 import com.asset.appwork.repository.MemosRepository;
-import com.asset.appwork.repository.RequestRepository;
 import com.asset.appwork.response.AppResponse;
-import com.asset.appwork.service.CordysService;
-import com.asset.appwork.service.OrgChartService;
-import com.asset.appwork.service.UserService;
+import com.asset.appwork.service.*;
 import com.asset.appwork.util.Docx;
 import com.asset.appwork.util.SystemUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -57,7 +51,11 @@ public class MemorandumController {
     @Autowired
     OrgChartService orgChartService;
     @Autowired
-    RequestRepository requestRepository;
+    RequestEntityService requestEntityService;
+    @Autowired
+    IncomingRegistrationService incomingRegistrationService;
+    @Autowired
+    IncomingCaseService incomingCaseService;
 
     @Transactional
     @PostMapping("/create")
@@ -68,12 +66,13 @@ public class MemorandumController {
             if (account == null) return respBuilder.status(ResponseCode.UNAUTHORIZED).build().getResponseEntity();
             User user = orgChartService.getLoggedInUser(account);
 
-            Optional<RequestEntity> requestEntity = requestRepository.findById(Long.parseLong(memo.getRequestId()));
+            RequestEntity requestEntity = requestEntityService.getRequestEntityById(Long.valueOf(memo.getRequestId()));
 
-            if(requestEntity.isPresent()){
+            if(requestEntity != null){
+                IncomingRegistration incomingRegistration = incomingRegistrationService.findById(Long.valueOf(requestEntity.getEntityId()));
+                IncomingCase incomingCase = incomingCaseService.findById(Long.valueOf(incomingRegistration.getJobEntityId()));
 
-
-            File file = docx.exportJsonToDocx(memo, user, requestEntity.get());
+            File file = docx.memoToDocx(memo, user, incomingRegistration, incomingCase);
 
             AppworkCSOperations appworkCSOperations = new AppworkCSOperations(account.getUsername(), account.getPassword());
 

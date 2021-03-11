@@ -1,21 +1,42 @@
 <template>
   <div>
-    <ckeditor :editor="editor" @ready="onReady" v-model="editorData"></ckeditor>
+    <ckeditor style="max-height: 400px !important;" :editor="editor" @input="updateValue" @ready="onReady" v-model="editorData"></ckeditor>
+    <ckeditor
+      :editor="editor"
+      @ready="onReady"
+      v-model="editorData"
+      :config="editorConfig"
+    ></ckeditor>
   </div>
 </template>
 <script>
 import DecoupledEditor from '@ckeditor/ckeditor5-build-decoupled-document'
+import UploadAdapter from '../components/UploadAdapter'
 export default {
   data() {
     return {
       editor: DecoupledEditor,
       editorData: this.val,
       editorConfig: {
+        extraPlugins: [this.uploader],
         // The configuration of the editor.
       },
     }
   },
   methods: {
+    updateValue(content){
+      this.editorData = content;
+      this.$emit('update', {
+        name: this.field.name,
+        value: this.editorData,
+        type: 'inputChange',
+      })
+    },
+    uploader(editor) {
+      editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+        return new UploadAdapter(loader)
+      }
+    },
     onReady(editor) {
       // Insert the toolbar before the editable area.
       editor.ui
