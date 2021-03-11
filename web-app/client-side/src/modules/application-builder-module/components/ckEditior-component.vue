@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ckeditor :editor="editor" @ready="onReady" v-model="editorData"></ckeditor>
+    <ckeditor style="max-height: 400px !important;" :editor="editor" @input="updateValue" @ready="onReady" v-model="editorData"></ckeditor>
   </div>
 </template>
 <script>
@@ -16,6 +16,14 @@ export default {
     }
   },
   methods: {
+    updateValue(content){
+      this.editorData = content;
+      this.$emit('update', {
+        name: this.field.name,
+        value: this.editorData,
+        type: 'inputChange',
+      })
+    },
     onReady(editor) {
       // Insert the toolbar before the editable area.
       editor.ui

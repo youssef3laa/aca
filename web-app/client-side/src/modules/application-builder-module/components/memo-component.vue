@@ -258,6 +258,23 @@ export default {
 }
 .name-number-wrapper{
   display: flex;
+}
 
+h3 {
+  display: none !important;
+}
+p {
+  text-align: right !important;
+}
+ol {
+  direction: rtl !important;
+  text-align: left !important;
+}
+ol ol {
+  list-style-type: lower-alpha !important;
+  margin-right: 3em !important;
+}
+ol ol ol {
+  list-style-type: upper-roman !important;
 }
 </style>
